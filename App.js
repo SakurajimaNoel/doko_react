@@ -5,7 +5,6 @@
  * @format
  */
 
-
 /**
  * To Do:
   1. Create UI for sign in, sign up and set up the navigational flow.
@@ -33,117 +32,124 @@ import {
   Button,
 } from 'react-native';
 
-import { Auth, Hub } from 'aws-amplify';
+import {Auth, Hub} from 'aws-amplify';
 
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+
+// our navigation components
+import Home from './src/screens/Home';
+import Login from './src/screens/Login';
+import Signup from './src/screens/Signup';
+import Profile from './src/screens/Profile';
+
+const Stack = createNativeStackNavigator();
 
 function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   //temp vars for testing integration, replace with actual fields.
   var username = email;
-  var name = "testName";
-  var preferred_username = "testPrefUsername";
-  
-  
+  var name = 'testName';
+  var preferred_username = 'testPrefUsername';
+
   const handleLogin = () => {
     console.log(email);
     console.log(password);
   };
 
-  async function signUp()
-  {
-    try{
+  async function signUp() {
+    try {
       const {user} = await Auth.signUp({
         username,
         password,
-        attributes:{
+        attributes: {
           email,
           name,
-          preferred_username
+          preferred_username,
         },
-        autoSignIn:{
+        autoSignIn: {
           enabled: true,
-        }
+        },
       });
       console.log(user);
-    }
-    catch(error)
-    {
-      console.log("sign up error: ", error);
+    } catch (error) {
+      console.log('sign up error: ', error);
     }
   }
 
-  function listenToAutoSignInEvent()
-  {//called automatically if sign up successful to sign in the user.
-    Hub.listen('auth',({payload})=>{
+  function listenToAutoSignInEvent() {
+    //called automatically if sign up successful to sign in the user.
+    Hub.listen('auth', ({payload}) => {
       const {event} = payload;
-      if(event === 'autoSignIn')
-      {
+      if (event === 'autoSignIn') {
         const user = payload.data;
-      }
-      else if(event === 'autoSignIn_failure')
-      {
+      } else if (event === 'autoSignIn_failure') {
         //sign in page open crow.
       }
-    })
+    });
   }
 
-  async function signIn()
-  {
-    try
-    {
+  async function signIn() {
+    try {
       const user = await Auth.signIn(email, password);
-    } 
-    catch (error)
-    {
-      console.log('error signing in: ', error)
+    } catch (error) {
+      console.log('error signing in: ', error);
     }
   }
 
-  async function signOut()
-  {
-    try
-    {
+  async function signOut() {
+    try {
       await Auth.signOut();
-    } 
-    catch (error)
-    {
+    } catch (error) {
       console.log('error signing out: ', error);
     }
   }
 
-  async function globalSignOut()
-  {
+  async function globalSignOut() {
     // sign out from all devices
-    try{
+    try {
       await Auth.signOut({global: true});
-    } catch (error){
+    } catch (error) {
       console.log('error signing out: ', error);
     }
   }
 
   return (
-    <SafeAreaView>
-      <View style={styles.container}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          onChangeText={email => setEmail(email)}
-          value={email}
-        />
+    <NavigationContainer>
+      {/* will shift this code elsewhere only navigation related code should be herer */}
+      {/* <SafeAreaView>
+        <View style={styles.container}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            onChangeText={email => setEmail(email)}
+            value={email}
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="password"
-          onChangeText={password => setPassword(password)}
-          value={password}
-          secureTextEntry={true}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="password"
+            onChangeText={password => setPassword(password)}
+            value={password}
+            secureTextEntry={true}
+          />
 
-        <Button style={styles.button} title={'login'} onPress={signUp} />
-      </View>
-    </SafeAreaView>
+          <Button style={styles.button} title={'login'} onPress={signUp} />
+        </View>
+      </SafeAreaView> */}
+
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={Home} />
+
+        <Stack.Screen name="Login" component={Login} />
+
+        <Stack.Screen name="Profile" component={Profile} />
+
+        <Stack.Screen name="Signup" component={Signup} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
