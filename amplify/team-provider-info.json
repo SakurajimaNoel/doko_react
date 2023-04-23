@@ -16,6 +16,7 @@
         "dokoreact": {}
       },
       "function": {
+
         "userCreateProfile": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
           "s3Key": "amplify-builds/userCreateProfile-55767678587156726958-build.zip"
@@ -35,6 +36,7 @@
         "trialFunction": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
           "s3Key": "amplify-builds/trialFunction-3079715374625364544f-build.zip"
+
         }
       }
     }
