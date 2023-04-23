@@ -1,4 +1,5 @@
 {
+  "api": {},
   "auth": {
     "dokoreact": {
       "customAuth": false,
@@ -32,6 +33,151 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
+    }
+  },
+  "function": {
+    "dokoreactneo4jdriver": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer"
+    },
+    "trialFunction": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "dokoreactneo4jdriver"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "userCreateFriendship": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "dokoreactneo4jdriver"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "userCreateProfile": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "dokoreactneo4jdriver"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "userGetProfile": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "dokoreactneo4jdriver"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_dokoreactneo4jdriver_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "dokoreactneo4jdriver"
+        }
+      ]
+    },
+    "AMPLIFY_function_dokoreactneo4jdriver_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "dokoreactneo4jdriver"
+        }
+      ]
+    },
+    "AMPLIFY_function_trialFunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "trialFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_trialFunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "trialFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_userCreateFriendship_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "userCreateFriendship"
+        }
+      ]
+    },
+    "AMPLIFY_function_userCreateFriendship_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "userCreateFriendship"
+        }
+      ]
+    },
+    "AMPLIFY_function_userCreateProfile_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "userCreateProfile"
+        }
+      ]
+    },
+    "AMPLIFY_function_userCreateProfile_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "userCreateProfile"
+        }
+      ]
+    },
+    "AMPLIFY_function_userGetProfile_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "userGetProfile"
+        }
+      ]
+    },
+    "AMPLIFY_function_userGetProfile_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "userGetProfile"
+        }
+      ]
     }
   }
 }
