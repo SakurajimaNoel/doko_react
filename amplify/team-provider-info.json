@@ -16,14 +16,7 @@
         "dokoreact": {}
       },
       "function": {
-        "trialFunction": {
-          "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/trialFunction-3079715374625364544f-build.zip"
-        },
-        "dokoreactneo4jdriver": {
-          "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/dokoreactneo4jdriver-LambdaLayerVersion60c60862-build.zip"
-        },
+
         "userCreateProfile": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
           "s3Key": "amplify-builds/userCreateProfile-55767678587156726958-build.zip"
@@ -35,6 +28,15 @@
         "userGetProfile": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
           "s3Key": "amplify-builds/userGetProfile-65646d7a434f646d2b66-build.zip"
+        },
+        "dokoreactneo4jdriver": {
+          "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
+          "s3Key": "amplify-builds/dokoreactneo4jdriver-LambdaLayerVersion60c60862-build.zip"
+        },
+        "trialFunction": {
+          "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
+          "s3Key": "amplify-builds/trialFunction-3079715374625364544f-build.zip"
+
         }
       }
     }
