@@ -21,6 +21,13 @@ export type AmplifyDependentResourcesAttributes = {
       "Name": "string",
       "Region": "string"
     },
+    "userCreateFriendRequest": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
     "userCreateFriendship": {
       "Arn": "string",
       "LambdaExecutionRole": "string",

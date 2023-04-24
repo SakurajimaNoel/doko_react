@@ -13,7 +13,8 @@ const createUserFriendship = async (driver, friendshipDetails) => {
 
   try {
     const writeQuery = `MATCH
-        (user:Person {id: "${friendshipDetails?.userId}"}),
+        (user:Person {id: "${friendshipDetails?.userId}"}) WITH user
+        MATCH
         (friend:Person {id: "${friendshipDetails?.friendId}"})
         MERGE (user)-[r:isFriend]-(friend)
         RETURN user.friends

@@ -32,3 +32,8 @@ export const createFriendship = /* GraphQL */ `
     createFriendship(userId: $userId, friendId: $friendId)
   }
 `;
+export const createFriendRequest = /* GraphQL */ `
+  mutation CreateFriendRequest($senderId: ID!, $receiverId: ID!) {
+    createFriendRequest(senderId: $senderId, receiverId: $receiverId)
+  }
+`;
