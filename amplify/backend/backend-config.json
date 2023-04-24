@@ -41,20 +41,6 @@
       "providerPlugin": "awscloudformation",
       "service": "LambdaLayer"
     },
-    "trialFunction": {
-      "build": true,
-      "dependsOn": [
-        {
-          "attributes": [
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "dokoreactneo4jdriver"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
     "userCreateFriendRequest": {
       "build": true,
       "dependsOn": [
