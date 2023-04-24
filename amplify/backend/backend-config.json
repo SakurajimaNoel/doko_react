@@ -115,22 +115,6 @@
         }
       ]
     },
-    "AMPLIFY_function_trialFunction_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "trialFunction"
-        }
-      ]
-    },
-    "AMPLIFY_function_trialFunction_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "trialFunction"
-        }
-      ]
-    },
     "AMPLIFY_function_userCreateFriendRequest_deploymentBucketName": {
       "usedBy": [
         {

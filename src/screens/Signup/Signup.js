@@ -10,6 +10,20 @@ import {
 import {Auth, Hub} from 'aws-amplify';
 import {useState} from 'react';
 
+// aws
+import {API} from 'aws-amplify';
+import * as mutations from '../../graphql/mutations';
+import * as queries from '../../graphql/queries';
+//
+
+const userDetails = {
+  id: '1212',
+  name: 'Abc',
+  username: 'abc',
+  email: 'abc@gmail.com',
+  dob: '2001-05-23',
+};
+
 function Signup({navigation}) {
   const [userInfo, setUserInfo] = useState({
     name: 'rohan',
@@ -23,6 +37,35 @@ function Signup({navigation}) {
       return {...prev, [type]: value};
     });
   };
+
+  // create profile
+  async function createProfile() {
+    try {
+      await API.graphql({
+        query: mutations.createProfile,
+        variables: {
+          input: userDetails,
+        },
+      });
+    } catch (error) {
+      console.log('appsync error: failed to create user profile');
+      console.log(error);
+    }
+  }
+
+  async function getProfile() {
+    try {
+      const fetchedProfile = await API.graphql({
+        query: queries.getProfile,
+        variables: {id: '122'},
+      });
+
+      console.log(fetchedProfile.data.getProfile);
+    } catch (error) {
+      console.log('appsync error: failed to fetch profile');
+      console.log(error);
+    }
+  }
 
   // handle sign up aws
   const handleSignup = async () => {
@@ -118,7 +161,8 @@ function Signup({navigation}) {
       <Button
         style={{borderRadius: 1}}
         title="Sign Up"
-        onPress={handleSignup}
+        // onPress={handleSignup}
+        onPress={getProfile}
       />
 
       <Pressable onPress={goToLogin}>
