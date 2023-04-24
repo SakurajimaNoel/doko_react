@@ -41,20 +41,6 @@
       "providerPlugin": "awscloudformation",
       "service": "LambdaLayer"
     },
-    "trialFunction": {
-      "build": true,
-      "dependsOn": [
-        {
-          "attributes": [
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "dokoreactneo4jdriver"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
     "userCreateFriendRequest": {
       "build": true,
       "dependsOn": [
@@ -126,22 +112,6 @@
         {
           "category": "function",
           "resourceName": "dokoreactneo4jdriver"
-        }
-      ]
-    },
-    "AMPLIFY_function_trialFunction_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "trialFunction"
-        }
-      ]
-    },
-    "AMPLIFY_function_trialFunction_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "trialFunction"
         }
       ]
     },

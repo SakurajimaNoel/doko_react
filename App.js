@@ -35,11 +35,10 @@ import {
 import {Auth, AWSCloudWatchProvider, Hub} from 'aws-amplify';
 
 //*************************appsync library************************************//
-import { API } from 'aws-amplify'; 
-import * as mutations  from './src/graphql/mutations' 
-import * as queries from './src/graphql/queries'
+import {API} from 'aws-amplify';
+import * as mutations from './src/graphql/mutations';
+import * as queries from './src/graphql/queries';
 //***************************************************************************//
-
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -123,52 +122,36 @@ function App() {
     }
   }
 
-
-
-  const profileDetails = 
-  {
-    id: $id,
-    name: $name,
-    username: $username,
-    email: $email,
-    dob: $dob
-  }
-  async function createProfile()
-  {
-    try{
+  async function createProfile() {
+    try {
       await API.graphql({
         query: mutations.createProfile,
-        variables: {input: profileDetails}
+        variables: {input: profileDetails},
       });
-    }
-    catch(error){
+    } catch (error) {
       console.log('appsync error: failed to create user profile');
     }
   }
 
-  async function createFriendship()
-  {
-    try{
+  async function createFriendship() {
+    try {
       await API.graphql({
         query: mutations.createFriendship,
-        variables: {input: friendshipDetails}
+        variables: {input: friendshipDetails},
       });
-    }
-    catch(error){
-      console.log('appsync error: failed to create friendship')
+    } catch (error) {
+      console.log('appsync error: failed to create friendship');
     }
   }
 
-  async function getProfile()
-  {
-    try{
+  async function getProfile() {
+    try {
       const fetchedProfile = await API.graphql({
         query: queries.getProfile,
-        variables: {id: "user_Id_jo_hoga"}
+        variables: {id: 'user_Id_jo_hoga'},
       });
-    }
-    catch(error){
-      console.log('appsync error: failed to fetch profile')
+    } catch (error) {
+      console.log('appsync error: failed to fetch profile');
     }
   }
 

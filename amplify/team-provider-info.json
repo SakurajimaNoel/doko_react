@@ -32,10 +32,6 @@
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
           "s3Key": "amplify-builds/dokoreactneo4jdriver-LambdaLayerVersion60c60862-build.zip"
         },
-        "trialFunction": {
-          "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/trialFunction-3079715374625364544f-build.zip"
-        },
         "userCreateFriendRequest": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
           "s3Key": "amplify-builds/userCreateFriendRequest-317062674f6249626a31-build.zip"

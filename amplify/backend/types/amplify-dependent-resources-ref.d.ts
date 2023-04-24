@@ -14,13 +14,6 @@ export type AmplifyDependentResourcesAttributes = {
     "dokoreactneo4jdriver": {
       "Arn": "string"
     },
-    "trialFunction": {
-      "Arn": "string",
-      "LambdaExecutionRole": "string",
-      "LambdaExecutionRoleArn": "string",
-      "Name": "string",
-      "Region": "string"
-    },
     "userCreateFriendRequest": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
