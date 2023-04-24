@@ -55,6 +55,20 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "userCreateFriendRequest": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "dokoreactneo4jdriver"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "userCreateFriendship": {
       "build": true,
       "dependsOn": [
@@ -128,6 +142,22 @@
         {
           "category": "function",
           "resourceName": "trialFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_userCreateFriendRequest_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "userCreateFriendRequest"
+        }
+      ]
+    },
+    "AMPLIFY_function_userCreateFriendRequest_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "userCreateFriendRequest"
         }
       ]
     },
