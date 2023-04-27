@@ -84,7 +84,7 @@ function Signup({navigation}) {
           enabled: true,
         },
       });
-      console.log(user);
+      console.log(user.pool.clientId);
     } catch (error) {
       console.log('sign up error: ', error);
     }
@@ -162,7 +162,7 @@ function Signup({navigation}) {
         style={{borderRadius: 1}}
         title="Sign Up"
         // onPress={handleSignup}
-        onPress={getProfile}
+        onPress={handleSignup}
       />
 
       <Pressable onPress={goToLogin}>
