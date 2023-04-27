@@ -36,6 +36,9 @@
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
           "s3Key": "amplify-builds/userCreateFriendRequest-317062674f6249626a31-build.zip"
         }
+      },
+      "api": {
+        "dokoreact": {}
       }
     }
   }

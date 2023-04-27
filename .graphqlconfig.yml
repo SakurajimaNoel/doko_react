@@ -1,5 +1,5 @@
 projects:
-  Doko API:
+  dokoreact:
     schemaPath: src/graphql/schema.json
     includes:
       - src/graphql/**/*.js
@@ -10,9 +10,6 @@ projects:
         codeGenTarget: javascript
         generatedFileName: ''
         docsFilePath: src/graphql
-        region: ap-south-1
-        apiId: k3dohaxwnbdfjiwtslwli7mdse
-        maxDepth: 2
 extensions:
   amplify:
     version: 3

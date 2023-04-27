@@ -3,11 +3,11 @@
 
 export const createProfile = /* GraphQL */ `
   mutation CreateProfile(
-    $id: ID!,
-    $name: String!,
-    $username: String!,
-    $email: AWSEmail!,
-    $dob: AWSDate!,
+    $id: ID!
+    $name: String!
+    $username: String!
+    $email: AWSEmail!
+    $dob: AWSDate!
   ) {
     createProfile(
       id: $id
