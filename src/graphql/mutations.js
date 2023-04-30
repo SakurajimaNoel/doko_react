@@ -8,6 +8,7 @@ export const createProfile = /* GraphQL */ `
     $username: String!
     $email: AWSEmail!
     $dob: AWSDate!
+    $bio: String
   ) {
     createProfile(
       id: $id
@@ -15,6 +16,7 @@ export const createProfile = /* GraphQL */ `
       username: $username
       email: $email
       dob: $dob
+      bio: $bio
     ) {
       id
       name

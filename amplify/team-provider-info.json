@@ -18,7 +18,7 @@
       "function": {
         "userCreateProfile": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/userCreateProfile-55767678587156726958-build.zip"
+          "s3Key": "amplify-builds/userCreateProfile-4f72506542652b613271-build.zip"
         },
         "userCreateFriendship": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",

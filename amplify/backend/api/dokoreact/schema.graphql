@@ -1,35 +1,39 @@
 # This "input" configures a global authorization rule to enable public access to
 # all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
-input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
-
+input AMPLIFY {
+  globalAuthRule: AuthRule = {allow: public}
+} # FOR TESTING ONLY!
 type Mutation {
-	createProfile(
-		id: ID!,
-		name: String!,
-		username: String!,
-		email: AWSEmail!,
-		dob: AWSDate!
-	): profile! @function(name: "userCreateProfile-${env}")
-	createFriendship(userId: ID!, friendId: ID!): String! @function(name: "userCreateFriendship-${env}")
-	createFriendRequest(senderId: ID!, receiverId: ID!): Boolean! @function(name: "userCreateFriendRequest-${env}")
+  createProfile(
+    id: ID!
+    name: String!
+    username: String!
+    email: AWSEmail!
+    dob: AWSDate!
+    bio: String
+  ): profile! @function(name: "userCreateProfile-${env}")
+  createFriendship(userId: ID!, friendId: ID!): String!
+    @function(name: "userCreateFriendship-${env}")
+  createFriendRequest(senderId: ID!, receiverId: ID!): Boolean!
+    @function(name: "userCreateFriendRequest-${env}")
 }
 
 type Query {
-	getProfile(id: ID!): profile @function(name: "userGetProfile-${env}")
+  getProfile(id: ID!): profile @function(name: "userGetProfile-${env}")
 }
 
 type profile {
-	id: ID!
-	name: String!
-	username: String!
-	email: AWSEmail!
-	dob: AWSDate!
-	bio: String
-	friends: Int
-	posts: Int
+  id: ID!
+  name: String!
+  username: String!
+  email: AWSEmail!
+  dob: AWSDate!
+  bio: String
+  friends: Int
+  posts: Int
 }
 
 schema {
-	query: Query
-	mutation: Mutation
+  query: Query
+  mutation: Mutation
 }
