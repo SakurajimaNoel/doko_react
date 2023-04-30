@@ -7,15 +7,12 @@ import {
 	Pressable,
 } from "react-native";
 
-import { Auth, Hub } from "aws-amplify";
-import { useState } from "react";
+import { Auth } from "aws-amplify";
+import { useState, useEffect } from "react";
 
 // recoil state manangement
 import { useSetRecoilState } from "recoil";
 import { userState } from "../../recoil/atoms/user";
-
-// encrypted storage
-import EncryptedStorage from "react-native-encrypted-storage";
 
 function Login({ navigation }) {
 	const [userCredentials, setUserCredentials] = useState({
@@ -24,6 +21,23 @@ function Login({ navigation }) {
 	});
 
 	const setUser = useSetRecoilState(userState);
+
+	useEffect(() => {
+		Auth.currentAuthenticatedUser()
+			.then(user => {
+				setUser({
+					id: user.pool.clientId,
+					email: user.attributes.email,
+					name: user.attributes.name,
+					isAuth: true,
+				});
+
+				navigation.navigate("Home");
+			})
+			.catch(err => {
+				console.log(err);
+			});
+	}, []);
 
 	const handleInput = (type, value) => {
 		setUserCredentials(prev => {
@@ -44,19 +58,10 @@ function Login({ navigation }) {
 				id: user.pool.clientId,
 				email: user.attributes.email,
 				name: user.attributes.name,
+				isAuth: true,
 			};
 
 			setUser(userObj);
-
-			try {
-				await EncryptedStorage.setItem(
-					"userCredentials",
-					JSON.stringify(userObj),
-				);
-				console.log("Saved data in encrypted storage");
-			} catch (error) {
-				console.log("Error saving user info, ", error);
-			}
 		} catch (error) {
 			console.log("error signing in: ", error);
 		}
@@ -64,10 +69,6 @@ function Login({ navigation }) {
 
 	const goToSignUp = () => {
 		navigation.navigate("Signup");
-	};
-
-	const handleHome = () => {
-		navigation.popToTop();
 	};
 
 	return (
@@ -101,10 +102,6 @@ function Login({ navigation }) {
 
 			<Pressable onPress={goToSignUp}>
 				<Text style={styles.link}>Go to sign up..</Text>
-			</Pressable>
-
-			<Pressable onPress={handleHome}>
-				<Text style={styles.link}>Go to Home.</Text>
 			</Pressable>
 		</View>
 	);

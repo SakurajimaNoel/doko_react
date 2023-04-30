@@ -20,14 +20,6 @@ function ConfirmSignup({ route, navigation }) {
 		setConfirmCode(value);
 	};
 
-	const goToSignUp = () => {
-		navigation.navigate("Signup");
-	};
-
-	const handleHome = () => {
-		navigation.popToTop();
-	};
-
 	async function signIn() {
 		try {
 			const user = await Auth.signIn(email, password);
@@ -64,14 +56,6 @@ function ConfirmSignup({ route, navigation }) {
 				title="Confirm Code"
 				onPress={confirmSignUp}
 			/>
-
-			<Pressable onPress={goToSignUp}>
-				<Text style={styles.link}>Go to sign up..</Text>
-			</Pressable>
-
-			<Pressable onPress={handleHome}>
-				<Text style={styles.link}>Go to Home.</Text>
-			</Pressable>
 		</View>
 	);
 }

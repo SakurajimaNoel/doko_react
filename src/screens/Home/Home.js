@@ -7,21 +7,6 @@ import { userState } from "../../recoil/atoms/user";
 function Home({ navigation }) {
 	const setUserDetails = useSetRecoilState(userState);
 
-	useEffect(() => {
-		Auth.currentAuthenticatedUser()
-			.then(user => {
-				setUserDetails({
-					id: user.pool.clientId,
-					email: user.attributes.email,
-					name: user.attributes.name,
-				});
-			})
-			.catch(err => {
-				console.log(err);
-				navigation.navigate("Login");
-			});
-	}, []);
-
 	return (
 		<View
 			style={{

@@ -6,5 +6,6 @@ export const userState = atom({
 		id: "",
 		email: "",
 		name: "",
+		isAuth: false,
 	},
 });
