@@ -24,7 +24,7 @@ const createUserProfile = async (userDetails, driver) => {
           username: "${userDetails?.username}", 
           email: "${userDetails?.email}", 
           dob: "${userDetails?.dob}", 
-          bio: '',
+          bio: '${userDetails?.bio}',
           posts: "0",
           friends: "0"})
           return a`;
