@@ -20,14 +20,6 @@ import * as mutations from "../../graphql/mutations";
 import * as queries from "../../graphql/queries";
 //
 
-const userDetails = {
-	id: "1212",
-	name: "Abc",
-	username: "abc",
-	email: "abc@gmail.com",
-	dob: "2001-05-23",
-};
-
 function Signup({ navigation }) {
 	const setUser = useSetRecoilState(userState);
 
@@ -39,25 +31,10 @@ function Signup({ navigation }) {
 	});
 
 	const handleInput = (type, value) => {
-		setUserInfo(prev => {
+		setUserInfo((prev) => {
 			return { ...prev, [type]: value };
 		});
 	};
-
-	// create profile
-	async function createProfile() {
-		try {
-			await API.graphql({
-				query: mutations.createProfile,
-				variables: {
-					input: userDetails,
-				},
-			});
-		} catch (error) {
-			console.log("appsync error: failed to create user profile");
-			console.log(error);
-		}
-	}
 
 	async function getProfile() {
 		try {
@@ -79,22 +56,23 @@ function Signup({ navigation }) {
 
 		try {
 			const { user } = await Auth.signUp({
-				username: userInfo.email,
-				password: userInfo.password,
+				username: userInfo?.email,
+				password: userInfo?.password,
 				attributes: {
-					email: userInfo.email,
-					name: userInfo.name,
-					preferred_username: userInfo.email,
+					email: userInfo?.email,
+					name: userInfo?.name,
+					preferred_username: userInfo?.email,
 				},
 				autoSignIn: {
 					enabled: false,
 				},
 			});
+			console.log(user);
 
 			let userObj = {
 				id: user.pool.clientId,
-				email: user.attributes.email,
-				name: user.attributes.name,
+				email: userInfo?.email,
+				name: userInfo?.name,
 				isAuth: true,
 			};
 
@@ -121,7 +99,7 @@ function Signup({ navigation }) {
 					placeholderTextColor="#7F8487"
 					style={styles.input}
 					value={userInfo.name}
-					onChangeText={name => handleInput("name", name)}
+					onChangeText={(name) => handleInput("name", name)}
 				/>
 			</View>
 
@@ -131,7 +109,7 @@ function Signup({ navigation }) {
 					placeholderTextColor="#7F8487"
 					style={styles.input}
 					value={userInfo.email}
-					onChangeText={email => handleInput("email", email)}
+					onChangeText={(email) => handleInput("email", email)}
 				/>
 			</View>
 
@@ -142,7 +120,9 @@ function Signup({ navigation }) {
 					placeholderTextColor="#7F8487"
 					style={styles.input}
 					value={userInfo.password}
-					onChangeText={password => handleInput("password", password)}
+					onChangeText={(password) =>
+						handleInput("password", password)
+					}
 				/>
 			</View>
 
@@ -153,7 +133,7 @@ function Signup({ navigation }) {
 					placeholderTextColor="#7F8487"
 					style={styles.input}
 					value={userInfo.confirmPassword}
-					onChangeText={confirmPassword =>
+					onChangeText={(confirmPassword) =>
 						handleInput("confirmPassword", confirmPassword)
 					}
 				/>

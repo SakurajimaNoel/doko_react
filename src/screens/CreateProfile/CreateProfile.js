@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../recoil/atoms/user";
@@ -11,6 +11,11 @@ import {
 	Icon,
 } from "@ui-kitten/components";
 
+// aws
+import { API } from "aws-amplify";
+import * as mutations from "../../graphql/mutations";
+import * as queries from "../../graphql/queries";
+
 const TextLabel = ({ children }) => {
 	return (
 		<Text style={{ marginBottom: 5 }} category="h6">
@@ -19,7 +24,7 @@ const TextLabel = ({ children }) => {
 	);
 };
 
-const CalendarIcon = props => <Icon {...props} name="calendar" />;
+const CalendarIcon = (props) => <Icon {...props} name="calendar" />;
 
 const CreateProfile = ({ navigation }) => {
 	const [userInput, setUserInput] = useState({
@@ -27,10 +32,10 @@ const CreateProfile = ({ navigation }) => {
 		dob: new Date(),
 		bio: "",
 	});
-	// const userDetails = useRecoilValue(userState);
+	const userDetails = useRecoilValue(userState);
 
 	const handleInput = (type, value) => {
-		setUserInput(prev => {
+		setUserInput((prev) => {
 			return {
 				...prev,
 				[type]: value,
@@ -38,16 +43,41 @@ const CreateProfile = ({ navigation }) => {
 		});
 	};
 
-	const handleSubmit = () => {
-		console.log(userInput);
-		console.log(userInput.dob.toLocaleDateString());
+	async function createProfile(profileDetails) {
+		console.log(profileDetails);
+		try {
+			await API.graphql({
+				query: mutations.createProfile,
+				variables: {
+					input: profileDetails,
+				},
+			});
+
+			console.log("Successfully created profile");
+		} catch (error) {
+			console.log("appsync error: failed to create user profile");
+			console.log(error);
+		}
+	}
+
+	const handleSubmit = async () => {
+		const profileDetails = {
+			id: userDetails.id,
+			name: userDetails.name,
+			email: userDetails.email,
+			userName: userInput.userName,
+			dob: userInput.dob.toLocaleTimeString(),
+			bio: userInput.bio,
+		};
+
+		await createProfile(profileDetails);
 	};
 
 	return (
 		<Layout level="3" style={styles.container}>
 			<Input
 				value={userInput.userName}
-				onChangeText={string => handleInput("userName", string)}
+				onChangeText={(string) => handleInput("userName", string)}
 				placeholder="User Name..."
 				label={<TextLabel>User Name</TextLabel>}
 				size="medium"
@@ -55,7 +85,7 @@ const CreateProfile = ({ navigation }) => {
 
 			<Input
 				value={userInput.bio}
-				onChangeText={string => handleInput("bio", string)}
+				onChangeText={(string) => handleInput("bio", string)}
 				placeholder="Bio..."
 				label={<TextLabel>Bio</TextLabel>}
 				multiline={true}
@@ -67,12 +97,12 @@ const CreateProfile = ({ navigation }) => {
 				placeholder="Pick DOB..."
 				min={new Date(null)}
 				date={userInput.dob}
-				onSelect={nextDate => handleInput("dob", nextDate)}
+				onSelect={(nextDate) => handleInput("dob", nextDate)}
 				accessoryRight={CalendarIcon}
 			/>
 
 			<Button style={styles.button} onPress={handleSubmit}>
-				BUTTON
+				Complete profile
 			</Button>
 		</Layout>
 	);

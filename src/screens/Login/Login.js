@@ -20,11 +20,12 @@ function Login({ navigation }) {
 		password: "6s4UPYN6@P]W8[p8",
 	});
 
+	const [userInfo, setUserInfo] = useState({});
 	const setUser = useSetRecoilState(userState);
 
 	useEffect(() => {
 		Auth.currentAuthenticatedUser()
-			.then(user => {
+			.then((user) => {
 				setUser({
 					id: user.pool.clientId,
 					email: user.attributes.email,
@@ -34,13 +35,13 @@ function Login({ navigation }) {
 
 				navigation.navigate("Home");
 			})
-			.catch(err => {
+			.catch((err) => {
 				console.log(err);
 			});
-	}, []);
+	}, [userInfo]);
 
 	const handleInput = (type, value) => {
-		setUserCredentials(prev => {
+		setUserCredentials((prev) => {
 			return { ...prev, [type]: value };
 		});
 	};
@@ -53,6 +54,8 @@ function Login({ navigation }) {
 				userCredentials.email,
 				userCredentials.password,
 			);
+
+			console.log(user);
 
 			let userObj = {
 				id: user.pool.clientId,
@@ -79,7 +82,7 @@ function Login({ navigation }) {
 					placeholderTextColor="#7F8487"
 					style={styles.input}
 					value={userCredentials.email}
-					onChangeText={email => handleInput("email", email)}
+					onChangeText={(email) => handleInput("email", email)}
 				/>
 			</View>
 
@@ -90,7 +93,9 @@ function Login({ navigation }) {
 					placeholderTextColor="#7F8487"
 					style={styles.input}
 					value={userCredentials.password}
-					onChangeText={password => handleInput("password", password)}
+					onChangeText={(password) =>
+						handleInput("password", password)
+					}
 				/>
 			</View>
 
