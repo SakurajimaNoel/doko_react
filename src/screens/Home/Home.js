@@ -1,23 +1,38 @@
-import {View, Text, Button} from 'react-native';
+import { View, Text, Button } from "react-native";
+import { Auth } from "aws-amplify";
+import { useEffect } from "react";
+import { useSetRecoilState } from "recoil";
+import { userState } from "../../recoil/atoms/user";
 
-function Home({navigation}) {
-  return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#010101',
-      }}>
-      <Text>Welcome to Dokii!!</Text>
+function Home({ navigation }) {
+	const setUserDetails = useSetRecoilState(userState);
 
-      <Button title="Login" onPress={() => navigation.navigate('Login')} />
+	return (
+		<View
+			style={{
+				flex: 1,
+				alignItems: "center",
+				justifyContent: "space-between",
+				backgroundColor: "#010101",
+			}}>
+			<Text>Welcome to Dokii!!</Text>
 
-      <Button title="Profile" onPress={() => navigation.navigate('Profile')} />
+			<Button
+				title="Login"
+				onPress={() => navigation.navigate("Login")}
+			/>
 
-      <Button title="Signup" onPress={() => navigation.navigate('Signup')} />
-    </View>
-  );
+			<Button
+				title="Profile"
+				onPress={() => navigation.navigate("Profile")}
+			/>
+
+			<Button
+				title="Signup"
+				onPress={() => navigation.navigate("Signup")}
+			/>
+		</View>
+	);
 }
 
 export default Home;
