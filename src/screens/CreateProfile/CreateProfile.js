@@ -12,7 +12,7 @@ import {
 } from "@ui-kitten/components";
 
 // aws
-import { API } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
 import * as mutations from "../../graphql/mutations";
 import * as queries from "../../graphql/queries";
 
@@ -46,28 +46,36 @@ const CreateProfile = ({ navigation }) => {
 	async function createProfile(profileDetails) {
 		console.log(profileDetails);
 		try {
-			await API.graphql({
+			
+			const newProfile = await API.graphql({
 				query: mutations.createProfile,
 				variables: {
-					input: profileDetails,
+					input: profileDetails
 				},
 			});
-
+		
+	
+			
 			console.log("Successfully created profile");
 		} catch (error) {
 			console.log("appsync error: failed to create user profile");
 			console.log(error);
+			
 		}
 	}
 
 	const handleSubmit = async () => {
 		const profileDetails = {
-			id: userDetails.id,
-			name: userDetails.name,
-			email: userDetails.email,
-			userName: userInput.userName,
-			dob: userInput.dob.toLocaleTimeString(),
-			bio: userInput.bio,
+			id: /*userDetails.id*/"145556",
+			name:  "kukuku"/*userDetails.name*/,
+			username: "kurakurawaku"/* userInput.userName*/,
+			email: "nobashisaki@gmail.com"/*userDetails.email*/,
+			dob: "2001-05-23"/*userInput.dob.toLocaleTimeString()*/,
+			bio: "hello"/*userInput.bio*/,
+			userId: "1000",
+			friendId: "2000",
+			senderId: "3000",
+			receiverId: "4000"
 		};
 
 		await createProfile(profileDetails);
