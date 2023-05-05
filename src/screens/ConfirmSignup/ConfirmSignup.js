@@ -10,19 +10,20 @@ import {
 
 import { Auth } from "aws-amplify";
 import { Hub } from "aws-amplify";
+import { login } from "../../backend connectors/auth/auth";
 
 function ConfirmSignup({ route, navigation }) {
 	const { email, password } = route.params;
 
 	const [confirmCode, setConfirmCode] = useState();
 
-	const handleInput = value => {
+	const handleInput = (value) => {
 		setConfirmCode(value);
 	};
 
 	async function signIn() {
 		try {
-			const user = await Auth.signIn(email, password);
+			const user = await login(email, password);
 
 			navigation.navigate("CreateProfile");
 		} catch (error) {
@@ -47,7 +48,7 @@ function ConfirmSignup({ route, navigation }) {
 					placeholderTextColor="#7F8487"
 					style={styles.input}
 					value={confirmCode}
-					onChangeText={code => handleInput(code)}
+					onChangeText={(code) => handleInput(code)}
 				/>
 			</View>
 

@@ -8,6 +8,7 @@ import {
 } from "react-native";
 
 import { Auth } from "aws-amplify";
+import { login } from "../../backend connectors/auth/auth";
 import { useState, useEffect } from "react";
 
 // recoil state manangement
@@ -48,19 +49,16 @@ function Login({ navigation }) {
 
 	// handle login using aws
 	const handleLogin = async () => {
-		console.log(userCredentials);
 		try {
-			const user = await Auth.signIn(
+			const user = await login(
 				userCredentials.email,
 				userCredentials.password,
 			);
 
-			console.log(user);
-
 			let userObj = {
-				id: user.pool.clientId,
-				email: user.attributes.email,
-				name: user.attributes.name,
+				id: user?.pool?.clientId,
+				email: user?.attributes?.email,
+				name: user?.attributes?.name,
 				isAuth: true,
 			};
 

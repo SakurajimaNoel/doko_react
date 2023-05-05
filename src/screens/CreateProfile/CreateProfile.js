@@ -28,9 +28,9 @@ const CalendarIcon = (props) => <Icon {...props} name="calendar" />;
 
 const CreateProfile = ({ navigation }) => {
 	const [userInput, setUserInput] = useState({
-		userName: "",
+		userName: "asdf",
 		dob: new Date(),
-		bio: "",
+		bio: "this is rohannn",
 	});
 	const userDetails = useRecoilValue(userState);
 
@@ -46,17 +46,15 @@ const CreateProfile = ({ navigation }) => {
 	async function createProfile(profileDetails) {
 		console.log(profileDetails);
 		try {
-			
-			const newProfile = await API.graphql({
+			const profile = await API.graphql({
 				query: mutations.createProfile,
-				variables: {
-					input: profileDetails
-				},
+				variables: profileDetails,
 			});
 		
 	
 			
 			console.log("Successfully created profile");
+			console.log(profile);
 		} catch (error) {
 			console.log("appsync error: failed to create user profile");
 			console.log(error);
@@ -65,18 +63,41 @@ const CreateProfile = ({ navigation }) => {
 	}
 
 	const handleSubmit = async () => {
+		var month = userInput.dob.getUTCMonth() + 1; //months from 1-12
+		var day = userInput.dob.getUTCDate() + 1;
+		var year = userInput.dob.getUTCFullYear();
+
+		const dob =
+			year +
+			"-" +
+			(month < 10 ? `0${month}` : month) +
+			"-" +
+			(day < 10 ? `0${day}` : day);
+
 		const profileDetails = {
-			id: /*userDetails.id*/"145556",
-			name:  "kukuku"/*userDetails.name*/,
-			username: "kurakurawaku"/* userInput.userName*/,
-			email: "nobashisaki@gmail.com"/*userDetails.email*/,
-			dob: "2001-05-23"/*userInput.dob.toLocaleTimeString()*/,
-			bio: "hello"/*userInput.bio*/,
-			userId: "1000",
-			friendId: "2000",
-			senderId: "3000",
-			receiverId: "4000"
+			id: userDetails.id,
+			name: userDetails.name,
+			email: userDetails.email,
+			username: userInput.userName,
+			dob,
+			bio: userInput.bio,
 		};
+		// const profileDetails = {
+		// 	id: "1l42rcm392giebgt3l1i49pf88",
+		// 	name: userDetails.name,
+		// 	email: userDetails.email,
+		// 	username: userInput.userName,
+		// 	dob,
+		// 	bio: userInput.bio,
+		// };
+		// const profileDetails = {
+		// 	id: "1234",
+		// 	name: "Rohan",
+		// 	email: "vermarohan031@gmail.com",
+		// 	username: "asdf",
+		// 	dob: "2002-10-11",
+		// 	bio: "This is rohan",
+		// };
 
 		await createProfile(profileDetails);
 	};
