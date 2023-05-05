@@ -1,0 +1,11 @@
+{
+  "lambdaLayers": [
+    {
+      "type": "ProjectLayer",
+      "resourceName": "dokoreactsharpdriver",
+      "env": "dev",
+      "version": 1,
+      "isLatestVersionSelected": false
+    }
+  ]
+}

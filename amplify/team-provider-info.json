@@ -30,15 +30,26 @@
         },
         "dokoreactneo4jdriver": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/dokoreactneo4jdriver-LambdaLayerVersion60c60862-build.zip"
+          "s3Key": "amplify-builds/dokoreactneo4jdriver-LambdaLayerVersiond56228bc-build.zip"
         },
         "userCreateFriendRequest": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
           "s3Key": "amplify-builds/userCreateFriendRequest-317062674f6249626a31-build.zip"
+        },
+        "S3Trigger172854d0": {
+          "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
+          "s3Key": "amplify-builds/S3Trigger172854d0-33456a30633042446962-build.zip"
+        },
+        "dokoreactsharpdriver": {
+          "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
+          "s3Key": "amplify-builds/dokoreactsharpdriver-LambdaLayerVersion3d2c9f36-build.zip"
         }
       },
       "api": {
         "dokoreact": {}
+      },
+      "storage": {
+        "UserImages": {}
       }
     }
   }
