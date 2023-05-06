@@ -22,7 +22,7 @@
         },
         "userCreateFriendship": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/userCreateFriendship-694a5a7a474d4a695a64-build.zip"
+          "s3Key": "amplify-builds/userCreateFriendship-4464326438734a697064-build.zip"
         },
         "userGetProfile": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
@@ -43,6 +43,10 @@
         "dokoreactsharpdriver": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
           "s3Key": "amplify-builds/dokoreactsharpdriver-LambdaLayerVersion3d2c9f36-build.zip"
+        },
+        "userGetRequests": {
+          "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
+          "s3Key": "amplify-builds/userGetRequests-7478774d62537456536b-build.zip"
         }
       },
       "api": {

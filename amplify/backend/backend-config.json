@@ -132,6 +132,20 @@
       ],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "userGetRequests": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "dokoreactneo4jdriver"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "parameters": {
@@ -244,6 +258,22 @@
         {
           "category": "function",
           "resourceName": "userGetProfile"
+        }
+      ]
+    },
+    "AMPLIFY_function_userGetRequests_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "userGetRequests"
+        }
+      ]
+    },
+    "AMPLIFY_function_userGetRequests_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "userGetRequests"
         }
       ]
     }
