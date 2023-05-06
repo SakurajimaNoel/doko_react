@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.1372.0",
+    "sharp": "^0.32.1"
+  }
+}

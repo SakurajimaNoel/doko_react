@@ -18,7 +18,17 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "function": {
+    "S3Trigger172854d0": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
     "dokoreactneo4jdriver": {
+      "Arn": "string"
+    },
+    "dokoreactsharpdriver": {
       "Arn": "string"
     },
     "userCreateFriendRequest": {
@@ -47,6 +57,12 @@ export type AmplifyDependentResourcesAttributes = {
       "LambdaExecutionRole": "string",
       "LambdaExecutionRoleArn": "string",
       "Name": "string",
+      "Region": "string"
+    }
+  },
+  "storage": {
+    "UserImages": {
+      "BucketName": "string",
       "Region": "string"
     }
   }

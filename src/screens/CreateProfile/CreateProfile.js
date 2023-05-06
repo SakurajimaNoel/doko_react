@@ -12,7 +12,7 @@ import {
 } from "@ui-kitten/components";
 
 // aws
-import { API } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
 import * as mutations from "../../graphql/mutations";
 import * as queries from "../../graphql/queries";
 
@@ -50,12 +50,15 @@ const CreateProfile = ({ navigation }) => {
 				query: mutations.createProfile,
 				variables: profileDetails,
 			});
-
+		
+	
+			
 			console.log("Successfully created profile");
 			console.log(profile);
 		} catch (error) {
 			console.log("appsync error: failed to create user profile");
 			console.log(error);
+			
 		}
 	}
 

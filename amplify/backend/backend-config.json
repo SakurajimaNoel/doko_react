@@ -53,7 +53,26 @@
     }
   },
   "function": {
+    "S3Trigger172854d0": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "dokoreactsharpdriver"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "dokoreactneo4jdriver": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer"
+    },
+    "dokoreactsharpdriver": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "LambdaLayer"
@@ -116,6 +135,22 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_S3Trigger172854d0_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger172854d0"
+        }
+      ]
+    },
+    "AMPLIFY_function_S3Trigger172854d0_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger172854d0"
+        }
+      ]
+    },
     "AMPLIFY_function_dokoreactneo4jdriver_deploymentBucketName": {
       "usedBy": [
         {
@@ -129,6 +164,22 @@
         {
           "category": "function",
           "resourceName": "dokoreactneo4jdriver"
+        }
+      ]
+    },
+    "AMPLIFY_function_dokoreactsharpdriver_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "dokoreactsharpdriver"
+        }
+      ]
+    },
+    "AMPLIFY_function_dokoreactsharpdriver_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "dokoreactsharpdriver"
         }
       ]
     },
@@ -195,6 +246,23 @@
           "resourceName": "userGetProfile"
         }
       ]
+    }
+  },
+  "storage": {
+    "UserImages": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "LambdaExecutionRole"
+          ],
+          "category": "function",
+          "resourceName": "S3Trigger172854d0"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "S3"
     }
   }
 }
