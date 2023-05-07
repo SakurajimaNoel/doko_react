@@ -12,17 +12,14 @@ const getRequests = async (driver, userDetails) => {
 	const session = driver.session({ database: "neo4j" });
 
 	try {
-		let readQuery;
+		let readQuery = `MATCH (a:Person {id: "${userDetails.myId}"})-[:sendFriendRequest]->(b:Person) return b as req`;
 
 		if (userDetails.incoming) {
 			readQuery = `MATCH (a:Person {id: "${userDetails.myId}"})<-[:sendFriendRequest]-(b:Person) return b as req`;
-		} else {
-			readQuery = `MATCH (a:Person {id: "${userDetails.myId}"})-[:sendFriendRequest]->(b:Person) return b as req`;
 		}
 
 		const readResult = await session.executeRead((tx) => tx.run(readQuery));
 
-		console.log("\n\n*********user Incoming requests************");
 		const requests = readResult.records.map((req) => {
 			return req.get("req")?.properties;
 		});
@@ -60,6 +57,6 @@ exports.handler = async (event) => {
 		//      "Access-Control-Allow-Origin": "*",
 		//      "Access-Control-Allow-Headers": "*"
 		//  },
-		body: JSON.stringify("Can't get user details!"),
+		body: JSON.stringify("Can't get user requests!"),
 	};
 };

@@ -18,15 +18,15 @@
       "function": {
         "userCreateProfile": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/userCreateProfile-4f72506542652b613271-build.zip"
+          "s3Key": "amplify-builds/userCreateProfile-55695a5836526544376d-build.zip"
         },
         "userCreateFriendship": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/userCreateFriendship-4464326438734a697064-build.zip"
+          "s3Key": "amplify-builds/userCreateFriendship-49386e7566443977704a-build.zip"
         },
         "userGetProfile": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/userGetProfile-65646d7a434f646d2b66-build.zip"
+          "s3Key": "amplify-builds/userGetProfile-61763846383270314435-build.zip"
         },
         "dokoreactneo4jdriver": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
@@ -34,7 +34,7 @@
         },
         "userCreateFriendRequest": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/userCreateFriendRequest-317062674f6249626a31-build.zip"
+          "s3Key": "amplify-builds/userCreateFriendRequest-742f386f733757757853-build.zip"
         },
         "S3Trigger172854d0": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
@@ -46,7 +46,7 @@
         },
         "userGetRequests": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/userGetRequests-7478774d62537456536b-build.zip"
+          "s3Key": "amplify-builds/userGetRequests-7078372b323954795470-build.zip"
         }
       },
       "api": {

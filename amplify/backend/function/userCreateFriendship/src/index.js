@@ -16,11 +16,22 @@ const createUserFriendship = async (driver, friendshipDetails) => {
         (user:Person {id: "${friendshipDetails?.userId}"}) WITH user
         MATCH
         (friend:Person {id: "${friendshipDetails?.friendId}"})
-        MERGE (user)-[r:isFriend]-(friend)
-        RETURN user.friends
+        MERGE (user)-[r:isFriend]-(friend)        
+        
+        RETURN r
         `;
-		// delete sendFriendRequest relation
 
+		// update number of friends
+		const updateQuery = `
+        MATCH
+        (user:Person {id: "${friendshipDetails?.userId}"}) WITH user
+        MATCH
+        (friend:Person {id: "${friendshipDetails?.friendId}"})
+        SET user.friends = +user.friends + 1
+        SET friend.friends = +friend.friends + 1
+        `;
+
+		// delete sendFriendRequest relation
 		const deleteQuery = `Match 
         (a:Person {id: "${friendshipDetails?.userId}"})-[r:sendFriendRequest]-(b:Person {id:"${friendshipDetails?.friendId}"})
         delete r;`;
@@ -29,11 +40,22 @@ const createUserFriendship = async (driver, friendshipDetails) => {
 			tx.run(writeQuery),
 		);
 
-		const deleteResutl = await session.executeWrite((tx) =>
-			tx.run(deleteQuery),
-		);
+		if (writeResult.summary.counters._stats.relationshipsCreated) {
+			const deleteResult = await session.executeWrite((tx) =>
+				tx.run(deleteQuery),
+			);
+
+			const updateFriends = await session.executeWrite((tx) =>
+				tx.run(updateQuery),
+			);
+
+			if (updateFriends.summary.counters._stats.propertiesSet)
+				return true;
+		}
+
+		return false;
 	} catch (error) {
-		console.error(`Something went wrong: ${error}`);
+		console.error(`Something went wrongs: ${error}`);
 	} finally {
 		// Close down the session if you're not using it anymore.
 		await session.close();
@@ -44,8 +66,13 @@ exports.handler = async (event) => {
 	const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
 
 	try {
-		await createUserFriendship(driver, event.arguments);
-		return event?.arguments;
+		const res = await createUserFriendship(driver, friendUserId);
+
+		if (res) {
+			return res;
+		} else {
+			throw "can't add friend";
+		}
 	} catch (error) {
 		console.error(`Something went wrong: ${error}`);
 	} finally {

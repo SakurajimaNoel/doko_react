@@ -20,6 +20,9 @@ type Mutation {
 
 type Query {
 	getProfile(id: ID!): profile @function(name: "userGetProfile-${env}")
+
+	getRequests(myId: ID!, incoming: Boolean!): [profile]
+		@function(name: "userGetRequests-${env}")
 }
 
 type profile {

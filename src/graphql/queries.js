@@ -15,3 +15,17 @@ export const getProfile = /* GraphQL */ `
     }
   }
 `;
+export const getRequests = /* GraphQL */ `
+  query GetRequests($myId: ID!, $incoming: Boolean!) {
+    getRequests(myId: $myId, incoming: $incoming) {
+      id
+      name
+      username
+      email
+      dob
+      bio
+      friends
+      posts
+    }
+  }
+`;
