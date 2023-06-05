@@ -18,11 +18,11 @@
       "function": {
         "userCreateProfile": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/userCreateProfile-55695a5836526544376d-build.zip"
+          "s3Key": "amplify-builds/userCreateProfile-446a4367413253733471-build.zip"
         },
         "userCreateFriendship": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",
-          "s3Key": "amplify-builds/userCreateFriendship-49386e7566443977704a-build.zip"
+          "s3Key": "amplify-builds/userCreateFriendship-57703971396a35426445-build.zip"
         },
         "userGetProfile": {
           "deploymentBucketName": "amplify-dokoreact-dev-235525-deployment",

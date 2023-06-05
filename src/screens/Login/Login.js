@@ -21,11 +21,10 @@ function Login({ navigation }) {
 		password: "6s4UPYN6@P]W8[p8",
 	});
 
-	const [userInfo, setUserInfo] = useState({});
 	const setUser = useSetRecoilState(userState);
 
 	useEffect(() => {
-		Auth.currentAuthenticatedUser()
+		Auth.currentAuthenticatedUser({ bypassCache: true })
 			.then((user) => {
 				setUser({
 					id: user.pool.clientId,
@@ -39,7 +38,7 @@ function Login({ navigation }) {
 			.catch((err) => {
 				console.log(err);
 			});
-	}, [userInfo]);
+	}, []);
 
 	const handleInput = (type, value) => {
 		setUserCredentials((prev) => {
@@ -55,16 +54,23 @@ function Login({ navigation }) {
 				userCredentials.password,
 			);
 
-			let userObj = {
-				id: user?.pool?.clientId,
-				email: user?.attributes?.email,
-				name: user?.attributes?.name,
+			setUser({
+				id: user.pool.clientId,
+				email: user.attributes.email,
+				name: user.attributes.name,
 				isAuth: true,
-			};
+			});
 
-			setUser(userObj);
+			navigation.navigate("Home");
 		} catch (error) {
 			console.log("error signing in: ", error);
+			let err = error.toString();
+			err = err.split(":");
+
+			if (err[0] === "UserNotConfirmedException")
+				navigation.navigate("ConfirmSignup", {
+					email: userCredentials.email,
+				});
 		}
 	};
 

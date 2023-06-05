@@ -1,7 +1,9 @@
 import { StyleSheet, Image, ScrollView } from "react-native";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../recoil/atoms/user";
+import "react-native-get-random-values";
+import { nanoid } from "nanoid";
 import {
 	Layout,
 	Button,
@@ -9,14 +11,30 @@ import {
 	Text,
 	Datepicker,
 	Icon,
+	Modal,
+	Card,
 } from "@ui-kitten/components";
 import * as ImagePicker from "react-native-image-picker";
 import { images } from "../../assests";
 
+import { login } from "../../backend connectors/auth/auth";
+
 // aws
-import { API, graphqlOperation } from "aws-amplify";
+import { API, graphqlOperation, Storage } from "aws-amplify";
 import * as mutations from "../../graphql/mutations";
 import * as queries from "../../graphql/queries";
+
+const user = {
+	bio: "this is rohannn",
+	dob: "2002-10-12",
+	email: "vermarohan031@gmail.com",
+	friends: null,
+	id: "1l42rcm392giebgt3l1i49pf88",
+	name: "rohan",
+	posts: null,
+	profilePicture: "IfjAqZRxjXG7jmRNJqOBz",
+	username: "Agjdhd",
+};
 
 const TextLabel = ({ children }) => {
 	return (
@@ -30,12 +48,25 @@ const CalendarIcon = (props) => <Icon {...props} name="calendar" />;
 
 const CreateProfile = ({ navigation }) => {
 	const [pickerResponse, setPickerResponse] = useState(null);
+	const [visible, setVisible] = useState(false);
 	const [userInput, setUserInput] = useState({
 		userName: "asdf",
 		dob: new Date(),
 		bio: "this is rohannn",
+		profilePicture: "",
 	});
 	const userDetails = useRecoilValue(userState);
+
+	useEffect(() => {
+		const uri = pickerResponse?.assets && pickerResponse.assets[0].uri;
+		if (uri) {
+			setVisible(false);
+			setUserInput((prev) => ({
+				...prev,
+				profilePicture: uri,
+			}));
+		}
+	}, [pickerResponse]);
 
 	const onImageLibraryPress = useCallback(() => {
 		const options = {
@@ -48,15 +79,12 @@ const CreateProfile = ({ navigation }) => {
 
 	const onCameraPress = useCallback(() => {
 		const options = {
-			saveToPhotos: true,
+			saveToPhotos: false,
 			mediaType: "photo",
 			includeBase64: false,
 		};
 		ImagePicker.launchCamera(options, setPickerResponse);
 	}, []);
-
-	const uri = pickerResponse?.assets && pickerResponse.assets[0].uri;
-	console.log(pickerResponse);
 
 	const handleInput = (type, value) => {
 		setUserInput((prev) => {
@@ -68,8 +96,19 @@ const CreateProfile = ({ navigation }) => {
 	};
 
 	async function createProfile(profileDetails) {
-		console.log(profileDetails);
 		try {
+			if (userInput.profilePicture) {
+				const response = await fetch(userInput.profilePicture);
+				const blob = await response.blob();
+				const key = nanoid();
+				await Storage.put(key, blob, {
+					// contentType: "image/jpeg", // contentType is optional
+				});
+
+				profileDetails = { ...profileDetails, profilePicture: key };
+			}
+
+			console.log(profileDetails);
 			const profile = await API.graphql({
 				query: mutations.createProfile,
 				variables: profileDetails,
@@ -84,72 +123,104 @@ const CreateProfile = ({ navigation }) => {
 	}
 
 	const handleSubmit = async () => {
-		var month = userInput.dob.getUTCMonth() + 1; //months from 1-12
-		var day = userInput.dob.getUTCDate() + 1;
-		var year = userInput.dob.getUTCFullYear();
-		const dob =
-			year +
-			"-" +
-			(month < 10 ? `0${month}` : month) +
-			"-" +
-			(day < 10 ? `0${day}` : day);
+		// let userDetails = {
+		// 	id: nanoid(),
+		// 	name: "amit69",
+		// 	email: "amit69@amit69.com",
+		// }; // remove after navigation change
+
+		let dob = userInput.dob;
+		dob.setDate(dob.getDate() + 1);
+
+		dob = dob.toISOString();
+		dob = dob.substr(0, 10);
+
 		const profileDetails = {
-			id: userDetails.id,
-			name: userDetails.name,
-			email: userDetails.email,
+			id: userDetails?.id,
+			name: userDetails?.name,
+			email: userDetails?.email,
 			username: userInput.userName,
 			dob,
 			bio: userInput.bio,
 		};
+
 		await createProfile(profileDetails);
 	};
 
 	return (
-		<ScrollView>
-			<Layout level="3" style={styles.container}>
-				<Input
-					value={userInput.userName}
-					onChangeText={(string) => handleInput("userName", string)}
-					placeholder="User Name..."
-					label={<TextLabel>User Name</TextLabel>}
-					size="medium"
-				/>
+		<Layout level="3" style={styles.container}>
+			<Image
+				style={styles.image}
+				source={
+					userInput.profilePicture
+						? { uri: userInput.profilePicture }
+						: images.img
+				}
+			/>
+			<Button
+				appearance="ghost"
+				style={{
+					marginVertical: 5,
+				}}
+				onPress={() => setVisible(true)}>
+				Upload Profile Picture
+			</Button>
+			<Modal
+				animationType="fade"
+				visible={visible}
+				backdropStyle={styles.backdrop}
+				onBackdropPress={() => setVisible(false)}>
+				<Card style={styles.modal}>
+					<Button
+						accessoryLeft={<Icon name="camera-outline" />}
+						style={styles.modalButton}
+						onPress={onCameraPress}
+						appearance="outline"
+						status="control">
+						Open Camera
+					</Button>
+					<Button
+						accessoryLeft={<Icon name="image-outline" />}
+						appearance="outline"
+						status="control"
+						style={styles.modalButton}
+						onPress={onImageLibraryPress}>
+						Open gallery
+					</Button>
+				</Card>
+			</Modal>
 
-				<Input
-					value={userInput.bio}
-					onChangeText={(string) => handleInput("bio", string)}
-					placeholder="Bio..."
-					label={<TextLabel>Bio</TextLabel>}
-					multiline={true}
-					textStyle={styles.inputTextStyle}
-				/>
+			<Input
+				value={userInput.userName}
+				onChangeText={(string) => handleInput("userName", string)}
+				placeholder="User Name..."
+				label={<TextLabel>User Name</TextLabel>}
+				size="medium"
+			/>
 
-				<Datepicker
-					label={<TextLabel>Date of Birth</TextLabel>}
-					placeholder="Pick DOB..."
-					min={new Date(null)}
-					date={userInput.dob}
-					onSelect={(nextDate) => handleInput("dob", nextDate)}
-					accessoryRight={CalendarIcon}
-				/>
+			<Input
+				value={userInput.bio}
+				onChangeText={(string) => handleInput("bio", string)}
+				placeholder="Bio..."
+				label={<TextLabel>Bio</TextLabel>}
+				multiline={true}
+				textStyle={styles.inputTextStyle}
+			/>
 
-				<Button style={styles.button} onPress={onCameraPress}>
-					Open Camera
-				</Button>
-				<Button style={styles.button} onPress={onImageLibraryPress}>
-					Open gallery
-				</Button>
+			<Datepicker
+				label={<TextLabel>Date of Birth</TextLabel>}
+				placeholder="Pick DOB..."
+				min={new Date(null)}
+				date={userInput.dob}
+				onSelect={(nextDate) => handleInput("dob", nextDate)}
+				accessoryRight={CalendarIcon}
+			/>
+			<Text>{userInput?.dob?.toDateString()}</Text>
 
-				<Image
-					style={styles.image}
-					source={uri ? { uri } : images.img}
-				/>
-
-				<Button style={styles.button} onPress={handleSubmit}>
-					Complete profile
-				</Button>
-			</Layout>
-		</ScrollView>
+			<Button style={styles.button} onPress={handleSubmit}>
+				Complete profile
+			</Button>
+		</Layout>
 	);
 };
 
@@ -164,11 +235,27 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		marginTop: 30,
+		// marginBottom: 15,
 	},
 	image: {
-		marginTop: 30,
+		marginTop: 10,
 		width: 390,
 		height: 300,
+		borderRadius: 100,
+	},
+	backdrop: {
+		backgroundColor: "rgba(0, 0, 0, 0.8)",
+	},
+	modal: {
+		width: 250,
+		height: 200,
+		flex: 1,
+		justifyContent: "space-evenly",
+		borderRadius: 20,
+		rowGap: 10,
+	},
+	modalButton: {
+		marginBottom: 20,
 	},
 });
 

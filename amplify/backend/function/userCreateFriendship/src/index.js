@@ -66,7 +66,7 @@ exports.handler = async (event) => {
 	const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
 
 	try {
-		const res = await createUserFriendship(driver, friendUserId);
+		const res = await createUserFriendship(driver, event.arguments);
 
 		if (res) {
 			return res;

@@ -11,6 +11,7 @@ type Mutation {
 		email: AWSEmail!
 		dob: AWSDate!
 		bio: String
+		profilePicture: String
 	): profile! @function(name: "userCreateProfile-${env}")
 	createFriendship(userId: ID!, friendId: ID!): String!
 		@function(name: "userCreateFriendship-${env}")
@@ -34,6 +35,7 @@ type profile {
 	bio: String
 	friends: Int
 	posts: Int
+	profilePicture: String
 }
 
 schema {

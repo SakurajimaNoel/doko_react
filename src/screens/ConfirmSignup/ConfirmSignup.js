@@ -1,19 +1,12 @@
 import { useState } from "react";
-import {
-	View,
-	Text,
-	Button,
-	StyleSheet,
-	TextInput,
-	Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
+import { Button } from "@ui-kitten/components";
 
 import { Auth } from "aws-amplify";
 import { Hub } from "aws-amplify";
-import { login } from "../../backend connectors/auth/auth";
 
 function ConfirmSignup({ route, navigation }) {
-	const { email, password } = route.params;
+	const { email } = route.params;
 
 	const [confirmCode, setConfirmCode] = useState();
 
@@ -21,20 +14,19 @@ function ConfirmSignup({ route, navigation }) {
 		setConfirmCode(value);
 	};
 
-	async function signIn() {
+	async function resendConfirmationCode() {
 		try {
-			const user = await login(email, password);
-
-			navigation.navigate("CreateProfile");
-		} catch (error) {
-			console.log("error signing in", error);
+			await Auth.resendSignUp(email);
+			console.log("code resent successfully");
+		} catch (err) {
+			console.log("error resending code: ", err);
 		}
 	}
 
 	async function confirmSignUp() {
 		try {
 			await Auth.confirmSignUp(email, confirmCode);
-			await signIn();
+			navigation.navigate("CreateProfile");
 		} catch (error) {
 			console.log("error confirming sign up", error);
 		}
@@ -52,11 +44,13 @@ function ConfirmSignup({ route, navigation }) {
 				/>
 			</View>
 
-			<Button
-				style={{ borderRadius: 1 }}
-				title="Confirm Code"
-				onPress={confirmSignUp}
-			/>
+			<Button style={{ borderRadius: 1 }} onPress={confirmSignUp}>
+				Confirm Code
+			</Button>
+
+			<Button onPress={resendConfirmationCode} appearance="ghost">
+				Resend confirmation code
+			</Button>
 		</View>
 	);
 }

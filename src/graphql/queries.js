@@ -12,6 +12,7 @@ export const getProfile = /* GraphQL */ `
       bio
       friends
       posts
+      profilePicture
     }
   }
 `;
@@ -26,6 +27,7 @@ export const getRequests = /* GraphQL */ `
       bio
       friends
       posts
+      profilePicture
     }
   }
 `;

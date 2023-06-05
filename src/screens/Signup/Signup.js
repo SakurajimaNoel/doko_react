@@ -20,6 +20,8 @@ import * as mutations from "../../graphql/mutations";
 import * as queries from "../../graphql/queries";
 //
 
+import { login } from "../../backend connectors/auth/auth";
+
 function Signup({ navigation }) {
 	const setUser = useSetRecoilState(userState);
 
@@ -35,6 +37,14 @@ function Signup({ navigation }) {
 			return { ...prev, [type]: value };
 		});
 	};
+
+	async function signIn() {
+		try {
+			const user = await login(userInfo.email, userInfo.password);
+		} catch (error) {
+			console.log("error signing in", error);
+		}
+	}
 
 	async function getProfile() {
 		try {
@@ -77,10 +87,10 @@ function Signup({ navigation }) {
 			};
 
 			setUser(userObj);
+			await signIn();
 
 			navigation.navigate("ConfirmSignup", {
 				email: userInfo.email,
-				password: userInfo.password,
 			});
 		} catch (error) {
 			console.log("sign up error: ", error);

@@ -26,7 +26,11 @@ const createUserProfile = async (driver, userDetails) => {
           dob: "${userDetails?.dob}", 
           bio: '${userDetails?.bio}',
           posts: 0,
-          friends: 0})
+          friends: 0,
+          profilePicture: "${
+				userDetails?.profilePicture ? userDetails.profilePicture : ""
+			}"
+        })
           return a as profile`;
 
 		const writeResult = await session.executeWrite((tx) =>
@@ -46,7 +50,7 @@ exports.handler = async (event) => {
 	const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
 
 	try {
-		const profile = await createUserProfile(driver, details);
+		const profile = await createUserProfile(driver, event.arguments);
 
 		if (profile) {
 			return profile;
