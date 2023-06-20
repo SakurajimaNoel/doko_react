@@ -25,8 +25,8 @@ const createUserProfile = async (driver, userDetails) => {
           email: "${userDetails?.email}", 
           dob: "${userDetails?.dob}", 
           bio: '${userDetails?.bio}',
-          posts: 0,
-          friends: 0,
+          posts: ${neo4j.int(0)},
+          friends: ${neo4j.int(0)},
           profilePicture: "${
 				userDetails?.profilePicture ? userDetails.profilePicture : ""
 			}"
@@ -47,7 +47,9 @@ const createUserProfile = async (driver, userDetails) => {
 };
 
 exports.handler = async (event) => {
-	const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+	const driver = neo4j.driver(uri, neo4j.auth.basic(user, password), {
+		disableLosslessIntegers: true,
+	});
 
 	try {
 		const profile = await createUserProfile(driver, event.arguments);

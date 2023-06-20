@@ -39,7 +39,9 @@ const userSendFriendRequest = async (driver, requestDetails) => {
 };
 
 exports.handler = async (event) => {
-	const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+	const driver = neo4j.driver(uri, neo4j.auth.basic(user, password), {
+		disableLosslessIntegers: true,
+	});
 
 	try {
 		const res = await userSendFriendRequest(driver, event.arguments);
