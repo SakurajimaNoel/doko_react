@@ -1,13 +1,6 @@
 export type AmplifyDependentResourcesAttributes = {
-  "api": {
-    "dokoreact": {
-      "GraphQLAPIEndpointOutput": "string",
-      "GraphQLAPIIdOutput": "string",
-      "GraphQLAPIKeyOutput": "string"
-    }
-  },
   "auth": {
-    "dokoreact": {
+    "dokoreact431697f3": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",
       "IdentityPoolId": "string",
@@ -18,48 +11,7 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "function": {
-    "S3Trigger172854d0": {
-      "Arn": "string",
-      "LambdaExecutionRole": "string",
-      "LambdaExecutionRoleArn": "string",
-      "Name": "string",
-      "Region": "string"
-    },
-    "dokoreactneo4jdriver": {
-      "Arn": "string"
-    },
-    "dokoreactsharpdriver": {
-      "Arn": "string"
-    },
-    "userCreateFriendRequest": {
-      "Arn": "string",
-      "LambdaExecutionRole": "string",
-      "LambdaExecutionRoleArn": "string",
-      "Name": "string",
-      "Region": "string"
-    },
-    "userCreateFriendship": {
-      "Arn": "string",
-      "LambdaExecutionRole": "string",
-      "LambdaExecutionRoleArn": "string",
-      "Name": "string",
-      "Region": "string"
-    },
-    "userCreateProfile": {
-      "Arn": "string",
-      "LambdaExecutionRole": "string",
-      "LambdaExecutionRoleArn": "string",
-      "Name": "string",
-      "Region": "string"
-    },
-    "userGetProfile": {
-      "Arn": "string",
-      "LambdaExecutionRole": "string",
-      "LambdaExecutionRoleArn": "string",
-      "Name": "string",
-      "Region": "string"
-    },
-    "userGetRequests": {
+    "S3Trigger9a92c08b": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
       "LambdaExecutionRoleArn": "string",
@@ -68,7 +20,7 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "storage": {
-    "UserImages": {
+    "dokibucket": {
       "BucketName": "string",
       "Region": "string"
     }

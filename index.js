@@ -10,13 +10,22 @@ import {RecoilRoot} from 'recoil';
 import {Amplify, Auth} from 'aws-amplify';
 import awsconfig from './src/aws-exports';
 
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+
+const apolloClient = new ApolloClient({
+  cache: new InMemoryCache(),
+  uri: 'https://p2ntnqst9j.execute-api.ap-south-1.amazonaws.com'
+});
+
 Amplify.configure(awsconfig);
 
 const recoilApp = () => {
   return (
-    <RecoilRoot>
-      <App />
-    </RecoilRoot>
+    <ApolloProvider client={apolloClient}>
+      <RecoilRoot>
+        <App />
+      </RecoilRoot>
+    </ApolloProvider>
   );
 };
 

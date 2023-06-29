@@ -1,24 +1,7 @@
 {
-  "api": {
-    "dokoreact": {
-      "dependsOn": [],
-      "output": {
-        "authConfig": {
-          "additionalAuthenticationProviders": [],
-          "defaultAuthentication": {
-            "apiKeyConfig": {
-              "apiKeyExpirationDays": 7
-            },
-            "authenticationType": "API_KEY"
-          }
-        }
-      },
-      "providerPlugin": "awscloudformation",
-      "service": "AppSync"
-    }
-  },
+  "api": {},
   "auth": {
-    "dokoreact": {
+    "dokoreact431697f3": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -27,18 +10,12 @@
           "SMS"
         ],
         "passwordProtectionSettings": {
-          "passwordPolicyCharacters": [
-            "REQUIRES_LOWERCASE",
-            "REQUIRES_NUMBERS",
-            "REQUIRES_SYMBOLS",
-            "REQUIRES_UPPERCASE"
-          ],
+          "passwordPolicyCharacters": [],
           "passwordPolicyMinLength": 8
         },
         "signupAttributes": [
           "EMAIL",
-          "NAME",
-          "PREFERRED_USERNAME"
+          "NAME"
         ],
         "socialProviders": [],
         "usernameAttributes": [
@@ -53,103 +30,32 @@
     }
   },
   "function": {
-    "S3Trigger172854d0": {
+    "S3Trigger9a92c08b": {
       "build": true,
-      "dependsOn": [
-        {
-          "attributes": [
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "dokoreactsharpdriver"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "dokoreactneo4jdriver": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "LambdaLayer"
-    },
-    "dokoreactsharpdriver": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "LambdaLayer"
-    },
-    "userCreateFriendRequest": {
-      "build": true,
-      "dependsOn": [
-        {
-          "attributes": [
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "dokoreactneo4jdriver"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "userCreateFriendship": {
-      "build": true,
-      "dependsOn": [
-        {
-          "attributes": [
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "dokoreactneo4jdriver"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "userCreateProfile": {
-      "build": true,
-      "dependsOn": [
-        {
-          "attributes": [
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "dokoreactneo4jdriver"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "userGetProfile": {
-      "build": true,
-      "dependsOn": [
-        {
-          "attributes": [
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "dokoreactneo4jdriver"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "userGetRequests": {
-      "build": true,
-      "dependsOn": [
-        {
-          "attributes": [
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "dokoreactneo4jdriver"
-        }
-      ],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     }
   },
+  "parameters": {
+    "AMPLIFY_function_S3Trigger9a92c08b_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger9a92c08b"
+        }
+      ]
+    },
+    "AMPLIFY_function_S3Trigger9a92c08b_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger9a92c08b"
+        }
+      ]
+    }
+  },
   "storage": {
-    "UserImages": {
+    "dokibucket": {
       "dependsOn": [
         {
           "attributes": [
@@ -158,7 +64,7 @@
             "LambdaExecutionRole"
           ],
           "category": "function",
-          "resourceName": "S3Trigger172854d0"
+          "resourceName": "S3Trigger9a92c08b"
         }
       ],
       "providerPlugin": "awscloudformation",

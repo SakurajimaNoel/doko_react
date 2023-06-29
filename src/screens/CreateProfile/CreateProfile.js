@@ -21,8 +21,8 @@ import { login } from "../../backend connectors/auth/auth";
 
 // aws
 import { API, graphqlOperation, Storage } from "aws-amplify";
-import * as mutations from "../../graphql/mutations";
-import * as queries from "../../graphql/queries";
+//import * as mutations from "../../graphql/mutations";
+//import * as queries from "../../graphql/queries";
 
 const user = {
 	bio: "this is rohannn",

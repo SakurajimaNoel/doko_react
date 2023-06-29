@@ -15,6 +15,7 @@ import { useState, useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { userState } from "../../recoil/atoms/user";
 
+
 function Login({ navigation }) {
 	const [userCredentials, setUserCredentials] = useState({
 		email: "vermarohan031@gmail.com",
@@ -78,6 +79,7 @@ function Login({ navigation }) {
 		navigation.navigate("Signup");
 	};
 
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.inputContainer}>
@@ -107,6 +109,7 @@ function Login({ navigation }) {
 				style={{ borderRadius: 1 }}
 				title="Login"
 				onPress={handleLogin}
+				//onPress={queryTest}
 			/>
 
 			<Pressable onPress={goToSignUp}>

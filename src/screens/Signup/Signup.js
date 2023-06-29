@@ -15,9 +15,9 @@ import { useSetRecoilState } from "recoil";
 import { userState } from "../../recoil/atoms/user";
 
 // aws
-import { API } from "aws-amplify";
-import * as mutations from "../../graphql/mutations";
-import * as queries from "../../graphql/queries";
+//import { API } from "aws-amplify";
+//import * as mutations from "../../graphql/mutations";
+//import * as queries from "../../graphql/queries";
 //
 
 import { login } from "../../backend connectors/auth/auth";
@@ -71,7 +71,7 @@ function Signup({ navigation }) {
 				attributes: {
 					email: userInfo?.email,
 					name: userInfo?.name,
-					preferred_username: userInfo?.email,
+					//preferred_username: userInfo?.email,
 				},
 				autoSignIn: {
 					enabled: false,
