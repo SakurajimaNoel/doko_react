@@ -1,11 +1,11 @@
 import { View, Text, Button } from "react-native";
-import { Auth } from "aws-amplify";
-import { useEffect } from "react";
-import { useSetRecoilState } from "recoil";
-import { userState } from "../../recoil/atoms/user";
+// import { Auth } from "aws-amplify";
+// import { useEffect } from "react";
+// import { useSetRecoilState } from "recoil";
+// import { userState } from "../../recoil/atoms/user";
 
 function Home({ navigation }) {
-	const setUserDetails = useSetRecoilState(userState);
+	// const setUserDetails = useSetRecoilState(userState);
 
 	return (
 		<View
@@ -18,18 +18,18 @@ function Home({ navigation }) {
 			<Text>Welcome to Dokii!!</Text>
 
 			<Button
-				title="Login"
-				onPress={() => navigation.navigate("Login")}
+				title="Create Profile"
+				onPress={() => navigation.navigate("CreateUserProfile")}
 			/>
 
 			<Button
-				title="Profile"
-				onPress={() => navigation.navigate("Profile")}
+				title="Send Req"
+				onPress={() => navigation.navigate("SendFriendRequest")}
 			/>
 
 			<Button
-				title="Signup"
-				onPress={() => navigation.navigate("Signup")}
+				title="View Req"
+				onPress={() => navigation.navigate("ViewFriendRequest")}
 			/>
 		</View>
 	);
