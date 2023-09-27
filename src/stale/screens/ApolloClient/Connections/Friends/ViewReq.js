@@ -34,12 +34,14 @@ const IncomingReq = ({ id }) => {
 			directed: null,
 		},
 	});
-	const [users, setUsers] = useState([{}]);
+	const [users, setUsers] = useState([]);
 
 	useEffect(() => {
 		if (data) {
-			let requests = data.users[0].friends;
-			setUsers(requests);
+			console.log(data);
+			let requests = data?.users[0]?.friends;
+			if (requests) setUsers(requests);
+			else setUsers([]);
 		}
 	}, [data]);
 
@@ -95,12 +97,14 @@ const OutgoingReq = ({ id }) => {
 			},
 		},
 	});
-	const [users, setUsers] = useState([{}]);
+	const [users, setUsers] = useState([]);
 
 	useEffect(() => {
 		if (data) {
-			let requests = data.users[0].friends;
-			setUsers(requests);
+			console.log(data);
+			let requests = data?.users[0]?.friends;
+			if (requests) setUsers(requests);
+			else setUsers([]);
 		}
 	}, [data]);
 
