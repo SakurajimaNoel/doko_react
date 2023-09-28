@@ -2,20 +2,21 @@ import { View, Text, StyleSheet, TextInput, Button } from "react-native";
 import React from "react";
 import { Formik } from "formik";
 
-import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
+import { SignupSchema } from "../../../ValidationSchema/Auth/SignupSchema";
 
-export default function Login({ navigation }) {
-	const handleLogin = (values) => {
+export default function Signup() {
+	const handleSignup = (values) => {
 		let email = values.email;
+		let name = values.name;
 		let password = values.password;
 
-		// handle login logic
+		// handle signup logic
 	};
 
 	return (
 		<View style={styles.container}>
 			<View style={styles.headContainer}>
-				<Text style={styles.head}>Login</Text>
+				<Text style={styles.head}>Signup</Text>
 			</View>
 
 			<View style={styles.formContainer}>
@@ -23,10 +24,12 @@ export default function Login({ navigation }) {
 					validateOnMount={true}
 					initialValues={{
 						email: "",
+						name: "",
 						password: "",
+						confirmPassword: "",
 					}}
-					validationSchema={LoginSchema}
-					onSubmit={(values) => handleLogin(values)}>
+					validationSchema={SignupSchema}
+					onSubmit={(values) => handleSignup(values)}>
 					{({
 						values,
 						errors,
@@ -44,11 +47,27 @@ export default function Login({ navigation }) {
 									placeholder="Email..."
 									placeholderTextColor="#7F8487"
 									onChangeText={handleChange("email")}
-									onBlur={handleBlur("email")}
+									onEndEditing={handleBlur("email")}
 								/>
 								{touched.email && errors.email && (
 									<Text style={styles.errorText}>
 										{errors.email}
+									</Text>
+								)}
+							</View>
+
+							<View style={styles.inputContainer}>
+								<TextInput
+									style={styles.inputStyle}
+									value={values.name}
+									placeholder="Name..."
+									placeholderTextColor="#7F8487"
+									onChangeText={handleChange("name")}
+									onEndEditing={handleBlur("name")}
+								/>
+								{touched.name && errors.name && (
+									<Text style={styles.errorText}>
+										{errors.name}
 									</Text>
 								)}
 							</View>
@@ -61,7 +80,7 @@ export default function Login({ navigation }) {
 									placeholder="Password..."
 									placeholderTextColor="#7F8487"
 									onChangeText={handleChange("password")}
-									onBlur={handleBlur("password")}
+									onEndEditing={handleBlur("password")}
 								/>
 								{touched.password && errors.password && (
 									<Text style={styles.errorText}>
@@ -70,11 +89,31 @@ export default function Login({ navigation }) {
 								)}
 							</View>
 
+							<View style={styles.inputContainer}>
+								<TextInput
+									secureTextEntry={true}
+									style={styles.inputStyle}
+									value={values.confirmPassword}
+									placeholder="Confirm Password..."
+									placeholderTextColor="#7F8487"
+									onChangeText={handleChange(
+										"confirmPassword",
+									)}
+									onBlur={handleBlur("confirmPassword")}
+								/>
+								{touched.confirmPassword &&
+									errors.confirmPassword && (
+										<Text style={styles.errorText}>
+											{errors.confirmPassword}
+										</Text>
+									)}
+							</View>
+
 							<Button
 								disabled={!isValid}
 								onPress={handleSubmit}
-								title="Login"
-								accessibilityLabel="Login based on submitted credentials"
+								title="Signup"
+								accessibilityLabel="Signup based on submitted credentials"
 							/>
 						</>
 					)}

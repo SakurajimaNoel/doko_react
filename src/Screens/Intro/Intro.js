@@ -5,8 +5,10 @@ export default function Intro({ navigation }) {
 	const handleAuthNavigation = (toLogin = true) => {
 		if (toLogin) {
 			// navigate to login screen
+			navigation.navigate("Login");
 		} else {
 			// navigate to signup screen
+			navigation.navigate("Signup");
 		}
 	};
 
