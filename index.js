@@ -24,7 +24,7 @@ const apolloClient = new ApolloClient({
 
 // Amplify.configure(awsconfig);
 
-const recoilApp = () => {
+const Application = () => {
 	return (
 		<ApolloProvider client={apolloClient}>
 			<App />
@@ -32,4 +32,4 @@ const recoilApp = () => {
 	);
 };
 
-AppRegistry.registerComponent(appName, () => recoilApp);
+AppRegistry.registerComponent(appName, () => Application);

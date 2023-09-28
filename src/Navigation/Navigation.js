@@ -1,28 +1,18 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import Home from "../stale/screens/Home";
-
-import CreateUserProfile from "../stale/screens/ApolloClient/Profile/CreateUserProfile";
-import SendReq from "../stale/screens/ApolloClient/Connections/Friends/SendReq";
-import ViewReq from "../stale/screens/ApolloClient/Connections/Friends/ViewReq";
+import Intro from "../Screens/Intro";
+import Login from "../Screens/Authentication/Login";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
 const Navigation = () => {
 	return (
 		<NavigationContainer>
-			<Navigator initialRouteName="Home">
-				<Screen name="Home" component={Home} />
+			<Navigator initialRouteName="Login">
+				<Screen name="Intro" component={Intro} />
 
-				<Screen
-					name="CreateUserProfile"
-					component={CreateUserProfile}
-				/>
-
-				<Screen name="SendFriendRequest" component={SendReq} />
-
-				<Screen name="ViewFriendRequest" component={ViewReq} />
+				<Screen name="Login" component={Login} />
 			</Navigator>
 		</NavigationContainer>
 	);
