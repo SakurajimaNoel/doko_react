@@ -4,13 +4,25 @@ import { Formik } from "formik";
 
 import { SignupSchema } from "../../../ValidationSchema/Auth/SignupSchema";
 
+import UserPool from "../../../users/UserPool";
+
+
 export default function Signup() {
 	const handleSignup = (values) => {
 		let email = values.email;
 		let name = values.name;
 		let password = values.password;
 
+
 		// handle signup logic
+		//parameters: username, password, attributes = email(necessary), validatindata? keep null, callbacks
+		
+		UserPool.signUp(name, password, [{Name: "email", Value: email}], null, (err, data) =>{
+			if(err){
+				console.error("cognito error: ", err);
+			}
+			console.log("cognito data: ", data);
+		});
 	};
 
 	return (

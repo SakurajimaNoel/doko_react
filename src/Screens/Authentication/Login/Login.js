@@ -4,12 +4,34 @@ import { Formik } from "formik";
 
 import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
 
+import { CognitoUser, AuthenticationDetails } from "amazon-cognito-identity-js";
+import UserPool from "../../../users/UserPool";
+
 export default function Login({ navigation }) {
 	const handleLogin = (values) => {
 		let email = values.email;
 		let password = values.password;
 
 		// handle login logic
+		const user = new CognitoUser({
+			Username: email,
+			Pool: UserPool
+		});
+
+		const authDetails = new AuthenticationDetails({
+			Username: email,
+			Password: password,
+		});
+
+		user.authenticateUser(authDetails,{
+			onSuccess: (data) => {
+				console.log("Cognito Signin Success: ", data);
+			},
+			onFailure: (err) => {
+				console.log("Cognito Signin Failure: ", err)
+			}
+		});
+
 	};
 
 	return (
