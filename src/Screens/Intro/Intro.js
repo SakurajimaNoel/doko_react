@@ -1,7 +1,11 @@
 import { View, Text, StyleSheet, SafeAreaView, Button } from "react-native";
 import React from "react";
 
+import { useQuery } from "@apollo/client";
+import { getUserProfile } from "../../stale/graphql/queries/getUserProfile";
+
 export default function Intro({ navigation }) {
+
 	const handleAuthNavigation = (toLogin = true) => {
 		if (toLogin) {
 			// navigate to login screen
@@ -11,6 +15,31 @@ export default function Intro({ navigation }) {
 			navigation.navigate("Signup");
 		}
 	};
+
+	const {loading, error, data} = useQuery(getUserProfile,
+		{
+			variables: {
+				where: {
+					id: "7ca6b20b-3d7f-4712-a2ca-a99551011681",
+				},
+				friendsWhere2: {
+					friendsConnection_ALL: {
+						edge: {
+							status: "ACCEPTED",
+						},
+					},
+				},
+				options: {
+					limit: 5,
+				},
+			}
+			
+		});
+	if(loading) console.log("Loading");
+	if(error) console.error("API error", error.message);
+	if(data) console.log(data);
+
+
 
 	return (
 		<View style={styles.container}>
@@ -30,10 +59,13 @@ export default function Intro({ navigation }) {
 					title="Signup"
 					accessibilityLabel="To navigate to Signup screen"
 				/>
+
+				
 			</View>
 		</View>
 	);
 }
+
 
 const styles = StyleSheet.create({
 	container: {

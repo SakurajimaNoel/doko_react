@@ -7,6 +7,8 @@ import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
 import { CognitoUser, AuthenticationDetails } from "amazon-cognito-identity-js";
 import UserPool from "../../../users/UserPool";
 
+import AWS from 'aws-sdk/dist/aws-sdk-react-native';
+
 export default function Login({ navigation }) {
 	const handleLogin = (values) => {
 		let email = values.email;
@@ -32,7 +34,11 @@ export default function Login({ navigation }) {
 			}
 		});
 
+
+		
 	};
+	
+	
 
 	return (
 		<View style={styles.container}>
