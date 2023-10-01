@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, TextInput, Button } from "react-native";
+import { View, Text, StyleSheet, TextInput } from "react-native";
+import { Button } from "@rneui/themed";
 import React from "react";
 import { Formik } from "formik";
 
@@ -15,7 +16,7 @@ export default function Login({ navigation }) {
 		// handle login logic
 		const user = new CognitoUser({
 			Username: email,
-			Pool: UserPool
+			Pool: UserPool,
 		});
 
 		const authDetails = new AuthenticationDetails({
@@ -23,15 +24,14 @@ export default function Login({ navigation }) {
 			Password: password,
 		});
 
-		user.authenticateUser(authDetails,{
+		user.authenticateUser(authDetails, {
 			onSuccess: (data) => {
 				console.log("Cognito Signin Success: ", data);
 			},
 			onFailure: (err) => {
-				console.log("Cognito Signin Failure: ", err)
-			}
+				console.log("Cognito Signin Failure: ", err);
+			},
 		});
-
 	};
 
 	return (
@@ -101,6 +101,13 @@ export default function Login({ navigation }) {
 						</>
 					)}
 				</Formik>
+				<View>
+					<Button
+						onPress={() => navigation.navigate("Reset Password")}
+						title="Forgot Password?"
+						type="clear"
+					/>
+				</View>
 			</View>
 		</View>
 	);
