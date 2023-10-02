@@ -7,6 +7,8 @@ import {
 	ResetPasswordSchema,
 	ConfirmResetPasswordSchema,
 } from "../../../ValidationSchema/Auth/ResetPasswordSchema";
+import { CognitoUser } from "amazon-cognito-identity-js";
+import UserPool from "../../../users/UserPool";
 
 export default function ResetPassword() {
 	const [isConfirmPassword, setIsConfirmPassword] = useState(false);
@@ -14,17 +16,52 @@ export default function ResetPassword() {
 
 	const handleForgotPassword = (values) => {
 		let email = values.email;
+		let name = "rohan";
 		setIsLoading(true);
 
 		// handle sending reset code
+		const user = new CognitoUser({
+			Username: name,
+			Pool: UserPool,
+		});
+
+		user.forgotPassword({
+			onSuccess: (result) => {
+				console.log(result);
+				setIsLoading(false);
+				setIsConfirmPassword(true);
+			},
+			onError: (err) => {
+				console.log(err);
+				setIsLoading(false);
+			},
+		});
 	};
 
 	const handleConfirmForgotPassword = (values) => {
-		let code = values.code;
-		let password = values.password;
+		let verificationCode = values.resetCode;
+		let newPassword = values.password;
+		let name = "rohan";
 		setIsLoading(true);
 
+		console.log(verificationCode);
+
 		// handle changing password
+		const user = new CognitoUser({
+			Username: name,
+			Pool: UserPool,
+		});
+
+		user.confirmPassword(verificationCode, newPassword, {
+			onSuccess: (data) => {
+				setIsLoading(false);
+				console.log(data);
+			},
+			onFailure: (err) => {
+				setIsLoading(false);
+				console.log(err);
+			},
+		});
 	};
 
 	return (
