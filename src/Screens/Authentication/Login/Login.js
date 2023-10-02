@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TextInput } from "react-native";
 import { Button } from "@rneui/themed";
-import React from "react";
+import React, { useState } from "react";
 import { Formik } from "formik";
 
 import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
@@ -9,9 +9,13 @@ import { CognitoUser, AuthenticationDetails } from "amazon-cognito-identity-js";
 import UserPool from "../../../users/UserPool";
 
 export default function Login({ navigation }) {
+	const [isLoading, setIsLoading] = useState(false);
+	const [message, setMessage] = useState("");
+
 	const handleLogin = (values) => {
 		let email = values.email;
 		let password = values.password;
+		setIsLoading(true);
 
 		// handle login logic
 		const user = new CognitoUser({
@@ -27,9 +31,13 @@ export default function Login({ navigation }) {
 		user.authenticateUser(authDetails, {
 			onSuccess: (data) => {
 				console.log("Cognito Signin Success: ", data);
+				setIsLoading(false);
+				setMessage("Successfully authenticated");
 			},
 			onFailure: (err) => {
 				console.log("Cognito Signin Failure: ", err);
+				setIsLoading(false);
+				setMessage("Error authenticating");
 			},
 		});
 	};
@@ -93,9 +101,10 @@ export default function Login({ navigation }) {
 							</View>
 
 							<Button
-								disabled={!isValid}
+								disabled={isLoading || !isValid}
 								onPress={handleSubmit}
 								title="Login"
+								loading={isLoading}
 								accessibilityLabel="Login based on submitted credentials"
 							/>
 						</>
@@ -108,6 +117,10 @@ export default function Login({ navigation }) {
 						type="clear"
 					/>
 				</View>
+			</View>
+
+			<View style={styles.message}>
+				<Text style={styles.messageText}>{message}</Text>
 			</View>
 		</View>
 	);
@@ -129,7 +142,6 @@ const styles = StyleSheet.create({
 		fontWeight: 500,
 	},
 	formContainer: {
-		flex: 1,
 		gap: 20,
 		padding: 12,
 	},
@@ -148,5 +160,12 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		margin: 10,
+	},
+	message: {
+		padding: 12,
+	},
+	messageText: {
+		color: "black",
+		fontWeight: 500,
 	},
 });

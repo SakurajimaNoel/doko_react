@@ -13,6 +13,7 @@ import UserPool from "../../../users/UserPool";
 export default function ResetPassword() {
 	const [isConfirmPassword, setIsConfirmPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [message, setMessage] = useState("");
 
 	const handleForgotPassword = (values) => {
 		let email = values.email;
@@ -30,10 +31,12 @@ export default function ResetPassword() {
 				console.log(result);
 				setIsLoading(false);
 				setIsConfirmPassword(true);
+				setMessage("Code sent successfully");
 			},
 			onError: (err) => {
 				console.log(err);
 				setIsLoading(false);
+				setMessage("Error sending code");
 			},
 		});
 	};
@@ -56,10 +59,12 @@ export default function ResetPassword() {
 			onSuccess: (data) => {
 				setIsLoading(false);
 				console.log(data);
+				setMessage("Successfully changed password");
 			},
 			onFailure: (err) => {
 				setIsLoading(false);
 				console.log(err);
+				setMessage("Error changing password");
 			},
 		});
 	};
@@ -203,6 +208,10 @@ export default function ResetPassword() {
 					</Formik>
 				)}
 			</View>
+
+			<View style={styles.message}>
+				<Text style={styles.messageText}>{message}</Text>
+			</View>
 		</View>
 	);
 }
@@ -223,7 +232,6 @@ const styles = StyleSheet.create({
 		fontWeight: 500,
 	},
 	formContainer: {
-		flex: 1,
 		gap: 20,
 		padding: 12,
 	},
@@ -242,5 +250,12 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		margin: 10,
+	},
+	message: {
+		padding: 12,
+	},
+	messageText: {
+		color: "black",
+		fontWeight: 500,
 	},
 });
