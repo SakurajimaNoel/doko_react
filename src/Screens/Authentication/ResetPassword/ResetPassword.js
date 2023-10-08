@@ -7,24 +7,66 @@ import {
 	ResetPasswordSchema,
 	ConfirmResetPasswordSchema,
 } from "../../../ValidationSchema/Auth/ResetPasswordSchema";
+import { CognitoUser } from "amazon-cognito-identity-js";
+import UserPool from "../../../users/UserPool";
 
 export default function ResetPassword() {
 	const [isConfirmPassword, setIsConfirmPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [message, setMessage] = useState("");
 
 	const handleForgotPassword = (values) => {
 		let email = values.email;
+		let name = "rohan";
 		setIsLoading(true);
 
 		// handle sending reset code
+		const user = new CognitoUser({
+			Username: name,
+			Pool: UserPool,
+		});
+
+		user.forgotPassword({
+			onSuccess: (result) => {
+				console.log(result);
+				setIsLoading(false);
+				setIsConfirmPassword(true);
+				setMessage("Code sent successfully");
+			},
+			onError: (err) => {
+				console.log(err);
+				setIsLoading(false);
+				setMessage("Error sending code");
+			},
+		});
 	};
 
 	const handleConfirmForgotPassword = (values) => {
-		let code = values.code;
-		let password = values.password;
+		let verificationCode = values.resetCode;
+		let newPassword = values.password;
+		let name = "rohan";
 		setIsLoading(true);
 
+		console.log(verificationCode);
+
 		// handle changing password
+		const user = new CognitoUser({
+			Username: name,
+			Pool: UserPool,
+		});
+
+		user.confirmPassword(verificationCode, newPassword, {
+			onSuccess: (data) => {
+				setIsLoading(false);
+				console.log(data);
+				setMessage("Successfully changed password");
+			},
+			onFailure: (err) => {
+				setIsLoading(false);
+				console.log(err);
+				setMessage("Error changing password");
+			},
+		});
 	};
 
 	return (
@@ -166,6 +208,10 @@ export default function ResetPassword() {
 					</Formik>
 				)}
 			</View>
+
+			<View style={styles.message}>
+				<Text style={styles.messageText}>{message}</Text>
+			</View>
 		</View>
 	);
 }
@@ -186,7 +232,6 @@ const styles = StyleSheet.create({
 		fontWeight: 500,
 	},
 	formContainer: {
-		flex: 1,
 		gap: 20,
 		padding: 12,
 	},
@@ -205,5 +250,12 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		margin: 10,
+	},
+	message: {
+		padding: 12,
+	},
+	messageText: {
+		color: "black",
+		fontWeight: 500,
 	},
 });

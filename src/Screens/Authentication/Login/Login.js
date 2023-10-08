@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TextInput } from "react-native";
 import { Button } from "@rneui/themed";
-import React from "react";
+import React, { useState } from "react";
 import { Formik } from "formik";
 
 import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
@@ -15,11 +15,15 @@ AWS.config.region = 'ap-south-1';
 
 
 export default function Login({ navigation }) {
+	const [isLoading, setIsLoading] = useState(false);
+	const [message, setMessage] = useState("");
+
 	const handleLogin = (values) => {
 		let email = values.email;
 		let password = values.password;
-		
-		
+		setIsLoading(true);
+
+		// handle login logic
 		const user = new CognitoUser({
 			Username: email,
 			Pool: UserPool,
@@ -35,9 +39,13 @@ export default function Login({ navigation }) {
 				console.log("Cognito Signin Success: ");
 				var jwtToken = result.getAccessToken().getJwtToken();
 				console.log("JWT Token: " + jwtToken); // get bearer token here
+				setIsLoading(false);
+				setMessage("Successfully authenticated");
 			},
-			onFailure: (err) =>{
-				console.error("Cognito Signin Failure: ", err);
+			onFailure: (err) => {
+				console.log("Cognito Signin Failure: ", err);
+				setIsLoading(false);
+				setMessage("Error authenticating");
 			},
 			newPasswordRequired: (userAttributes, requiredAttributes) =>{
 				//console.log("passwrd req", e);
@@ -110,9 +118,10 @@ export default function Login({ navigation }) {
 							</View>
 
 							<Button
-								disabled={!isValid}
+								disabled={isLoading || !isValid}
 								onPress={handleSubmit}
 								title="Login"
+								loading={isLoading}
 								accessibilityLabel="Login based on submitted credentials"
 							/>
 						</>
@@ -125,6 +134,10 @@ export default function Login({ navigation }) {
 						type="clear"
 					/>
 				</View>
+			</View>
+
+			<View style={styles.message}>
+				<Text style={styles.messageText}>{message}</Text>
 			</View>
 		</View>
 	);
@@ -146,7 +159,6 @@ const styles = StyleSheet.create({
 		fontWeight: 500,
 	},
 	formContainer: {
-		flex: 1,
 		gap: 20,
 		padding: 12,
 	},
@@ -165,5 +177,12 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		margin: 10,
+	},
+	message: {
+		padding: 12,
+	},
+	messageText: {
+		color: "black",
+		fontWeight: 500,
 	},
 });

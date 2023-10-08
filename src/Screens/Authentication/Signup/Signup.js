@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet, TextInput, Button } from "react-native";
-import React from "react";
+import { View, Text, StyleSheet, TextInput } from "react-native";
+import { Button } from "@rneui/themed";
+import React, { useState } from "react";
 import { Formik } from "formik";
 
 import { SignupSchema } from "../../../ValidationSchema/Auth/SignupSchema";
@@ -11,21 +12,35 @@ import * as AWS from "aws-sdk"
 
 
 export default function Signup() {
+	const [isLoading, setIsLoading] = useState(false);
+	const [message, setMessage] = useState("this is sample message");
+
 	const handleSignup = (values) => {
 		let email = values.email;
 		let name = values.name;
 		let password = values.password;
-
+		setIsLoading(true);
 
 		// handle signup logic
 		//parameters: username, password, attributes = email(necessary), validatindata? keep null, callbacks
-		
-		UserPool.signUp(name, password, [{Name: "email", Value: email}], null, (err, data) =>{
-			if(err){
-				console.error("cognito error: ", err);
-			}
-			console.log("cognito data: ", data);
-		});
+
+		UserPool.signUp(
+			name,
+			password,
+			[{ Name: "email", Value: email }],
+			null,
+			(err, data) => {
+				setIsLoading(false);
+				let msg =
+					"Successfully created account. Check mail to verify account";
+				if (err) {
+					console.error("cognito error: ", err);
+					msg = "Error creating account";
+				}
+				console.log("cognito data: ", data);
+				setMessage(msg);
+			},
+		);
 	};
 
 	return (
@@ -125,14 +140,19 @@ export default function Signup() {
 							</View>
 
 							<Button
-								disabled={!isValid}
+								disabled={isLoading || !isValid}
 								onPress={handleSubmit}
 								title="Signup"
+								loading={isLoading}
 								accessibilityLabel="Signup based on submitted credentials"
 							/>
 						</>
 					)}
 				</Formik>
+			</View>
+
+			<View style={styles.message}>
+				<Text style={styles.messageText}>{message}</Text>
 			</View>
 		</View>
 	);
@@ -154,7 +174,6 @@ const styles = StyleSheet.create({
 		fontWeight: 500,
 	},
 	formContainer: {
-		flex: 1,
 		gap: 20,
 		padding: 12,
 	},
@@ -173,5 +192,12 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		margin: 10,
+	},
+	message: {
+		padding: 12,
+	},
+	messageText: {
+		color: "black",
+		fontWeight: 500,
 	},
 });
