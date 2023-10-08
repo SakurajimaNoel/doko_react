@@ -6,6 +6,9 @@ import { SignupSchema } from "../../../ValidationSchema/Auth/SignupSchema";
 
 import UserPool from "../../../users/UserPool";
 
+import * as AWS from "aws-sdk"
+
+
 
 export default function Signup() {
 	const handleSignup = (values) => {

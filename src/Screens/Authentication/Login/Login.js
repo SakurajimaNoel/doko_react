@@ -6,14 +6,20 @@ import { Formik } from "formik";
 import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
 
 import { CognitoUser, AuthenticationDetails } from "amazon-cognito-identity-js";
+
 import UserPool from "../../../users/UserPool";
+
+import * as AWS from "aws-sdk"
+
+AWS.config.region = 'ap-south-1';
+
 
 export default function Login({ navigation }) {
 	const handleLogin = (values) => {
 		let email = values.email;
 		let password = values.password;
-
-		// handle login logic
+		
+		
 		const user = new CognitoUser({
 			Username: email,
 			Pool: UserPool,
@@ -25,15 +31,26 @@ export default function Login({ navigation }) {
 		});
 
 		user.authenticateUser(authDetails, {
-			onSuccess: (data) => {
-				console.log("Cognito Signin Success: ", data);
+			onSuccess: (result) =>{
+				console.log("Cognito Signin Success: ");
+				var jwtToken = result.getAccessToken().getJwtToken();
+				console.log("JWT Token: " + jwtToken); // get bearer token here
 			},
-			onFailure: (err) => {
-				console.log("Cognito Signin Failure: ", err);
+			onFailure: (err) =>{
+				console.error("Cognito Signin Failure: ", err);
 			},
+			newPasswordRequired: (userAttributes, requiredAttributes) =>{
+				//console.log("passwrd req", e);
+				userAttributes: authDetails;
+				requiredAttributes: email;
+				let newPassword = password;
+				user.completeNewPasswordChallenge(newPassword,[], this)
+			},
+			
+			
 		});
 	};
-
+	
 	return (
 		<View style={styles.container}>
 			<View style={styles.headContainer}>
