@@ -5,42 +5,31 @@ import { Formik } from "formik";
 
 import { SignupSchema } from "../../../ValidationSchema/Auth/SignupSchema";
 
-import UserPool from "../../../users/UserPool";
+// import * as AWS from "aws-sdk";
+import { HandleSignupParams, SignupProps } from "./types";
+import { SignUp } from "../../../Connectors/Auth/auth";
 
-import * as AWS from "aws-sdk"
-
-
-
-export default function Signup() {
+export default function Signup({ navigation }: SignupProps) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [message, setMessage] = useState("this is sample message");
 
-	const handleSignup = (values) => {
-		let email = values.email;
-		let name = values.name;
-		let password = values.password;
+	const handleSignup = (userDetails: HandleSignupParams) => {
 		setIsLoading(true);
 
 		// handle signup logic
-		//parameters: username, password, attributes = email(necessary), validatindata? keep null, callbacks
-
-		UserPool.signUp(
-			name,
-			password,
-			[{ Name: "email", Value: email }],
-			null,
-			(err, data) => {
-				setIsLoading(false);
+		SignUp(userDetails)
+			.then((data) => {
 				let msg =
 					"Successfully created account. Check mail to verify account";
-				if (err) {
-					console.error("cognito error: ", err);
-					msg = "Error creating account";
-				}
-				console.log("cognito data: ", data);
 				setMessage(msg);
-			},
-		);
+			})
+			.catch((err) => {
+				let msg = "Error creating account";
+				setMessage(msg);
+			})
+			.finally(() => {
+				setIsLoading(false);
+			});
 	};
 
 	return (
@@ -171,7 +160,7 @@ const styles = StyleSheet.create({
 		color: "black",
 		fontSize: 24,
 		textAlign: "center",
-		fontWeight: 500,
+		fontWeight: "500",
 	},
 	formContainer: {
 		gap: 20,
@@ -198,6 +187,6 @@ const styles = StyleSheet.create({
 	},
 	messageText: {
 		color: "black",
-		fontWeight: 500,
+		fontWeight: "500",
 	},
 });

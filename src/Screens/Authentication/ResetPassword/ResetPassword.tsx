@@ -10,13 +10,21 @@ import {
 import { CognitoUser } from "amazon-cognito-identity-js";
 import UserPool from "../../../users/UserPool";
 
-export default function ResetPassword() {
+import { ResetPasswordProps } from "./types";
+import {
+	HandleConfirmPasswordParams,
+	HandleForgotPasswordParams,
+} from "./types";
+
+export default function ResetPassword({ navigation }: ResetPasswordProps) {
 	const [isConfirmPassword, setIsConfirmPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [message, setMessage] = useState("");
+	const [email, setEmail] = useState("");
 
-	const handleForgotPassword = (values) => {
+	const handleForgotPassword = (values: HandleForgotPasswordParams) => {
 		let email = values.email;
+		setEmail(email);
 		let name = "rohan";
 		setIsLoading(true);
 
@@ -33,7 +41,7 @@ export default function ResetPassword() {
 				setIsConfirmPassword(true);
 				setMessage("Code sent successfully");
 			},
-			onError: (err) => {
+			onFailure: (err) => {
 				console.log(err);
 				setIsLoading(false);
 				setMessage("Error sending code");
@@ -41,7 +49,9 @@ export default function ResetPassword() {
 		});
 	};
 
-	const handleConfirmForgotPassword = (values) => {
+	const handleConfirmForgotPassword = (
+		values: HandleConfirmPasswordParams,
+	) => {
 		let verificationCode = values.resetCode;
 		let newPassword = values.password;
 		let name = "rohan";
@@ -229,7 +239,7 @@ const styles = StyleSheet.create({
 		color: "black",
 		fontSize: 24,
 		textAlign: "center",
-		fontWeight: 500,
+		fontWeight: "500",
 	},
 	formContainer: {
 		gap: 20,
@@ -256,6 +266,6 @@ const styles = StyleSheet.create({
 	},
 	messageText: {
 		color: "black",
-		fontWeight: 500,
+		fontWeight: "500",
 	},
 });

@@ -4,26 +4,23 @@ import React, { useState } from "react";
 import { Formik } from "formik";
 
 import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
-
+import { HandleLoginParams, LoginProps } from "./types";
 import { CognitoUser, AuthenticationDetails } from "amazon-cognito-identity-js";
-
+import * as AWS from "aws-sdk";
 import UserPool from "../../../users/UserPool";
 
-import * as AWS from "aws-sdk"
+AWS.config.region = "ap-south-1";
 
-AWS.config.region = 'ap-south-1';
-
-
-export default function Login({ navigation }) {
+export default function Login({ navigation }: LoginProps) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [message, setMessage] = useState("");
 
-	const handleLogin = (values) => {
-		let email = values.email;
-		let password = values.password;
+	const handleLogin = (userCredentials: HandleLoginParams) => {
 		setIsLoading(true);
 
 		// handle login logic
+		const { email, password } = userCredentials;
+
 		const user = new CognitoUser({
 			Username: email,
 			Pool: UserPool,
@@ -35,30 +32,31 @@ export default function Login({ navigation }) {
 		});
 
 		user.authenticateUser(authDetails, {
-			onSuccess: (result) =>{
-				console.log("Cognito Signin Success: ");
+			onSuccess: (result) => {
+				setMessage("Successfully authenticated");
+				setIsLoading(false);
+				console.log("Cognito Signin Success: ", result);
 				var jwtToken = result.getAccessToken().getJwtToken();
 				console.log("JWT Token: " + jwtToken); // get bearer token here
-				setIsLoading(false);
-				setMessage("Successfully authenticated");
 			},
 			onFailure: (err) => {
-				console.log("Cognito Signin Failure: ", err);
 				setIsLoading(false);
+				console.log("Cognito Signin Failure: ", err);
 				setMessage("Error authenticating");
 			},
-			newPasswordRequired: (userAttributes, requiredAttributes) =>{
-				//console.log("passwrd req", e);
+			newPasswordRequired: (userAttributes, requiredAttributes) => {
 				userAttributes: authDetails;
 				requiredAttributes: email;
 				let newPassword = password;
-				user.completeNewPasswordChallenge(newPassword,[], this)
+				user.completeNewPasswordChallenge(
+					newPassword,
+					userAttributes,
+					this,
+				);
 			},
-			
-			
 		});
 	};
-	
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.headContainer}>
@@ -129,7 +127,7 @@ export default function Login({ navigation }) {
 				</Formik>
 				<View>
 					<Button
-						onPress={() => navigation.navigate("Reset Password")}
+						onPress={() => navigation.navigate("ResetPassword")}
 						title="Forgot Password?"
 						type="clear"
 					/>
@@ -156,7 +154,7 @@ const styles = StyleSheet.create({
 		color: "black",
 		fontSize: 24,
 		textAlign: "center",
-		fontWeight: 500,
+		fontWeight: "500",
 	},
 	formContainer: {
 		gap: 20,
@@ -183,6 +181,6 @@ const styles = StyleSheet.create({
 	},
 	messageText: {
 		color: "black",
-		fontWeight: 500,
+		fontWeight: "500",
 	},
 });

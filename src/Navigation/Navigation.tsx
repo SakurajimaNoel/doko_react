@@ -1,12 +1,22 @@
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import {
+	createNativeStackNavigator,
+	NativeStackScreenProps,
+} from "@react-navigation/native-stack";
 
 import Intro from "../Screens/Intro";
 import Login from "../Screens/Authentication/Login";
 import Signup from "../Screens/Authentication/Signup";
 import ResetPassword from "../Screens/Authentication/ResetPassword";
 
-const { Navigator, Screen } = createNativeStackNavigator();
+export type RootStackParamList = {
+	Intro: undefined;
+	Login: undefined;
+	Signup: undefined;
+	ResetPassword: undefined;
+};
+
+const { Navigator, Screen } = createNativeStackNavigator<RootStackParamList>();
 
 const Navigation = () => {
 	return (
@@ -18,7 +28,7 @@ const Navigation = () => {
 
 				<Screen name="Signup" component={Signup} />
 
-				<Screen name="Reset Password" component={ResetPassword} />
+				<Screen name="ResetPassword" component={ResetPassword} />
 			</Navigator>
 		</NavigationContainer>
 	);
