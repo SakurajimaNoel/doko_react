@@ -7,29 +7,45 @@ import { SignupSchema } from "../../../ValidationSchema/Auth/SignupSchema";
 
 // import * as AWS from "aws-sdk";
 import { HandleSignupParams, SignupProps } from "./types";
-import { SignUp } from "../../../Connectors/Auth/auth";
+import "react-native-get-random-values";
+import { nanoid } from "nanoid";
+import UserPool from "../../../users/UserPool";
 
 export default function Signup({ navigation }: SignupProps) {
 	const [isLoading, setIsLoading] = useState(false);
-	const [message, setMessage] = useState("this is sample message");
+	const [message, setMessage] = useState("");
 
 	const handleSignup = (userDetails: HandleSignupParams) => {
 		setIsLoading(true);
+		const { name, email, password } = userDetails;
+		const userId = nanoid();
+
+		const userAttributes = [
+			{
+				Name: "email",
+				Value: email,
+			},
+			{
+				Name: "name",
+				Value: name,
+			},
+		];
 
 		// handle signup logic
-		SignUp(userDetails)
-			.then((data) => {
-				let msg =
-					"Successfully created account. Check mail to verify account";
-				setMessage(msg);
-			})
-			.catch((err) => {
-				let msg = "Error creating account";
-				setMessage(msg);
-			})
-			.finally(() => {
-				setIsLoading(false);
-			});
+
+		// parameters: username, password, attributes = email(necessary), validatindata? keep null, callbacks
+		UserPool.signUp(name, password, userAttributes, null, (err, data) => {
+			setIsLoading(false);
+			if (err) {
+				console.error("cognito error: ", err);
+				setMessage(err.message);
+				return;
+			}
+			console.log("cognito data: ", data);
+			setMessage(
+				"Successfully created account. Check mail to verify account",
+			);
+		});
 	};
 
 	return (
