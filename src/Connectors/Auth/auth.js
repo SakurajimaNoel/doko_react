@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import UserPool from "../../users/UserPool";
 
 export const SignUp = async (userDetails) => {
@@ -15,7 +16,7 @@ export const SignUp = async (userDetails) => {
 	];
 
 	//parameters: username, password, attributes = email(necessary), validatindata? keep null, callbacks
-	UserPool.signUp(email, password, userAttributes, null, (err, data) => {
+	UserPool.signUp(nanoid(), password, userAttributes, null, (err, data) => {
 		if (err) {
 			console.error("cognito error: ", err);
 			throw new Error(err);
