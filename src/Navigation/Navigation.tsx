@@ -28,11 +28,11 @@ export type RootTabParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 const Navigation = () => {
-	const auth = useAppSelector((state) => state.auth.value);
+	const auth = useAppSelector((state) => state.auth);
 
 	return (
 		<NavigationContainer>
-			{!auth ? (
+			{!auth.status ? (
 				<>
 					<Stack.Navigator initialRouteName="Intro">
 						<Stack.Screen name="Intro" component={Intro} />

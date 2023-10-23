@@ -18,7 +18,7 @@ export default function Signup({ navigation }: SignupProps) {
 	const handleSignup = (userDetails: HandleSignupParams) => {
 		setIsLoading(true);
 		const { name, email, password } = userDetails;
-		const userId = nanoid();
+		const userId = nanoid().toLowerCase();
 
 		const userAttributes = [
 			{
@@ -29,12 +29,16 @@ export default function Signup({ navigation }: SignupProps) {
 				Name: "name",
 				Value: name,
 			},
+			{
+				Name: "preferred_username",
+				Value: userId,
+			},
 		];
 
 		// handle signup logic
 
 		// parameters: username, password, attributes = email(necessary), validatindata? keep null, callbacks
-		UserPool.signUp(name, password, userAttributes, null, (err, data) => {
+		UserPool.signUp(userId, password, userAttributes, null, (err, data) => {
 			setIsLoading(false);
 			if (err) {
 				console.error("cognito error: ", err);

@@ -5,15 +5,66 @@ import { Formik } from "formik";
 
 import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
 import { HandleLoginParams, LoginProps } from "./types";
-import { CognitoUser, AuthenticationDetails } from "amazon-cognito-identity-js";
+import {
+	CognitoUser,
+	AuthenticationDetails,
+	CognitoUserSession,
+} from "amazon-cognito-identity-js";
 import * as AWS from "aws-sdk";
 import UserPool from "../../../users/UserPool";
 
 AWS.config.region = "ap-south-1";
 
+import { loginUser } from "../../../redux/slices/authSlice";
+import { useAppDispatch } from "../../../hooks/reduxHooks";
+import { useAppSelector } from "../../../hooks/reduxHooks";
+
 export default function Login({ navigation }: LoginProps) {
+	const dispatch = useAppDispatch();
+	const auth = useAppSelector((state) => state.auth);
+
 	const [isLoading, setIsLoading] = useState(false);
 	const [message, setMessage] = useState("");
+
+	const handleAuthSuccess = (payload: CognitoUserSession) => {
+		let decodedAccess = payload.getAccessToken().decodePayload();
+		let decodedId = payload.getIdToken().decodePayload();
+		console.log(decodedId);
+
+		// accesstoken
+		let accessToken = {
+			token: payload.getAccessToken().getJwtToken(),
+			expTime: payload.getAccessToken().getExpiration(),
+			issuedAt: payload.getAccessToken().getIssuedAt(),
+		};
+
+		// idToken
+		let idToken = {
+			token: payload.getIdToken().getJwtToken(),
+			expTime: payload.getIdToken().getExpiration(),
+			issuedAt: payload.getIdToken().getIssuedAt(),
+		};
+
+		let refreshToken = payload.getRefreshToken().getToken();
+		let name = decodedId.name ? decodedId.name : "dokiii";
+		let username = decodedId.preferred_username;
+		let email = decodedId.email;
+		let awsUsername = decodedAccess.username;
+		let completeProfile = awsUsername !== username;
+
+		let userDetails = {
+			accessToken,
+			idToken,
+			refreshToken,
+			name,
+			username,
+			email,
+			completeProfile,
+			awsUsername,
+		};
+
+		dispatch(loginUser(userDetails));
+	};
 
 	const handleLogin = (userCredentials: HandleLoginParams) => {
 		setIsLoading(true);
@@ -35,14 +86,15 @@ export default function Login({ navigation }: LoginProps) {
 			onSuccess: (result) => {
 				setMessage("Successfully authenticated");
 				setIsLoading(false);
-				console.log("Cognito Signin Success: ", result);
-				var jwtToken = result.getAccessToken().getJwtToken();
-				console.log("JWT Token: " + jwtToken); // get bearer token here
+				console.log("Cognito Signin Success");
+				handleAuthSuccess(result);
+				// var jwtToken = result.getAccessToken().getJwtToken();
+				// console.log("JWT Token: " + jwtToken); // get bearer token here
 			},
 			onFailure: (err) => {
 				setIsLoading(false);
 				console.log("Cognito Signin Failure: ", err);
-				setMessage("Error authenticating");
+				setMessage(err.message);
 			},
 			newPasswordRequired: (userAttributes, requiredAttributes) => {
 				userAttributes: authDetails;
@@ -67,8 +119,8 @@ export default function Login({ navigation }: LoginProps) {
 				<Formik
 					validateOnMount={true}
 					initialValues={{
-						email: "",
-						password: "",
+						email: "rohanverma031@gmail.com",
+						password: "R1o2h3a4n5:%%",
 					}}
 					validationSchema={LoginSchema}
 					onSubmit={(values) => handleLogin(values)}>

@@ -2,9 +2,6 @@ import { View, Text, StyleSheet } from "react-native";
 import { Button } from "@rneui/themed";
 import React from "react";
 
-import { useAppDispatch } from "../../hooks/reduxHooks";
-import { toggle } from "../../redux/slices/authSlice";
-
 import { gql, useQuery } from "@apollo/client";
 import { getUserProfile } from "../../stale/graphql/queries/getUserProfile";
 
@@ -20,12 +17,6 @@ const tempquery = gql`
 `;
 
 export default function Intro({ navigation }: IntroProps) {
-	const dispatch = useAppDispatch();
-
-	const handleAuthChange = () => {
-		dispatch(toggle());
-	};
-
 	const handleAuthNavigation = (toLogin = true) => {
 		if (toLogin) {
 			// navigate to login screen
@@ -71,13 +62,6 @@ export default function Intro({ navigation }: IntroProps) {
 					onPress={() => handleAuthNavigation(false)}
 					title="Signup"
 					accessibilityLabel="To navigate to Signup screen"
-				/>
-
-				<Button
-					onPress={handleAuthChange}
-					title="Auth Change"
-					accessibilityLabel="auth change"
-					type="clear"
 				/>
 			</View>
 		</View>
