@@ -29,7 +29,6 @@ export default function Login({ navigation }: LoginProps) {
 	const handleAuthSuccess = (payload: CognitoUserSession) => {
 		let decodedAccess = payload.getAccessToken().decodePayload();
 		let decodedId = payload.getIdToken().decodePayload();
-		console.log(decodedId);
 
 		// accesstoken
 		let accessToken = {
@@ -37,6 +36,7 @@ export default function Login({ navigation }: LoginProps) {
 			expTime: payload.getAccessToken().getExpiration(),
 			issuedAt: payload.getAccessToken().getIssuedAt(),
 		};
+		console.log(accessToken.token);
 
 		// idToken
 		let idToken = {
@@ -196,7 +196,6 @@ export default function Login({ navigation }: LoginProps) {
 const styles = StyleSheet.create({
 	container: {
 		margin: 10,
-		flex: 1,
 	},
 	headContainer: {
 		paddingTop: 10,

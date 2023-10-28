@@ -11,12 +11,12 @@ import { store } from "./src/redux/store/store";
 
 // import { Amplify, Auth } from "aws-amplify";
 // import awsconfig from "./src/aws-exports";
-// import { startNetworkLogging } from "react-native-network-logger";
+import { startNetworkLogging } from "react-native-network-logger";
 
 import { ApolloProvider } from "@apollo/client";
 // import { setContext } from "@apollo/client/link/context";
 
-//startNetworkLogging();   //for network logging, dont delete
+startNetworkLogging(); //for network logging, dont delete
 
 // Amplify.configure(awsconfig);
 

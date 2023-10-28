@@ -7,7 +7,7 @@ interface TokenState {
 	issuedAt: string;
 }
 
-interface AuthState {
+export interface AuthState {
 	status: boolean;
 	accessToken: TokenState;
 	idToken: TokenState;
