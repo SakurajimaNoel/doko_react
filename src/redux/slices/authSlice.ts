@@ -39,8 +39,8 @@ const initialState: AuthState = {
 	awsUsername: "",
 };
 
-export const authSlice = createSlice({
-	name: "text",
+const authSlice = createSlice({
+	name: "auth",
 	initialState,
 	reducers: {
 		loginUser: (state, action) => {
@@ -63,7 +63,7 @@ export const authSlice = createSlice({
 			state.email = email;
 			state.username = username;
 			state.completeProfile = completeProfile;
-			state.awsUsername = username;
+			state.awsUsername = awsUsername;
 		},
 		logoutUser: (state) => {
 			state.status = false;

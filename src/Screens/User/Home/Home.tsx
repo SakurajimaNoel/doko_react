@@ -5,6 +5,8 @@ import { Button } from "@rneui/themed";
 import { useAppDispatch, useAppSelector } from "../../../hooks/reduxHooks";
 import { logoutUser } from "../../../redux/slices/authSlice";
 import * as Keychain from "react-native-keychain";
+import * as AWS from "aws-sdk";
+import { getAWSCredentials } from "../../../Connectors/auth/aws";
 
 const Home = ({ navigation }: HomeProps) => {
 	const dispatch = useAppDispatch();
@@ -13,6 +15,30 @@ const Home = ({ navigation }: HomeProps) => {
 	const handleLogout = async () => {
 		await Keychain.resetGenericPassword();
 		dispatch(logoutUser());
+	};
+
+	const handleTrial = () => {
+		const credentials = getAWSCredentials();
+
+		credentials?.get((error) => {
+			if (error) {
+				console.error("Error fetching AWS credentials: ", error);
+			} else {
+				// Initialize AWS service with the obtained credentials
+				const s3 = new AWS.S3();
+
+				// Example: List S3 buckets
+				s3.listBuckets((err, data) => {
+					if (err) {
+						console.error("Error listing S3 buckets: ", err);
+					} else {
+						console.log("S3 buckets: ", data.Buckets);
+					}
+				});
+
+				// You can use other AWS services similarly with the obtained credentials
+			}
+		});
 	};
 
 	return (
@@ -28,6 +54,12 @@ const Home = ({ navigation }: HomeProps) => {
 				title="Logout"
 				accessibilityLabel="Logout"
 				type="clear"
+			/>
+			<Button
+				onPress={handleTrial}
+				title="trial"
+				accessibilityLabel="Logout"
+				// type="clear"
 			/>
 		</View>
 	);

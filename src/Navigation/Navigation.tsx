@@ -2,6 +2,15 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useAppSelector } from "../hooks/reduxHooks";
+import { useEffect } from "react";
+import * as AWS from "aws-sdk";
+
+import {
+	initAWSCredentials,
+	getAWSCredentials,
+	resetAWSCredentials,
+} from "../Connectors/auth/aws";
+import { resetCognitoUser } from "../Connectors/auth/cognitoUser";
 
 import Intro from "../Screens/Intro";
 import Login from "../Screens/Authentication/Login";
@@ -29,6 +38,17 @@ const Tab = createBottomTabNavigator<RootTabParamList>();
 
 const Navigation = () => {
 	const auth = useAppSelector((state) => state.auth);
+
+	useEffect(() => {
+		if (auth.status) {
+			// for iam access
+			initAWSCredentials(auth.idToken.token);
+			const credentials = getAWSCredentials();
+		} else {
+			resetAWSCredentials();
+			resetCognitoUser();
+		}
+	}, [auth]);
 
 	return (
 		<NavigationContainer>

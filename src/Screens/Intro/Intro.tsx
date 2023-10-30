@@ -2,12 +2,14 @@ import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { Button } from "@rneui/themed";
 import React, { useState, useEffect } from "react";
 import * as Keychain from "react-native-keychain";
-import { CognitoUser, CognitoRefreshToken } from "amazon-cognito-identity-js";
-import * as AWS from "aws-sdk";
-import UserPool from "../../users/UserPool";
+import { CognitoRefreshToken } from "amazon-cognito-identity-js";
+
+import {
+	initCognitoUser,
+	getCognitoUser,
+} from "../../Connectors/auth/cognitoUser";
 
 import { userTokenDetails } from "../../Connectors/auth/auth";
-import { iamAccess } from "../../Connectors/auth/aws";
 import { loginUser } from "../../redux/slices/authSlice";
 import { useAppDispatch } from "../../hooks/reduxHooks";
 
@@ -21,58 +23,26 @@ export default function Intro({ navigation }: IntroProps) {
 	const [loading, setLoading] = useState(true);
 
 	const handleTokenRefresh = (credentials: Keychain.UserCredentials) => {
-		let { username: email, password: refreshToken } = credentials;
-		console.log(email);
-		console.log(refreshToken);
+		let { username, password: refreshToken } = credentials;
 
-		const user = new CognitoUser({
-			Username: email,
-			Pool: UserPool,
-		});
+		initCognitoUser(username);
+		const user = getCognitoUser();
 
 		const refreshDetails = new CognitoRefreshToken({
 			RefreshToken: refreshToken,
 		});
 
-		user.refreshSession(refreshDetails, async (error, result) => {
-			setLoading(false);
+		user?.refreshSession(refreshDetails, async (error, result) => {
 			if (error) {
 				console.log(error);
 			} else {
 				let userDetails = userTokenDetails(result);
-				// for iam access
-				// const credentials = iamAccess(userDetails.idToken.token);
-
-				// credentials.get((error) => {
-				// 	if (error) {
-				// 		console.error(
-				// 			"Error fetching AWS credentials: ",
-				// 			error,
-				// 		);
-				// 	} else {
-				// 		// Initialize AWS service with the obtained credentials
-				// 		const s3 = new AWS.S3();
-
-				// 		// Example: List S3 buckets
-				// 		s3.listBuckets((err, data) => {
-				// 			if (err) {
-				// 				console.error(
-				// 					"Error listing S3 buckets: ",
-				// 					err,
-				// 				);
-				// 			} else {
-				// 				console.log("S3 buckets: ", data.Buckets);
-				// 			}
-				// 		});
-
-				// 		// You can use other AWS services similarly with the obtained credentials
-				// 	}
-				// });
 
 				await Keychain.setGenericPassword(
 					userDetails.email,
 					userDetails.refreshToken,
 				);
+				setLoading(false);
 				dispatch(loginUser(userDetails));
 			}
 		});
@@ -87,7 +57,7 @@ export default function Intro({ navigation }: IntroProps) {
 				if (credentials) {
 					handleTokenRefresh(credentials);
 				} else {
-					console.log("No credentials stored");
+					// console.log("No credentials stored");
 					setLoading(false);
 				}
 			} catch (error) {

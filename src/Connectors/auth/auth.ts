@@ -10,7 +10,7 @@ export const userTokenDetails: UserTokenDetails = (payload) => {
 		expTime: String(payload.getAccessToken().getExpiration()),
 		issuedAt: String(payload.getAccessToken().getIssuedAt()),
 	};
-	// console.log(accessToken.token);
+	console.log(accessToken.token);
 
 	// idToken
 	let idToken: TokenState = {

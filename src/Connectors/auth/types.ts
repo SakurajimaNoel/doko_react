@@ -1,4 +1,4 @@
-import { CognitoUserSession } from "amazon-cognito-identity-js";
+import { CognitoUserSession, CognitoUser } from "amazon-cognito-identity-js";
 
 export interface TokenState {
 	token: string;
@@ -19,4 +19,10 @@ interface AuthState {
 
 export type UserTokenDetails = (payload: CognitoUserSession) => AuthState;
 
-export type IamAccess = (idToken: string) => AWS.CognitoIdentityCredentials;
+export type InitCognitoUser = (userName: string) => void;
+
+export type GetCognitoUser = () => CognitoUser | null;
+
+export type InitAWSCredentials = (idToken: string) => void;
+
+export type GetAWSCredentials = () => null | AWS.CognitoIdentityCredentials;

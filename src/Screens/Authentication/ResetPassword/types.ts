@@ -20,3 +20,13 @@ export interface HandleConfirmPasswordParams {
 	password: string;
 	confirmPassword: string;
 }
+
+export interface SendCodeProps {
+	handleForgotPassword: (values: HandleForgotPasswordParams) => void;
+	isLoading: boolean;
+}
+
+export interface ChangePasswordProps {
+	handleConfirmForgotPassword: (values: HandleConfirmPasswordParams) => void;
+	isLoading: boolean;
+}

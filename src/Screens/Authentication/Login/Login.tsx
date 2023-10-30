@@ -3,84 +3,32 @@ import { Button } from "@rneui/themed";
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Keychain from "react-native-keychain";
+
 import { userTokenDetails } from "../../../Connectors/auth/auth";
-import { iamAccess } from "../../../Connectors/auth/aws";
+import {
+	initCognitoUser,
+	getCognitoUser,
+} from "../../../Connectors/auth/cognitoUser";
 
 import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
 import { HandleLoginParams, LoginProps } from "./types";
 import {
-	CognitoUser,
 	AuthenticationDetails,
 	CognitoUserSession,
 } from "amazon-cognito-identity-js";
 import * as AWS from "aws-sdk";
-import UserPool from "../../../users/UserPool";
 
 import { loginUser } from "../../../redux/slices/authSlice";
 import { useAppDispatch } from "../../../hooks/reduxHooks";
-import { useAppSelector } from "../../../hooks/reduxHooks";
 
 export default function Login({ navigation }: LoginProps) {
 	const dispatch = useAppDispatch();
-	// const auth = useAppSelector((state) => state.auth);
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [message, setMessage] = useState("");
 
 	const handleAuthSuccess = async (payload: CognitoUserSession) => {
-		// AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-		// 	IdentityPoolId: "ap-south-1:be985ba0-fa08-4b08-933a-4bdabaa2fcc2", // your identity pool id here
-		// 	Logins: {
-		// 		// Change the key below according to the specific region your user pool is in.
-		// 		"cognito-idp.ap-south-1.amazonaws.com/ap-south-1_7y9RKbI3j":
-		// 			idToken.token,
-		// 	},
-		// });
-
-		// AWS.config.credentials.get((error) => {
-		// 	if (error) {
-		// 		console.error("Error fetching AWS credentials: ", error);
-		// 	} else {
-		// 		// Initialize AWS service with the obtained credentials
-		// 		const s3 = new AWS.S3();
-
-		// 		// Example: List S3 buckets
-		// 		s3.listBuckets((err, data) => {
-		// 			if (err) {
-		// 				console.error("Error listing S3 buckets: ", err);
-		// 			} else {
-		// 				console.log("S3 buckets: ", data.Buckets);
-		// 			}
-		// 		});
-
-		// 		// You can use other AWS services similarly with the obtained credentials
-		// 	}
-		// });
-
 		let userDetails = userTokenDetails(payload);
-
-		// for iam access
-		// const credentials = iamAccess(userDetails.idToken.token);
-
-		// credentials.get((error) => {
-		// 	if (error) {
-		// 		console.error("Error fetching AWS credentials: ", error);
-		// 	} else {
-		// 		// Initialize AWS service with the obtained credentials
-		// 		const s3 = new AWS.S3();
-
-		// 		// Example: List S3 buckets
-		// 		s3.listBuckets((err, data) => {
-		// 			if (err) {
-		// 				console.error("Error listing S3 buckets: ", err);
-		// 			} else {
-		// 				console.log("S3 buckets: ", data.Buckets);
-		// 			}
-		// 		});
-
-		// 		// You can use other AWS services similarly with the obtained credentials
-		// 	}
-		// });
 
 		// store as {usernam, password}
 		await Keychain.setGenericPassword(
@@ -97,26 +45,20 @@ export default function Login({ navigation }: LoginProps) {
 		// handle login logic
 		const { email, password } = userCredentials;
 
-		const user = new CognitoUser({
-			Username: email,
-			Pool: UserPool,
-		});
+		initCognitoUser(email);
+		const user = getCognitoUser();
 
 		const authDetails = new AuthenticationDetails({
 			Username: email,
 			Password: password,
 		});
 
-		user.authenticateUser(authDetails, {
+		user?.authenticateUser(authDetails, {
 			onSuccess: (result) => {
 				setMessage("Successfully authenticated");
 				setIsLoading(false);
 				console.log("Cognito Signin Success");
 				handleAuthSuccess(result);
-				// var jwtToken = result.getAccessToken().getJwtToken();
-				// console.log("JWT Token: " + jwtToken); // get bearer token here
-
-				// AWS.config.region = "ap-south-1";
 			},
 			onFailure: (err) => {
 				setIsLoading(false);

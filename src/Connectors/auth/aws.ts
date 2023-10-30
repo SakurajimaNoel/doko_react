@@ -1,7 +1,9 @@
 import * as AWS from "aws-sdk";
-import { IamAccess } from "./types";
+import { InitAWSCredentials, GetAWSCredentials } from "./types";
 
-export const iamAccess: IamAccess = (idToken) => {
+let awsCredentials: null | AWS.CognitoIdentityCredentials = null;
+
+const initAWSCredentials: InitAWSCredentials = (idToken) => {
 	AWS.config.update({ region: "ap-south-1" });
 
 	const credentials = new AWS.CognitoIdentityCredentials({
@@ -13,5 +15,15 @@ export const iamAccess: IamAccess = (idToken) => {
 		},
 	});
 
-	return credentials;
+	awsCredentials = credentials;
 };
+
+const getAWSCredentials: GetAWSCredentials = () => {
+	return awsCredentials;
+};
+
+const resetAWSCredentials = () => {
+	awsCredentials = null;
+};
+
+export { initAWSCredentials, getAWSCredentials, resetAWSCredentials };
