@@ -2,6 +2,9 @@ import { View, Text, StyleSheet, TextInput } from "react-native";
 import { Button } from "@rneui/themed";
 import React, { useState } from "react";
 import { Formik } from "formik";
+import * as Keychain from "react-native-keychain";
+import { userTokenDetails } from "../../../Connectors/auth/auth";
+import { iamAccess } from "../../../Connectors/auth/aws";
 
 import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
 import { HandleLoginParams, LoginProps } from "./types";
@@ -13,60 +16,82 @@ import {
 import * as AWS from "aws-sdk";
 import UserPool from "../../../users/UserPool";
 
-AWS.config.region = "ap-south-1";
-
 import { loginUser } from "../../../redux/slices/authSlice";
 import { useAppDispatch } from "../../../hooks/reduxHooks";
 import { useAppSelector } from "../../../hooks/reduxHooks";
 
 export default function Login({ navigation }: LoginProps) {
 	const dispatch = useAppDispatch();
-	const auth = useAppSelector((state) => state.auth);
+	// const auth = useAppSelector((state) => state.auth);
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [message, setMessage] = useState("");
 
-	const handleAuthSuccess = (payload: CognitoUserSession) => {
-		let decodedAccess = payload.getAccessToken().decodePayload();
-		let decodedId = payload.getIdToken().decodePayload();
+	const handleAuthSuccess = async (payload: CognitoUserSession) => {
+		// AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+		// 	IdentityPoolId: "ap-south-1:be985ba0-fa08-4b08-933a-4bdabaa2fcc2", // your identity pool id here
+		// 	Logins: {
+		// 		// Change the key below according to the specific region your user pool is in.
+		// 		"cognito-idp.ap-south-1.amazonaws.com/ap-south-1_7y9RKbI3j":
+		// 			idToken.token,
+		// 	},
+		// });
 
-		// accesstoken
-		let accessToken = {
-			token: payload.getAccessToken().getJwtToken(),
-			expTime: payload.getAccessToken().getExpiration(),
-			issuedAt: payload.getAccessToken().getIssuedAt(),
-		};
-		console.log(accessToken.token);
+		// AWS.config.credentials.get((error) => {
+		// 	if (error) {
+		// 		console.error("Error fetching AWS credentials: ", error);
+		// 	} else {
+		// 		// Initialize AWS service with the obtained credentials
+		// 		const s3 = new AWS.S3();
 
-		// idToken
-		let idToken = {
-			token: payload.getIdToken().getJwtToken(),
-			expTime: payload.getIdToken().getExpiration(),
-			issuedAt: payload.getIdToken().getIssuedAt(),
-		};
+		// 		// Example: List S3 buckets
+		// 		s3.listBuckets((err, data) => {
+		// 			if (err) {
+		// 				console.error("Error listing S3 buckets: ", err);
+		// 			} else {
+		// 				console.log("S3 buckets: ", data.Buckets);
+		// 			}
+		// 		});
 
-		let refreshToken = payload.getRefreshToken().getToken();
-		let name = decodedId.name ? decodedId.name : "dokiii";
-		let username = decodedId.preferred_username;
-		let email = decodedId.email;
-		let awsUsername = decodedAccess.username;
-		let completeProfile = awsUsername !== username;
+		// 		// You can use other AWS services similarly with the obtained credentials
+		// 	}
+		// });
 
-		let userDetails = {
-			accessToken,
-			idToken,
-			refreshToken,
-			name,
-			username,
-			email,
-			completeProfile,
-			awsUsername,
-		};
+		let userDetails = userTokenDetails(payload);
 
+		// for iam access
+		// const credentials = iamAccess(userDetails.idToken.token);
+
+		// credentials.get((error) => {
+		// 	if (error) {
+		// 		console.error("Error fetching AWS credentials: ", error);
+		// 	} else {
+		// 		// Initialize AWS service with the obtained credentials
+		// 		const s3 = new AWS.S3();
+
+		// 		// Example: List S3 buckets
+		// 		s3.listBuckets((err, data) => {
+		// 			if (err) {
+		// 				console.error("Error listing S3 buckets: ", err);
+		// 			} else {
+		// 				console.log("S3 buckets: ", data.Buckets);
+		// 			}
+		// 		});
+
+		// 		// You can use other AWS services similarly with the obtained credentials
+		// 	}
+		// });
+
+		// store as {usernam, password}
+		await Keychain.setGenericPassword(
+			userDetails.email,
+			userDetails.refreshToken,
+		);
 		dispatch(loginUser(userDetails));
 	};
 
 	const handleLogin = (userCredentials: HandleLoginParams) => {
+		// let sec = Math.round(Date.now() / 1000)
 		setIsLoading(true);
 
 		// handle login logic
@@ -90,6 +115,8 @@ export default function Login({ navigation }: LoginProps) {
 				handleAuthSuccess(result);
 				// var jwtToken = result.getAccessToken().getJwtToken();
 				// console.log("JWT Token: " + jwtToken); // get bearer token here
+
+				// AWS.config.region = "ap-south-1";
 			},
 			onFailure: (err) => {
 				setIsLoading(false);

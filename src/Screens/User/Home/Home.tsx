@@ -4,12 +4,14 @@ import { HomeProps } from "./types";
 import { Button } from "@rneui/themed";
 import { useAppDispatch, useAppSelector } from "../../../hooks/reduxHooks";
 import { logoutUser } from "../../../redux/slices/authSlice";
+import * as Keychain from "react-native-keychain";
 
 const Home = ({ navigation }: HomeProps) => {
 	const dispatch = useAppDispatch();
 	const user = useAppSelector((state) => state.auth);
 
-	const handleLogout = () => {
+	const handleLogout = async () => {
+		await Keychain.resetGenericPassword();
 		dispatch(logoutUser());
 	};
 

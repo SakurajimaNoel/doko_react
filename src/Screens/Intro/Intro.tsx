@@ -1,22 +1,104 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { Button } from "@rneui/themed";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import * as Keychain from "react-native-keychain";
+import { CognitoUser, CognitoRefreshToken } from "amazon-cognito-identity-js";
+import * as AWS from "aws-sdk";
+import UserPool from "../../users/UserPool";
+
+import { userTokenDetails } from "../../Connectors/auth/auth";
+import { iamAccess } from "../../Connectors/auth/aws";
+import { loginUser } from "../../redux/slices/authSlice";
+import { useAppDispatch } from "../../hooks/reduxHooks";
 
 import { gql, useQuery } from "@apollo/client";
-import { getUserProfile } from "../../stale/graphql/queries/getUserProfile";
 
 import NetworkLogger from "react-native-network-logger";
 import { IntroProps } from "./types";
 
-const tempquery = gql`
-	query Users {
-		users {
-			id
-		}
-	}
-`;
-
 export default function Intro({ navigation }: IntroProps) {
+	const dispatch = useAppDispatch();
+	const [loading, setLoading] = useState(true);
+
+	const handleTokenRefresh = (credentials: Keychain.UserCredentials) => {
+		let { username: email, password: refreshToken } = credentials;
+		console.log(email);
+		console.log(refreshToken);
+
+		const user = new CognitoUser({
+			Username: email,
+			Pool: UserPool,
+		});
+
+		const refreshDetails = new CognitoRefreshToken({
+			RefreshToken: refreshToken,
+		});
+
+		user.refreshSession(refreshDetails, async (error, result) => {
+			setLoading(false);
+			if (error) {
+				console.log(error);
+			} else {
+				let userDetails = userTokenDetails(result);
+				// for iam access
+				// const credentials = iamAccess(userDetails.idToken.token);
+
+				// credentials.get((error) => {
+				// 	if (error) {
+				// 		console.error(
+				// 			"Error fetching AWS credentials: ",
+				// 			error,
+				// 		);
+				// 	} else {
+				// 		// Initialize AWS service with the obtained credentials
+				// 		const s3 = new AWS.S3();
+
+				// 		// Example: List S3 buckets
+				// 		s3.listBuckets((err, data) => {
+				// 			if (err) {
+				// 				console.error(
+				// 					"Error listing S3 buckets: ",
+				// 					err,
+				// 				);
+				// 			} else {
+				// 				console.log("S3 buckets: ", data.Buckets);
+				// 			}
+				// 		});
+
+				// 		// You can use other AWS services similarly with the obtained credentials
+				// 	}
+				// });
+
+				await Keychain.setGenericPassword(
+					userDetails.email,
+					userDetails.refreshToken,
+				);
+				dispatch(loginUser(userDetails));
+			}
+		});
+	};
+
+	useEffect(() => {
+		async function fetchRefreshToken() {
+			try {
+				// Retrieve the credentials
+				const credentials = await Keychain.getGenericPassword();
+
+				if (credentials) {
+					handleTokenRefresh(credentials);
+				} else {
+					console.log("No credentials stored");
+					setLoading(false);
+				}
+			} catch (error) {
+				console.log("Keychain couldn't be accessed!", error);
+				setLoading(false);
+			}
+		}
+
+		fetchRefreshToken();
+	}, []);
+
 	const handleAuthNavigation = (toLogin = true) => {
 		if (toLogin) {
 			// navigate to login screen
@@ -27,49 +109,42 @@ export default function Intro({ navigation }: IntroProps) {
 		}
 	};
 
-	//temp fr testing******************************************************************************************************************************/
-	// const token  = "eyJraWQiOiJXV1NWOFwvbEVwYjNtZ29RZmplUGVKaVU3YUNtQzBBdFlhRGdLV1J6QXpnOD0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI2MDBhNDc3Ny1kZTJhLTRiZWUtYjNmYS01Y2RjZTU1MWY0NzAiLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuYXAtc291dGgtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aC0xXzd5OVJLYkkzaiIsImNsaWVudF9pZCI6IjI3NXAycGZydnFoZG5kcWFuNjg2bjltdnZhIiwib3JpZ2luX2p0aSI6ImVkNGY2ZWU5LWM3MzAtNDA5OS1hMjg5LWFjYmZhNzU2MTMyYiIsImV2ZW50X2lkIjoiOTE3YmU5NTMtZDFkZC00NDA0LThhYTctN2FiYjFmYjk4MWUxIiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTY5Njc0OTQ0NywiZXhwIjoxNjk2NzUzMDQ3LCJpYXQiOjE2OTY3NDk0NDcsImp0aSI6IjczMGJlODc2LWQ0ZjAtNDU3Yy1hOGVmLTFjYjUwZmM0ODc3ZSIsInVzZXJuYW1lIjoiYW1pdCJ9.R9uz-zeGs5ATF0PD-QqNP0wzfov5KVdQda-XLD400Q75KKysx3gkhmlRMm4axTOP4GBotBitE6PIzWV9DkzfxX_odqYtZ2UP2Yqxvx2KmwWLvic0d8YPJH2ByGx10cY9RCNI02APBiF244okNzc03LfFrvTH1awYiUxPl1CwL_hFgdDK3GCyLz3TV0Emi3DHUozSf2CqUmfAZvg1EzjmK_8ITkeCoEsvuoMcR_D_ge0SI7N3V2Ub3h9AjDIpT0GJCez7WTSY7aX-DKtE2N9C_ttbbNVWzI1uEzgehGWFRI8yhw01qjDj9sqGDQ2GoiKfQWkOjUnIC1YPTOWedeeR8A"
-	// const {loading, error, data} = useQuery(tempquery,
-	// 	{
-	// 		context:{
-	// 			headers:{
-	// 				'Authorization': "Bearer " + token,
-	// 			}
-	// 		}
-
-	// 	},
-
-	// );
-
-	// if(loading) console.log("Loading");
-	// if(error) console.error("API error", error.message);
-	// if(data) console.log(data);
-	//************************************************************************************************************************************** */
 	return (
-		<View style={styles.container}>
-			<View style={styles.headContainer}>
-				<Text style={styles.head}>Hii welcome to dokii</Text>
-			</View>
+		<>
+			{loading ? (
+				<View style={styles.loadingContainer}>
+					<ActivityIndicator size="large" />
+				</View>
+			) : (
+				<View style={styles.container}>
+					<View style={styles.headContainer}>
+						<Text style={styles.head}>Hii welcome to dokii</Text>
+					</View>
 
-			<View style={styles.buttonContainer}>
-				<Button
-					onPress={() => handleAuthNavigation()}
-					title="Login"
-					accessibilityLabel="To navigate to login screen"
-				/>
+					<View style={styles.buttonContainer}>
+						<Button
+							onPress={() => handleAuthNavigation()}
+							title="Login"
+							accessibilityLabel="To navigate to login screen"
+						/>
 
-				<Button
-					onPress={() => handleAuthNavigation(false)}
-					title="Signup"
-					accessibilityLabel="To navigate to Signup screen"
-				/>
-			</View>
-		</View>
-		//<NetworkLogger /> //no delete
+						<Button
+							onPress={() => handleAuthNavigation(false)}
+							title="Signup"
+							accessibilityLabel="To navigate to Signup screen"
+						/>
+					</View>
+				</View>
+			)}
+			{/* //<NetworkLogger /> //no delete */}
+		</>
 	);
 }
 
 const styles = StyleSheet.create({
+	loadingContainer: {
+		paddingVertical: "50%",
+	},
 	container: {
 		margin: 10,
 		flex: 1,

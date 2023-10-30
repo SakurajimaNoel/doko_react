@@ -10,6 +10,7 @@ import { HandleSignupParams, SignupProps } from "./types";
 import "react-native-get-random-values";
 import { nanoid } from "nanoid";
 import UserPool from "../../../users/UserPool";
+import { CognitoUserAttribute } from "amazon-cognito-identity-js";
 
 export default function Signup({ navigation }: SignupProps) {
 	const [isLoading, setIsLoading] = useState(false);
@@ -20,19 +21,34 @@ export default function Signup({ navigation }: SignupProps) {
 		const { name, email, password } = userDetails;
 		const userId = nanoid().toLowerCase();
 
+		// const userAttributes = [
+		// 	{
+		// 		Name: "email",
+		// 		Value: email,
+		// 	},
+		// 	{
+		// 		Name: "name",
+		// 		Value: name,
+		// 	},
+		// 	{
+		// 		Name: "preferred_username",
+		// 		Value: userId,
+		// 	},
+		// ];
+
 		const userAttributes = [
-			{
+			new CognitoUserAttribute({
 				Name: "email",
 				Value: email,
-			},
-			{
+			}),
+			new CognitoUserAttribute({
 				Name: "name",
 				Value: name,
-			},
-			{
+			}),
+			new CognitoUserAttribute({
 				Name: "preferred_username",
 				Value: userId,
-			},
+			}),
 		];
 
 		// handle signup logic
