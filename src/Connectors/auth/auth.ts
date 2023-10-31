@@ -1,25 +1,18 @@
-import { UserTokenDetails, TokenState } from "./types";
+import { NeedsRefresh, UserTokenDetails, UserTokens } from "./types";
 
 export const userTokenDetails: UserTokenDetails = (payload) => {
 	let decodedAccess = payload.getAccessToken().decodePayload();
 	let decodedId = payload.getIdToken().decodePayload();
 
 	// accesstoken
-	let accessToken: TokenState = {
-		token: payload.getAccessToken().getJwtToken(),
-		expTime: String(payload.getAccessToken().getExpiration()),
-		issuedAt: String(payload.getAccessToken().getIssuedAt()),
-	};
-	console.log(accessToken.token);
+	let accessToken = payload.getAccessToken().getJwtToken();
+	let expireAt = payload.getAccessToken().getExpiration();
+	console.log(accessToken);
 
-	// idToken
-	let idToken: TokenState = {
-		token: payload.getIdToken().getJwtToken(),
-		expTime: String(payload.getIdToken().getExpiration()),
-		issuedAt: String(payload.getIdToken().getIssuedAt()),
-	};
-
+	//idtoken
+	let idToken = payload.getIdToken().getJwtToken();
 	let refreshToken = payload.getRefreshToken().getToken();
+
 	let name = decodedId.name ? decodedId.name : "dokiii";
 	let username = decodedId.preferred_username;
 	let email = decodedId.email;
@@ -30,6 +23,7 @@ export const userTokenDetails: UserTokenDetails = (payload) => {
 		accessToken,
 		idToken,
 		refreshToken,
+		expireAt,
 		name,
 		username,
 		email,
@@ -38,4 +32,28 @@ export const userTokenDetails: UserTokenDetails = (payload) => {
 	};
 
 	return userDetails;
+};
+
+export const userTokens: UserTokens = (payload) => {
+	let accessToken = payload.getAccessToken().getJwtToken();
+	console.log(accessToken);
+
+	let idToken = payload.getIdToken().getJwtToken();
+	let refreshToken = payload.getRefreshToken().getToken();
+	let expireAt = payload.getAccessToken().getExpiration();
+
+	let tokens = {
+		accessToken,
+		idToken,
+		refreshToken,
+		expireAt,
+	};
+
+	return tokens;
+};
+
+export const needsRefresh: NeedsRefresh = (expAt) => {
+	let curr: number = Math.round(Date.now() / 1000);
+
+	return expAt - curr <= 300;
 };

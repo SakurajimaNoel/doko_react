@@ -1,17 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-interface TokenState {
-	token: string;
-	expTime: string;
-	issuedAt: string;
-}
-
 export interface AuthState {
 	status: boolean;
-	accessToken: TokenState;
-	idToken: TokenState;
+	accessToken: string;
+	idToken: string;
 	refreshToken: string;
+	expireAt: number;
 	name: string;
 	email: string;
 	username: string;
@@ -21,17 +16,10 @@ export interface AuthState {
 
 const initialState: AuthState = {
 	status: false,
-	accessToken: {
-		token: "",
-		expTime: "",
-		issuedAt: "",
-	},
-	idToken: {
-		token: "",
-		expTime: "",
-		issuedAt: "",
-	},
+	accessToken: "",
+	idToken: "",
 	refreshToken: "",
+	expireAt: 0,
 	name: "",
 	email: "",
 	username: "",
@@ -46,8 +34,9 @@ const authSlice = createSlice({
 		loginUser: (state, action) => {
 			const {
 				accessToken,
-				refreshToken,
 				idToken,
+				refreshToken,
+				expireAt,
 				name,
 				email,
 				username,
@@ -57,8 +46,9 @@ const authSlice = createSlice({
 
 			state.status = true;
 			state.accessToken = accessToken;
-			state.refreshToken = refreshToken;
 			state.idToken = idToken;
+			state.refreshToken = refreshToken;
+			state.expireAt = expireAt;
 			state.name = name;
 			state.email = email;
 			state.username = username;
@@ -68,24 +58,52 @@ const authSlice = createSlice({
 		logoutUser: (state) => {
 			state.status = false;
 			state.completeProfile = false;
-			state.accessToken = {
-				token: "",
-				expTime: "",
-				issuedAt: "",
-			};
+			state.accessToken = "";
+			state.idToken = "";
 			state.refreshToken = "";
-			state.idToken = {
-				token: "",
-				expTime: "",
-				issuedAt: "",
-			};
+			state.expireAt = 0;
 			state.name = "";
 			state.email = "";
 			state.username = "";
 			state.awsUsername = "";
 		},
+		updateTokens: (state, action) => {
+			const { idToken, accessToken, refreshToken, expireAt } =
+				action.payload;
+
+			state.accessToken = accessToken;
+			state.idToken = idToken;
+			state.refreshToken = refreshToken;
+			state.expireAt = expireAt;
+		},
+		updateName: (state, action) => {
+			const { name } = action.payload;
+
+			state.name = name;
+		},
+		updateUsername: (state, action) => {
+			const { username } = action.payload;
+
+			state.username = username;
+		},
+		updateEmail: (state, action) => {
+			const { email } = action.payload;
+
+			state.email = email;
+		},
+		updateCompleteProfile: (state, action) => {
+			state.completeProfile = action.payload.value;
+		},
 	},
 });
 
-export const { loginUser, logoutUser } = authSlice.actions;
+export const {
+	loginUser,
+	logoutUser,
+	updateTokens,
+	updateEmail,
+	updateName,
+	updateUsername,
+	updateCompleteProfile,
+} = authSlice.actions;
 export default authSlice.reducer;

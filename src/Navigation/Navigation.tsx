@@ -5,12 +5,7 @@ import { useAppSelector } from "../hooks/reduxHooks";
 import { useEffect } from "react";
 import * as AWS from "aws-sdk";
 
-import {
-	initAWSCredentials,
-	getAWSCredentials,
-	resetAWSCredentials,
-} from "../Connectors/auth/aws";
-import { resetCognitoUser } from "../Connectors/auth/cognitoUser";
+import { initAWSCredentials, getAWSCredentials } from "../Connectors/auth/aws";
 
 import Intro from "../Screens/Intro";
 import Login from "../Screens/Authentication/Login";
@@ -41,14 +36,10 @@ const Navigation = () => {
 
 	useEffect(() => {
 		if (auth.status) {
-			// for iam access
-			initAWSCredentials(auth.idToken.token);
-			const credentials = getAWSCredentials();
-		} else {
-			resetAWSCredentials();
-			resetCognitoUser();
+			console.log("iam updated");
+			initAWSCredentials(auth.idToken);
 		}
-	}, [auth]);
+	}, [auth.idToken]);
 
 	return (
 		<NavigationContainer>

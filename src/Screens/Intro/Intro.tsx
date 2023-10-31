@@ -1,13 +1,14 @@
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { Button } from "@rneui/themed";
 import React, { useState, useEffect } from "react";
-import * as Keychain from "react-native-keychain";
-import { CognitoRefreshToken } from "amazon-cognito-identity-js";
-
+import { CognitoUserSession } from "amazon-cognito-identity-js";
+import * as AWS from "aws-sdk";
+import UserPool from "../../users/UserPool";
+import { initCognitoUser } from "../../Connectors/auth/cognitoUser";
 import {
-	initCognitoUser,
-	getCognitoUser,
-} from "../../Connectors/auth/cognitoUser";
+	initAWSCredentials,
+	getAWSCredentials,
+} from "../../Connectors/auth/aws";
 
 import { userTokenDetails } from "../../Connectors/auth/auth";
 import { loginUser } from "../../redux/slices/authSlice";
@@ -16,57 +17,54 @@ import { useAppDispatch } from "../../hooks/reduxHooks";
 import { gql, useQuery } from "@apollo/client";
 
 import NetworkLogger from "react-native-network-logger";
-import { IntroProps } from "./types";
+import { IntroProps, HandleUserSession } from "./types";
 
 export default function Intro({ navigation }: IntroProps) {
 	const dispatch = useAppDispatch();
 	const [loading, setLoading] = useState(true);
 
-	const handleTokenRefresh = (credentials: Keychain.UserCredentials) => {
-		let { username, password: refreshToken } = credentials;
+	const handleUserSession: HandleUserSession = (session) => {
+		let userDetails = userTokenDetails(session);
+		initCognitoUser(userDetails.email);
 
-		initCognitoUser(username);
-		const user = getCognitoUser();
+		// cognito iam
+		initAWSCredentials(userDetails.idToken);
+		const credentials = getAWSCredentials();
+		AWS.config.credentials = credentials;
 
-		const refreshDetails = new CognitoRefreshToken({
-			RefreshToken: refreshToken,
-		});
-
-		user?.refreshSession(refreshDetails, async (error, result) => {
-			if (error) {
-				console.log(error);
-			} else {
-				let userDetails = userTokenDetails(result);
-
-				await Keychain.setGenericPassword(
-					userDetails.email,
-					userDetails.refreshToken,
-				);
-				setLoading(false);
-				dispatch(loginUser(userDetails));
-			}
-		});
+		dispatch(loginUser(userDetails));
 	};
 
 	useEffect(() => {
-		async function fetchRefreshToken() {
-			try {
-				// Retrieve the credentials
-				const credentials = await Keychain.getGenericPassword();
+		UserPool.storage.sync(function (err: Error, result: string) {
+			if (err) {
+			} else if (result === "SUCCESS") {
+				var cognitoUser = UserPool.getCurrentUser();
 
-				if (credentials) {
-					handleTokenRefresh(credentials);
+				if (cognitoUser != null) {
+					cognitoUser.getSession(function (
+						err: Error | null,
+						session: CognitoUserSession,
+					) {
+						if (err) {
+							console.log("getSession Error ", err.message);
+							setLoading(false);
+							return;
+						}
+
+						if (session.isValid()) {
+							handleUserSession(session);
+							console.log(
+								session.getAccessToken().getExpiration(),
+							);
+						}
+						setLoading(false);
+					});
 				} else {
-					// console.log("No credentials stored");
 					setLoading(false);
 				}
-			} catch (error) {
-				console.log("Keychain couldn't be accessed!", error);
-				setLoading(false);
 			}
-		}
-
-		fetchRefreshToken();
+		});
 	}, []);
 
 	const handleAuthNavigation = (toLogin = true) => {

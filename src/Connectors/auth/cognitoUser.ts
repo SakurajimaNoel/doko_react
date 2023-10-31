@@ -17,8 +17,4 @@ const getCognitoUser: GetCognitoUser = () => {
 	return cognitoUser;
 };
 
-const resetCognitoUser = () => {
-	cognitoUser = null;
-};
-
-export { initCognitoUser, getCognitoUser, resetCognitoUser };
+export { initCognitoUser, getCognitoUser };

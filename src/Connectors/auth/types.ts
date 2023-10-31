@@ -1,15 +1,10 @@
 import { CognitoUserSession, CognitoUser } from "amazon-cognito-identity-js";
 
-export interface TokenState {
-	token: string;
-	expTime: string;
-	issuedAt: string;
-}
-
 interface AuthState {
-	accessToken: TokenState;
-	idToken: TokenState;
+	accessToken: string;
+	idToken: string;
 	refreshToken: string;
+	expireAt: number;
 	name: string;
 	email: string;
 	username: string;
@@ -17,7 +12,18 @@ interface AuthState {
 	awsUsername: string;
 }
 
+interface TokenState {
+	accessToken: string;
+	idToken: string;
+	refreshToken: string;
+	expireAt: number;
+}
+
 export type UserTokenDetails = (payload: CognitoUserSession) => AuthState;
+
+export type UserTokens = (payload: CognitoUserSession) => TokenState;
+
+export type NeedsRefresh = (expAt: number) => boolean;
 
 export type InitCognitoUser = (userName: string) => void;
 

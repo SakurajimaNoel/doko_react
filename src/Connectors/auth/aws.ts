@@ -22,8 +22,4 @@ const getAWSCredentials: GetAWSCredentials = () => {
 	return awsCredentials;
 };
 
-const resetAWSCredentials = () => {
-	awsCredentials = null;
-};
-
-export { initAWSCredentials, getAWSCredentials, resetAWSCredentials };
+export { initAWSCredentials, getAWSCredentials };

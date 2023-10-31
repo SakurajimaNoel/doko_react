@@ -2,13 +2,16 @@ import { View, Text, StyleSheet, TextInput } from "react-native";
 import { Button } from "@rneui/themed";
 import React, { useState } from "react";
 import { Formik } from "formik";
-import * as Keychain from "react-native-keychain";
 
 import { userTokenDetails } from "../../../Connectors/auth/auth";
 import {
 	initCognitoUser,
 	getCognitoUser,
 } from "../../../Connectors/auth/cognitoUser";
+import {
+	initAWSCredentials,
+	getAWSCredentials,
+} from "../../../Connectors/auth/aws";
 
 import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
 import { HandleLoginParams, LoginProps } from "./types";
@@ -30,16 +33,15 @@ export default function Login({ navigation }: LoginProps) {
 	const handleAuthSuccess = async (payload: CognitoUserSession) => {
 		let userDetails = userTokenDetails(payload);
 
-		// store as {usernam, password}
-		await Keychain.setGenericPassword(
-			userDetails.email,
-			userDetails.refreshToken,
-		);
+		// cognito iam
+		initAWSCredentials(userDetails.idToken);
+		const credentials = getAWSCredentials();
+		AWS.config.credentials = credentials;
+
 		dispatch(loginUser(userDetails));
 	};
 
 	const handleLogin = (userCredentials: HandleLoginParams) => {
-		// let sec = Math.round(Date.now() / 1000)
 		setIsLoading(true);
 
 		// handle login logic
