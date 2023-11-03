@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Pressable, TextInput } from "react-native";
 import React, { useState } from "react";
-import { UserDetailsProps } from "../../types";
+import { HandleSteps, UserDetailsProps } from "../../types";
 import DatePicker from "react-native-date-picker";
 import { Button } from "@rneui/base";
 
@@ -21,9 +21,11 @@ const UserDetails = ({
 		setOpen(true);
 	};
 
-	const handleNextStep = () => {
+	const handleSteps: HandleSteps = (prev = true) => {
 		setUserInfo((prev) => ({ ...prev, date, bio }));
-		handleNext();
+
+		if (prev) handlePrev();
+		else handleNext();
 	};
 
 	return (
@@ -70,7 +72,7 @@ const UserDetails = ({
 
 			<View style={styles.buttonContainer}>
 				<Button
-					onPress={handlePrev}
+					onPress={() => handleSteps()}
 					title="Previous"
 					type="outline"
 					accessibilityLabel="Move to prevoius form step"
@@ -80,7 +82,7 @@ const UserDetails = ({
 				/>
 
 				<Button
-					onPress={handleNextStep}
+					onPress={() => handleSteps(false)}
 					title="Next"
 					accessibilityLabel="Move to next page to fill details"
 					containerStyle={{

@@ -23,7 +23,9 @@ const CompleteProfile = ({ auth }: CompleteProfileProps) => {
 		setSteps((prev) => (prev - 1) as Steps);
 	};
 
-	const handleProfileCreate = () => {};
+	const handleProfileCreate = () => {
+		console.log(userInfo);
+	};
 
 	const completeProfileStep = () => {
 		switch (steps) {
@@ -31,7 +33,7 @@ const CompleteProfile = ({ auth }: CompleteProfileProps) => {
 				return (
 					<Username
 						handleNext={handleNext}
-						accessToken={auth.accessToken.token}
+						accessToken={auth.accessToken}
 						setUserInfo={setUserInfo}
 						userName={userInfo.username}
 					/>

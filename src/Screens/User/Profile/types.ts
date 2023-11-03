@@ -41,3 +41,12 @@ export interface ProfilePictureProps {
 	userInfo: UserInfo;
 	handleProfileCreate: () => void;
 }
+
+export interface ProfileModalProps {
+	openModal: boolean;
+	setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+	handleCamera: () => void;
+	handleGallery: () => void;
+}
+
+export type HandleSteps = (prev?: boolean) => void;
