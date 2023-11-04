@@ -1,4 +1,15 @@
-import { NeedsRefresh, UserTokenDetails, UserTokens } from "./types";
+import {
+	CognitoRefreshToken,
+	CognitoUserSession,
+} from "amazon-cognito-identity-js";
+import { getCognitoUser } from "./cognitoUser";
+import { initAWSCredentials } from "./aws";
+import {
+	NeedsRefresh,
+	RefreshTokens,
+	UserTokenDetails,
+	UserTokens,
+} from "./types";
 
 export const userTokenDetails: UserTokenDetails = (payload) => {
 	let decodedAccess = payload.getAccessToken().decodePayload();
@@ -30,11 +41,12 @@ export const userTokenDetails: UserTokenDetails = (payload) => {
 		completeProfile,
 		awsUsername,
 	};
+	initAWSCredentials(idToken);
 
 	return userDetails;
 };
 
-export const userTokens: UserTokens = (payload) => {
+const userTokens: UserTokens = (payload) => {
 	let accessToken = payload.getAccessToken().getJwtToken();
 	console.log(accessToken);
 
@@ -48,6 +60,7 @@ export const userTokens: UserTokens = (payload) => {
 		refreshToken,
 		expireAt,
 	};
+	initAWSCredentials(idToken);
 
 	return tokens;
 };
@@ -56,4 +69,32 @@ export const needsRefresh: NeedsRefresh = (expAt) => {
 	let curr: number = Math.round(Date.now() / 1000);
 
 	return expAt - curr <= 300;
+};
+
+export const refreshTokens: RefreshTokens = async (refreshToken) => {
+	const cognitoUser = getCognitoUser();
+	const refreshDetails = new CognitoRefreshToken({
+		RefreshToken: refreshToken,
+	});
+
+	try {
+		const session: CognitoUserSession = await new Promise(
+			(resolve, reject) => {
+				cognitoUser?.refreshSession(refreshDetails, (error, result) => {
+					console.info("3");
+					if (error) {
+						reject(error);
+					} else {
+						resolve(result);
+					}
+				});
+			},
+		);
+
+		let userDetails = userTokens(session);
+		return userDetails;
+	} catch (err) {
+		console.error("my error", err);
+		return {};
+	}
 };

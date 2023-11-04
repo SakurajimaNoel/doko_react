@@ -4,6 +4,7 @@ import { Button, Icon } from "@rneui/base";
 import React, { useState } from "react";
 import {
 	HandleSteps,
+	ImageMetaDetails,
 	ProfileModalProps,
 	ProfilePictureProps,
 } from "../../types";
@@ -88,16 +89,30 @@ const ProfilePicture = ({
 	const [userUpload, setUserUpload] = useState<string>(
 		userInfo.profilePicture,
 	);
+	const [imageMetaDetails, setImageMetaDetails] = useState<ImageMetaDetails>({
+		name: "",
+		type: "",
+	});
 
 	const handleOpen = () => {
 		setOpenModal(true);
 	};
 
 	const handleSteps: HandleSteps = (prev = true) => {
-		setUserInfo((prev) => {
-			return { ...prev, profilePicture: userUpload };
-		});
+		if (userUpload) {
+			let imageName = imageMetaDetails.name;
+			let img: string[] = imageName.split(".");
+			let imageExtension = img[img.length - 1];
 
+			setUserInfo((prev) => ({
+				...prev,
+				profilePicture: userUpload,
+				imageExtension: imageExtension,
+				imageType: imageMetaDetails.type,
+			}));
+		}
+
+		// return;
 		if (prev) handlePrev();
 		else handleProfileCreate();
 	};
@@ -111,7 +126,18 @@ const ProfilePicture = ({
 		const result = await launchCamera(options);
 		if (result.assets) {
 			let profilePicture = result.assets[0].uri;
-			if (profilePicture) setUserUpload(profilePicture);
+			let { fileName, type } = result.assets[0];
+
+			if (profilePicture && fileName && type) {
+				let details = {
+					name: fileName,
+					type,
+				};
+				console.log(details);
+
+				setUserUpload(profilePicture);
+				setImageMetaDetails(details);
+			}
 			setOpenModal(false);
 		}
 	};
@@ -125,7 +151,17 @@ const ProfilePicture = ({
 		const result = await launchImageLibrary(options);
 		if (result.assets) {
 			let profilePicture = result.assets[0].uri;
-			if (profilePicture) setUserUpload(profilePicture);
+			let { fileName, type } = result.assets[0];
+
+			if (profilePicture && fileName && type) {
+				let details = {
+					name: fileName,
+					type,
+				};
+				console.log(details);
+				setUserUpload(profilePicture);
+				setImageMetaDetails(details);
+			}
 			setOpenModal(false);
 		}
 	};

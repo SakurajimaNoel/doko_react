@@ -25,6 +25,8 @@ export type UserTokens = (payload: CognitoUserSession) => TokenState;
 
 export type NeedsRefresh = (expAt: number) => boolean;
 
+export type RefreshTokens = (refreshToken: string) => TokenState | {};
+
 export type InitCognitoUser = (userName: string) => void;
 
 export type GetCognitoUser = () => CognitoUser | null;

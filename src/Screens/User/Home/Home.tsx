@@ -9,7 +9,7 @@ import * as AWS from "aws-sdk";
 import { getAWSCredentials } from "../../../Connectors/auth/aws";
 import { getCognitoUser } from "../../../Connectors/auth/cognitoUser";
 import { CognitoRefreshToken } from "amazon-cognito-identity-js";
-import { userTokens, needsRefresh } from "../../../Connectors/auth/auth";
+import { needsRefresh, refreshTokens } from "../../../Connectors/auth/auth";
 
 const Home = ({ navigation }: HomeProps) => {
 	const dispatch = useAppDispatch();
@@ -20,7 +20,17 @@ const Home = ({ navigation }: HomeProps) => {
 		dispatch(logoutUser());
 	};
 
-	const handleTrial = () => {
+	const handleTrial = async () => {
+		// refreshing token
+		if (needsRefresh(user.expireAt)) {
+			const tokens = await refreshTokens(user.refreshToken);
+			if (JSON.stringify(tokens) !== "{}") {
+				dispatch(updateTokens(tokens));
+			} else {
+				console.error("can't refresh tokens");
+				return;
+			}
+		}
 		const credentials = getAWSCredentials();
 
 		credentials?.get((error) => {
@@ -58,21 +68,6 @@ const Home = ({ navigation }: HomeProps) => {
 				console.log("Error updating user attributes ", err);
 			} else {
 				console.log("Successfully updated user attributes ", result);
-			}
-		});
-
-		// refreshing token
-		const refreshDetails = new CognitoRefreshToken({
-			RefreshToken: user.refreshToken,
-		});
-
-		cognitoUser?.refreshSession(refreshDetails, async (error, result) => {
-			if (error) {
-				console.log(error);
-			} else {
-				let userDetails = userTokens(result);
-
-				dispatch(updateTokens(userDetails));
 			}
 		});
 	};

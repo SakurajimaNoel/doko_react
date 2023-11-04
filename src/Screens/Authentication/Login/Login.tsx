@@ -34,9 +34,9 @@ export default function Login({ navigation }: LoginProps) {
 		let userDetails = userTokenDetails(payload);
 
 		// cognito iam
-		initAWSCredentials(userDetails.idToken);
-		const credentials = getAWSCredentials();
-		AWS.config.credentials = credentials;
+		// initAWSCredentials(userDetails.idToken);
+		// const credentials = getAWSCredentials();
+		// AWS.config.credentials = credentials;
 
 		dispatch(loginUser(userDetails));
 	};

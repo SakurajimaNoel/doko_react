@@ -34,12 +34,11 @@ const Tab = createBottomTabNavigator<RootTabParamList>();
 const Navigation = () => {
 	const auth = useAppSelector((state) => state.auth);
 
-	useEffect(() => {
-		if (auth.status) {
-			console.log("iam updated");
-			initAWSCredentials(auth.idToken);
-		}
-	}, [auth.idToken]);
+	// useEffect(() => {
+	// 	if (auth.status) {
+	// 		initAWSCredentials(auth.idToken);
+	// 	}
+	// }, [auth.idToken]);
 
 	return (
 		<NavigationContainer>

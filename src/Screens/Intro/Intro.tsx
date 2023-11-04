@@ -28,9 +28,9 @@ export default function Intro({ navigation }: IntroProps) {
 		initCognitoUser(userDetails.email);
 
 		// cognito iam
-		initAWSCredentials(userDetails.idToken);
-		const credentials = getAWSCredentials();
-		AWS.config.credentials = credentials;
+		// initAWSCredentials(userDetails.idToken);
+		// const credentials = getAWSCredentials();
+		// AWS.config.credentials = credentials;
 
 		dispatch(loginUser(userDetails));
 	};
@@ -54,9 +54,6 @@ export default function Intro({ navigation }: IntroProps) {
 
 						if (session.isValid()) {
 							handleUserSession(session);
-							console.log(
-								session.getAccessToken().getExpiration(),
-							);
 						}
 						setLoading(false);
 					});

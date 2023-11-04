@@ -19,6 +19,13 @@ export interface UserInfo {
 	dob: Date;
 	bio?: string;
 	profilePicture: string;
+	imageExtension: string;
+	imageType: string;
+}
+
+export interface ImageMetaDetails {
+	name: string;
+	type: string;
 }
 
 export interface UsernameProps {
