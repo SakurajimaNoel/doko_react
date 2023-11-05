@@ -9,6 +9,7 @@ import {
 	ProfilePictureProps,
 } from "../../types";
 import {
+	ImagePickerResponse,
 	MediaType,
 	launchCamera,
 	launchImageLibrary,
@@ -99,22 +100,35 @@ const ProfilePicture = ({
 	};
 
 	const handleSteps: HandleSteps = (prev = true) => {
-		if (userUpload) {
-			let imageName = imageMetaDetails.name;
-			let img: string[] = imageName.split(".");
-			let imageExtension = img[img.length - 1];
-
-			setUserInfo((prev) => ({
-				...prev,
-				profilePicture: userUpload,
-				imageExtension: imageExtension,
-				imageType: imageMetaDetails.type,
-			}));
-		}
-
-		// return;
+		// state update
 		if (prev) handlePrev();
 		else handleProfileCreate();
+	};
+
+	const handleState = (result: ImagePickerResponse) => {
+		if (result.assets) {
+			let profile = result.assets[0].uri;
+			let { fileName, type } = result.assets[0];
+
+			if (profile && fileName && type) {
+				let imageName = fileName;
+				let img: string[] = imageName.split(".");
+				let imageExtension = img[img.length - 1];
+
+				let imageType: string = type;
+				let profilePicture: string = profile;
+
+				setUserInfo((prev) => ({
+					...prev,
+					profilePicture,
+					imageExtension,
+					imageType,
+				}));
+
+				setUserUpload(profilePicture);
+			}
+			setOpenModal(false);
+		}
 	};
 
 	const handleCamera = async () => {
@@ -124,22 +138,7 @@ const ProfilePicture = ({
 		};
 
 		const result = await launchCamera(options);
-		if (result.assets) {
-			let profilePicture = result.assets[0].uri;
-			let { fileName, type } = result.assets[0];
-
-			if (profilePicture && fileName && type) {
-				let details = {
-					name: fileName,
-					type,
-				};
-				console.log(details);
-
-				setUserUpload(profilePicture);
-				setImageMetaDetails(details);
-			}
-			setOpenModal(false);
-		}
+		handleState(result);
 	};
 
 	const handleGallery = async () => {
@@ -149,21 +148,7 @@ const ProfilePicture = ({
 		};
 
 		const result = await launchImageLibrary(options);
-		if (result.assets) {
-			let profilePicture = result.assets[0].uri;
-			let { fileName, type } = result.assets[0];
-
-			if (profilePicture && fileName && type) {
-				let details = {
-					name: fileName,
-					type,
-				};
-				console.log(details);
-				setUserUpload(profilePicture);
-				setImageMetaDetails(details);
-			}
-			setOpenModal(false);
-		}
+		handleState(result);
 	};
 
 	return (
