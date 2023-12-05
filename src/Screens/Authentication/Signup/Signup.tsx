@@ -19,7 +19,7 @@ export default function Signup({ navigation }: SignupProps) {
 	const handleSignup = (userDetails: HandleSignupParams) => {
 		setIsLoading(true);
 		const { name, email, password } = userDetails;
-		const userId = nanoid().toLowerCase();
+		// const userId = nanoid().toLowerCase();
 
 		// const userAttributes = [
 		// 	{
@@ -37,24 +37,20 @@ export default function Signup({ navigation }: SignupProps) {
 		// ];
 
 		const userAttributes = [
-			new CognitoUserAttribute({
-				Name: "email",
-				Value: email,
-			}),
+			// new CognitoUserAttribute({
+			// 	Name: "email",
+			// 	Value: email,
+			// }),
 			new CognitoUserAttribute({
 				Name: "name",
 				Value: name,
-			}),
-			new CognitoUserAttribute({
-				Name: "preferred_username",
-				Value: userId,
 			}),
 		];
 
 		// handle signup logic
 
 		// parameters: username, password, attributes = email(necessary), validatindata? keep null, callbacks
-		UserPool.signUp(userId, password, userAttributes, null, (err, data) => {
+		UserPool.signUp(email, password, userAttributes, null, (err, data) => {
 			setIsLoading(false);
 			if (err) {
 				console.error("cognito error: ", err);
