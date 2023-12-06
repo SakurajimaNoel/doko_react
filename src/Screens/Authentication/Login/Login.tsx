@@ -14,7 +14,7 @@ import {
 } from "../../../Connectors/auth/aws";
 
 import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
-import { HandleLoginParams, LoginProps } from "./types";
+import { HandleLoginParams, LoginProps, ResendConfrimMailState } from "./types";
 import {
 	AuthenticationDetails,
 	CognitoUserSession,
@@ -27,8 +27,14 @@ import { useAppDispatch } from "../../../hooks/reduxHooks";
 export default function Login({ navigation }: LoginProps) {
 	const dispatch = useAppDispatch();
 
-	const [isLoading, setIsLoading] = useState(false);
-	const [message, setMessage] = useState("");
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [message, setMessage] = useState<string>("");
+	const [resendVerification, setResendVerification] =
+		useState<ResendConfrimMailState>({
+			resend: false,
+			response: "",
+			isEnabled: true,
+		});
 
 	const handleAuthSuccess = async (payload: CognitoUserSession) => {
 		let userDetails = userTokenDetails(payload);
@@ -65,6 +71,23 @@ export default function Login({ navigation }: LoginProps) {
 			onFailure: (err) => {
 				setIsLoading(false);
 				console.log("Cognito Signin Failure: ", err);
+
+				let errorName = err.name;
+				if (errorName === "UserNotConfirmedException") {
+					setResendVerification({
+						resend: true,
+						response: "",
+						isEnabled: true,
+					});
+				} else {
+					if (resendVerification)
+						setResendVerification({
+							resend: false,
+							response: "",
+							isEnabled: true,
+						});
+				}
+
 				setMessage(err.message);
 			},
 			newPasswordRequired: (userAttributes, requiredAttributes) => {
@@ -78,6 +101,34 @@ export default function Login({ navigation }: LoginProps) {
 				);
 			},
 		});
+	};
+
+	const handleResendVerificationMail = () => {
+		const user = getCognitoUser();
+
+		if (user) {
+			user.resendConfirmationCode((err, res) => {
+				if (err) {
+					console.log("Resend Verification Mail Failed ", err);
+					setResendVerification({
+						resend: true,
+						response: err.message,
+						isEnabled: true,
+					});
+					return;
+				}
+
+				console.log(res);
+				setResendVerification({
+					resend: true,
+					response:
+						"Successfully sent confirmation mail. Confirm your mail id and try signing in again.",
+					isEnabled: false,
+				});
+			});
+		} else {
+			setMessage("Error sending verification mail. User not defiend");
+		}
 	};
 
 	return (
@@ -159,6 +210,19 @@ export default function Login({ navigation }: LoginProps) {
 
 			<View style={styles.message}>
 				<Text style={styles.messageText}>{message}</Text>
+
+				{resendVerification.resend && (
+					<Button
+						onPress={handleResendVerificationMail}
+						title="Resend Confirmation Mail"
+						type="outline"
+						disabled={!resendVerification.isEnabled}
+					/>
+				)}
+
+				<Text style={styles.messageText}>
+					{resendVerification.response}
+				</Text>
 			</View>
 		</View>
 	);
@@ -204,5 +268,6 @@ const styles = StyleSheet.create({
 	messageText: {
 		color: "black",
 		fontWeight: "500",
+		marginBottom: 10,
 	},
 });

@@ -12,3 +12,9 @@ export interface HandleLoginParams {
 	email: string;
 	password: string;
 }
+
+export interface ResendConfrimMailState {
+	resend: boolean;
+	response: string;
+	isEnabled: boolean;
+}
