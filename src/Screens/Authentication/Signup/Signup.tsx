@@ -19,28 +19,8 @@ export default function Signup({ navigation }: SignupProps) {
 	const handleSignup = (userDetails: HandleSignupParams) => {
 		setIsLoading(true);
 		const { name, email, password } = userDetails;
-		// const userId = nanoid().toLowerCase();
-
-		// const userAttributes = [
-		// 	{
-		// 		Name: "email",
-		// 		Value: email,
-		// 	},
-		// 	{
-		// 		Name: "name",
-		// 		Value: name,
-		// 	},
-		// 	{
-		// 		Name: "preferred_username",
-		// 		Value: userId,
-		// 	},
-		// ];
 
 		const userAttributes = [
-			// new CognitoUserAttribute({
-			// 	Name: "email",
-			// 	Value: email,
-			// }),
 			new CognitoUserAttribute({
 				Name: "name",
 				Value: name,

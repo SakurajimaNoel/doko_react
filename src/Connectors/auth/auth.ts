@@ -25,10 +25,8 @@ export const userTokenDetails: UserTokenDetails = (payload) => {
 	let refreshToken = payload.getRefreshToken().getToken();
 
 	let name = decodedId.name ? decodedId.name : "dokiii";
-	let username = decodedId.preferred_username;
 	let email = decodedId.email;
-	let awsUsername = decodedAccess.username;
-	let completeProfile = awsUsername !== username;
+	let username = decodedAccess.username;
 
 	let userDetails = {
 		accessToken,
@@ -38,8 +36,6 @@ export const userTokenDetails: UserTokenDetails = (payload) => {
 		name,
 		username,
 		email,
-		completeProfile,
-		awsUsername,
 	};
 	initAWSCredentials(idToken);
 
@@ -97,4 +93,9 @@ export const refreshTokens: RefreshTokens = async (refreshToken) => {
 		console.error("my error", err);
 		return {};
 	}
+};
+
+export const logout = () => {
+	const cognitoUser = getCognitoUser();
+	cognitoUser?.signOut();
 };

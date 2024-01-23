@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { Button } from "@rneui/themed";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { CognitoUserSession } from "amazon-cognito-identity-js";
 import * as AWS from "aws-sdk";
 import UserPool from "../../users/UserPool";
@@ -18,24 +18,47 @@ import { gql, useQuery } from "@apollo/client";
 
 import NetworkLogger from "react-native-network-logger";
 import { IntroProps, HandleUserSession } from "./types";
+import { UserContext } from "../../context/userContext";
 
 export default function Intro({ navigation }: IntroProps) {
 	const dispatch = useAppDispatch();
 	const [loading, setLoading] = useState(true);
+	const user = useContext(UserContext);
 
 	const handleUserSession: HandleUserSession = (session) => {
-		let userDetails = userTokenDetails(session);
-		initCognitoUser(userDetails.email);
+		let {
+			name,
+			accessToken,
+			expireAt,
+			refreshToken,
+			email,
+			idToken,
+			username,
+		} = userTokenDetails(session);
+		initCognitoUser(email);
 
 		// cognito iam
 		// initAWSCredentials(userDetails.idToken);
 		// const credentials = getAWSCredentials();
 		// AWS.config.credentials = credentials;
 
-		dispatch(loginUser(userDetails));
+		// dispatch(loginUser(userDetails));
+
+		if (!user) return;
+
+		user.setUser({
+			name,
+			accessToken,
+			expireAt,
+			refreshToken,
+			idToken,
+			username,
+			email,
+		});
 	};
 
 	useEffect(() => {
+		//@ts-ignore
 		UserPool.storage.sync(function (err: Error, result: string) {
 			if (err) {
 			} else if (result === "SUCCESS") {

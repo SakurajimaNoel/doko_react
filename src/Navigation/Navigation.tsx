@@ -2,7 +2,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useAppSelector } from "../hooks/reduxHooks";
-import { useEffect } from "react";
+import { UserContext } from "../context/userContext";
+import { useEffect, useContext } from "react";
 import * as AWS from "aws-sdk";
 
 import { initAWSCredentials, getAWSCredentials } from "../Connectors/auth/aws";
@@ -32,7 +33,7 @@ export type RootTabParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 const Navigation = () => {
-	const auth = useAppSelector((state) => state.auth);
+	const user = useContext(UserContext);
 
 	// useEffect(() => {
 	// 	if (auth.status) {
@@ -42,7 +43,20 @@ const Navigation = () => {
 
 	return (
 		<NavigationContainer>
-			{!auth.status ? (
+			{user?.user ? (
+				<>
+					<Tab.Navigator initialRouteName="Home">
+						<Tab.Screen name="Home" component={Home} />
+						<Tab.Screen name="Nearby" component={Nearby} />
+						<Tab.Screen name="Search" component={Search} />
+						<Tab.Screen
+							name="Profile"
+							component={Profile}
+							options={{ title: user.user.name }}
+						/>
+					</Tab.Navigator>
+				</>
+			) : (
 				<>
 					<Stack.Navigator initialRouteName="Intro">
 						<Stack.Screen name="Intro" component={Intro} />
@@ -53,19 +67,6 @@ const Navigation = () => {
 							component={ResetPassword}
 						/>
 					</Stack.Navigator>
-				</>
-			) : (
-				<>
-					<Tab.Navigator initialRouteName="Home">
-						<Tab.Screen name="Home" component={Home} />
-						<Tab.Screen name="Nearby" component={Nearby} />
-						<Tab.Screen name="Search" component={Search} />
-						<Tab.Screen
-							name="Profile"
-							component={Profile}
-							options={{ title: auth.name }}
-						/>
-					</Tab.Navigator>
 				</>
 			)}
 		</NavigationContainer>

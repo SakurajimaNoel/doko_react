@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, TextInput } from "react-native";
 import { Button } from "@rneui/themed";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Formik } from "formik";
+import { UserContext } from "../../../context/userContext";
 
 import { userTokenDetails } from "../../../Connectors/auth/auth";
 import {
@@ -26,6 +27,7 @@ import { useAppDispatch } from "../../../hooks/reduxHooks";
 
 export default function Login({ navigation }: LoginProps) {
 	const dispatch = useAppDispatch();
+	const user = useContext(UserContext);
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [message, setMessage] = useState<string>("");
@@ -37,14 +39,34 @@ export default function Login({ navigation }: LoginProps) {
 		});
 
 	const handleAuthSuccess = async (payload: CognitoUserSession) => {
-		let userDetails = userTokenDetails(payload);
+		let {
+			name,
+			username,
+			email,
+			accessToken,
+			refreshToken,
+			expireAt,
+			idToken,
+		} = userTokenDetails(payload);
 
 		// cognito iam
 		// initAWSCredentials(userDetails.idToken);
 		// const credentials = getAWSCredentials();
 		// AWS.config.credentials = credentials;
 
-		dispatch(loginUser(userDetails));
+		// dispatch(loginUser(userDetails));
+
+		if (!user) return;
+
+		user.setUser({
+			name,
+			accessToken,
+			expireAt,
+			refreshToken,
+			idToken,
+			username,
+			email,
+		});
 	};
 
 	const handleLogin = (userCredentials: HandleLoginParams) => {
@@ -97,6 +119,7 @@ export default function Login({ navigation }: LoginProps) {
 				user.completeNewPasswordChallenge(
 					newPassword,
 					userAttributes,
+					//@ts-ignore
 					this,
 				);
 			},

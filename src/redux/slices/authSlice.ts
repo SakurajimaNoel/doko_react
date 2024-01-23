@@ -11,7 +11,6 @@ export interface AuthState {
 	email: string;
 	username: string;
 	completeProfile: boolean;
-	awsUsername: string;
 }
 
 const initialState: AuthState = {
@@ -24,7 +23,6 @@ const initialState: AuthState = {
 	email: "",
 	username: "",
 	completeProfile: false,
-	awsUsername: "",
 };
 
 const authSlice = createSlice({
@@ -41,7 +39,6 @@ const authSlice = createSlice({
 				email,
 				username,
 				completeProfile,
-				awsUsername,
 			} = action.payload;
 
 			state.status = true;
@@ -53,7 +50,6 @@ const authSlice = createSlice({
 			state.email = email;
 			state.username = username;
 			state.completeProfile = completeProfile;
-			state.awsUsername = awsUsername;
 		},
 		logoutUser: (state) => {
 			state.status = false;
@@ -65,7 +61,6 @@ const authSlice = createSlice({
 			state.name = "";
 			state.email = "";
 			state.username = "";
-			state.awsUsername = "";
 		},
 		updateTokens: (state, action) => {
 			const { idToken, accessToken, refreshToken, expireAt } =
@@ -80,11 +75,6 @@ const authSlice = createSlice({
 			const { name } = action.payload;
 
 			state.name = name;
-		},
-		updateUsername: (state, action) => {
-			const { username } = action.payload;
-
-			state.username = username;
 		},
 		updateEmail: (state, action) => {
 			const { email } = action.payload;
@@ -103,7 +93,6 @@ export const {
 	updateTokens,
 	updateEmail,
 	updateName,
-	updateUsername,
 	updateCompleteProfile,
 } = authSlice.actions;
 export default authSlice.reducer;

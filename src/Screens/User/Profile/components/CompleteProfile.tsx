@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { CompleteProfileProps, Steps, UserInfo } from "../types";
 import * as AWS from "aws-sdk";
 
@@ -11,10 +11,12 @@ import { needsRefresh, refreshTokens } from "../../../../Connectors/auth/auth";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/reduxHooks";
 import { updateTokens } from "../../../../redux/slices/authSlice";
 import { ManagedUpload } from "aws-sdk/clients/s3";
+import { UserContext } from "../../../../context/userContext";
 
 const CompleteProfile = ({ auth }: CompleteProfileProps) => {
 	const dispatch = useAppDispatch();
-	const user = useAppSelector((state) => state.auth);
+	// const user = useAppSelector((state) => state.auth);
+	const userDetails = useContext(UserContext);
 	const [steps, setSteps] = useState<Steps>(3);
 	const [userInfo, setUserInfo] = useState<UserInfo>({
 		username: "",
@@ -34,6 +36,11 @@ const CompleteProfile = ({ auth }: CompleteProfileProps) => {
 	};
 
 	const handleProfileCreate = async () => {
+		if (!userDetails) return;
+
+		const user = userDetails.user;
+		if (!user) return;
+
 		// handle token expiry
 		if (needsRefresh(user.expireAt)) {
 			const tokens = await refreshTokens(user.refreshToken);
@@ -98,12 +105,16 @@ const CompleteProfile = ({ auth }: CompleteProfileProps) => {
 	};
 
 	const completeProfileStep = () => {
+		const user = userDetails?.user;
+
+		if (!user) return;
+
 		switch (steps) {
 			case 1:
 				return (
 					<Username
 						handleNext={handleNext}
-						accessToken={auth.accessToken}
+						accessToken={user.accessToken}
 						setUserInfo={setUserInfo}
 						userName={userInfo.username}
 					/>

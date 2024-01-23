@@ -8,8 +8,6 @@ interface AuthState {
 	name: string;
 	email: string;
 	username: string;
-	completeProfile: boolean;
-	awsUsername: string;
 }
 
 interface TokenState {
