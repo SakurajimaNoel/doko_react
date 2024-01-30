@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
-import { CompleteProfileProps, Steps, UserInfo } from "../types";
+import { Steps, UserInfo } from "../types";
 import * as AWS from "aws-sdk";
 
 import Username from "./profileSteps/Username";
@@ -8,16 +8,14 @@ import UserDetails from "./profileSteps/UserDetails";
 import ProfilePicture from "./profileSteps/ProfilePicture";
 import { getAWSCredentials } from "../../../../Connectors/auth/aws";
 import { needsRefresh, refreshTokens } from "../../../../Connectors/auth/auth";
-import { useAppDispatch, useAppSelector } from "../../../../hooks/reduxHooks";
-import { updateTokens } from "../../../../redux/slices/authSlice";
 import { ManagedUpload } from "aws-sdk/clients/s3";
 import { UserContext } from "../../../../context/userContext";
+import { useMutation } from "@apollo/client";
+import { createUser } from "../../../../Connectors/graphql/mutation/createUser";
 
-const CompleteProfile = ({ auth }: CompleteProfileProps) => {
-	const dispatch = useAppDispatch();
-	// const user = useAppSelector((state) => state.auth);
+const CompleteProfile = () => {
 	const userDetails = useContext(UserContext);
-	const [steps, setSteps] = useState<Steps>(3);
+	const [steps, setSteps] = useState<Steps>(1);
 	const [userInfo, setUserInfo] = useState<UserInfo>({
 		username: "",
 		dob: new Date(),
@@ -26,6 +24,37 @@ const CompleteProfile = ({ auth }: CompleteProfileProps) => {
 		imageExtension: "",
 		imageType: "",
 	});
+
+	const [createUserProfile, { data, loading, error }] = useMutation(
+		createUser,
+		{
+			context: {
+				headers: {
+					Authorization: "Bearer " + userDetails?.user?.accessToken,
+				},
+			},
+		},
+	);
+
+	useEffect(() => {
+		if (data) {
+			console.log("Profile created");
+			console.log(data);
+			//@ts-ignore
+			userDetails?.setUser((prev) => {
+				return {
+					...prev,
+					displayUsername: userInfo.username,
+					completeProfile: true,
+					profilePicture: `${userInfo.username}/profile.${userInfo.imageExtension}`,
+				};
+			});
+		}
+
+		if (error) {
+			console.error("error completing user profile");
+		}
+	}, [data, error]);
 
 	const handleNext = () => {
 		setSteps((prev) => (prev + 1) as Steps);
@@ -41,11 +70,14 @@ const CompleteProfile = ({ auth }: CompleteProfileProps) => {
 		const user = userDetails.user;
 		if (!user) return;
 
+		let key = `${user.username}/profile.${userInfo.imageExtension}`;
+
 		// handle token expiry
 		if (needsRefresh(user.expireAt)) {
 			const tokens = await refreshTokens(user.refreshToken);
 			if (JSON.stringify(tokens) !== "{}") {
-				dispatch(updateTokens(tokens));
+				// dispatch(updateTokens(tokens));
+				// token refreshing
 			} else {
 				console.error("can't refresh tokens");
 				return;
@@ -70,7 +102,7 @@ const CompleteProfile = ({ auth }: CompleteProfileProps) => {
 				});
 
 				let bucketName = "dokiuserprofile";
-				let key = `trial/a.${userInfo.imageExtension}`;
+				// let key = `${user.username}/profile.${userInfo.imageExtension}`;
 
 				console.log(key);
 				const response = await fetch(userInfo.profilePicture);
@@ -94,14 +126,30 @@ const CompleteProfile = ({ auth }: CompleteProfileProps) => {
 								"Image uploaded successfully. Location:",
 								data.Key,
 							);
+
+							// create node in neo4j
+							let variables = {
+								input: [
+									{
+										id: userDetails.user?.username,
+										username: userInfo.username,
+										email: userDetails.user?.email,
+										bio: userInfo.bio,
+										dob: userInfo.dob,
+										name: userDetails.user?.name,
+										profilePicture: key,
+									},
+								],
+							};
+
+							createUserProfile({
+								variables,
+							});
 						}
 					},
 				);
 			}
 		});
-		// update username in aws
-
-		// create node in neo4j
 	};
 
 	const completeProfileStep = () => {
@@ -141,6 +189,14 @@ const CompleteProfile = ({ auth }: CompleteProfileProps) => {
 				);
 		}
 	};
+
+	if (loading) {
+		return (
+			<View>
+				<Text style={styles.head}>Completing profile....</Text>
+			</View>
+		);
+	}
 
 	return (
 		<View style={styles.container}>

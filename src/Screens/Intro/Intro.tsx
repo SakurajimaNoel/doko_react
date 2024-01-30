@@ -11,8 +11,6 @@ import {
 } from "../../Connectors/auth/aws";
 
 import { userTokenDetails } from "../../Connectors/auth/auth";
-import { loginUser } from "../../redux/slices/authSlice";
-import { useAppDispatch } from "../../hooks/reduxHooks";
 
 import { gql, useQuery } from "@apollo/client";
 
@@ -21,7 +19,6 @@ import { IntroProps, HandleUserSession } from "./types";
 import { UserContext } from "../../context/userContext";
 
 export default function Intro({ navigation }: IntroProps) {
-	const dispatch = useAppDispatch();
 	const [loading, setLoading] = useState(true);
 	const user = useContext(UserContext);
 

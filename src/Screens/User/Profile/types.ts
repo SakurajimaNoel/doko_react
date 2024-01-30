@@ -1,15 +1,10 @@
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { RootTabParamList } from "../../../Navigation/Navigation";
-import { AuthState } from "../../../redux/slices/authSlice";
 
 type NavigationProps = BottomTabScreenProps<RootTabParamList, "Profile">;
 
 export interface ProfileProps {
 	navigation: NavigationProps["navigation"];
-}
-
-export interface CompleteProfileProps {
-	auth: AuthState;
 }
 
 export type Steps = 1 | 2 | 3;

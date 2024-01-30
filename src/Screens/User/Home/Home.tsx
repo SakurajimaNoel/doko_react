@@ -2,8 +2,6 @@ import { View, Text, StyleSheet } from "react-native";
 import React, { useContext, useEffect } from "react";
 import { HomeProps } from "./types";
 import { Button } from "@rneui/themed";
-import { useAppDispatch, useAppSelector } from "../../../hooks/reduxHooks";
-import { logoutUser, updateTokens } from "../../../redux/slices/authSlice";
 import * as Keychain from "react-native-keychain";
 import * as AWS from "aws-sdk";
 import { getAWSCredentials } from "../../../Connectors/auth/aws";
@@ -20,46 +18,25 @@ import { useLazyQuery } from "@apollo/client";
 import { getInitialUser } from "../../../Connectors/graphql/queries/getInitialUser";
 
 const Home = ({ navigation }: HomeProps) => {
-	const dispatch = useAppDispatch();
-	// const user = useAppSelector((state) => state.auth);
 	const user = useContext(UserContext);
 
 	const handleLogout = async () => {
 		await Keychain.resetGenericPassword();
-		// dispatch(logoutUser());
 		user?.setUser(null);
 		logout();
 	};
 
-	if (!user) {
-		handleLogout();
-		return (
-			<>
-				<Text>Not Authenticated</Text>
-			</>
-		);
-	}
-
-	if (!user.user) {
-		handleLogout();
-		return (
-			<>
-				<Text>Not Authenticated</Text>
-			</>
-		);
-	}
-
 	const [getUser, { loading, error, data }] = useLazyQuery(getInitialUser, {
 		context: {
 			headers: {
-				Authorization: "Bearer " + user.user.accessToken,
+				Authorization: "Bearer " + user?.user?.accessToken,
 			},
 		},
 	});
 
 	useEffect(() => {
 		if (!getUser) return;
-		if (!user.user) return;
+		if (!user) return;
 
 		let variables = {
 			where: {
@@ -70,21 +47,18 @@ const Home = ({ navigation }: HomeProps) => {
 		getUser({ variables });
 	}, [getUser, user]);
 
-	if (loading) {
-		return <Text style={styles.text}>Loading user details...</Text>;
-	}
-
 	useEffect(() => {
 		if (data) {
-			let completeProfile: boolean = data.users.length !== 1;
+			console.log(data.users.length);
+			let completeProfile: boolean = data.users.length === 1;
 
 			if (completeProfile) {
-				let user = data.users[0];
+				let userData = data.users[0];
 
-				if (!user) return;
+				if (!userData) return;
 
-				let displayUsername = user.username;
-				let profilePicture = user.profilePicture;
+				let displayUsername = userData.username;
+				let profilePicture = userData.profilePicture;
 
 				//@ts-ignore
 				user.setUser((prev) => {
@@ -109,59 +83,50 @@ const Home = ({ navigation }: HomeProps) => {
 		}
 	}, [data, error]);
 
-	const handleTrial = async () => {
-		if (!user.user) return;
+	if (loading) {
+		return <Text style={styles.text}>Loading user details...</Text>;
+	}
 
-		if (needsRefresh(user.user.expireAt)) {
-			// refreshing token
-			const tokens = await refreshTokens(user.user.refreshToken);
-			if (JSON.stringify(tokens) !== "{}") {
-				dispatch(updateTokens(tokens));
-			} else {
-				console.error("can't refresh tokens");
-				return;
-			}
-		}
-		const credentials = getAWSCredentials();
+	if (!user || !user.user) {
+		handleLogout();
+		return (
+			<>
+				<Text>Not Authenticated</Text>
+			</>
+		);
+	}
 
-		credentials?.get((error) => {
-			if (error) {
-				console.error("Error fetching AWS credentials: ", error);
-			} else {
-				var accessKeyId = credentials.accessKeyId;
-				var secretAccessKey = credentials.secretAccessKey;
-				var sessionToken = credentials.sessionToken;
+	// const handleTrial = async () => {
+	// 	if (!user.user) return;
 
-				// console.log(accessKeyId);
-				// console.log(secretAccessKey);
-				// console.log(sessionToken);
-			}
-		});
+	// 	if (needsRefresh(user.user.expireAt)) {
+	// 		// refreshing token
+	// 		const tokens = await refreshTokens(user.user.refreshToken);
+	// 		if (JSON.stringify(tokens) !== "{}") {
+	// 			//token update
+	// 		} else {
+	// 			console.error("can't refresh tokens");
+	// 			return;
+	// 		}
+	// 	}
+	// 	const credentials = getAWSCredentials();
 
-		if (needsRefresh(user.user.expireAt)) {
-			console.log("refresh tokens here");
-		} else {
-			console.log("no need to refresh now");
-		}
-		return;
+	// 	credentials?.get((error) => {
+	// 		if (error) {
+	// 			console.error("Error fetching AWS credentials: ", error);
+	// 		} else {
+	// 			var accessKeyId = credentials.accessKeyId;
+	// 			var secretAccessKey = credentials.secretAccessKey;
+	// 			var sessionToken = credentials.sessionToken;
+	// 		}
+	// 	});
 
-		// const updateAttributes = [
-		// 	{
-		// 		Name: "preferred_username",
-		// 		Value: user.awsUsername,
-		// 		// Value: "rohan",
-		// 	},
-		// ];
-		// const cognitoUser = getCognitoUser();
-
-		// cognitoUser?.updateAttributes(updateAttributes, (err, result) => {
-		// 	if (err) {
-		// 		console.log("Error updating user attributes ", err);
-		// 	} else {
-		// 		console.log("Successfully updated user attributes ", result);
-		// 	}
-		// });
-	};
+	// 	if (needsRefresh(user.user.expireAt)) {
+	// 		console.log("refresh tokens here");
+	// 	} else {
+	// 		console.log("no need to refresh now");
+	// 	}
+	// };
 
 	return (
 		<View>
@@ -177,12 +142,12 @@ const Home = ({ navigation }: HomeProps) => {
 				accessibilityLabel="Logout"
 				type="clear"
 			/>
-			<Button
+			{/* <Button
 				onPress={handleTrial}
 				title="trial"
 				accessibilityLabel="Logout"
 				// type="clear"
-			/>
+			/> */}
 		</View>
 	);
 };

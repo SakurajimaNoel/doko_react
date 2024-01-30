@@ -1,7 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { useAppSelector } from "../hooks/reduxHooks";
 import { UserContext } from "../context/userContext";
 import { useEffect, useContext } from "react";
 import * as AWS from "aws-sdk";

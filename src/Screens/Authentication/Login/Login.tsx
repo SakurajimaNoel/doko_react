@@ -22,11 +22,7 @@ import {
 } from "amazon-cognito-identity-js";
 import * as AWS from "aws-sdk";
 
-import { loginUser } from "../../../redux/slices/authSlice";
-import { useAppDispatch } from "../../../hooks/reduxHooks";
-
 export default function Login({ navigation }: LoginProps) {
-	const dispatch = useAppDispatch();
 	const user = useContext(UserContext);
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);

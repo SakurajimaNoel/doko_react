@@ -7,8 +7,6 @@ import { useState } from "react";
 import App from "./App";
 import { name as appName } from "./app.json";
 import { apolloClient } from "./src/Connectors/Apollo-client/apollo";
-import { Provider } from "react-redux";
-import { store } from "./src/redux/store/store";
 
 // import { Amplify, Auth } from "aws-amplify";
 // import awsconfig from "./src/aws-exports";
@@ -23,11 +21,9 @@ startNetworkLogging(); //for network logging, dont delete
 
 const Application = () => {
 	return (
-		<Provider store={store}>
-			<ApolloProvider client={apolloClient}>
-				<App />
-			</ApolloProvider>
-		</Provider>
+		<ApolloProvider client={apolloClient}>
+			<App />
+		</ApolloProvider>
 	);
 };
 

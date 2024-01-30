@@ -77,7 +77,6 @@ export const refreshTokens: RefreshTokens = async (refreshToken) => {
 		const session: CognitoUserSession = await new Promise(
 			(resolve, reject) => {
 				cognitoUser?.refreshSession(refreshDetails, (error, result) => {
-					console.info("3");
 					if (error) {
 						reject(error);
 					} else {
