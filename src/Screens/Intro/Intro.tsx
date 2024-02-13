@@ -16,11 +16,13 @@ import { gql, useQuery } from "@apollo/client";
 
 import NetworkLogger from "react-native-network-logger";
 import { IntroProps, HandleUserSession } from "./types";
-import { UserContext } from "../../context/userContext";
+import { UserContext, UserDispatchContext } from "../../context/userContext";
+import { UserActionKind } from "../../context/types";
 
 export default function Intro({ navigation }: IntroProps) {
+	const userDispatch = useContext(UserDispatchContext);
+
 	const [loading, setLoading] = useState(true);
-	const user = useContext(UserContext);
 
 	const handleUserSession: HandleUserSession = (session) => {
 		let {
@@ -41,21 +43,24 @@ export default function Intro({ navigation }: IntroProps) {
 
 		// dispatch(loginUser(userDetails));
 
-		if (!user) return;
+		if (!userDispatch) return;
 
-		user.setUser({
-			name,
-			accessToken,
-			expireAt,
-			refreshToken,
-			idToken,
-			username,
-			email,
+		userDispatch({
+			type: UserActionKind.INIT,
+			payload: {
+				name,
+				accessToken,
+				expireAt,
+				refreshToken,
+				idToken,
+				username,
+				email,
+			},
 		});
 	};
 
 	useEffect(() => {
-		//@ts-ignore
+		//@ts-expect-error
 		UserPool.storage.sync(function (err: Error, result: string) {
 			if (err) {
 			} else if (result === "SUCCESS") {
@@ -67,7 +72,7 @@ export default function Intro({ navigation }: IntroProps) {
 						session: CognitoUserSession,
 					) {
 						if (err) {
-							console.log("getSession Error ", err.message);
+							console.error("getSession Error ", err.message);
 							setLoading(false);
 							return;
 						}

@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TextInput } from "react-native";
 import { Button } from "@rneui/themed";
 import React, { useState, useContext } from "react";
 import { Formik } from "formik";
-import { UserContext } from "../../../context/userContext";
+import { UserDispatchContext } from "../../../context/userContext";
 
 import { userTokenDetails } from "../../../Connectors/auth/auth";
 import {
@@ -21,9 +21,10 @@ import {
 	CognitoUserSession,
 } from "amazon-cognito-identity-js";
 import * as AWS from "aws-sdk";
+import { UserActionKind } from "../../../context/types";
 
 export default function Login({ navigation }: LoginProps) {
-	const user = useContext(UserContext);
+	const userDispatch = useContext(UserDispatchContext);
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [message, setMessage] = useState<string>("");
@@ -50,18 +51,30 @@ export default function Login({ navigation }: LoginProps) {
 		// const credentials = getAWSCredentials();
 		// AWS.config.credentials = credentials;
 
-		// dispatch(loginUser(userDetails));
+		// if (!user) return;
 
-		if (!user) return;
+		// user.setUser({
+		// 	name,
+		// 	accessToken,
+		// 	expireAt,
+		// 	refreshToken,
+		// 	idToken,
+		// 	username,
+		// 	email,
+		// });
+		if (!userDispatch) return;
 
-		user.setUser({
-			name,
-			accessToken,
-			expireAt,
-			refreshToken,
-			idToken,
-			username,
-			email,
+		userDispatch({
+			type: UserActionKind.INIT,
+			payload: {
+				name,
+				accessToken,
+				expireAt,
+				refreshToken,
+				idToken,
+				username,
+				email,
+			},
 		});
 	};
 
@@ -88,7 +101,7 @@ export default function Login({ navigation }: LoginProps) {
 			},
 			onFailure: (err) => {
 				setIsLoading(false);
-				console.log("Cognito Signin Failure: ", err);
+				console.error("Cognito Signin Failure: ", err);
 
 				let errorName = err.name;
 				if (errorName === "UserNotConfirmedException") {
@@ -128,7 +141,7 @@ export default function Login({ navigation }: LoginProps) {
 		if (user) {
 			user.resendConfirmationCode((err, res) => {
 				if (err) {
-					console.log("Resend Verification Mail Failed ", err);
+					console.error("Resend Verification Mail Failed ", err);
 					setResendVerification({
 						resend: true,
 						response: err.message,

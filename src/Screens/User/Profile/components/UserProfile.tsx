@@ -1,11 +1,18 @@
 import { View, Text, StyleSheet, Image, Button } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { UserContext } from "../../../../context/userContext";
+import {
+	UserContext,
+	UserDispatchContext,
+} from "../../../../context/userContext";
 import { getAWSCredentials } from "../../../../Connectors/auth/aws";
 import * as AWS from "aws-sdk";
+import { UserActionKind } from "../../../../context/types";
+import { UserProfileProps } from "../types";
 
-const UserProfile = () => {
+const UserProfile = ({ navigateEditProfile }: UserProfileProps) => {
 	const user = useContext(UserContext);
+	const userDispatch = useContext(UserDispatchContext);
+
 	const [image, setImage] = useState<string | null>(null);
 	const s3Ref = useRef<AWS.S3 | null>(null);
 
@@ -29,7 +36,7 @@ const UserProfile = () => {
 				s3Ref.current = s3;
 
 				let bucketName = "dokiuserprofile";
-				let key = user?.user?.profilePicture;
+				let key = user?.profilePicture;
 
 				const params = {
 					Bucket: bucketName,
@@ -54,9 +61,9 @@ const UserProfile = () => {
 		const s3 = s3Ref.current;
 		if (!s3) return;
 
-		if (!user || !user.user) return;
+		if (!user) return;
 
-		let key = user.user.profilePicture;
+		let key = user.profilePicture;
 
 		if (typeof key !== "string") return;
 
@@ -72,19 +79,24 @@ const UserProfile = () => {
 			} else {
 				console.log("Item deleted successfully:", data);
 
-				// @ts-expect-error
-				user.setUser((prev) => {
-					return {
-						...prev,
+				if (!userDispatch) return;
+
+				userDispatch({
+					type: UserActionKind.UPDATE,
+					payload: {
 						profilePicture: "",
-					};
+					},
 				});
 			}
 		});
 	};
 
-	if (!user || !user.user) {
-		handleLogout();
+	const handleEditProfile = () => {
+		navigateEditProfile();
+	};
+
+	if (!user) {
+		// handleLogout();
 		return (
 			<>
 				<Text>Not Authenticated</Text>
@@ -96,11 +108,11 @@ const UserProfile = () => {
 		<View>
 			<Text style={styles.text}>UserProfile</Text>
 
-			<Text style={styles.text}>{user.user.displayUsername}</Text>
+			<Text style={styles.text}>{user.displayUsername}</Text>
 
-			<Text style={styles.text}>{user.user.email}</Text>
+			<Text style={styles.text}>{user.email}</Text>
 
-			<Text style={styles.text}>{user.user.name}</Text>
+			<Text style={styles.text}>{user.name}</Text>
 
 			{image && (
 				<>
@@ -109,6 +121,8 @@ const UserProfile = () => {
 						style={{ width: 200, height: 200 }}
 					/>
 
+					<View style={styles.space} />
+
 					<Button
 						onPress={handleDelete}
 						title="Delete profile picture"
@@ -116,6 +130,9 @@ const UserProfile = () => {
 					/>
 				</>
 			)}
+			<View style={styles.space} />
+
+			<Button onPress={handleEditProfile} title="Edit Profile" />
 		</View>
 	);
 };
@@ -126,9 +143,10 @@ const styles = StyleSheet.create({
 		fontSize: 22,
 		marginVertical: 10,
 	},
+	space: {
+		width: 20,
+		height: 20,
+	},
 });
 
 export default UserProfile;
-function handleLogout() {
-	throw new Error("Function not implemented.");
-}

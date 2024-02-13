@@ -1,16 +1,19 @@
-import React, { useState } from "react";
+import React, { useReducer } from "react";
 import Navigation from "./src/Navigation/Navigation";
 
-import { UserContext } from "./src/context/userContext";
+import { UserContext, UserDispatchContext } from "./src/context/userContext";
 import { User } from "./src/context/types";
+import { initUser, userReducer } from "./src/context/reducer";
 
 function App() {
-	const [user, setUser] = useState<User | null>(null);
+	const [user, userDispatch] = useReducer(userReducer, initUser);
 
 	return (
 		<>
-			<UserContext.Provider value={{ user, setUser }}>
-				<Navigation />
+			<UserContext.Provider value={user}>
+				<UserDispatchContext.Provider value={userDispatch}>
+					<Navigation />
+				</UserDispatchContext.Provider>
 			</UserContext.Provider>
 		</>
 	);

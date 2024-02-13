@@ -9,10 +9,15 @@ import { UserContext } from "../../../context/userContext";
 const Profile = ({ navigation }: ProfileProps) => {
 	const user = useContext(UserContext);
 
+	const editProfile = () => {
+		//@ts-ignore
+		navigation.navigate("EditProfile");
+	};
+
 	return (
 		<View>
-			{user?.user?.completeProfile ? (
-				<UserProfile />
+			{user?.completeProfile ? (
+				<UserProfile navigateEditProfile={editProfile} />
 			) : (
 				<CompleteProfile />
 			)}

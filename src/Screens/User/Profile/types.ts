@@ -13,14 +13,9 @@ export interface UserInfo {
 	username: string;
 	dob: Date;
 	bio?: string;
-	profilePicture: string;
-	imageExtension: string;
-	imageType: string;
-}
-
-export interface ImageMetaDetails {
-	name: string;
-	type: string;
+	profilePicture?: string;
+	imageExtension?: string;
+	imageType?: string;
 }
 
 export interface UsernameProps {
@@ -52,3 +47,7 @@ export interface ProfileModalProps {
 }
 
 export type HandleSteps = (prev?: boolean) => void;
+
+export interface UserProfileProps {
+	navigateEditProfile: () => void;
+}

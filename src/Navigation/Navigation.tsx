@@ -19,10 +19,17 @@ export type RootStackParamList = {
 };
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+export type ProfileStackParamList = {
+	ProfileInfo: undefined;
+	EditProfile: undefined;
+};
+const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
+
 import Home from "../Screens/User/Home";
 import Nearby from "../Screens/User/Nearby";
 import Search from "../Screens/User/Search";
 import Profile from "../Screens/User/Profile";
+import EditProfile from "../Screens/User/Profile/components/EditProfile";
 export type RootTabParamList = {
 	Home: undefined;
 	Nearby: undefined;
@@ -30,6 +37,25 @@ export type RootTabParamList = {
 	Search: undefined;
 };
 const Tab = createBottomTabNavigator<RootTabParamList>();
+
+function ProfileStackScreen() {
+	const user = useContext(UserContext);
+
+	return (
+		<ProfileStack.Navigator initialRouteName="ProfileInfo">
+			<ProfileStack.Screen
+				name="ProfileInfo"
+				component={Profile}
+				options={{ title: user?.name }}
+			/>
+			<ProfileStack.Screen
+				name="EditProfile"
+				component={EditProfile}
+				options={{ title: "Edit" }}
+			/>
+		</ProfileStack.Navigator>
+	);
+}
 
 const Navigation = () => {
 	const user = useContext(UserContext);
@@ -42,7 +68,7 @@ const Navigation = () => {
 
 	return (
 		<NavigationContainer>
-			{user?.user ? (
+			{user ? (
 				<>
 					<Tab.Navigator initialRouteName="Home">
 						<Tab.Screen name="Home" component={Home} />
@@ -50,8 +76,11 @@ const Navigation = () => {
 						<Tab.Screen name="Search" component={Search} />
 						<Tab.Screen
 							name="Profile"
-							component={Profile}
-							options={{ title: user.user.name }}
+							component={ProfileStackScreen}
+							options={{
+								headerShown: false,
+								title: user.name,
+							}}
 						/>
 					</Tab.Navigator>
 				</>

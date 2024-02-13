@@ -4,7 +4,6 @@ import { Button, Icon } from "@rneui/base";
 import React, { useState } from "react";
 import {
 	HandleSteps,
-	ImageMetaDetails,
 	ProfileModalProps,
 	ProfilePictureProps,
 } from "../../types";
@@ -87,12 +86,9 @@ const ProfilePicture = ({
 	handleProfileCreate,
 }: ProfilePictureProps) => {
 	const [openModal, setOpenModal] = useState<boolean>(false);
-	const [userUpload, setUserUpload] = useState<string>(
-		userInfo.profilePicture,
-	);
-	const [imageMetaDetails, setImageMetaDetails] = useState<ImageMetaDetails>({
-		name: "",
-		type: "",
+	const [userUpload, setUserUpload] = useState<string | null>(() => {
+		if (userInfo.profilePicture) return userInfo.profilePicture;
+		else return null;
 	});
 
 	const handleOpen = () => {
@@ -164,11 +160,7 @@ const ProfilePicture = ({
 
 				<Image
 					style={styles.image}
-					source={
-						userUpload.length > 0
-							? { uri: userUpload }
-							: images.profile
-					}
+					source={userUpload ? { uri: userUpload } : images.profile}
 				/>
 
 				<ProfileModal

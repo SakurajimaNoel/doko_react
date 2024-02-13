@@ -36,7 +36,7 @@ export default function ResetPassword({ navigation }: ResetPasswordProps) {
 				setMessage("Code sent successfully");
 			},
 			onFailure: (err) => {
-				console.log(err);
+				console.error(err);
 				setIsLoading(false);
 				setMessage("Error sending code");
 			},
@@ -61,7 +61,7 @@ export default function ResetPassword({ navigation }: ResetPasswordProps) {
 			},
 			onFailure: (err) => {
 				setIsLoading(false);
-				console.log(err);
+				console.error(err);
 				setMessage("Error changing password");
 			},
 		});

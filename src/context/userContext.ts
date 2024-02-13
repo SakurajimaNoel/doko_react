@@ -1,4 +1,6 @@
 import { createContext } from "react";
-import { UserContextType } from "./types";
+import { User, UserAction } from "./types";
 
-export const UserContext = createContext<UserContextType | null>(null);
+export const UserContext = createContext<User | null>(null);
+export const UserDispatchContext =
+	createContext<React.Dispatch<UserAction> | null>(null);

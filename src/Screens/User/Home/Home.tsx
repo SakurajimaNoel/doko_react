@@ -12,24 +12,31 @@ import {
 	refreshTokens,
 	logout,
 } from "../../../Connectors/auth/auth";
-import { UserContext } from "../../../context/userContext";
+import { UserContext, UserDispatchContext } from "../../../context/userContext";
 
 import { useLazyQuery } from "@apollo/client";
 import { getInitialUser } from "../../../Connectors/graphql/queries/getInitialUser";
+import { Payload, UserActionKind } from "../../../context/types";
 
 const Home = ({ navigation }: HomeProps) => {
 	const user = useContext(UserContext);
+	const userDispatch = useContext(UserDispatchContext);
 
 	const handleLogout = async () => {
 		await Keychain.resetGenericPassword();
-		user?.setUser(null);
+		if (!userDispatch) {
+			logout();
+			return;
+		}
+
+		userDispatch({ type: UserActionKind.ERASE, payload: null });
 		logout();
 	};
 
 	const [getUser, { loading, error, data }] = useLazyQuery(getInitialUser, {
 		context: {
 			headers: {
-				Authorization: "Bearer " + user?.user?.accessToken,
+				Authorization: "Bearer " + user?.accessToken,
 			},
 		},
 	});
@@ -40,7 +47,7 @@ const Home = ({ navigation }: HomeProps) => {
 
 		let variables = {
 			where: {
-				id: user.user?.username,
+				id: user.username,
 			},
 		};
 
@@ -51,6 +58,7 @@ const Home = ({ navigation }: HomeProps) => {
 		if (data) {
 			console.log(data.users.length);
 			let completeProfile: boolean = data.users.length === 1;
+			let payload: Payload;
 
 			if (completeProfile) {
 				let userData = data.users[0];
@@ -60,21 +68,20 @@ const Home = ({ navigation }: HomeProps) => {
 				let displayUsername = userData.username;
 				let profilePicture = userData.profilePicture;
 
-				//@ts-ignore
-				user.setUser((prev) => {
-					return {
-						...prev,
-						displayUsername,
-						profilePicture,
-						completeProfile,
-					};
-				});
+				payload = {
+					displayUsername,
+					profilePicture,
+					completeProfile,
+				};
 			} else {
-				//@ts-ignore
-				user.setUser((prev) => {
-					return { ...prev, completeProfile };
-				});
+				payload = {
+					completeProfile,
+				};
 			}
+
+			if (!userDispatch) return;
+
+			userDispatch({ type: UserActionKind.INIT, payload });
 		}
 
 		if (error) {
@@ -87,7 +94,7 @@ const Home = ({ navigation }: HomeProps) => {
 		return <Text style={styles.text}>Loading user details...</Text>;
 	}
 
-	if (!user || !user.user) {
+	if (!user) {
 		handleLogout();
 		return (
 			<>
@@ -130,9 +137,9 @@ const Home = ({ navigation }: HomeProps) => {
 
 	return (
 		<View>
-			<Text style={styles.text}>{`Hii ${user.user.name}`}</Text>
+			<Text style={styles.text}>{`Hii ${user.name}`}</Text>
 
-			{!user.user.completeProfile && (
+			{!user.completeProfile && (
 				<Text style={styles.text}>Incomplete profile</Text>
 			)}
 

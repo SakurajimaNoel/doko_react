@@ -9,12 +9,18 @@ import ProfilePicture from "./profileSteps/ProfilePicture";
 import { getAWSCredentials } from "../../../../Connectors/auth/aws";
 import { needsRefresh, refreshTokens } from "../../../../Connectors/auth/auth";
 import { ManagedUpload } from "aws-sdk/clients/s3";
-import { UserContext } from "../../../../context/userContext";
+import {
+	UserContext,
+	UserDispatchContext,
+} from "../../../../context/userContext";
 import { useMutation } from "@apollo/client";
 import { createUser } from "../../../../Connectors/graphql/mutation/createUser";
+import { UserActionKind } from "../../../../context/types";
 
 const CompleteProfile = () => {
-	const userDetails = useContext(UserContext);
+	const user = useContext(UserContext);
+	const userDispatch = useContext(UserDispatchContext);
+
 	const [steps, setSteps] = useState<Steps>(1);
 	const [userInfo, setUserInfo] = useState<UserInfo>({
 		username: "",
@@ -30,7 +36,7 @@ const CompleteProfile = () => {
 		{
 			context: {
 				headers: {
-					Authorization: "Bearer " + userDetails?.user?.accessToken,
+					Authorization: "Bearer " + user?.accessToken,
 				},
 			},
 		},
@@ -40,14 +46,16 @@ const CompleteProfile = () => {
 		if (data) {
 			console.log("Profile created");
 			console.log(data);
-			//@ts-ignore
-			userDetails?.setUser((prev) => {
-				return {
-					...prev,
+
+			if (!userDispatch) return;
+
+			userDispatch({
+				type: UserActionKind.UPDATE,
+				payload: {
 					displayUsername: userInfo.username,
 					completeProfile: true,
 					profilePicture: `${userInfo.username}/profile.${userInfo.imageExtension}`,
-				};
+				},
 			});
 		}
 
@@ -65,12 +73,9 @@ const CompleteProfile = () => {
 	};
 
 	const handleProfileCreate = async () => {
-		if (!userDetails) return;
-
-		const user = userDetails.user;
 		if (!user) return;
 
-		let key = `${user.username}/profile.${userInfo.imageExtension}`;
+		let key = "";
 
 		// handle token expiry
 		if (needsRefresh(user.expireAt)) {
@@ -85,75 +90,81 @@ const CompleteProfile = () => {
 		}
 
 		// upload image
-		const credentials = getAWSCredentials();
-		credentials?.get(async (error) => {
-			if (error) {
-				console.error("Error fetching AWS credentials: ", error);
-			} else {
-				var accessKeyId = credentials.accessKeyId;
-				var secretAccessKey = credentials.secretAccessKey;
-				var sessionToken = credentials.sessionToken;
+		// handle no image case too
+		if (userInfo.profilePicture) {
+			const profilePicture = userInfo.profilePicture;
+			const credentials = getAWSCredentials();
+			key = `${user.username}/profile.${userInfo.imageExtension}`;
 
-				const s3 = new AWS.S3({
-					accessKeyId,
-					secretAccessKey,
-					sessionToken,
-					region: "ap-south-1",
-				});
+			credentials?.get(async (error) => {
+				if (error) {
+					console.error("Error fetching AWS credentials: ", error);
+				} else {
+					var accessKeyId = credentials.accessKeyId;
+					var secretAccessKey = credentials.secretAccessKey;
+					var sessionToken = credentials.sessionToken;
 
-				let bucketName = "dokiuserprofile";
-				// let key = `${user.username}/profile.${userInfo.imageExtension}`;
+					const s3 = new AWS.S3({
+						accessKeyId,
+						secretAccessKey,
+						sessionToken,
+						region: "ap-south-1",
+					});
 
-				console.log(key);
-				const response = await fetch(userInfo.profilePicture);
-				const blob = await response.blob();
+					let bucketName = "dokiuserprofile";
 
-				let params = {
-					Bucket: bucketName,
-					Key: key,
-					Body: blob,
-					ContentType: userInfo.imageType,
-				};
+					console.log(key);
+					const response = await fetch(profilePicture);
+					const blob = await response.blob();
 
-				s3.upload(
-					params,
-					(err: Error, data: ManagedUpload.SendData) => {
-						if (err) {
-							console.error("Error uploading image: ", err);
-						} else {
-							console.log(data);
-							console.log(
-								"Image uploaded successfully. Location:",
-								data.Key,
-							);
+					let params = {
+						Bucket: bucketName,
+						Key: key,
+						Body: blob,
+						ContentType: userInfo.imageType,
+					};
 
-							// create node in neo4j
-							let variables = {
-								input: [
-									{
-										id: userDetails.user?.username,
-										username: userInfo.username,
-										email: userDetails.user?.email,
-										bio: userInfo.bio,
-										dob: userInfo.dob,
-										name: userDetails.user?.name,
-										profilePicture: key,
-									},
-								],
-							};
+					s3.upload(
+						params,
+						(err: Error, data: ManagedUpload.SendData) => {
+							if (err) {
+								console.error("Error uploading image: ", err);
+							} else {
+								console.log(data);
+								console.log(
+									"Image uploaded successfully. Location:",
+									data.Key,
+								);
 
-							createUserProfile({
-								variables,
-							});
-						}
-					},
-				);
-			}
-		});
+								// create node in neo4j
+								let variables = {
+									input: [
+										{
+											id: user.username,
+											username: userInfo.username,
+											email: user.email,
+											bio: userInfo.bio,
+											dob: userInfo.dob,
+											name: user.name,
+											profilePicture: key,
+										},
+									],
+								};
+
+								createUserProfile({
+									variables,
+								});
+							}
+						},
+					);
+				}
+			});
+		} else {
+		}
 	};
 
 	const completeProfileStep = () => {
-		const user = userDetails?.user;
+		// const user = userDetails?.user;
 
 		if (!user) return;
 
