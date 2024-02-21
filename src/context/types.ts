@@ -29,6 +29,7 @@ export enum UserActionKind {
 	COMPLETE = "complete",
 	UPDATE = "update",
 	ERASE = "erase",
+	TOKEN = "token",
 }
 
 export interface UserAction {

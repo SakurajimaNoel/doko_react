@@ -46,22 +46,6 @@ export default function Login({ navigation }: LoginProps) {
 			idToken,
 		} = userTokenDetails(payload);
 
-		// cognito iam
-		// initAWSCredentials(userDetails.idToken);
-		// const credentials = getAWSCredentials();
-		// AWS.config.credentials = credentials;
-
-		// if (!user) return;
-
-		// user.setUser({
-		// 	name,
-		// 	accessToken,
-		// 	expireAt,
-		// 	refreshToken,
-		// 	idToken,
-		// 	username,
-		// 	email,
-		// });
 		if (!userDispatch) return;
 
 		userDispatch({

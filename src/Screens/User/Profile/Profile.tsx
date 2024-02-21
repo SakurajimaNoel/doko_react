@@ -10,14 +10,22 @@ const Profile = ({ navigation }: ProfileProps) => {
 	const user = useContext(UserContext);
 
 	const editProfile = () => {
-		//@ts-ignore
-		navigation.navigate("EditProfile");
+		if (!user) return;
+
+		navigation.navigate("Profile", {
+			screen: "EditProfile",
+			params: {
+				name: user.name,
+				bio: "",
+				username: user.displayUsername ? user.displayUsername : "",
+			},
+		});
 	};
 
 	return (
 		<View>
 			{user?.completeProfile ? (
-				<UserProfile navigateEditProfile={editProfile} />
+				<UserProfile navigation={navigation} />
 			) : (
 				<CompleteProfile />
 			)}

@@ -7,7 +7,6 @@ import Username from "./profileSteps/Username";
 import UserDetails from "./profileSteps/UserDetails";
 import ProfilePicture from "./profileSteps/ProfilePicture";
 import { getAWSCredentials } from "../../../../Connectors/auth/aws";
-import { needsRefresh, refreshTokens } from "../../../../Connectors/auth/auth";
 import { ManagedUpload } from "aws-sdk/clients/s3";
 import {
 	UserContext,
@@ -60,7 +59,7 @@ const CompleteProfile = () => {
 		}
 
 		if (error) {
-			console.error("error completing user profile");
+			console.error("error completing user profile", error);
 		}
 	}, [data, error]);
 
@@ -76,18 +75,6 @@ const CompleteProfile = () => {
 		if (!user) return;
 
 		let key = "";
-
-		// handle token expiry
-		if (needsRefresh(user.expireAt)) {
-			const tokens = await refreshTokens(user.refreshToken);
-			if (JSON.stringify(tokens) !== "{}") {
-				// dispatch(updateTokens(tokens));
-				// token refreshing
-			} else {
-				console.error("can't refresh tokens");
-				return;
-			}
-		}
 
 		// upload image
 		// handle no image case too

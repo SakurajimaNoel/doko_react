@@ -7,11 +7,7 @@ import * as AWS from "aws-sdk";
 import { getAWSCredentials } from "../../../Connectors/auth/aws";
 import { getCognitoUser } from "../../../Connectors/auth/cognitoUser";
 import { CognitoRefreshToken } from "amazon-cognito-identity-js";
-import {
-	needsRefresh,
-	refreshTokens,
-	logout,
-} from "../../../Connectors/auth/auth";
+import { refreshTokens, logout } from "../../../Connectors/auth/auth";
 import { UserContext, UserDispatchContext } from "../../../context/userContext";
 
 import { useLazyQuery } from "@apollo/client";
@@ -56,7 +52,6 @@ const Home = ({ navigation }: HomeProps) => {
 
 	useEffect(() => {
 		if (data) {
-			console.log(data.users.length);
 			let completeProfile: boolean = data.users.length === 1;
 			let payload: Payload;
 
@@ -90,6 +85,34 @@ const Home = ({ navigation }: HomeProps) => {
 		}
 	}, [data, error]);
 
+	// token refreshing
+	useEffect(() => {
+		let time = 50; // in mins
+
+		const refreshTokenInterval = setInterval(async () => {
+			if (!user) return;
+			if (!userDispatch) return;
+
+			const tokens = await refreshTokens(user.refreshToken);
+
+			if (JSON.stringify(tokens) !== "{}") {
+				let payload = {
+					...tokens,
+				};
+
+				userDispatch({
+					type: UserActionKind.TOKEN,
+					payload,
+				});
+			} else {
+				console.error("can't refresh tokens");
+				return;
+			}
+		}, time * 60 * 1000);
+
+		return () => clearInterval(refreshTokenInterval);
+	}, []);
+
 	if (loading) {
 		return <Text style={styles.text}>Loading user details...</Text>;
 	}
@@ -102,38 +125,6 @@ const Home = ({ navigation }: HomeProps) => {
 			</>
 		);
 	}
-
-	// const handleTrial = async () => {
-	// 	if (!user.user) return;
-
-	// 	if (needsRefresh(user.user.expireAt)) {
-	// 		// refreshing token
-	// 		const tokens = await refreshTokens(user.user.refreshToken);
-	// 		if (JSON.stringify(tokens) !== "{}") {
-	// 			//token update
-	// 		} else {
-	// 			console.error("can't refresh tokens");
-	// 			return;
-	// 		}
-	// 	}
-	// 	const credentials = getAWSCredentials();
-
-	// 	credentials?.get((error) => {
-	// 		if (error) {
-	// 			console.error("Error fetching AWS credentials: ", error);
-	// 		} else {
-	// 			var accessKeyId = credentials.accessKeyId;
-	// 			var secretAccessKey = credentials.secretAccessKey;
-	// 			var sessionToken = credentials.sessionToken;
-	// 		}
-	// 	});
-
-	// 	if (needsRefresh(user.user.expireAt)) {
-	// 		console.log("refresh tokens here");
-	// 	} else {
-	// 		console.log("no need to refresh now");
-	// 	}
-	// };
 
 	return (
 		<View>
@@ -149,12 +140,6 @@ const Home = ({ navigation }: HomeProps) => {
 				accessibilityLabel="Logout"
 				type="clear"
 			/>
-			{/* <Button
-				onPress={handleTrial}
-				title="trial"
-				accessibilityLabel="Logout"
-				// type="clear"
-			/> */}
 		</View>
 	);
 };

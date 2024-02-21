@@ -49,5 +49,27 @@ export interface ProfileModalProps {
 export type HandleSteps = (prev?: boolean) => void;
 
 export interface UserProfileProps {
-	navigateEditProfile: () => void;
+	navigation: NavigationProps["navigation"];
+}
+
+export interface CompleteUser {
+	bio: string;
+	dob: string;
+	email: string;
+	name: string;
+	username: string;
+	profilePicture: string;
+	friends: {
+		id: string;
+		name: string;
+		username: string;
+		profilePicture: string;
+	}[];
+	posts:
+		| {
+				id: string;
+				content: string;
+				caption: string;
+				likes: string;
+		  }[];
 }

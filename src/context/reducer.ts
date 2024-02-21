@@ -13,8 +13,14 @@ export function userReducer(user: User | null, action: UserAction) {
 		case UserActionKind.UPDATE:
 			return { ...user, ...payload };
 
+		case UserActionKind.TOKEN:
+			return {
+				...user,
+				...payload,
+			};
+
 		case UserActionKind.ERASE:
-			return payload;
+			return null;
 		default:
 			return user;
 	}

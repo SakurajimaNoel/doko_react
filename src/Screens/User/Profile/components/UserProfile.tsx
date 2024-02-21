@@ -7,14 +7,63 @@ import {
 import { getAWSCredentials } from "../../../../Connectors/auth/aws";
 import * as AWS from "aws-sdk";
 import { UserActionKind } from "../../../../context/types";
-import { UserProfileProps } from "../types";
+import { CompleteUser, UserProfileProps } from "../types";
+import { useQuery } from "@apollo/client";
+import { getCompleteUser } from "../../../../Connectors/graphql/queries/getCompleteUser";
+import { images } from "../../../../assests/index";
 
-const UserProfile = ({ navigateEditProfile }: UserProfileProps) => {
+const UserProfile = ({ navigation }: UserProfileProps) => {
 	const user = useContext(UserContext);
 	const userDispatch = useContext(UserDispatchContext);
 
+	const { loading, error, data } = useQuery(getCompleteUser, {
+		context: {
+			headers: {
+				Authorization: "Bearer " + user?.accessToken,
+			},
+		},
+		variables: {
+			where: {
+				id: user?.username,
+			},
+		},
+	});
+
+	const [completeUser, setCompleteUser] = useState<CompleteUser | null>(null);
+
 	const [image, setImage] = useState<string | null>(null);
 	const s3Ref = useRef<AWS.S3 | null>(null);
+
+	useEffect(() => {
+		if (data) {
+			// data.user[0].friends.length friends
+			// data.users[0].posts.length posts
+
+			let user = data.users[0];
+
+			const {
+				bio,
+				dob,
+				email,
+				name,
+				username,
+				profilePicture,
+				friends,
+				posts,
+			} = user;
+
+			setCompleteUser({
+				bio,
+				dob,
+				email,
+				name,
+				username,
+				profilePicture,
+				friends,
+				posts,
+			});
+		}
+	}, [data]);
 
 	useEffect(() => {
 		const credentials = getAWSCredentials();
@@ -55,7 +104,7 @@ const UserProfile = ({ navigateEditProfile }: UserProfileProps) => {
 				});
 			}
 		});
-	});
+	}, []);
 
 	const handleDelete = () => {
 		const s3 = s3Ref.current;
@@ -92,7 +141,16 @@ const UserProfile = ({ navigateEditProfile }: UserProfileProps) => {
 	};
 
 	const handleEditProfile = () => {
-		navigateEditProfile();
+		if (!completeUser) return;
+
+		navigation.navigate("Profile", {
+			screen: "EditProfile",
+			params: {
+				name: completeUser.name,
+				bio: completeUser.bio,
+				username: completeUser.username,
+			},
+		});
 	};
 
 	if (!user) {
@@ -104,43 +162,133 @@ const UserProfile = ({ navigateEditProfile }: UserProfileProps) => {
 		);
 	}
 
+	if (loading) {
+		return (
+			<View>
+				<Text style={styles.text}>Loading</Text>
+			</View>
+		);
+	}
+
+	if (error) {
+		console.error(error);
+		return (
+			<View>
+				<Text style={styles.text}>Error Loading Profile</Text>
+			</View>
+		);
+	}
+
+	let dob = new Date();
+	if (completeUser) {
+		dob = new Date(completeUser.dob);
+	}
+
+	// return (
+	// 	<View>
+	// 		<Text style={styles.text}>{user.displayUsername}</Text>
+
+	// 		<Text style={styles.text}>{user.email}</Text>
+
+	// 		<Text style={styles.text}>{user.name}</Text>
+
+	// 		{image && (
+	// 			<>
+	// 				<Image
+	// 					source={{ uri: image }}
+	// 					style={{ width: 200, height: 200 }}
+	// 				/>
+
+	// 				<View style={styles.space} />
+
+	// 				<Button
+	// 					onPress={handleDelete}
+	// 					title="Delete profile picture"
+	// 					color="#841584"
+	// 				/>
+	// 			</>
+	// 		)}
+	// 		<View style={styles.space} />
+
+	// 		<Button onPress={handleEditProfile} title="Edit Profile" />
+	// 	</View>
+	// );
+
 	return (
-		<View>
-			<Text style={styles.text}>UserProfile</Text>
+		<>
+			<View>
+				{/* username */}
+				<View>
+					<Text style={styles.text}>{completeUser?.username}</Text>
+				</View>
+				{/* profile info */}
+				<View>
+					{/* profile picture */}
+					<View>
+						<Image
+							source={image ? { uri: image } : images.profile}
+							style={{ width: 200, height: 200 }}
+						/>
+					</View>
 
-			<Text style={styles.text}>{user.displayUsername}</Text>
+					{/* profile details */}
+					<View>
+						<Text style={styles.text}>{completeUser?.name}</Text>
 
-			<Text style={styles.text}>{user.email}</Text>
+						<Text style={styles.text}>
+							{dob.toLocaleString("default", {
+								day: "numeric",
+								month: "short",
+							})}
+						</Text>
+					</View>
+				</View>
+				{/* bio */}
+				<View>
+					<Text style={styles.text}>{completeUser?.bio}</Text>
+				</View>
+				{/* profile options */}
+				<View>
+					{/* friends */}
+					<View>
+						<Text style={styles.text}>
+							{completeUser?.friends.length}
+						</Text>
+					</View>
 
-			<Text style={styles.text}>{user.name}</Text>
+					{/* posts */}
+					<View>
+						<Text style={styles.text}>
+							{completeUser?.posts.length}
+						</Text>
+					</View>
 
-			{image && (
-				<>
-					<Image
-						source={{ uri: image }}
-						style={{ width: 200, height: 200 }}
-					/>
+					{/* edit */}
+					<View>
+						<Button onPress={handleEditProfile} title="Edit" />
+					</View>
+				</View>
 
-					<View style={styles.space} />
-
-					<Button
-						onPress={handleDelete}
-						title="Delete profile picture"
-						color="#841584"
-					/>
-				</>
-			)}
-			<View style={styles.space} />
-
-			<Button onPress={handleEditProfile} title="Edit Profile" />
-		</View>
+				{/* posts */}
+				{completeUser &&
+					(completeUser.posts.length > 0 ? (
+						<View></View>
+					) : (
+						<View>
+							<Text style={styles.text}>
+								Upload your first post to see it here.
+							</Text>
+						</View>
+					))}
+			</View>
+		</>
 	);
 };
 
 const styles = StyleSheet.create({
 	text: {
 		color: "black",
-		fontSize: 22,
+		fontSize: 16,
 		marginVertical: 10,
 	},
 	space: {
