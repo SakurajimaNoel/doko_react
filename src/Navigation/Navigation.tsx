@@ -28,6 +28,7 @@ export type ProfileStackParamList = {
 		name: string;
 		bio: string;
 		username: string;
+		profilePicture: string;
 	};
 };
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();

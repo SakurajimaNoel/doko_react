@@ -9,19 +9,6 @@ import { UserContext } from "../../../context/userContext";
 const Profile = ({ navigation }: ProfileProps) => {
 	const user = useContext(UserContext);
 
-	const editProfile = () => {
-		if (!user) return;
-
-		navigation.navigate("Profile", {
-			screen: "EditProfile",
-			params: {
-				name: user.name,
-				bio: "",
-				username: user.displayUsername ? user.displayUsername : "",
-			},
-		});
-	};
-
 	return (
 		<View>
 			{user?.completeProfile ? (

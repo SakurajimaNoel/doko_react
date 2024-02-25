@@ -10,9 +10,6 @@ const UserDetails = ({
 	setUserInfo,
 	userInfo,
 }: UserDetailsProps) => {
-	// for date parsing aws
-	// dob = dob.toISOString();
-	// 	dob = dob.substr(0, 10);
 	const [date, setDate] = useState(userInfo.dob);
 	const [bio, setBio] = useState(userInfo.bio);
 	const [open, setOpen] = useState<boolean>(false);
@@ -22,7 +19,7 @@ const UserDetails = ({
 	};
 
 	const handleSteps: HandleSteps = (prev = true) => {
-		setUserInfo((prev) => ({ ...prev, date, bio }));
+		setUserInfo((prev) => ({ ...prev, dob: date, bio }));
 
 		if (prev) handlePrev();
 		else handleNext();

@@ -1,7 +1,16 @@
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { RootTabParamList } from "../../../Navigation/Navigation";
+import {
+	ProfileStackParamList,
+	RootTabParamList,
+} from "../../../Navigation/Navigation";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 type NavigationProps = BottomTabScreenProps<RootTabParamList, "Profile">;
+
+type EditProfileNavigationProps = NativeStackScreenProps<
+	ProfileStackParamList,
+	"EditProfile"
+>;
 
 export interface ProfileProps {
 	navigation: NavigationProps["navigation"];
@@ -37,6 +46,7 @@ export interface ProfilePictureProps {
 	setUserInfo: React.Dispatch<React.SetStateAction<UserInfo>>;
 	userInfo: UserInfo;
 	handleProfileCreate: () => void;
+	creating: boolean;
 }
 
 export interface ProfileModalProps {
@@ -72,4 +82,13 @@ export interface CompleteUser {
 				caption: string;
 				likes: string;
 		  }[];
+}
+
+export interface EditProfileProps {
+	route: EditProfileNavigationProps["route"];
+	navigation: EditProfileNavigationProps["navigation"];
+}
+
+export interface UpdateProfileImageProps {
+	profileImage: string;
 }

@@ -84,6 +84,7 @@ const ProfilePicture = ({
 	setUserInfo,
 	userInfo,
 	handleProfileCreate,
+	creating,
 }: ProfilePictureProps) => {
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const [userUpload, setUserUpload] = useState<string | null>(() => {
@@ -189,6 +190,8 @@ const ProfilePicture = ({
 					containerStyle={{
 						width: 150,
 					}}
+					loading={creating}
+					disabled={creating}
 				/>
 			</View>
 		</View>

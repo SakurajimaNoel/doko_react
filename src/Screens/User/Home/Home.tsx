@@ -62,11 +62,13 @@ const Home = ({ navigation }: HomeProps) => {
 
 				let displayUsername = userData.username;
 				let profilePicture = userData.profilePicture;
+				let name = userData.name;
 
 				payload = {
 					displayUsername,
 					profilePicture,
 					completeProfile,
+					name,
 				};
 			} else {
 				payload = {

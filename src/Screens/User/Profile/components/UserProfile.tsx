@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Image, Button } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { Button, Image } from "@rneui/base";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import {
 	UserContext,
@@ -8,26 +9,32 @@ import { getAWSCredentials } from "../../../../Connectors/auth/aws";
 import * as AWS from "aws-sdk";
 import { UserActionKind } from "../../../../context/types";
 import { CompleteUser, UserProfileProps } from "../types";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { getCompleteUser } from "../../../../Connectors/graphql/queries/getCompleteUser";
 import { images } from "../../../../assests/index";
+
+import { useIsFocused } from "@react-navigation/native";
 
 const UserProfile = ({ navigation }: UserProfileProps) => {
 	const user = useContext(UserContext);
 	const userDispatch = useContext(UserDispatchContext);
+	const isFocused = useIsFocused();
 
-	const { loading, error, data } = useQuery(getCompleteUser, {
-		context: {
-			headers: {
-				Authorization: "Bearer " + user?.accessToken,
+	const [getUserDetail, { loading, error, data }] = useLazyQuery(
+		getCompleteUser,
+		{
+			context: {
+				headers: {
+					Authorization: "Bearer " + user?.accessToken,
+				},
+			},
+			variables: {
+				where: {
+					id: user?.username,
+				},
 			},
 		},
-		variables: {
-			where: {
-				id: user?.username,
-			},
-		},
-	});
+	);
 
 	const [completeUser, setCompleteUser] = useState<CompleteUser | null>(null);
 
@@ -35,11 +42,18 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 	const s3Ref = useRef<AWS.S3 | null>(null);
 
 	useEffect(() => {
+		if (isFocused) {
+			getUserDetail();
+		}
+	}, [isFocused]);
+
+	useEffect(() => {
 		if (data) {
 			// data.user[0].friends.length friends
 			// data.users[0].posts.length posts
 
 			let user = data.users[0];
+			if (!user) return;
 
 			const {
 				bio,
@@ -66,6 +80,8 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 	}, [data]);
 
 	useEffect(() => {
+		if (!completeUser || !completeUser.profilePicture) return;
+
 		const credentials = getAWSCredentials();
 
 		credentials?.get(async (error) => {
@@ -85,12 +101,12 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 				s3Ref.current = s3;
 
 				let bucketName = "dokiuserprofile";
-				let key = user?.profilePicture;
+				let key = completeUser.profilePicture;
 
 				const params = {
 					Bucket: bucketName,
 					Key: key,
-					Expires: 60,
+					Expires: 180,
 				};
 
 				s3.getSignedUrl("getObject", params, (err, url) => {
@@ -104,7 +120,7 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 				});
 			}
 		});
-	}, []);
+	}, [completeUser]);
 
 	const handleDelete = () => {
 		const s3 = s3Ref.current;
@@ -149,6 +165,7 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 				name: completeUser.name,
 				bio: completeUser.bio,
 				username: completeUser.username,
+				profilePicture: image ? image : "",
 			},
 		});
 	};
@@ -184,39 +201,9 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 		dob = new Date(completeUser.dob);
 	}
 
-	// return (
-	// 	<View>
-	// 		<Text style={styles.text}>{user.displayUsername}</Text>
-
-	// 		<Text style={styles.text}>{user.email}</Text>
-
-	// 		<Text style={styles.text}>{user.name}</Text>
-
-	// 		{image && (
-	// 			<>
-	// 				<Image
-	// 					source={{ uri: image }}
-	// 					style={{ width: 200, height: 200 }}
-	// 				/>
-
-	// 				<View style={styles.space} />
-
-	// 				<Button
-	// 					onPress={handleDelete}
-	// 					title="Delete profile picture"
-	// 					color="#841584"
-	// 				/>
-	// 			</>
-	// 		)}
-	// 		<View style={styles.space} />
-
-	// 		<Button onPress={handleEditProfile} title="Edit Profile" />
-	// 	</View>
-	// );
-
 	return (
 		<>
-			<View>
+			<ScrollView style={styles.container}>
 				{/* username */}
 				<View>
 					<Text style={styles.text}>{completeUser?.username}</Text>
@@ -252,14 +239,14 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 					{/* friends */}
 					<View>
 						<Text style={styles.text}>
-							{completeUser?.friends.length}
+							Friends: {completeUser?.friends.length}
 						</Text>
 					</View>
 
 					{/* posts */}
 					<View>
 						<Text style={styles.text}>
-							{completeUser?.posts.length}
+							Posts: {completeUser?.posts.length}
 						</Text>
 					</View>
 
@@ -280,7 +267,7 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 							</Text>
 						</View>
 					))}
-			</View>
+			</ScrollView>
 		</>
 	);
 };
@@ -294,6 +281,10 @@ const styles = StyleSheet.create({
 	space: {
 		width: 20,
 		height: 20,
+	},
+
+	container: {
+		paddingHorizontal: 8,
 	},
 });
 

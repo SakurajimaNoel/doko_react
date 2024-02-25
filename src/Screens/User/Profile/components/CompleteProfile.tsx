@@ -41,21 +41,34 @@ const CompleteProfile = () => {
 		},
 	);
 
+	const [creating, setCreating] = useState(false);
+
 	useEffect(() => {
+		setCreating(false);
+
 		if (data) {
 			console.log("Profile created");
-			console.log(data);
 
 			if (!userDispatch) return;
 
-			userDispatch({
-				type: UserActionKind.UPDATE,
-				payload: {
-					displayUsername: userInfo.username,
-					completeProfile: true,
-					profilePicture: `${userInfo.username}/profile.${userInfo.imageExtension}`,
-				},
-			});
+			if (userInfo.profilePicture) {
+				userDispatch({
+					type: UserActionKind.UPDATE,
+					payload: {
+						displayUsername: userInfo.username,
+						completeProfile: true,
+						profilePicture: `${userInfo.username}/profile.${userInfo.imageExtension}`,
+					},
+				});
+			} else {
+				userDispatch({
+					type: UserActionKind.UPDATE,
+					payload: {
+						displayUsername: userInfo.username,
+						completeProfile: true,
+					},
+				});
+			}
 		}
 
 		if (error) {
@@ -71,10 +84,51 @@ const CompleteProfile = () => {
 		setSteps((prev) => (prev - 1) as Steps);
 	};
 
+	const createNode = (key = "") => {
+		if (!user) return;
+
+		// let dob = userInfo.dob.toISOString();
+		// dob = dob.substring(0, 10);
+
+		let input;
+
+		if (key.length <= 0) {
+			input = {
+				id: user.username,
+				username: userInfo.username,
+				email: user.email,
+				bio: userInfo.bio,
+				dob: userInfo.dob,
+				name: user.name,
+			};
+		} else {
+			input = {
+				id: user.username,
+				username: userInfo.username,
+				email: user.email,
+				bio: userInfo.bio,
+				dob: userInfo.dob,
+				name: user.name,
+				profilePicture: key,
+			};
+		}
+
+		// console.log(input);
+
+		let variables = {
+			input: [input],
+		};
+
+		createUserProfile({
+			variables,
+		});
+	};
+
 	const handleProfileCreate = async () => {
 		if (!user) return;
 
 		let key = "";
+		setCreating(true);
 
 		// upload image
 		// handle no image case too
@@ -123,30 +177,14 @@ const CompleteProfile = () => {
 									data.Key,
 								);
 
-								// create node in neo4j
-								let variables = {
-									input: [
-										{
-											id: user.username,
-											username: userInfo.username,
-											email: user.email,
-											bio: userInfo.bio,
-											dob: userInfo.dob,
-											name: user.name,
-											profilePicture: key,
-										},
-									],
-								};
-
-								createUserProfile({
-									variables,
-								});
+								createNode(key);
 							}
 						},
 					);
 				}
 			});
 		} else {
+			createNode();
 		}
 	};
 
@@ -183,6 +221,7 @@ const CompleteProfile = () => {
 						setUserInfo={setUserInfo}
 						userInfo={userInfo}
 						handleProfileCreate={handleProfileCreate}
+						creating={creating}
 					/>
 				);
 		}
