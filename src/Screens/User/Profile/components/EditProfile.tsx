@@ -239,7 +239,7 @@ export default function EditProfile({ route, navigation }: EditProfileProps) {
 					title="Update"
 					loading={updateProfileLoading}
 					accessibilityLabel="Update profile"
-					containerStyle={{ marginTop: 20 }}
+					containerStyle={{ marginVertical: 20 }}
 				/>
 			</View>
 		</ScrollView>
