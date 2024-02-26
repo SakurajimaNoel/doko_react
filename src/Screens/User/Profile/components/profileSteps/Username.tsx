@@ -12,7 +12,7 @@ const Username = ({
 	userName,
 }: UsernameProps) => {
 	const [username, setUsername] = useState<string>(userName);
-	const [err, setErr] = useState<string>("");
+	const [err, setErr] = useState<string | null>(null);
 	const [getUsers, { loading, error, data }] = useLazyQuery(getUsername, {
 		context: {
 			headers: {
@@ -23,6 +23,19 @@ const Username = ({
 
 	const handleUsername = () => {
 		if (username.length === 0 || typeof username !== "string") return;
+
+		const regex = /^\w+$/;
+
+		const result = regex.test(username);
+
+		if (!result) {
+			setErr(
+				"Username only contain single word with characters a-z, 0-9 and _",
+			);
+			return;
+		} else {
+			setErr(null);
+		}
 
 		let variables = {
 			where: {
@@ -40,7 +53,7 @@ const Username = ({
 			if (!validUsername) {
 				setErr("Username already in use");
 			} else {
-				setErr("");
+				setErr(null);
 				setUserInfo((prev) => ({ ...prev, username }));
 				handleNext();
 			}
@@ -60,9 +73,12 @@ const Username = ({
 				value={username}
 				placeholder="username..."
 				placeholderTextColor="#7F8487"
-				onChangeText={setUsername}
+				onChangeText={(text) => {
+					let value = text.toLowerCase();
+					return setUsername(value);
+				}}
 			/>
-			{err.length > 0 && <Text style={styles.error}>{err}</Text>}
+			{err && <Text style={styles.error}>{err}</Text>}
 
 			<Button
 				disabled={loading || username.length === 0}

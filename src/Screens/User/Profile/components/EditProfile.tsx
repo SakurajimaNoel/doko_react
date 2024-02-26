@@ -60,6 +60,19 @@ export default function EditProfile({ route, navigation }: EditProfileProps) {
 		if (run.current === 1) return;
 		if (username.length === 0 || typeof username !== "string") return;
 
+		const regex = /^\w+$/;
+
+		const result = regex.test(username);
+
+		if (!result) {
+			setUsernameError(
+				"Username only contain single word with characters a-z, 0-9 and _",
+			);
+			return;
+		} else {
+			setUsernameError(null);
+		}
+
 		let variables = {
 			where: {
 				username,
@@ -133,14 +146,6 @@ export default function EditProfile({ route, navigation }: EditProfileProps) {
 		updateUserProfile({ variables });
 	};
 
-	// if (updateProfileLoading) {
-	// 	return (
-	// 		<View>
-	// 			<Text style={styles.text}>Updating user profile</Text>
-	// 		</View>
-	// 	);
-	// }
-
 	let valid = false;
 	{
 		let { bio, username: un, name } = route.params;
@@ -179,6 +184,7 @@ export default function EditProfile({ route, navigation }: EditProfileProps) {
 						value={userDetail.name}
 						placeholder="name..."
 						placeholderTextColor="#7F8487"
+						editable={!updateProfileLoading}
 					/>
 				</View>
 
@@ -189,10 +195,14 @@ export default function EditProfile({ route, navigation }: EditProfileProps) {
 					<TextInput
 						style={styles.inputStyle}
 						numberOfLines={4}
-						onChangeText={setUsername}
+						onChangeText={(text) => {
+							let value = text.toLowerCase();
+							return setUsername(value);
+						}}
 						value={username}
 						placeholder="username..."
 						placeholderTextColor="#7F8487"
+						editable={!updateProfileLoading}
 					/>
 
 					{usernameError && (
@@ -219,6 +229,7 @@ export default function EditProfile({ route, navigation }: EditProfileProps) {
 						value={userDetail.bio}
 						placeholder="Bio here..."
 						placeholderTextColor="#7F8487"
+						editable={!updateProfileLoading}
 					/>
 				</View>
 
