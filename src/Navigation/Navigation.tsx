@@ -65,12 +65,6 @@ function ProfileStackScreen() {
 const Navigation = () => {
 	const user = useContext(UserContext);
 
-	// useEffect(() => {
-	// 	if (auth.status) {
-	// 		initAWSCredentials(auth.idToken);
-	// 	}
-	// }, [auth.idToken]);
-
 	return (
 		<NavigationContainer>
 			{user ? (

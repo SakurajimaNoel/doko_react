@@ -8,7 +8,11 @@ import { UserContext, UserDispatchContext } from "../../../context/userContext";
 
 import { useLazyQuery } from "@apollo/client";
 import { getInitialUser } from "../../../Connectors/graphql/queries/getInitialUser";
-import { Payload, UserActionKind } from "../../../context/types";
+import {
+	Payload,
+	ProfileStatusKind,
+	UserActionKind,
+} from "../../../context/types";
 
 const Home = ({ navigation }: HomeProps) => {
 	const user = useContext(UserContext);
@@ -49,6 +53,11 @@ const Home = ({ navigation }: HomeProps) => {
 	useEffect(() => {
 		if (data) {
 			let completeProfile: boolean = data.users.length === 1;
+
+			let profileStatus: ProfileStatusKind = completeProfile
+				? ProfileStatusKind.COMPLETE
+				: ProfileStatusKind.INCOMPLETE;
+
 			let payload: Payload;
 
 			if (completeProfile) {
@@ -63,12 +72,12 @@ const Home = ({ navigation }: HomeProps) => {
 				payload = {
 					displayUsername,
 					profilePicture,
-					completeProfile,
+					profileStatus,
 					name,
 				};
 			} else {
 				payload = {
-					completeProfile,
+					profileStatus,
 				};
 			}
 
@@ -128,7 +137,7 @@ const Home = ({ navigation }: HomeProps) => {
 		<View>
 			<Text style={styles.text}>{`Hii ${user.name}`}</Text>
 
-			{!user.completeProfile && (
+			{user.profileStatus === ProfileStatusKind.INCOMPLETE && (
 				<Text style={styles.text}>Incomplete profile</Text>
 			)}
 

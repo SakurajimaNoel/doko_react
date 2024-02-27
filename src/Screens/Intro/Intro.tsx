@@ -11,7 +11,7 @@ import { userTokenDetails } from "../../Connectors/auth/auth";
 import NetworkLogger from "react-native-network-logger";
 import { IntroProps, HandleUserSession } from "./types";
 import { UserDispatchContext } from "../../context/userContext";
-import { UserActionKind } from "../../context/types";
+import { ProfileStatusKind, UserActionKind } from "../../context/types";
 
 export default function Intro({ navigation }: IntroProps) {
 	const userDispatch = useContext(UserDispatchContext);
@@ -42,6 +42,7 @@ export default function Intro({ navigation }: IntroProps) {
 				idToken,
 				username,
 				email,
+				profileStatus: ProfileStatusKind.PENDING,
 			},
 		});
 	};
