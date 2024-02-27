@@ -56,7 +56,6 @@ const CompleteProfile = () => {
 					type: UserActionKind.UPDATE,
 					payload: {
 						displayUsername: userInfo.username,
-						completeProfile: true,
 						profilePicture: `${userInfo.username}/profile.${userInfo.imageExtension}`,
 					},
 				});
@@ -65,7 +64,6 @@ const CompleteProfile = () => {
 					type: UserActionKind.UPDATE,
 					payload: {
 						displayUsername: userInfo.username,
-						completeProfile: true,
 					},
 				});
 			}
