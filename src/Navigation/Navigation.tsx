@@ -5,10 +5,7 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { UserContext } from "../context/userContext";
-import { useEffect, useContext } from "react";
-import * as AWS from "aws-sdk";
-
-import { initAWSCredentials, getAWSCredentials } from "../Connectors/auth/aws";
+import { useContext } from "react";
 
 import Intro from "../Screens/Intro";
 import Login from "../Screens/Authentication/Login";

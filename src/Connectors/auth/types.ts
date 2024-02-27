@@ -32,3 +32,7 @@ export type GetCognitoUser = () => CognitoUser | null;
 export type InitAWSCredentials = (idToken: string) => void;
 
 export type GetAWSCredentials = () => null | AWS.CognitoIdentityCredentials;
+
+export type InitS3 = () => void;
+
+export type GetS3Obj = () => null | AWS.S3;

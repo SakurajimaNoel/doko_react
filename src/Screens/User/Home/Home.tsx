@@ -3,10 +3,6 @@ import React, { useContext, useEffect } from "react";
 import { HomeProps } from "./types";
 import { Button } from "@rneui/themed";
 import * as Keychain from "react-native-keychain";
-import * as AWS from "aws-sdk";
-import { getAWSCredentials } from "../../../Connectors/auth/aws";
-import { getCognitoUser } from "../../../Connectors/auth/cognitoUser";
-import { CognitoRefreshToken } from "amazon-cognito-identity-js";
 import { refreshTokens, logout } from "../../../Connectors/auth/auth";
 import { UserContext, UserDispatchContext } from "../../../context/userContext";
 

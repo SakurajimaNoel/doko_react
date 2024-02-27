@@ -1,11 +1,8 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { Button, Image } from "@rneui/base";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import {
-	UserContext,
-	UserDispatchContext,
-} from "../../../../context/userContext";
-import { getAWSCredentials } from "../../../../Connectors/auth/aws";
+import { UserContext } from "../../../../context/userContext";
+import { getS3Obj } from "../../../../Connectors/auth/aws";
 import * as AWS from "aws-sdk";
 import { UserActionKind } from "../../../../context/types";
 import { CompleteUser, UserProfileProps } from "../types";
@@ -17,7 +14,6 @@ import { useIsFocused } from "@react-navigation/native";
 
 const UserProfile = ({ navigation }: UserProfileProps) => {
 	const user = useContext(UserContext);
-	const userDispatch = useContext(UserDispatchContext);
 	const isFocused = useIsFocused();
 
 	const [getUserDetail, { loading, error, data }] = useLazyQuery(
@@ -82,79 +78,28 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 	useEffect(() => {
 		if (!completeUser || !completeUser.profilePicture) return;
 
-		const credentials = getAWSCredentials();
-
-		credentials?.get(async (error) => {
-			if (error) {
-				console.error("Error fetching AWS credentials: ", error);
-			} else {
-				var accessKeyId = credentials.accessKeyId;
-				var secretAccessKey = credentials.secretAccessKey;
-				var sessionToken = credentials.sessionToken;
-
-				const s3 = new AWS.S3({
-					accessKeyId,
-					secretAccessKey,
-					sessionToken,
-					region: "ap-south-1",
-				});
-				s3Ref.current = s3;
-
-				let bucketName = "dokiuserprofile";
-				let key = completeUser.profilePicture;
-
-				const params = {
-					Bucket: bucketName,
-					Key: key,
-					Expires: 180,
-				};
-
-				s3.getSignedUrl("getObject", params, (err, url) => {
-					if (err) {
-						console.error("Error generating signed URL:", err);
-						return;
-					}
-
-					// Use this signed URL in your React Native component
-					setImage(url);
-				});
-			}
-		});
-	}, [completeUser]);
-
-	const handleDelete = () => {
-		const s3 = s3Ref.current;
+		const s3 = getS3Obj();
 		if (!s3) return;
 
-		if (!user) return;
-
-		let key = user.profilePicture;
-
-		if (typeof key !== "string") return;
+		let bucketName = "dokiuserprofile";
+		let key = completeUser.profilePicture;
 
 		const params = {
-			Bucket: "dokiuserprofile",
+			Bucket: bucketName,
 			Key: key,
+			Expires: 180,
 		};
 
-		// Delete the item from S3
-		s3.deleteObject(params, (err, data) => {
+		s3.getSignedUrl("getObject", params, (err, url) => {
 			if (err) {
-				console.error("Error deleting item:", err);
-			} else {
-				console.log("Item deleted successfully:", data);
-
-				if (!userDispatch) return;
-
-				userDispatch({
-					type: UserActionKind.UPDATE,
-					payload: {
-						profilePicture: "",
-					},
-				});
+				console.error("Error generating signed URL:", err);
+				return;
 			}
+
+			// Use this signed URL in your React Native component
+			setImage(url);
 		});
-	};
+	}, [completeUser]);
 
 	const handleEditProfile = () => {
 		if (!completeUser) return;

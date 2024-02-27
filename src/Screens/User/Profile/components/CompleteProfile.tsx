@@ -6,7 +6,7 @@ import * as AWS from "aws-sdk";
 import Username from "./profileSteps/Username";
 import UserDetails from "./profileSteps/UserDetails";
 import ProfilePicture from "./profileSteps/ProfilePicture";
-import { getAWSCredentials } from "../../../../Connectors/auth/aws";
+import { getS3Obj } from "../../../../Connectors/auth/aws";
 import { ManagedUpload } from "aws-sdk/clients/s3";
 import {
 	UserContext,
@@ -127,65 +127,44 @@ const CompleteProfile = () => {
 	const handleProfileCreate = async () => {
 		if (!user) return;
 
-		let key = "";
 		setCreating(true);
+
+		let key = "";
+		const s3 = getS3Obj();
 
 		// upload image
 		// handle no image case too
-		if (userInfo.profilePicture) {
-			const profilePicture = userInfo.profilePicture;
-			const credentials = getAWSCredentials();
-			key = `${user.username}/profile.${userInfo.imageExtension}`;
-
-			credentials?.get(async (error) => {
-				if (error) {
-					console.error("Error fetching AWS credentials: ", error);
-				} else {
-					var accessKeyId = credentials.accessKeyId;
-					var secretAccessKey = credentials.secretAccessKey;
-					var sessionToken = credentials.sessionToken;
-
-					const s3 = new AWS.S3({
-						accessKeyId,
-						secretAccessKey,
-						sessionToken,
-						region: "ap-south-1",
-					});
-
-					let bucketName = "dokiuserprofile";
-
-					console.log(key);
-					const response = await fetch(profilePicture);
-					const blob = await response.blob();
-
-					let params = {
-						Bucket: bucketName,
-						Key: key,
-						Body: blob,
-						ContentType: userInfo.imageType,
-					};
-
-					s3.upload(
-						params,
-						(err: Error, data: ManagedUpload.SendData) => {
-							if (err) {
-								console.error("Error uploading image: ", err);
-							} else {
-								console.log(data);
-								console.log(
-									"Image uploaded successfully. Location:",
-									data.Key,
-								);
-
-								createNode(key);
-							}
-						},
-					);
-				}
-			});
-		} else {
+		if (!userInfo.profilePicture || !s3) {
 			createNode();
+			return;
 		}
+
+		const profilePicture = userInfo.profilePicture;
+		key = `${user.username}/profile.${userInfo.imageExtension}`;
+
+		let bucketName = "dokiuserprofile";
+
+		console.log(key);
+		const response = await fetch(profilePicture);
+		const blob = await response.blob();
+
+		let params = {
+			Bucket: bucketName,
+			Key: key,
+			Body: blob,
+			ContentType: userInfo.imageType,
+		};
+
+		s3.upload(params, (err: Error, data: ManagedUpload.SendData) => {
+			if (err) {
+				console.error("Error uploading image: ", err);
+			} else {
+				console.log(data);
+				console.log("Image uploaded successfully. Location:", data.Key);
+
+				createNode(key);
+			}
+		});
 	};
 
 	const completeProfileStep = () => {

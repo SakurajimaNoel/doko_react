@@ -9,10 +9,6 @@ import {
 	initCognitoUser,
 	getCognitoUser,
 } from "../../../Connectors/auth/cognitoUser";
-import {
-	initAWSCredentials,
-	getAWSCredentials,
-} from "../../../Connectors/auth/aws";
 
 import { LoginSchema } from "../../../ValidationSchema/Auth/LoginSchema";
 import { HandleLoginParams, LoginProps, ResendConfrimMailState } from "./types";
@@ -20,7 +16,6 @@ import {
 	AuthenticationDetails,
 	CognitoUserSession,
 } from "amazon-cognito-identity-js";
-import * as AWS from "aws-sdk";
 import { UserActionKind } from "../../../context/types";
 
 export default function Login({ navigation }: LoginProps) {

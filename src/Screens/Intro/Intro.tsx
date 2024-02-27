@@ -5,18 +5,12 @@ import { CognitoUserSession } from "amazon-cognito-identity-js";
 import * as AWS from "aws-sdk";
 import UserPool from "../../users/UserPool";
 import { initCognitoUser } from "../../Connectors/auth/cognitoUser";
-import {
-	initAWSCredentials,
-	getAWSCredentials,
-} from "../../Connectors/auth/aws";
 
 import { userTokenDetails } from "../../Connectors/auth/auth";
 
-import { gql, useQuery } from "@apollo/client";
-
 import NetworkLogger from "react-native-network-logger";
 import { IntroProps, HandleUserSession } from "./types";
-import { UserContext, UserDispatchContext } from "../../context/userContext";
+import { UserDispatchContext } from "../../context/userContext";
 import { UserActionKind } from "../../context/types";
 
 export default function Intro({ navigation }: IntroProps) {
@@ -35,13 +29,6 @@ export default function Intro({ navigation }: IntroProps) {
 			username,
 		} = userTokenDetails(session);
 		initCognitoUser(email);
-
-		// cognito iam
-		// initAWSCredentials(userDetails.idToken);
-		// const credentials = getAWSCredentials();
-		// AWS.config.credentials = credentials;
-
-		// dispatch(loginUser(userDetails));
 
 		if (!userDispatch) return;
 
