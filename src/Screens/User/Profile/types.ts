@@ -91,4 +91,20 @@ export interface EditProfileProps {
 
 export interface UpdateProfileImageProps {
 	profileImage: string;
+	navigation: EditProfileNavigationProps["navigation"];
+}
+
+export interface ProfileImageDetails {
+	profilePicture: string;
+	imageExtension: string;
+	imageType: string;
+}
+
+export interface ProfileImageModalProps {
+	toggleModal: () => void;
+	openModal: boolean;
+	handleDelete: (show: boolean) => void;
+	setError: React.Dispatch<React.SetStateAction<string | null>>;
+	setMessage: React.Dispatch<React.SetStateAction<string | null>>;
+	navigation: EditProfileNavigationProps["navigation"];
 }

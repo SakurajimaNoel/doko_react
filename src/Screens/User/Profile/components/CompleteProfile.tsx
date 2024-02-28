@@ -85,9 +85,6 @@ const CompleteProfile = () => {
 	const createNode = (key = "") => {
 		if (!user) return;
 
-		// let dob = userInfo.dob.toISOString();
-		// dob = dob.substring(0, 10);
-
 		let input;
 
 		if (key.length <= 0) {

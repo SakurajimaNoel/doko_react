@@ -161,8 +161,15 @@ export default function EditProfile({ route, navigation }: EditProfileProps) {
 	}
 
 	return (
-		<ScrollView style={styles.container}>
-			<UpdateProfileImage profileImage={route.params.profilePicture} />
+		<ScrollView
+			style={styles.container}
+			contentContainerStyle={{
+				paddingBottom: 20,
+			}}>
+			<UpdateProfileImage
+				profileImage={route.params.profilePicture}
+				navigation={navigation}
+			/>
 
 			{/* userinfo */}
 			<View>
@@ -248,7 +255,7 @@ export default function EditProfile({ route, navigation }: EditProfileProps) {
 
 const styles = StyleSheet.create({
 	container: {
-		padding: 10,
+		padding: 20,
 		flex: 1,
 		gap: 10,
 	},

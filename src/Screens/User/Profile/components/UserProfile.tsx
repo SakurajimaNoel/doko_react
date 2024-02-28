@@ -44,6 +44,10 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 	}, [isFocused]);
 
 	useEffect(() => {
+		getUserDetail();
+	}, [user]);
+
+	useEffect(() => {
 		if (data) {
 			// data.user[0].friends.length friends
 			// data.users[0].posts.length posts
