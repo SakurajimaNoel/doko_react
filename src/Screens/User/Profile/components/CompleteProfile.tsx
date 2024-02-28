@@ -30,6 +30,8 @@ const CompleteProfile = () => {
 		imageType: "",
 	});
 
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
 	const [createUserProfile, { data, loading, error }] = useMutation(
 		createUser,
 		{
@@ -48,6 +50,7 @@ const CompleteProfile = () => {
 
 		if (data) {
 			console.log("Profile created");
+			setErrorMessage(null);
 
 			if (!userDispatch) return;
 
@@ -71,6 +74,7 @@ const CompleteProfile = () => {
 
 		if (error) {
 			console.error("error completing user profile", error);
+			setErrorMessage(error.message);
 		}
 	}, [data, error]);
 
@@ -153,6 +157,7 @@ const CompleteProfile = () => {
 		s3.upload(params, (err: Error, data: ManagedUpload.SendData) => {
 			if (err) {
 				console.error("Error uploading image: ", err);
+				setErrorMessage("Error creating user profile");
 			} else {
 				console.log(data);
 				console.log("Image uploaded successfully. Location:", data.Key);
@@ -215,6 +220,10 @@ const CompleteProfile = () => {
 			<Text style={styles.step}>Step {steps} of 3</Text>
 
 			{completeProfileStep()}
+
+			{errorMessage && (
+				<Text style={styles.error}>Error: {errorMessage}</Text>
+			)}
 		</View>
 	);
 };
@@ -241,6 +250,10 @@ const styles = StyleSheet.create({
 		fontWeight: "500",
 		fontSize: 18,
 		marginBottom: 0,
+	},
+	error: {
+		fontSize: 12,
+		color: "red",
 	},
 });
 

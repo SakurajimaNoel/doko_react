@@ -71,7 +71,6 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 
 	useEffect(() => {
 		if (!completeUser || !completeUser.profilePicture) return;
-		console.log(completeUser.profilePicture);
 
 		const s3 = getS3Obj();
 		if (!s3) return;

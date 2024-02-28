@@ -55,6 +55,8 @@ function ProfileImageModal({
 	);
 
 	useEffect(() => {
+		setUpdating(false);
+
 		if (data) {
 			if (!data) return;
 
@@ -278,6 +280,59 @@ export default function UpdateProfileImage({
 	const [error, setError] = useState<string | null>(null);
 	const [message, setMessage] = useState<string | null>(null);
 
+	const [updateImage, { loading, data, error: updateError }] = useMutation(
+		updateProfileImage,
+		{
+			context: {
+				headers: {
+					Authorization: "Bearer " + user?.accessToken,
+				},
+			},
+		},
+	);
+
+	useEffect(() => {
+		setDeleting(false);
+
+		if (data) {
+			if (!data) return;
+
+			setError(null);
+			setMessage("Successfully deleted profile picture");
+
+			if (!userDispatch) return;
+
+			userDispatch({
+				type: UserActionKind.UPDATE,
+				payload: {
+					profilePicture: "",
+				},
+			});
+
+			navigation.goBack();
+		}
+
+		if (updateError) {
+			setMessage(null);
+			setError(updateError.message);
+		}
+	}, [data, updateError]);
+
+	const updateGraph = () => {
+		if (!user) return;
+
+		let variables = {
+			where: {
+				id: user.username,
+			},
+			update: {
+				profilePicture: "",
+			},
+		};
+
+		updateImage({ variables });
+	};
+
 	const toogleModal = () => {
 		setOpenModal((prev) => !prev);
 	};
@@ -301,12 +356,14 @@ export default function UpdateProfileImage({
 
 		// Delete the item from S3
 		s3.deleteObject(params, (err, data) => {
-			if (show) setDeleting(false);
-
 			if (err) {
 				console.error("Error deleting item:", err);
 
-				if (show) setError(err.message);
+				if (show) {
+					setDeleting(false);
+					setMessage(null);
+					setError(err.message);
+				}
 			} else {
 				console.log("Item deleted successfully:", data);
 
@@ -314,14 +371,7 @@ export default function UpdateProfileImage({
 					setError(null);
 					setMessage("Successfully removed profile photo");
 
-					if (!userDispatch) return;
-
-					userDispatch({
-						type: UserActionKind.UPDATE,
-						payload: {
-							profilePicture: "",
-						},
-					});
+					updateGraph();
 				}
 			}
 		});
