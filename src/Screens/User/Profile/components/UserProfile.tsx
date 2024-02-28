@@ -10,11 +10,8 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import { getCompleteUser } from "../../../../Connectors/graphql/queries/getCompleteUser";
 import { images } from "../../../../assests/index";
 
-import { useIsFocused } from "@react-navigation/native";
-
 const UserProfile = ({ navigation }: UserProfileProps) => {
 	const user = useContext(UserContext);
-	const isFocused = useIsFocused();
 
 	const [getUserDetail, { loading, error, data }] = useLazyQuery(
 		getCompleteUser,
@@ -35,13 +32,6 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 	const [completeUser, setCompleteUser] = useState<CompleteUser | null>(null);
 
 	const [image, setImage] = useState<string | null>(null);
-	const s3Ref = useRef<AWS.S3 | null>(null);
-
-	useEffect(() => {
-		if (isFocused) {
-			getUserDetail();
-		}
-	}, [isFocused]);
 
 	useEffect(() => {
 		getUserDetail();
@@ -81,6 +71,7 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 
 	useEffect(() => {
 		if (!completeUser || !completeUser.profilePicture) return;
+		console.log(completeUser.profilePicture);
 
 		const s3 = getS3Obj();
 		if (!s3) return;
@@ -103,7 +94,7 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 			// Use this signed URL in your React Native component
 			setImage(url);
 		});
-	}, [completeUser]);
+	}, [completeUser, user]);
 
 	const handleEditProfile = () => {
 		if (!completeUser) return;

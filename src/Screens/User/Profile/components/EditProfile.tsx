@@ -121,7 +121,8 @@ export default function EditProfile({ route, navigation }: EditProfileProps) {
 					displayUsername: validUsername,
 				},
 			});
-			navigation.navigate("ProfileInfo");
+			// navigation.navigate("ProfileInfo");
+			navigation.goBack();
 		}
 
 		if (updateProfileError) {

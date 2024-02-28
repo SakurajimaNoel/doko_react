@@ -57,7 +57,6 @@ function ProfileImageModal({
 	useEffect(() => {
 		if (data) {
 			if (!data) return;
-			console.log(data.updateUsers.users[0].profilePicture);
 
 			setError(null);
 			setMessage("Successfully updated profile picture");
@@ -72,7 +71,7 @@ function ProfileImageModal({
 				},
 			});
 
-			navigation.navigate("ProfileInfo");
+			navigation.goBack();
 		}
 
 		if (updateError) {
@@ -135,7 +134,6 @@ function ProfileImageModal({
 				setMessage(null);
 				setUpdating(false);
 			} else {
-				console.log(data);
 				console.log("Image uploaded successfully. Location:", data.Key);
 
 				updateGraph(key);
