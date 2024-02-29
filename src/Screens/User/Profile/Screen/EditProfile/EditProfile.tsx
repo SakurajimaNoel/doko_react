@@ -1,18 +1,18 @@
 import { View, Text, StyleSheet, TextInput, ScrollView } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 
-import { updateUser } from "../../../../Connectors/graphql/mutation/updateUser";
+import { updateUser } from "../../../../../Connectors/graphql/mutation/updateUser";
 import {
 	UserContext,
 	UserDispatchContext,
-} from "../../../../context/userContext";
+} from "../../../../../context/userContext";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { UserActionKind } from "../../../../context/types";
-import { EditProfileProps } from "../types";
-import UpdateProfileImage from "./updateProfile/UpdateProfileImage";
+import { UserActionKind } from "../../../../../context/types";
+import { EditProfileProps } from "../../types";
+import UpdateProfileImage from "./components/updateProfile/UpdateProfileImage";
 
 import { useDebounce } from "use-debounce";
-import { getUsername } from "../../../../Connectors/graphql/queries/getUsername";
+import { getUsername } from "../../../../../Connectors/graphql/queries/getUsername";
 import { Button } from "@rneui/base";
 
 export default function EditProfile({ route, navigation }: EditProfileProps) {

@@ -4,16 +4,16 @@ import {
 	ProfileImageDetails,
 	ProfileImageModalProps,
 	UpdateProfileImageProps,
-} from "../../types";
+} from "../../../../types";
 import { Button, Image } from "@rneui/base";
 
-import { images } from "../../../../../assests";
-import { getS3Obj } from "../../../../../Connectors/auth/aws";
+import { images } from "../../../../../../../assests";
+import { getS3Obj } from "../../../../../../../Connectors/auth/aws";
 import {
 	UserContext,
 	UserDispatchContext,
-} from "../../../../../context/userContext";
-import { UserActionKind } from "../../../../../context/types";
+} from "../../../../../../../context/userContext";
+import { UserActionKind } from "../../../../../../../context/types";
 import {
 	ImagePickerResponse,
 	MediaType,
@@ -22,7 +22,7 @@ import {
 } from "react-native-image-picker";
 import { ManagedUpload } from "aws-sdk/clients/s3";
 import { useMutation } from "@apollo/client";
-import { updateProfileImage } from "../../../../../Connectors/graphql/mutation/updateProfileImage";
+import { updateProfileImage } from "../../../../../../../Connectors/graphql/mutation/updateProfileImage";
 
 import { Overlay } from "@rneui/base";
 

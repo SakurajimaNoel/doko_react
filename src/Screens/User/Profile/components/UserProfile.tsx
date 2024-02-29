@@ -109,6 +109,14 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 		});
 	};
 
+	const handleFriends = () => {
+		if (!completeUser) return;
+
+		navigation.navigate("Profile", {
+			screen: "Friends",
+		});
+	};
+
 	if (!user) {
 		// handleLogout();
 		return (
@@ -142,26 +150,33 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 
 	return (
 		<>
-			<ScrollView style={styles.container}>
+			<ScrollView
+				style={styles.container}
+				contentContainerStyle={{
+					paddingBottom: 20,
+				}}>
 				{/* username */}
-				<View>
-					<Text style={styles.text}>{completeUser?.username}</Text>
+				<View style={styles.usernameContainer}>
+					<Text style={styles.username}>
+						{completeUser?.username}
+					</Text>
 				</View>
+
 				{/* profile info */}
-				<View>
+				<View style={styles.profileInfoContainer}>
 					{/* profile picture */}
-					<View>
-						<Image
-							source={image ? { uri: image } : images.profile}
-							style={{ width: 200, height: 200 }}
-						/>
-					</View>
+
+					<Image
+						source={image ? { uri: image } : images.profile}
+						style={styles.profilePhoto}
+					/>
 
 					{/* profile details */}
-					<View>
+					<View style={styles.profileDetails}>
 						<Text style={styles.text}>{completeUser?.name}</Text>
 
 						<Text style={styles.text}>
+							Birthday 🎂:{" "}
 							{dob.toLocaleString("default", {
 								day: "numeric",
 								month: "short",
@@ -169,30 +184,36 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 						</Text>
 					</View>
 				</View>
+
 				{/* bio */}
-				<View>
-					<Text style={styles.text}>{completeUser?.bio}</Text>
+				<View style={styles.bioContainer}>
+					<Text style={styles.bio}>{completeUser?.bio}</Text>
 				</View>
+
 				{/* profile options */}
-				<View>
+				<View style={styles.profileOptions}>
 					{/* friends */}
-					<View>
-						<Text style={styles.text}>
-							Friends: {completeUser?.friends.length}
-						</Text>
-					</View>
+
+					<Button
+						title={`Friends: ${completeUser?.friends.length}`}
+						type="clear"
+						containerStyle={styles.button}
+						onPress={handleFriends}
+					/>
 
 					{/* posts */}
-					<View>
-						<Text style={styles.text}>
-							Posts: {completeUser?.posts.length}
+					<View style={styles.postCount}>
+						<Text style={styles.profileOptionsText}>
+							{`Posts: ${completeUser?.posts.length}`}
 						</Text>
 					</View>
 
 					{/* edit */}
-					<View>
-						<Button onPress={handleEditProfile} title="Edit" />
-					</View>
+					<Button
+						onPress={handleEditProfile}
+						title="Edit "
+						containerStyle={styles.button}
+					/>
 				</View>
 
 				{/* posts */}
@@ -214,16 +235,66 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 const styles = StyleSheet.create({
 	text: {
 		color: "black",
-		fontSize: 16,
-		marginVertical: 10,
-	},
-	space: {
-		width: 20,
-		height: 20,
+		fontSize: 18,
 	},
 
 	container: {
-		paddingHorizontal: 8,
+		paddingHorizontal: 10,
+	},
+
+	usernameContainer: {
+		marginVertical: 20,
+	},
+	username: {
+		fontSize: 28,
+		fontWeight: "600",
+		color: "black",
+		textAlign: "center",
+	},
+
+	profileInfoContainer: {
+		flexDirection: "row",
+		gap: 20,
+		alignItems: "center",
+	},
+	profilePhoto: {
+		width: 125,
+		height: 125,
+		borderRadius: 125 / 2,
+	},
+	profileDetails: {
+		flex: 1,
+		gap: 10,
+	},
+
+	bioContainer: {
+		marginVertical: 20,
+	},
+	bio: {
+		fontSize: 16,
+		color: "black",
+	},
+
+	profileOptions: {
+		marginBottom: 20,
+		flexDirection: "row",
+		gap: 20,
+
+		justifyContent: "space-between",
+	},
+
+	button: {
+		flex: 1,
+	},
+	profileOptionsText: {
+		color: "black",
+
+		fontSize: 18,
+	},
+	postCount: {
+		alignItems: "center",
+		justifyContent: "center",
+		flex: 1,
 	},
 });
 
