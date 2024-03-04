@@ -10,17 +10,21 @@ let awsCredentials: null | AWS.CognitoIdentityCredentials = null;
 let prevIdToken: string = "";
 let s3: null | AWS.S3 = null;
 
+const identityPoolId: string =
+	"ap-south-1:be985ba0-fa08-4b08-933a-4bdabaa2fcc2";
+const userPoolId: string =
+	"cognito-idp.ap-south-1.amazonaws.com/ap-south-1_8FDnHEsKB";
+
 const initAWSCredentials: InitAWSCredentials = (idToken) => {
 	if (idToken !== prevIdToken) {
 		prevIdToken = idToken;
 		AWS.config.update({ region: "ap-south-1" });
 
 		const credentials = new AWS.CognitoIdentityCredentials({
-			IdentityPoolId: "ap-south-1:be985ba0-fa08-4b08-933a-4bdabaa2fcc2", // your identity pool id here
+			IdentityPoolId: identityPoolId, // your identity pool id here
 			Logins: {
 				// Change the key below according to the specific region your user pool is in.
-				"cognito-idp.ap-south-1.amazonaws.com/ap-south-1_8FDnHEsKB":
-					idToken,
+				[userPoolId]: idToken,
 			},
 		});
 
@@ -64,3 +68,23 @@ export const getS3Obj: GetS3Obj = () => {
 };
 
 export { initAWSCredentials, getAWSCredentials };
+
+//version 3
+const newInitAWSCredentials = (idToken: string) => {
+	if (idToken !== prevIdToken) {
+		prevIdToken = idToken;
+		AWS.config.update({ region: "ap-south-1" });
+
+		const credentials = new AWS.CognitoIdentityCredentials({
+			IdentityPoolId: identityPoolId, // your identity pool id here
+			Logins: {
+				// Change the key below according to the specific region your user pool is in.
+				[userPoolId]: idToken,
+			},
+		});
+
+		awsCredentials = credentials;
+
+		initS3();
+	}
+};
