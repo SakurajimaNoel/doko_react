@@ -28,6 +28,7 @@ export type ProfileStackParamList = {
 		profilePicture: string;
 	};
 	Friends: undefined;
+	CreatePost: undefined;
 };
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 
@@ -37,6 +38,7 @@ import Search from "../Screens/User/Search";
 import Profile from "../Screens/User/Profile";
 import EditProfile from "../Screens/User/Profile/Screen/EditProfile";
 import Friends from "../Screens/User/Profile/Screen/Friends";
+import Post from "../Screens/User/Profile/Screen/Post";
 
 export type RootTabParamList = {
 	Home: undefined;
@@ -65,6 +67,11 @@ function ProfileStackScreen() {
 				name="Friends"
 				component={Friends}
 				options={{ title: "Friends" }}
+			/>
+			<ProfileStack.Screen
+				name="CreatePost"
+				component={Post}
+				options={{ title: "Create New Post" }}
 			/>
 		</ProfileStack.Navigator>
 	);

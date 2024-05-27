@@ -117,6 +117,14 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 		});
 	};
 
+	const handleNewPost = () => {
+		if (!completeUser) return;
+
+		navigation.navigate("Profile", {
+			screen: "CreatePost",
+		});
+	};
+
 	if (!user) {
 		// handleLogout();
 		return (
@@ -216,6 +224,16 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 					/>
 				</View>
 
+				{/* create post */}
+				<View style={styles.newPostContainer}>
+					<Button
+						onPress={handleNewPost}
+						title="Create New Post "
+						type="outline"
+						containerStyle={styles.newPostButton}
+					/>
+				</View>
+
 				{/* posts */}
 				{completeUser &&
 					(completeUser.posts.length > 0 ? (
@@ -295,6 +313,15 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 		flex: 1,
+	},
+	newPostContainer: {
+		marginTop: 5,
+		marginBottom: 15,
+		flexDirection: "row",
+		justifyContent: "center",
+	},
+	newPostButton: {
+		marginHorizontal: 1,
 	},
 });
 
