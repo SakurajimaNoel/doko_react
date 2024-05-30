@@ -12,6 +12,11 @@ type EditProfileNavigationProps = NativeStackScreenProps<
 	"EditProfile"
 >;
 
+type PostNavigatioProps = NativeStackScreenProps<
+	ProfileStackParamList,
+	"CreatePost"
+>;
+
 export interface ProfileProps {
 	navigation: NavigationProps["navigation"];
 }
@@ -87,6 +92,10 @@ export interface CompleteUser {
 export interface EditProfileProps {
 	route: EditProfileNavigationProps["route"];
 	navigation: EditProfileNavigationProps["navigation"];
+}
+
+export interface PostProps {
+	navigation: PostNavigatioProps["navigation"];
 }
 
 export interface UpdateProfileImageProps {

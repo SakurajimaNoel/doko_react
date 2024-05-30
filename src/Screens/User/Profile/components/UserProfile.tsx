@@ -12,6 +12,7 @@ import { images } from "../../../../assests/index";
 
 const UserProfile = ({ navigation }: UserProfileProps) => {
 	const user = useContext(UserContext);
+	const [refresh, setRefresh] = useState<boolean>(false);
 
 	const [getUserDetail, { loading, error, data }] = useLazyQuery(
 		getCompleteUser,
@@ -34,8 +35,9 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 	const [image, setImage] = useState<string | null>(null);
 
 	useEffect(() => {
+		console.log("refetching user profile data");
 		getUserDetail();
-	}, [user]);
+	}, [user, refresh]);
 
 	useEffect(() => {
 		if (data) {
@@ -232,12 +234,30 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 						type="outline"
 						containerStyle={styles.newPostButton}
 					/>
+
+					<Button
+						onPress={() => setRefresh((prev) => !prev)}
+						title="Refresh"
+						type="clear"
+						containerStyle={styles.newPostButton}
+					/>
 				</View>
 
 				{/* posts */}
 				{completeUser &&
 					(completeUser.posts.length > 0 ? (
-						<View></View>
+						completeUser.posts.map((post) => {
+							return (
+								<View
+									style={styles.postContainer}
+									key={post.id}>
+									<Text style={styles.postText}>
+										{post.caption}
+										{`\nimage length: ${post.content.length}`}
+									</Text>
+								</View>
+							);
+						})
 					) : (
 						<View>
 							<Text style={styles.text}>
@@ -319,9 +339,16 @@ const styles = StyleSheet.create({
 		marginBottom: 15,
 		flexDirection: "row",
 		justifyContent: "center",
+		gap: 20,
 	},
 	newPostButton: {
 		marginHorizontal: 1,
+	},
+	postContainer: {
+		marginVertical: 10,
+	},
+	postText: {
+		color: "black",
 	},
 });
 
