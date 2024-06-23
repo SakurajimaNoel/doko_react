@@ -88,7 +88,7 @@ const Home = ({ navigation }: HomeProps) => {
 
 		if (error) {
 			console.error("Error, ", error.message);
-			handleLogout();
+			// handleLogout();
 		}
 	}, [data, error]);
 
@@ -131,6 +131,25 @@ const Home = ({ navigation }: HomeProps) => {
 				<Text>Not Authenticated</Text>
 			</>
 		);
+	}
+
+	if (error) {
+		<View>
+			<Text style={styles.text}>{`Hii ${user.name}`}</Text>
+
+			<Text style={styles.text}>Can't fetch user profile right now</Text>
+
+			{user.profileStatus === ProfileStatusKind.INCOMPLETE && (
+				<Text style={styles.text}>Incomplete profile</Text>
+			)}
+
+			<Button
+				onPress={handleLogout}
+				title="Logout"
+				accessibilityLabel="Logout"
+				type="clear"
+			/>
+		</View>;
 	}
 
 	return (

@@ -16,7 +16,7 @@ import {
 	AuthenticationDetails,
 	CognitoUserSession,
 } from "amazon-cognito-identity-js";
-import { UserActionKind } from "../../../context/types";
+import { ProfileStatusKind, UserActionKind } from "../../../context/types";
 
 export default function Login({ navigation }: LoginProps) {
 	const userDispatch = useContext(UserDispatchContext);
@@ -53,6 +53,7 @@ export default function Login({ navigation }: LoginProps) {
 				idToken,
 				username,
 				email,
+				profileStatus: ProfileStatusKind.PENDING,
 			},
 		});
 	};

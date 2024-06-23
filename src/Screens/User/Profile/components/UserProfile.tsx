@@ -1,18 +1,19 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { Button, Image } from "@rneui/base";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { UserContext } from "../../../../context/userContext";
 import { getS3Obj } from "../../../../Connectors/auth/aws";
-import * as AWS from "aws-sdk";
-import { UserActionKind } from "../../../../context/types";
-import { CompleteUser, UserProfileProps } from "../types";
+import { CompleteUser, Post, UserProfileProps } from "../types";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { getCompleteUser } from "../../../../Connectors/graphql/queries/getCompleteUser";
 import { images } from "../../../../assests/index";
+import { getS3PresignedUrl } from "../../../../Connectors/helpers/s3";
+import Posts from "./post/Posts";
 
 const UserProfile = ({ navigation }: UserProfileProps) => {
 	const user = useContext(UserContext);
 	const [refresh, setRefresh] = useState<boolean>(false);
+	const [allow, setAllow] = useState(false);
 
 	const [getUserDetail, { loading, error, data }] = useLazyQuery(
 		getCompleteUser,
@@ -74,27 +75,17 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 	useEffect(() => {
 		if (!completeUser || !completeUser.profilePicture) return;
 
-		const s3 = getS3Obj();
-		if (!s3) return;
-
-		let bucketName = "dokiuserprofile";
-		let key = completeUser.profilePicture;
-
-		const params = {
-			Bucket: bucketName,
-			Key: key,
-			Expires: 180,
-		};
-
-		s3.getSignedUrl("getObject", params, (err, url) => {
-			if (err) {
-				console.error("Error generating signed URL:", err);
+		(async function () {
+			try {
+				const url = await getS3PresignedUrl(
+					completeUser.profilePicture,
+				);
+				setImage(url);
+				setAllow(true);
+			} catch (err) {
 				return;
 			}
-
-			// Use this signed URL in your React Native component
-			setImage(url);
-		});
+		})();
 	}, [completeUser, user]);
 
 	const handleEditProfile = () => {
@@ -157,6 +148,22 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 	if (completeUser) {
 		dob = new Date(completeUser.dob);
 	}
+
+	// let posts: React.ReactElement[] = [];
+	// completeUser?.posts.forEach(async (post) => {
+	// 	const url = await getS3PresignedUrl(post.content[0]);
+
+	// 	const element = (
+	// 		<Pressable
+	// 			style={styles.postContainer}
+	// 			key={post.id}
+	// 			onPress={() => handlePostItem(post)}>
+	// 			<Image style={styles.postImage} source={{ uri: url }} />
+	// 		</Pressable>
+	// 	);
+
+	// 	posts.push(element);
+	// });
 
 	return (
 		<>
@@ -236,7 +243,9 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 					/>
 
 					<Button
-						onPress={() => setRefresh((prev) => !prev)}
+						onPress={() => {
+							setRefresh((prev) => !prev);
+						}}
 						title="Refresh"
 						type="clear"
 						containerStyle={styles.newPostButton}
@@ -246,18 +255,30 @@ const UserProfile = ({ navigation }: UserProfileProps) => {
 				{/* posts */}
 				{completeUser &&
 					(completeUser.posts.length > 0 ? (
-						completeUser.posts.map((post) => {
-							return (
-								<View
-									style={styles.postContainer}
-									key={post.id}>
-									<Text style={styles.postText}>
-										{post.caption}
-										{`\nimage length: ${post.content.length}`}
-									</Text>
-								</View>
-							);
-						})
+						// <View style={styles.postParent}>
+						// 	{completeUser.posts.map((post) => {
+						// 		return (
+						// 			<Pressable
+						// 				style={styles.postContainer}
+						// 				key={post.id}
+						// 				onPress={() => handlePostItem(post)}>
+						// 				<Image
+						// 					style={styles.postImage}
+						// 					source={
+						// 						image
+						// 							? { uri: image }
+						// 							: images.profile
+						// 					}
+						// 				/>
+						// 			</Pressable>
+						// 		);
+						// 	})}
+						// </View>
+						<Posts
+							navigation={navigation}
+							posts={completeUser.posts}
+							allow={allow}
+						/>
 					) : (
 						<View>
 							<Text style={styles.text}>
@@ -343,12 +364,6 @@ const styles = StyleSheet.create({
 	},
 	newPostButton: {
 		marginHorizontal: 1,
-	},
-	postContainer: {
-		marginVertical: 10,
-	},
-	postText: {
-		color: "black",
 	},
 });
 

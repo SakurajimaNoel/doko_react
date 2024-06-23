@@ -26,11 +26,11 @@ import { nanoid } from "nanoid";
 import { getS3Obj } from "../../../../../Connectors/auth/aws";
 import { S3 } from "aws-sdk";
 import { ManagedUpload } from "aws-sdk/clients/s3";
-import { PostProps } from "../../types";
+import { CreatePostProps } from "../../types";
 
 const { width, height } = Dimensions.get("window");
 
-const Post = ({ navigation }: PostProps) => {
+const Post = ({ navigation }: CreatePostProps) => {
 	const user = useContext(UserContext);
 
 	const scrollRef = useRef<ScrollView>(null);

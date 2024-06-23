@@ -17,6 +17,11 @@ type PostNavigatioProps = NativeStackScreenProps<
 	"CreatePost"
 >;
 
+type PostItemNavigationProps = NativeStackScreenProps<
+	ProfileStackParamList,
+	"PostItem"
+>;
+
 export interface ProfileProps {
 	navigation: NavigationProps["navigation"];
 }
@@ -67,6 +72,13 @@ export interface UserProfileProps {
 	navigation: NavigationProps["navigation"];
 }
 
+export interface Post {
+	id: string;
+	content: string[];
+	caption: string;
+	likes: string;
+}
+
 export interface CompleteUser {
 	bio: string;
 	dob: string;
@@ -80,13 +92,7 @@ export interface CompleteUser {
 		username: string;
 		profilePicture: string;
 	}[];
-	posts:
-		| {
-				id: string;
-				content: string;
-				caption: string;
-				likes: string;
-		  }[];
+	posts: Post[];
 }
 
 export interface EditProfileProps {
@@ -94,8 +100,13 @@ export interface EditProfileProps {
 	navigation: EditProfileNavigationProps["navigation"];
 }
 
-export interface PostProps {
+export interface CreatePostProps {
 	navigation: PostNavigatioProps["navigation"];
+}
+
+export interface PostItemProps {
+	navigation: PostItemNavigationProps["navigation"];
+	route: PostItemNavigationProps["route"];
 }
 
 export interface UpdateProfileImageProps {
@@ -116,4 +127,10 @@ export interface ProfileImageModalProps {
 	setError: React.Dispatch<React.SetStateAction<string | null>>;
 	setMessage: React.Dispatch<React.SetStateAction<string | null>>;
 	navigation: EditProfileNavigationProps["navigation"];
+}
+
+export interface PostsProps {
+	posts: Post[];
+	navigation: NavigationProps["navigation"];
+	allow: boolean;
 }

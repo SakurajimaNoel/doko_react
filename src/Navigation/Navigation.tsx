@@ -29,6 +29,12 @@ export type ProfileStackParamList = {
 	};
 	Friends: undefined;
 	CreatePost: undefined;
+	PostItem: {
+		caption: string;
+		content: string[];
+		id: string;
+		likes: string;
+	};
 };
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 
@@ -39,6 +45,7 @@ import Profile from "../Screens/User/Profile";
 import EditProfile from "../Screens/User/Profile/Screen/EditProfile";
 import Friends from "../Screens/User/Profile/Screen/Friends";
 import Post from "../Screens/User/Profile/Screen/Post";
+import PostItem from "../Screens/User/Profile/Screen/PostItem/PostItem";
 
 export type RootTabParamList = {
 	Home: undefined;
@@ -72,6 +79,11 @@ function ProfileStackScreen() {
 				name="CreatePost"
 				component={Post}
 				options={{ title: "Create New Post" }}
+			/>
+			<ProfileStack.Screen
+				name="PostItem"
+				component={PostItem}
+				options={{ title: "PostItem" }}
 			/>
 		</ProfileStack.Navigator>
 	);
