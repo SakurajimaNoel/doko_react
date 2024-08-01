@@ -8,6 +8,7 @@ class GlobalThemeData {
       // canvasColor: colorScheme.surface,
       // scaffoldBackgroundColor: colorScheme.surface,
       // highlightColor: Colors.transparent,
+      fontFamily: "Rubik",
       useMaterial3: true,
     );
   }
