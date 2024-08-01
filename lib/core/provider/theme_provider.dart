@@ -1,11 +1,13 @@
+import 'package:doko_react/core/helpers/enum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum UserTheme { system, light, dark }
+
 class ThemeProvider extends ChangeNotifier {
-  List<String> themeModeList = ["light", "dark", "system default"];
   static const String _themePrefKey = "theme";
 
-  String themeMode = "system default";
+  UserTheme themeMode = UserTheme.system;
 
   ThemeProvider() {
     _loadTheme();
@@ -13,15 +15,15 @@ class ThemeProvider extends ChangeNotifier {
 
   void _loadTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String storedTheme = prefs.getString(_themePrefKey) ?? "system default";
-    themeMode = storedTheme;
+    String storedTheme =
+        prefs.getString(_themePrefKey) ?? UserTheme.system.toString();
+    themeMode = EnumHelpers.stringToEnum(storedTheme, UserTheme.values);
     notifyListeners();
   }
 
-  void toggleTheme(String theme) async {
+  void toggleTheme(UserTheme theme) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    await prefs.setString(_themePrefKey, theme);
+    await prefs.setString(_themePrefKey, EnumHelpers.enumToString(theme));
 
     themeMode = theme;
     notifyListeners();
