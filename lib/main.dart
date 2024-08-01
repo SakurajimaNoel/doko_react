@@ -1,3 +1,6 @@
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:doko_react/aws/amplifyconfiguration.dart';
 import 'package:doko_react/core/provider/theme_provider.dart';
 import 'package:doko_react/core/theme/theme_data.dart';
 import 'package:doko_react/features/authentication/presentation/screens/login_page.dart';
@@ -6,14 +9,29 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await SharedPreferences.getInstance();
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    await SharedPreferences.getInstance();
+    await _configureAmplify();
 
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-    )
-  ], child: const MyApp()));
+    runApp(MultiProvider(providers: [
+      ChangeNotifierProvider(
+        create: (context) => ThemeProvider(),
+      )
+    ], child: const MyApp()));
+  } on AmplifyException catch (e) {
+    runApp(Text("Error configuring Amplify: ${e.message}"));
+  }
+}
+
+Future<void> _configureAmplify() async {
+  try {
+    await Amplify.addPlugin(AmplifyAuthCognito());
+    await Amplify.configure(amplifyconfig);
+    safePrint('Successfully configured');
+  } on Exception catch (e) {
+    safePrint('Error configuring Amplify: $e');
+  }
 }
 
 class MyApp extends StatelessWidget {

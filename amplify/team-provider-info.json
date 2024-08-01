@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-dokoreact-dev-8d8ed-authRole",
+      "UnauthRoleArn": "arn:aws:iam::019253667737:role/amplify-dokoreact-dev-8d8ed-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::019253667737:role/amplify-dokoreact-dev-8d8ed-authRole",
+      "Region": "ap-south-1",
+      "DeploymentBucketName": "amplify-dokoreact-dev-8d8ed-deployment",
+      "UnauthRoleName": "amplify-dokoreact-dev-8d8ed-unauthRole",
+      "StackName": "amplify-dokoreact-dev-8d8ed",
+      "StackId": "arn:aws:cloudformation:ap-south-1:019253667737:stack/amplify-dokoreact-dev-8d8ed/68bfef60-4fec-11ef-9da8-0679b21aab71",
+      "AmplifyAppId": "d1n4rjx5z659iu"
+    },
+    "categories": {
+      "auth": {
+        "dokoreact": {}
+      }
+    }
+  }
+}
