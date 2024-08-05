@@ -1,3 +1,4 @@
+import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/features/authentication/presentation/screens/password_reset_page.dart';
 import 'package:doko_react/features/authentication/presentation/screens/signup_page.dart';
 import 'package:flutter/gestures.dart';
@@ -12,6 +13,15 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+
+  void _submit() {
+    final isValid = _formKey.currentState?.validate();
+    if (!isValid!) {
+      return;
+    }
+
+    _formKey.currentState?.save();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +46,11 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   TextFormField(
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Email can't be empty";
+                      InputStatus status = ValidateInput.validateEmail(value);
+                      if (!status.isValid) {
+                        return status.message;
                       }
+
                       return null;
                     },
                     autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -64,11 +76,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton(
-                    onPressed: () {
-                      if (!_formKey.currentState!.validate()) {
-                        return;
-                      }
-                    },
+                    onPressed: _submit,
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 24),
                       backgroundColor: currTheme.primary,
@@ -95,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const Spacer(),
             Padding(
-              padding: const EdgeInsets.only(bottom: 32),
+              padding: const EdgeInsets.only(bottom: 16),
               child: RichText(
                   text: TextSpan(
                 text: "Don't have the account? ",

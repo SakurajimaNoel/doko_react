@@ -1,3 +1,4 @@
+import 'package:doko_react/core/helpers/input.dart';
 import 'package:flutter/material.dart';
 
 class PasswordResetPage extends StatefulWidget {
@@ -34,9 +35,12 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                   children: [
                     TextFormField(
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Email can't be empty";
+                        InputStatus status = ValidateInput.validateEmail(value);
+
+                        if (!status.isValid) {
+                          return status.message;
                         }
+
                         return null;
                       },
                       autovalidateMode: AutovalidateMode.onUserInteraction,
