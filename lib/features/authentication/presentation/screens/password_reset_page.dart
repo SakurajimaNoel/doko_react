@@ -18,7 +18,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 150),
+        padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 150),
         child: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,

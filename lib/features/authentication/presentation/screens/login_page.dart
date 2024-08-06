@@ -1,4 +1,5 @@
 import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/features/authentication/data/auth.dart';
 import 'package:doko_react/features/authentication/presentation/screens/password_reset_page.dart';
 import 'package:doko_react/features/authentication/presentation/screens/signup_page.dart';
 import 'package:flutter/gestures.dart';
@@ -13,6 +14,9 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  String _email = "";
+  String _password = "";
+  bool _loading = false;
 
   void _submit() {
     final isValid = _formKey.currentState?.validate();
@@ -21,6 +25,10 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     _formKey.currentState?.save();
+    setState(() {
+      _loading = true;
+    });
+    AuthenticationActions.signInUser(_email, _password);
   }
 
   @override
@@ -45,6 +53,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   TextFormField(
+                    enabled: !_loading,
                     validator: (value) {
                       InputStatus status = ValidateInput.validateEmail(value);
                       if (!status.isValid) {
@@ -58,9 +67,14 @@ class _LoginPageState extends State<LoginPage> {
                         border: OutlineInputBorder(),
                         labelText: "Email",
                         hintText: "Email..."),
+                    onSaved: (value) {
+                      if (value == null || value.isEmpty) return;
+                      _email = value;
+                    },
                   ),
                   const SizedBox(height: 30),
                   TextFormField(
+                    enabled: !_loading,
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -73,18 +87,32 @@ class _LoginPageState extends State<LoginPage> {
                         border: OutlineInputBorder(),
                         labelText: "Password",
                         hintText: "Password..."),
+                    onSaved: (value) {
+                      if (value == null || value.isEmpty) {
+                        return;
+                      }
+
+                      _password = value;
+                    },
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton(
-                    onPressed: _submit,
+                    onPressed: _loading ? null : _submit,
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 24),
                       backgroundColor: currTheme.primary,
                       foregroundColor: currTheme.onPrimary,
+                      disabledBackgroundColor: Colors.grey,
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12.0),
-                      child: Text("Login"),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: _loading
+                          ? const SizedBox(
+                              height: 25,
+                              width: 25,
+                              child: CircularProgressIndicator(),
+                            )
+                          : const Text("Login"),
                     ),
                   )
                 ],
@@ -92,12 +120,14 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 10),
             TextButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const PasswordResetPage()));
-              },
+              onPressed: _loading
+                  ? null
+                  : () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const PasswordResetPage()));
+                    },
               style: TextButton.styleFrom(foregroundColor: currTheme.secondary),
               child: const Text("Forgot Password?"),
             ),
@@ -115,12 +145,15 @@ class _LoginPageState extends State<LoginPage> {
                           color: currTheme.primary,
                           fontWeight: FontWeight.w500),
                       recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const SignupPage()));
-                        })
+                        ..onTap = _loading
+                            ? null
+                            : () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SignupPage()));
+                              })
                 ],
               )),
             ),
