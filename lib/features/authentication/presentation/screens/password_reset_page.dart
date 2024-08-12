@@ -1,6 +1,10 @@
 import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/features/authentication/data/auth.dart';
+import 'package:doko_react/features/authentication/presentation/screens/password_reset_confirm_page.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/material.dart';
+
+import '../widgets/error_widget.dart';
 
 class PasswordResetPage extends StatefulWidget {
   const PasswordResetPage({super.key});
@@ -11,6 +15,40 @@ class PasswordResetPage extends StatefulWidget {
 
 class _PasswordResetPageState extends State<PasswordResetPage> {
   final _formKey = GlobalKey<FormState>();
+  String _email = "";
+  bool _loading = false;
+  String _errorMessage = "";
+
+  Future<void> _submit() async {
+    bool isValid = _formKey.currentState?.validate() ?? false;
+    if (!isValid) {
+      return;
+    }
+    _formKey.currentState?.save();
+
+    setState(() {
+      _loading = true;
+      _errorMessage = "";
+    });
+
+    var resetStatus = await AuthenticationActions.resetPassword(_email);
+    if (resetStatus.status == AuthStatus.error) {
+      setState(() {
+        _loading = false;
+        _errorMessage = resetStatus.message!;
+      });
+      return;
+    }
+
+    _handleResetCode();
+  }
+
+  void _handleResetCode() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PasswordResetConfirmPage(email: _email)));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +72,14 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                 child: Column(
                   children: [
                     TextFormField(
+                      enabled: !_loading,
+                      onSaved: (value) {
+                        if (value == null || value.isEmpty) {
+                          return;
+                        }
+
+                        _email = value;
+                      },
                       validator: (value) {
                         InputStatus status = ValidateInput.validateEmail(value);
 
@@ -52,21 +98,27 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                     ),
                     const SizedBox(height: 30),
                     ElevatedButton(
-                      onPressed: () {
-                        if (!_formKey.currentState!.validate()) {
-                          return;
-                        }
-                      },
+                      onPressed: _loading ? null : _submit,
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 24),
                         backgroundColor: currTheme.primary,
                         foregroundColor: currTheme.onPrimary,
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12.0),
-                        child: Text("Continue"),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12.0),
+                        child: _loading
+                            ? const SizedBox(
+                                height: 25,
+                                width: 25,
+                                child: CircularProgressIndicator(),
+                              )
+                            : const Text("Continue"),
                       ),
-                    )
+                    ),
+                    if (_errorMessage.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      ErrorText(_errorMessage),
+                    ],
                   ],
                 ),
               )

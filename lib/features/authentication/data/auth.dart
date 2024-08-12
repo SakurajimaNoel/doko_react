@@ -3,15 +3,15 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 
 enum AuthStatus { done, confirmMFA, error }
 
-class AuthenticationStatus {
+class AuthenticationResult {
   final AuthStatus status;
   final String? message;
 
-  AuthenticationStatus({required this.status, this.message});
+  AuthenticationResult({required this.status, this.message});
 }
 
 class AuthenticationActions {
-  static Future<AuthenticationStatus> signInUser(
+  static Future<AuthenticationResult> signInUser(
       String email, String password) async {
     try {
       final result =
@@ -19,25 +19,25 @@ class AuthenticationActions {
 
       return _handleSignInResult(result, email);
     } on AuthException catch (e) {
-      return AuthenticationStatus(status: AuthStatus.error, message: e.message);
+      return AuthenticationResult(status: AuthStatus.error, message: e.message);
     } catch (e) {
       safePrint(e);
-      return AuthenticationStatus(
+      return AuthenticationResult(
           status: AuthStatus.error, message: "Oops! Something went wrong.");
     }
   }
 
-  static Future<AuthenticationStatus> confirmSignInUser(
+  static Future<AuthenticationResult> confirmSignInUser(
       String confirmString) async {
     try {
       await Amplify.Auth.confirmSignIn(confirmationValue: confirmString);
 
-      return AuthenticationStatus(status: AuthStatus.done);
+      return AuthenticationResult(status: AuthStatus.done);
     } on AuthException catch (e) {
-      return AuthenticationStatus(status: AuthStatus.error, message: e.message);
+      return AuthenticationResult(status: AuthStatus.error, message: e.message);
     } catch (e) {
       safePrint(e);
-      return AuthenticationStatus(
+      return AuthenticationResult(
           status: AuthStatus.error, message: "Oops! Something went wrong.");
     }
   }
@@ -52,37 +52,67 @@ class AuthenticationActions {
     }
   }
 
-  static Future<AuthenticationStatus> signUpUser(
+  static Future<AuthenticationResult> signUpUser(
       String email, String password) async {
     try {
       await Amplify.Auth.signUp(username: email, password: password);
 
-      return AuthenticationStatus(status: AuthStatus.done);
+      return AuthenticationResult(status: AuthStatus.done);
     } on AuthException catch (e) {
-      return AuthenticationStatus(status: AuthStatus.error, message: e.message);
+      return AuthenticationResult(status: AuthStatus.error, message: e.message);
     } catch (e) {
       safePrint(e);
-      return AuthenticationStatus(
+      return AuthenticationResult(
           status: AuthStatus.error, message: "Oops! Something went wrong.");
     }
   }
 
-  static AuthenticationStatus _handleSignInResult(
+  static Future<AuthenticationResult> resetPassword(String email) async {
+    try {
+      await Amplify.Auth.resetPassword(username: email);
+
+      return AuthenticationResult(status: AuthStatus.done);
+    } on AuthException catch (e) {
+      return AuthenticationResult(status: AuthStatus.error, message: e.message);
+    } catch (e) {
+      safePrint(e);
+      return AuthenticationResult(
+          status: AuthStatus.error, message: "Oops! Something went wrong.");
+    }
+  }
+
+  static Future<AuthenticationResult> confirmResetPassword(
+      String email, String code, String password) async {
+    try {
+      await Amplify.Auth.confirmResetPassword(
+          username: email, confirmationCode: code, newPassword: password);
+
+      return AuthenticationResult(status: AuthStatus.done);
+    } on AuthException catch (e) {
+      return AuthenticationResult(status: AuthStatus.error, message: e.message);
+    } catch (e) {
+      safePrint(e);
+      return AuthenticationResult(
+          status: AuthStatus.error, message: "Oops! Something went wrong.");
+    }
+  }
+
+  static AuthenticationResult _handleSignInResult(
       SignInResult result, String username) {
     switch (result.nextStep.signInStep) {
       case AuthSignInStep.confirmSignInWithTotpMfaCode:
-        return AuthenticationStatus(status: AuthStatus.confirmMFA);
+        return AuthenticationResult(status: AuthStatus.confirmMFA);
       case AuthSignInStep.done:
-        return AuthenticationStatus(status: AuthStatus.done);
+        return AuthenticationResult(status: AuthStatus.done);
       case AuthSignInStep.confirmSignUp:
         // handle sending user confirm mail
         Amplify.Auth.resendSignUpCode(username: username);
-        return AuthenticationStatus(
+        return AuthenticationResult(
             status: AuthStatus.error,
             message:
                 "Your account is not verified. Please verify it to proceed.");
       default:
-        return AuthenticationStatus(status: AuthStatus.done);
+        return AuthenticationResult(status: AuthStatus.done);
     }
   }
 }

@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 
 class ErrorText extends StatelessWidget {
   final String errorText;
+  final Color? color;
 
-  const ErrorText(
-    this.errorText, {
-    super.key,
-  });
+  const ErrorText(this.errorText, {super.key, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +13,7 @@ class ErrorText extends StatelessWidget {
     return Text(
       errorText,
       style: TextStyle(
-        color: currTheme.error,
+        color: color ?? currTheme.error,
         fontWeight: FontWeight.w500,
         fontSize: 14,
       ),

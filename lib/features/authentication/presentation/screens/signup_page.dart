@@ -21,8 +21,8 @@ class _SignupPageState extends State<SignupPage> {
   String _errorMessage = "";
 
   void _submit() async {
-    final isValid = _formKey.currentState?.validate();
-    if (isValid == null || !isValid) {
+    final isValid = _formKey.currentState?.validate() ?? false;
+    if (!isValid) {
       return;
     }
     _formKey.currentState?.save();
@@ -80,6 +80,7 @@ class _SignupPageState extends State<SignupPage> {
               child: Column(
                 children: [
                   TextFormField(
+                    enabled: !_loading,
                     onSaved: (value) {
                       if (value == null || value.isEmpty) {
                         return;
@@ -104,6 +105,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   const SizedBox(height: 30),
                   TextFormField(
+                    enabled: !_loading,
                     obscureText: true,
                     onChanged: (value) {
                       _password = value;
@@ -133,6 +135,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   const SizedBox(height: 30),
                   TextFormField(
+                    enabled: !_loading,
                     obscureText: true,
                     validator: (value) {
                       InputStatus status =
