@@ -1,7 +1,10 @@
 import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/features/authentication/presentation/widgets/error_widget.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
+import 'package:doko_react/features/authentication/presentation/screens/confirm_mfa_page.dart';
 import 'package:doko_react/features/authentication/presentation/screens/password_reset_page.dart';
 import 'package:doko_react/features/authentication/presentation/screens/signup_page.dart';
+import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -17,8 +20,9 @@ class _LoginPageState extends State<LoginPage> {
   String _email = "";
   String _password = "";
   bool _loading = false;
+  String _errorMessage = "";
 
-  void _submit() {
+  void _submit() async {
     final isValid = _formKey.currentState?.validate();
     if (!isValid!) {
       return;
@@ -27,8 +31,24 @@ class _LoginPageState extends State<LoginPage> {
     _formKey.currentState?.save();
     setState(() {
       _loading = true;
+      _errorMessage = "";
     });
-    AuthenticationActions.signInUser(_email, _password);
+    var loginStatus = await AuthenticationActions.signInUser(_email, _password);
+    if (loginStatus.status == AuthStatus.error) {
+      setState(() {
+        _loading = false;
+        _errorMessage = loginStatus.message!;
+      });
+    }
+
+    if (loginStatus.status == AuthStatus.confirmMFA) {
+      _handleMfa();
+    }
+  }
+
+  void _handleMfa() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const ConfirmMfaPage()));
   }
 
   @override
@@ -111,7 +131,11 @@ class _LoginPageState extends State<LoginPage> {
                             )
                           : const Text("Login"),
                     ),
-                  )
+                  ),
+                  if (_errorMessage.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    ErrorText(_errorMessage),
+                  ],
                 ],
               ),
             ),

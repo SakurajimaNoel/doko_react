@@ -67,11 +67,11 @@ class _MyAppState extends State<MyApp> {
           break;
         case AuthHubEventType.sessionExpired:
           _authProvider.setAuthStatus(AuthenticationStatus.signedOut);
-          // snackbar with message user needs to login again
+          // snack bar with message user needs to login again
           break;
         case AuthHubEventType.userDeleted:
           _authProvider.setAuthStatus(AuthenticationStatus.signedOut);
-          // snackbar with message user is deleted
+          // snack bar with message user is deleted
           break;
       }
     });
