@@ -24,11 +24,11 @@ class _LoginPageState extends State<LoginPage> {
 
   void _submit() async {
     final isValid = _formKey.currentState?.validate();
-    if (!isValid!) {
+    if (isValid == null || !isValid) {
       return;
     }
-
     _formKey.currentState?.save();
+
     setState(() {
       _loading = true;
       _errorMessage = "";
@@ -101,9 +101,10 @@ class _LoginPageState extends State<LoginPage> {
                     },
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Password",
-                        hintText: "Password..."),
+                      border: OutlineInputBorder(),
+                      labelText: "Password",
+                      hintText: "Password...",
+                    ),
                     onSaved: (value) {
                       if (value == null || value.isEmpty) {
                         return;

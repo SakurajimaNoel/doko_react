@@ -15,6 +15,7 @@ class Heading extends StatelessWidget {
           fontSize: size ?? 48,
           fontWeight: FontWeight.w500,
         ),
+        textAlign: TextAlign.center,
       ),
     );
   }

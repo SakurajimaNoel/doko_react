@@ -21,6 +21,22 @@ class AuthenticationActions {
     } on AuthException catch (e) {
       return AuthenticationStatus(status: AuthStatus.error, message: e.message);
     } catch (e) {
+      safePrint(e);
+      return AuthenticationStatus(
+          status: AuthStatus.error, message: "Oops! Something went wrong.");
+    }
+  }
+
+  static Future<AuthenticationStatus> confirmSignInUser(
+      String confirmString) async {
+    try {
+      await Amplify.Auth.confirmSignIn(confirmationValue: confirmString);
+
+      return AuthenticationStatus(status: AuthStatus.done);
+    } on AuthException catch (e) {
+      return AuthenticationStatus(status: AuthStatus.error, message: e.message);
+    } catch (e) {
+      safePrint(e);
       return AuthenticationStatus(
           status: AuthStatus.error, message: "Oops! Something went wrong.");
     }

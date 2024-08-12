@@ -86,4 +86,22 @@ class ValidateInput {
 
     return InputStatus(isValid: true);
   }
+
+  static InputStatus validateConfirmCode(String? code) {
+    if (code == null || code.isEmpty) {
+      return InputStatus(
+        isValid: false,
+        message: "MFA code can't be empty",
+      );
+    }
+
+    if (code.length != 6) {
+      return InputStatus(
+        isValid: false,
+        message: "Invalid confirm code.",
+      );
+    }
+
+    return InputStatus(isValid: true);
+  }
 }
