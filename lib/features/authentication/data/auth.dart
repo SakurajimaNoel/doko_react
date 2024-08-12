@@ -55,9 +55,7 @@ class AuthenticationActions {
   static Future<AuthenticationStatus> signUpUser(
       String email, String password) async {
     try {
-      final result =
-          await Amplify.Auth.signUp(username: email, password: password);
-
+      await Amplify.Auth.signUp(username: email, password: password);
 
       return AuthenticationStatus(status: AuthStatus.done);
     } on AuthException catch (e) {

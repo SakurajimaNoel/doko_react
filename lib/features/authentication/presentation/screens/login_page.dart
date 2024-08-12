@@ -1,4 +1,3 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/error_widget.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
@@ -6,10 +5,8 @@ import 'package:doko_react/features/authentication/presentation/screens/confirm_
 import 'package:doko_react/features/authentication/presentation/screens/password_reset_page.dart';
 import 'package:doko_react/features/authentication/presentation/screens/signup_page.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
