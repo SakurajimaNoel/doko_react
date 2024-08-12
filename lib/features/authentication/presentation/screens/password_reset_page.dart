@@ -1,4 +1,5 @@
 import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/material.dart';
 
 class PasswordResetPage extends StatefulWidget {
@@ -23,10 +24,9 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Center(
-                child: Text("Password Reset",
-                    style:
-                        TextStyle(fontSize: 36, fontWeight: FontWeight.w500)),
+              const Heading(
+                "Password Reset",
+                size: 36,
               ),
               const SizedBox(height: 30),
               Form(

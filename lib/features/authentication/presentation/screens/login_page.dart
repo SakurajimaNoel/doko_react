@@ -43,10 +43,7 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(),
-            const Center(
-              child: Text("Login",
-                  style: TextStyle(fontSize: 48, fontWeight: FontWeight.w500)),
-            ),
+            const Heading("Login"),
             const SizedBox(height: 30),
             Form(
               key: _formKey,

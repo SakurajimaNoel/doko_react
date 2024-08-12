@@ -1,4 +1,5 @@
 import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -25,10 +26,7 @@ class _SignupPageState extends State<SignupPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(),
-            const Center(
-              child: Text("Signup",
-                  style: TextStyle(fontSize: 48, fontWeight: FontWeight.w500)),
-            ),
+            const Heading("Signup"),
             const SizedBox(height: 30),
             Form(
               key: _formKey,
