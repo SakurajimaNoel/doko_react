@@ -52,6 +52,23 @@ class AuthenticationActions {
     }
   }
 
+  static Future<AuthenticationStatus> signUpUser(
+      String email, String password) async {
+    try {
+      final result =
+          await Amplify.Auth.signUp(username: email, password: password);
+
+
+      return AuthenticationStatus(status: AuthStatus.done);
+    } on AuthException catch (e) {
+      return AuthenticationStatus(status: AuthStatus.error, message: e.message);
+    } catch (e) {
+      safePrint(e);
+      return AuthenticationStatus(
+          status: AuthStatus.error, message: "Oops! Something went wrong.");
+    }
+  }
+
   static AuthenticationStatus _handleSignInResult(
       SignInResult result, String username) {
     switch (result.nextStep.signInStep) {

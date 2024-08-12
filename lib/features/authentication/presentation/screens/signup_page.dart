@@ -1,7 +1,10 @@
 import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/features/authentication/data/auth.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
+import '../widgets/error_widget.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -12,7 +15,51 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
+  String _email = "";
   String _password = "";
+  bool _loading = false;
+  String _errorMessage = "";
+
+  void _submit() async {
+    final isValid = _formKey.currentState?.validate();
+    if (isValid == null || !isValid) {
+      return;
+    }
+    _formKey.currentState?.save();
+
+    setState(() {
+      _loading = true;
+      _errorMessage = "";
+    });
+
+    var signupStatus =
+        await AuthenticationActions.signUpUser(_email, _password);
+
+    if (signupStatus.status == AuthStatus.error) {
+      setState(() {
+        _loading = false;
+        _errorMessage = signupStatus.message!;
+      });
+      return;
+    }
+
+    // send user back to login screen;
+    _handleSuccess();
+  }
+
+  void _handleSuccess() {
+    String message =
+        "Account created successfully. Please verify your email to log in.";
+    String email = _email;
+    String password = _password;
+
+    var successInfo = {
+      "email": email,
+      "password": password,
+      "message": message,
+    };
+    Navigator.pop(context, successInfo);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +80,13 @@ class _SignupPageState extends State<SignupPage> {
               child: Column(
                 children: [
                   TextFormField(
+                    onSaved: (value) {
+                      if (value == null || value.isEmpty) {
+                        return;
+                      }
+
+                      _email = value;
+                    },
                     validator: (value) {
                       InputStatus status = ValidateInput.validateEmail(value);
 
@@ -52,6 +106,13 @@ class _SignupPageState extends State<SignupPage> {
                   TextFormField(
                     obscureText: true,
                     onChanged: (value) {
+                      _password = value;
+                    },
+                    onSaved: (value) {
+                      if (value == null || value.isEmpty) {
+                        return;
+                      }
+
                       _password = value;
                     },
                     validator: (value) {
@@ -92,21 +153,27 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton(
-                    onPressed: () {
-                      if (!_formKey.currentState!.validate()) {
-                        return;
-                      }
-                    },
+                    onPressed: _loading ? null : _submit,
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 24),
                       backgroundColor: currTheme.primary,
                       foregroundColor: currTheme.onPrimary,
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12.0),
-                      child: Text("Signup"),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: _loading
+                          ? const SizedBox(
+                              height: 25,
+                              width: 25,
+                              child: CircularProgressIndicator(),
+                            )
+                          : const Text("Sign Up"),
                     ),
                   ),
+                  if (_errorMessage.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    ErrorText(_errorMessage),
+                  ],
                 ],
               ),
             ),

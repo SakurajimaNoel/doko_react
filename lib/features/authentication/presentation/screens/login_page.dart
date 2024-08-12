@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/error_widget.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
@@ -5,8 +6,10 @@ import 'package:doko_react/features/authentication/presentation/screens/confirm_
 import 'package:doko_react/features/authentication/presentation/screens/password_reset_page.dart';
 import 'package:doko_react/features/authentication/presentation/screens/signup_page.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,6 +20,9 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  var _emailController = TextEditingController();
+  var _passwordController = TextEditingController();
+
   String _email = "";
   String _password = "";
   bool _loading = false;
@@ -70,6 +76,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   TextFormField(
+                    controller: _emailController,
                     enabled: !_loading,
                     validator: (value) {
                       InputStatus status = ValidateInput.validateEmail(value);
@@ -91,6 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 30),
                   TextFormField(
+                    controller: _passwordController,
                     enabled: !_loading,
                     obscureText: true,
                     validator: (value) {
@@ -169,12 +177,32 @@ class _LoginPageState extends State<LoginPage> {
                       recognizer: TapGestureRecognizer()
                         ..onTap = _loading
                             ? null
-                            : () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SignupPage()));
+                            : () async {
+                                final Map<String, String>? result =
+                                    await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const SignupPage()));
+
+                                if (!context.mounted) return;
+                                if (result == null) {
+                                  return;
+                                }
+
+                                setState(() {
+                                  _emailController.text = result["email"]!;
+                                  _passwordController.text =
+                                      result["password"]!;
+                                });
+
+                                ScaffoldMessenger.of(context)
+                                  ..removeCurrentSnackBar()
+                                  ..showSnackBar(SnackBar(
+                                      content: Text(
+                                    result["message"]!,
+                                    textAlign: TextAlign.center,
+                                  )));
                               })
                 ],
               )),

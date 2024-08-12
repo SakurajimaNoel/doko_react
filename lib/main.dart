@@ -68,10 +68,24 @@ class _MyAppState extends State<MyApp> {
         case AuthHubEventType.sessionExpired:
           _authProvider.setAuthStatus(AuthenticationStatus.signedOut);
           // snack bar with message user needs to login again
+          ScaffoldMessenger.of(context)
+            ..removeCurrentSnackBar()
+            ..showSnackBar(const SnackBar(
+                content: Text(
+              "Your session has expired. Please log in again.",
+              textAlign: TextAlign.center,
+            )));
           break;
         case AuthHubEventType.userDeleted:
           _authProvider.setAuthStatus(AuthenticationStatus.signedOut);
           // snack bar with message user is deleted
+          ScaffoldMessenger.of(context)
+            ..removeCurrentSnackBar()
+            ..showSnackBar(const SnackBar(
+                content: Text(
+              "The user account you are trying to access no longer exists.",
+              textAlign: TextAlign.center,
+            )));
           break;
       }
     });
