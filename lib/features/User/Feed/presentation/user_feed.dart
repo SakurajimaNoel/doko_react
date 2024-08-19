@@ -1,4 +1,5 @@
 import 'package:doko_react/features/authentication/data/auth.dart';
+import 'package:doko_react/features/authentication/presentation/screens/mfa_setup_page.dart';
 import 'package:flutter/material.dart';
 
 class UserFeedPage extends StatefulWidget {
@@ -17,6 +18,14 @@ class _UserFeedPageState extends State<UserFeedPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text("user feed!"),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const MfaSetupPage()));
+                },
+                child: const Text("Setup mfa")),
             ElevatedButton(
                 onPressed: () {
                   AuthenticationActions.signOutUser();

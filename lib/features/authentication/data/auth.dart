@@ -6,8 +6,9 @@ enum AuthStatus { done, confirmMFA, error }
 class AuthenticationResult {
   final AuthStatus status;
   final String? message;
+  final Uri? url;
 
-  AuthenticationResult({required this.status, this.message});
+  AuthenticationResult({required this.status, this.message, this.url});
 }
 
 class AuthenticationActions {
@@ -113,6 +114,34 @@ class AuthenticationActions {
                 "Your account is not verified. Please verify it to proceed.");
       default:
         return AuthenticationResult(status: AuthStatus.done);
+    }
+  }
+
+  static Future<AuthenticationResult> setupMfa() async {
+    try {
+      final userAttributes = await Amplify.Auth.fetchUserAttributes();
+      var email = userAttributes.firstWhere(
+          (attribute) =>
+              attribute.userAttributeKey == CognitoUserAttributeKey.email,
+          orElse: () => const AuthUserAttribute(
+              userAttributeKey: CognitoUserAttributeKey.email, value: "dokii"));
+
+      final totpSetupDetails = await Amplify.Auth.setUpTotp();
+      final setupUri = totpSetupDetails.getSetupUri(
+          appName: 'Doki', accountName: email.value);
+      safePrint('Open URI to complete setup: $setupUri');
+      safePrint(totpSetupDetails.sharedSecret);
+
+      return AuthenticationResult(
+          status: AuthStatus.done,
+          url: setupUri,
+          message: totpSetupDetails.sharedSecret);
+    } on AuthException catch (e) {
+      return AuthenticationResult(status: AuthStatus.error, message: e.message);
+    } catch (e) {
+      safePrint(e);
+      return AuthenticationResult(
+          status: AuthStatus.error, message: "Oops! Something went wrong.");
     }
   }
 }
