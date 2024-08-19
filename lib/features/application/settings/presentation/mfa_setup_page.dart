@@ -1,11 +1,14 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/helpers/display.dart';
+import 'package:doko_react/features/application/settings/presentation/verify_mfa_page.dart';
 import 'package:doko_react/features/application/settings/widgets/settings_heading.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../../authentication/presentation/widgets/error_widget.dart';
 
 class MfaSetupPage extends StatefulWidget {
   const MfaSetupPage({super.key});
@@ -84,11 +87,8 @@ class _MfaSetupPageState extends State<MfaSetupPage> {
           : _errorMessage.isNotEmpty
               ? Center(
                   // Centering the CircularProgressIndicator
-                  child: SettingsHeading(
-                  _errorMessage,
-                  fontWeight: FontWeight.w500,
-                  color: currTheme.error,
-                ))
+                  child: ErrorText(_errorMessage),
+                )
               : Padding(
                   padding: const EdgeInsets.all(_padding),
                   child: Column(
@@ -154,7 +154,13 @@ class _MfaSetupPageState extends State<MfaSetupPage> {
                           height: 30,
                         ),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const VerifyMfaPage()));
+                          },
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 24),
                             backgroundColor: currTheme.primary,
