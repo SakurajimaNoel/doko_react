@@ -96,8 +96,6 @@ class _MyAppState extends State<MyApp> {
       final result = await Amplify.Auth.fetchAuthSession();
       safePrint('User is signed in: ${result.isSignedIn}');
 
-
-
       AuthenticationStatus status = result.isSignedIn
           ? AuthenticationStatus.signedIn
           : AuthenticationStatus.signedOut;

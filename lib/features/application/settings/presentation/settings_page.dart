@@ -3,6 +3,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/features/application/settings/widgets/theme_widget.dart';
 import 'package:doko_react/features/application/settings/widgets/settings_heading.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
+import 'package:doko_react/features/application/settings/presentation/mfa_setup_page.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -108,7 +109,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   TextButton(
                     style: const ButtonStyle(
                         padding: WidgetStatePropertyAll(EdgeInsets.zero)),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const MfaSetupPage()));
+                    },
                     child: const Text(
                       "Setup MFA",
                     ),
