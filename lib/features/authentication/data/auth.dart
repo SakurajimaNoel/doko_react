@@ -129,13 +129,31 @@ class AuthenticationActions {
       final totpSetupDetails = await Amplify.Auth.setUpTotp();
       final setupUri = totpSetupDetails.getSetupUri(
           appName: 'Doki', accountName: email.value);
-      safePrint('Open URI to complete setup: $setupUri');
-      safePrint(totpSetupDetails.sharedSecret);
 
       return AuthenticationResult(
           status: AuthStatus.done,
           url: setupUri,
           message: totpSetupDetails.sharedSecret);
+    } on AuthException catch (e) {
+      return AuthenticationResult(status: AuthStatus.error, message: e.message);
+    } catch (e) {
+      safePrint(e);
+      return AuthenticationResult(
+          status: AuthStatus.error, message: "Oops! Something went wrong.");
+    }
+  }
+
+  static Future<AuthenticationResult> verifyMfaSetup(String code) async {
+    try {
+      await Amplify.Auth.verifyTotpSetup(code);
+      final cognitoPlugin =
+          Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
+
+      await cognitoPlugin.updateMfaPreference(
+        totp: MfaPreference.preferred,
+      );
+
+      return AuthenticationResult(status: AuthStatus.done);
     } on AuthException catch (e) {
       return AuthenticationResult(status: AuthStatus.error, message: e.message);
     } catch (e) {
