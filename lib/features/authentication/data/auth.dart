@@ -144,4 +144,12 @@ class AuthenticationActions {
           status: AuthStatus.error, message: "Oops! Something went wrong.");
     }
   }
+
+  static Future<void> removeMFA() async {
+    final cognitoPlugin = Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
+
+    await cognitoPlugin.updateMfaPreference(
+      totp: MfaPreference.disabled,
+    );
+  }
 }

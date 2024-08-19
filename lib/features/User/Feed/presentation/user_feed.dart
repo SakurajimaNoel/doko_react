@@ -1,6 +1,5 @@
 import 'package:doko_react/features/application/settings/presentation/settings_page.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
-import 'package:doko_react/features/authentication/presentation/screens/mfa_setup_page.dart';
 import 'package:flutter/material.dart';
 
 class UserFeedPage extends StatefulWidget {

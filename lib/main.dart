@@ -96,11 +96,7 @@ class _MyAppState extends State<MyApp> {
       final result = await Amplify.Auth.fetchAuthSession();
       safePrint('User is signed in: ${result.isSignedIn}');
 
-      final cognitoPlugin =
-          Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
-      final currentPreference = await cognitoPlugin.fetchMfaPreference();
-      safePrint('Enabled MFA types for user: ${currentPreference.enabled}');
-      safePrint('Preferred MFA type for user: ${currentPreference.preferred}');
+
 
       AuthenticationStatus status = result.isSignedIn
           ? AuthenticationStatus.signedIn
