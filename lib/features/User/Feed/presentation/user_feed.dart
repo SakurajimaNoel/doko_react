@@ -10,28 +10,45 @@ class UserFeedPage extends StatefulWidget {
 }
 
 class _UserFeedPageState extends State<UserFeedPage> {
+  static const double _padding = 16;
+
   @override
   Widget build(BuildContext context) {
+    ColorScheme currScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("user feed!"),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const MfaSetupPage()));
-                },
-                child: const Text("Setup mfa")),
-            ElevatedButton(
-                onPressed: () {
-                  AuthenticationActions.signOutUser();
-                },
-                child: const Text("Sign out"))
-          ],
+      appBar: AppBar(
+        title: const Text("Dokii"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const MfaSetupPage()));
+            },
+            icon: const Icon(Icons.settings),
+            tooltip: "Settings",
+          ),
+          TextButton(
+              onPressed: () {
+                AuthenticationActions.signOutUser();
+              },
+              child: Text(
+                "Sign out",
+                style: TextStyle(color: currScheme.error),
+              ))
+        ],
+      ),
+      body: const SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(left: _padding, right: _padding, bottom: _padding),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text("user feed!"),
+            ],
+          ),
         ),
       ),
     );
