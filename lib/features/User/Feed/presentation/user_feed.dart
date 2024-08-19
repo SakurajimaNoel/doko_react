@@ -1,3 +1,4 @@
+import 'package:doko_react/features/application/settings/presentation/settings_page.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
 import 'package:doko_react/features/authentication/presentation/screens/mfa_setup_page.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const MfaSetupPage()));
+                      builder: (context) => const SettingsPage()));
             },
             icon: const Icon(Icons.settings),
             tooltip: "Settings",

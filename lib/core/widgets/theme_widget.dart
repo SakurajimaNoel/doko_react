@@ -3,34 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ThemeWidget extends StatelessWidget {
-  const ThemeWidget({
-    super.key,
-  });
+  const ThemeWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     final themeProviderModel = Provider.of<ThemeProvider>(context);
     UserTheme userThemeView = themeProviderModel.themeMode;
 
-    String themeText;
-    switch (userThemeView) {
-      case UserTheme.light:
-        themeText = "Light";
-        break;
-      case UserTheme.dark:
-        themeText = "Dark";
-        break;
-      default:
-        themeText = "System Default";
-    }
-    return SafeArea(
-      child: Column(
-        children: [
-          Text("Theme: $themeText"),
-          const SizedBox(
-            height: 20,
-          ),
-          SegmentedButton<UserTheme>(
+    return Row(
+      children: [
+        Expanded(
+          child: SegmentedButton<UserTheme>(
             segments: const <ButtonSegment<UserTheme>>[
               ButtonSegment<UserTheme>(
                   value: UserTheme.light,
@@ -49,9 +32,9 @@ class ThemeWidget extends StatelessWidget {
             onSelectionChanged: (Set<UserTheme> newSelection) {
               themeProviderModel.toggleTheme(newSelection.first);
             },
-          )
-        ],
-      ),
+          ),
+        ),
+      ],
     );
   }
 }
