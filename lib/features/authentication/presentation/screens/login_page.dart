@@ -12,9 +12,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/provider/authentication_provider.dart';
 
 class LoginPage extends StatefulWidget {
-  final String? data;
-
-  const LoginPage({super.key, this.data});
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -29,7 +27,6 @@ class _LoginPageState extends State<LoginPage> {
   String _password = "";
   bool _loading = false;
   String _errorMessage = "";
-  String _message = "";
 
   void _submit() async {
     final isValid = _formKey.currentState?.validate() ?? false;
@@ -41,7 +38,6 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _loading = true;
       _errorMessage = "";
-      _message = "";
     });
 
     var loginStatus = await AuthenticationActions.signInUser(_email, _password);
@@ -73,13 +69,6 @@ class _LoginPageState extends State<LoginPage> {
   void _handleMfa() {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => const ConfirmMfaPage()));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    String? message = widget.data;
-    _message = message ?? "";
   }
 
   @override
@@ -169,13 +158,6 @@ class _LoginPageState extends State<LoginPage> {
                   if (_errorMessage.isNotEmpty) ...[
                     const SizedBox(height: 10),
                     ErrorText(_errorMessage),
-                  ],
-                  if (_message.isNotEmpty) ...[
-                    const SizedBox(height: 10),
-                    ErrorText(
-                      _message,
-                      color: currTheme.primary,
-                    ),
                   ],
                 ],
               ),

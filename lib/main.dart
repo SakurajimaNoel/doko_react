@@ -5,6 +5,7 @@ import 'package:doko_react/core/provider/authentication_provider.dart';
 import 'package:doko_react/core/provider/theme_provider.dart';
 import 'package:doko_react/core/theme/theme_data.dart';
 import 'package:doko_react/features/User/Feed/presentation/user_feed.dart';
+import 'package:doko_react/features/application/router/authenticated_routes.dart';
 import 'package:doko_react/features/authentication/presentation/screens/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -60,9 +61,11 @@ class _MyAppState extends State<MyApp> {
     Amplify.Hub.listen(HubChannel.Auth, (AuthHubEvent event) {
       switch (event.type) {
         case AuthHubEventType.signedIn:
+          safePrint("sign in");
           _authProvider.setAuthStatus(AuthenticationStatus.signedIn);
           break;
         case AuthHubEventType.signedOut:
+          safePrint("sign out");
           _authProvider.setAuthStatus(AuthenticationStatus.signedOut);
           break;
         case AuthHubEventType.sessionExpired:
@@ -132,18 +135,20 @@ class _MyAppState extends State<MyApp> {
         home = const Loader();
         break;
       case AuthenticationStatus.signedIn:
-        home = const UserFeedPage();
+        // home = const UserFeedPage();
+        home = const AuthenticatedRoutes();
         break;
       default:
         home = const LoginPage();
     }
 
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Dokii',
-        themeMode: themeMode,
-        theme: GlobalThemeData.lightThemeData,
-        darkTheme: GlobalThemeData.darkThemeData,
-        home: home);
+      debugShowCheckedModeBanner: false,
+      title: 'Dokii',
+      themeMode: themeMode,
+      theme: GlobalThemeData.lightThemeData,
+      darkTheme: GlobalThemeData.darkThemeData,
+      home: home,
+    );
   }
 }

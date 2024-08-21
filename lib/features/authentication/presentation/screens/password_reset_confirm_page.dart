@@ -57,14 +57,25 @@ class _PasswordResetConfirmPage extends State<PasswordResetConfirmPage> {
   }
 
   void _handlePasswordResetSuccess() {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-          builder: (context) => const LoginPage(
-              data:
-                  "Password reset successful. You can now login using new password.")),
-      (Route<dynamic> route) => false,
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+            'Password reset successful. You can now login using new password.'),
+        duration: Duration(milliseconds: 500), // Duration for the Snackbar
+      ),
     );
+
+    // Delay the navigation
+    Future.delayed(const Duration(milliseconds: 500), () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ),
+        (route) => false, // Remove all previous routes
+      );
+    });
+
   }
 
   @override
