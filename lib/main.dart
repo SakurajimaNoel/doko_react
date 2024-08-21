@@ -4,7 +4,7 @@ import 'package:doko_react/aws/amplifyconfiguration.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
 import 'package:doko_react/core/provider/theme_provider.dart';
 import 'package:doko_react/core/theme/theme_data.dart';
-import 'package:doko_react/features/User/Feed/presentation/user_feed.dart';
+import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/application/router/authenticated_routes.dart';
 import 'package:doko_react/features/authentication/presentation/screens/login_page.dart';
 import 'package:flutter/material.dart';

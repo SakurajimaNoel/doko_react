@@ -1,4 +1,4 @@
-import 'package:doko_react/features/User/Feed/presentation/user_feed.dart';
+import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

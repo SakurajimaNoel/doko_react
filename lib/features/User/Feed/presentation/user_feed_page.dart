@@ -19,30 +19,11 @@ class _UserFeedPageState extends State<UserFeedPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Dokii"),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SettingsPage()));
-            },
-            icon: const Icon(Icons.settings),
-            tooltip: "Settings",
-          ),
-          TextButton(
-              onPressed: () {
-                AuthenticationActions.signOutUser();
-              },
-              child: Text(
-                "Sign out",
-                style: TextStyle(color: currScheme.error),
-              ))
-        ],
       ),
       body: const SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(left: _padding, right: _padding, bottom: _padding),
+          padding: EdgeInsets.only(
+              left: _padding, right: _padding, bottom: _padding),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
