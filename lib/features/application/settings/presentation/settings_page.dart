@@ -33,6 +33,31 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
+  void _handleRemoveMFA() async {
+    setState(() {
+      _removing = true;
+    });
+
+    await AuthenticationActions.removeMFA();
+
+    setState(() {
+      _removing = false;
+    });
+
+    _showMessage("Successfully removed MFA for this account!");
+    _fetchMfaStatus();
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration:
+            const Duration(milliseconds: 300), // Duration for the Snackbar
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var currScheme = Theme.of(context).colorScheme;
@@ -74,20 +99,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   TextButton(
                     style: const ButtonStyle(
                         padding: WidgetStatePropertyAll(EdgeInsets.zero)),
-                    onPressed: _removing
-                        ? null
-                        : () {
-                            setState(() {
-                              _removing = true;
-                            });
-
-                            AuthenticationActions.removeMFA();
-
-                            setState(() {
-                              _removing = false;
-                            });
-                            _fetchMfaStatus();
-                          },
+                    onPressed: _removing ? null : _handleRemoveMFA,
                     child: _removing
                         ? SizedBox(
                             height: 15,
