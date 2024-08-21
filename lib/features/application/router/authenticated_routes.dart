@@ -1,8 +1,6 @@
 import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/User/Nearby/presentation/nearby_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/profile_page.dart';
-import 'package:doko_react/features/authentication/presentation/screens/login_page.dart';
-import 'package:doko_react/features/authentication/presentation/screens/signup_page.dart';
 import 'package:flutter/material.dart';
 
 class AuthenticatedRoutes extends StatefulWidget {
