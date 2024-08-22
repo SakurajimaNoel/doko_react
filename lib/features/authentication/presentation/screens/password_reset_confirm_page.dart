@@ -1,7 +1,8 @@
-import 'package:doko_react/features/authentication/presentation/screens/login_page.dart';
+import 'package:doko_react/core/router/router_constants.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/helpers/input.dart';
 import '../../data/auth.dart';
@@ -66,16 +67,12 @@ class _PasswordResetConfirmPage extends State<PasswordResetConfirmPage> {
     );
 
     // Delay the navigation
-    Future.delayed(const Duration(milliseconds: 500), () {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const LoginPage(),
-        ),
-        (route) => false, // Remove all previous routes
-      );
-    });
-
+    Future.delayed(
+      const Duration(milliseconds: 500),
+      () {
+        context.goNamed(RouterConstants.login);
+      },
+    );
   }
 
   @override

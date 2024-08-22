@@ -1,8 +1,8 @@
 import 'package:doko_react/core/helpers/input.dart';
-import 'package:doko_react/features/authentication/data/auth.dart';
-import 'package:doko_react/features/authentication/presentation/screens/password_reset_confirm_page.dart';
-import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
+import 'package:doko_react/core/router/router_constants.dart';
+import 'package:doko_react/features/authentication/data/auth.dart';import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../widgets/error_widget.dart';
 
@@ -44,10 +44,10 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
   }
 
   void _handleResetCode() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => PasswordResetConfirmPage(email: _email)));
+   context.goNamed(
+      RouterConstants.passwordResetConfirm,
+      pathParameters: {"email": _email},
+    );
   }
 
   @override

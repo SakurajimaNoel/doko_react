@@ -1,15 +1,11 @@
 import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/core/router/router_constants.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/error_widget.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
-import 'package:doko_react/features/authentication/presentation/screens/confirm_mfa_page.dart';
-import 'package:doko_react/features/authentication/presentation/screens/password_reset_page.dart';
-import 'package:doko_react/features/authentication/presentation/screens/signup_page.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../../../core/provider/authentication_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,8 +16,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
 
   String _email = "";
   String _password = "";
@@ -53,22 +47,10 @@ class _LoginPageState extends State<LoginPage> {
       _handleMfa();
       return;
     }
-
-    if (loginStatus.status == AuthStatus.done) {
-      _handleSuccess();
-    }
-  }
-
-  void _handleSuccess() {
-    AuthenticationProvider authProvider =
-        Provider.of<AuthenticationProvider>(context, listen: false);
-
-    authProvider.setAuthStatus(AuthenticationStatus.signedIn);
   }
 
   void _handleMfa() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const ConfirmMfaPage()));
+    context.goNamed(RouterConstants.mfa);
   }
 
   @override
@@ -90,7 +72,6 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   TextFormField(
-                    controller: _emailController,
                     enabled: !_loading,
                     validator: (value) {
                       InputStatus status = ValidateInput.validateEmail(value);
@@ -112,7 +93,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 30),
                   TextFormField(
-                    controller: _passwordController,
                     enabled: !_loading,
                     obscureText: true,
                     validator: (value) {
@@ -167,10 +147,7 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: _loading
                   ? null
                   : () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const PasswordResetPage()));
+                      context.goNamed(RouterConstants.passwordReset);
                     },
               style: TextButton.styleFrom(foregroundColor: currTheme.secondary),
               child: const Text("Forgot Password?"),
@@ -192,31 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                         ..onTap = _loading
                             ? null
                             : () async {
-                                final Map<String, String>? result =
-                                    await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const SignupPage()));
-
-                                if (!context.mounted) return;
-                                if (result == null) {
-                                  return;
-                                }
-
-                                setState(() {
-                                  _emailController.text = result["email"]!;
-                                  _passwordController.text =
-                                      result["password"]!;
-                                });
-
-                                ScaffoldMessenger.of(context)
-                                  ..removeCurrentSnackBar()
-                                  ..showSnackBar(SnackBar(
-                                      content: Text(
-                                    result["message"]!,
-                                    textAlign: TextAlign.center,
-                                  )));
+                                context.goNamed(RouterConstants.signUp);
                               })
                 ],
               )),

@@ -1,6 +1,6 @@
+import 'package:doko_react/core/router/router_constants.dart';
 import 'package:flutter/material.dart';
-
-import '../../../application/settings/presentation/settings_page.dart';
+import 'package:go_router/go_router.dart';
 import '../../../authentication/data/auth.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -23,10 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SettingsPage()));
+              context.goNamed(RouterConstants.settings);
             },
             icon: const Icon(Icons.settings),
             tooltip: "Settings",

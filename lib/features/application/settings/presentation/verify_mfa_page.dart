@@ -1,6 +1,7 @@
-import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
+import 'package:doko_react/core/router/router_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/helpers/input.dart';
 import '../../../authentication/data/auth.dart';
@@ -56,15 +57,17 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
     );
 
     // Delay the navigation
-    Future.delayed(const Duration(milliseconds: 500), () {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const UserFeedPage(),
-        ),
-        (route) => false, // Remove all previous routes
-      );
-    });
+    Future.delayed(
+      const Duration(milliseconds: 500),
+      () {
+        context.goNamed(
+          RouterConstants.settings,
+          extra: {
+            "clearStack": true,
+          },
+        );
+      },
+    );
   }
 
   @override

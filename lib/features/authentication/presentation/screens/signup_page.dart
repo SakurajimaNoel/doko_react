@@ -1,8 +1,10 @@
 import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/core/router/router_constants.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../widgets/error_widget.dart';
 
@@ -50,15 +52,17 @@ class _SignupPageState extends State<SignupPage> {
   void _handleSuccess() {
     String message =
         "Account created successfully. Please verify your email to log in.";
-    String email = _email;
-    String password = _password;
 
-    var successInfo = {
-      "email": email,
-      "password": password,
-      "message": message,
-    };
-    Navigator.pop(context, successInfo);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration:
+            const Duration(milliseconds: 500), // Duration for the Snackbar
+      ),
+    );
+    _formKey.currentState?.reset();
+
+    context.goNamed(RouterConstants.login);
   }
 
   @override
@@ -195,7 +199,7 @@ class _SignupPageState extends State<SignupPage> {
                           fontWeight: FontWeight.w500),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Navigator.pop(context);
+                          context.goNamed(RouterConstants.login);
                         })
                 ],
               )),

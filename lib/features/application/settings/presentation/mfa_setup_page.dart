@@ -1,10 +1,11 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/helpers/display.dart';
-import 'package:doko_react/features/application/settings/presentation/verify_mfa_page.dart';
+import 'package:doko_react/core/router/router_constants.dart';
 import 'package:doko_react/features/application/settings/widgets/settings_heading.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -155,11 +156,7 @@ class _MfaSetupPageState extends State<MfaSetupPage> {
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const VerifyMfaPage()));
+                            context.goNamed(RouterConstants.verifyMfa);
                           },
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 24),
