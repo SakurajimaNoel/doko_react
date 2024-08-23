@@ -45,8 +45,6 @@ class _AccentWidgetState extends State<AccentWidget> {
     );
   }
 
-
-
   Future<void> _openColorPicker() async {
     final selectedColor = await showDialog<Color>(
       context: context,
@@ -62,6 +60,7 @@ class _AccentWidgetState extends State<AccentWidget> {
                 setState(() {
                   _tempColor = newColor;
                 });
+                _themeProvider.changeAccent(newColor);
               },
               borderRadius: 20,
               spacing: 10,
@@ -99,6 +98,8 @@ class _AccentWidgetState extends State<AccentWidget> {
         _currentColor = selectedColor;
       });
       _themeProvider.changeAccent(selectedColor);
+    } else {
+      _themeProvider.changeAccent(_currentColor);
     }
   }
 }
