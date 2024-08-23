@@ -10,7 +10,7 @@ class ThemeProvider extends ChangeNotifier {
   static const String _colorPrefKey = "color";
 
   UserTheme _themeMode = UserTheme.system;
-  Color _accentColor = Colors.green;
+  Color _accentColor = Colors.red;
 
   UserTheme get themeMode => _themeMode;
 
@@ -23,10 +23,10 @@ class ThemeProvider extends ChangeNotifier {
   void _loadTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String storedTheme =
-        prefs.getString(_themePrefKey) ?? UserTheme.system.toString();
+        prefs.getString(_themePrefKey) ?? _themeMode.toString();
     _themeMode = EnumHelpers.stringToEnum(storedTheme, UserTheme.values);
 
-    int storedAccent = prefs.getInt(_colorPrefKey) ?? Colors.green.value;
+    int storedAccent = prefs.getInt(_colorPrefKey) ?? _accentColor.value;
     _accentColor = Color(storedAccent);
     notifyListeners();
   }

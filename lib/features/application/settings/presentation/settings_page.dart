@@ -1,5 +1,6 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/provider/mfa_status_provider.dart';
+import 'package:doko_react/features/application/settings/widgets/accent_widget.dart';
 import 'package:doko_react/features/application/settings/widgets/theme_widget.dart';
 import 'package:doko_react/features/application/settings/widgets/settings_heading.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
@@ -54,7 +55,20 @@ class ThemeSettings extends StatelessWidget {
       children: [
         SettingsHeading("Theme Settings"),
         SizedBox(height: 8),
+        SettingsHeading(
+          "Application Mode",
+          size: 16,
+          fontWeight: FontWeight.w500,
+        ),
         ThemeWidget(),
+        SizedBox(height: 8),
+        SettingsHeading(
+          "Application Accent",
+          size: 16,
+          fontWeight: FontWeight.w500,
+        ),
+        SizedBox(height: 8),
+        AccentWidget(),
       ],
     );
   }
