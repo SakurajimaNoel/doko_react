@@ -16,9 +16,32 @@ class GlobalThemeData {
   static final Color _lightFocusColor = Colors.black.withOpacity(0.12);
   static final Color _darkFocusColor = Colors.white.withOpacity(0.12);
 
-  static ThemeData lightThemeData =
-  themeData(light, _lightFocusColor);
-  static ThemeData darkThemeData = themeData(dark, _darkFocusColor);
+  // fixed color
+  static ThemeData lightThemeData = themeData(_light, _lightFocusColor);
+  static ThemeData darkThemeData = themeData(_dark, _darkFocusColor);
+
+  static final ColorScheme _light = ColorScheme.fromSeed(
+      seedColor: Colors.green, brightness: Brightness.light);
+
+  static final ColorScheme _dark = ColorScheme.fromSeed(
+      seedColor: Colors.green, brightness: Brightness.dark);
+
+  // custom color
+  static ThemeData lightCustomThemeData(Color color) {
+    return themeData(_lightCustom(color), _lightFocusColor);
+  }
+
+  static ThemeData darkCustomThemeData(Color color) {
+    return themeData(_darkCustom(color), _darkFocusColor);
+  }
+
+  static ColorScheme _lightCustom(Color color) {
+    return ColorScheme.fromSeed(seedColor: color, brightness: Brightness.light);
+  }
+
+  static ColorScheme _darkCustom(Color color) {
+    return ColorScheme.fromSeed(seedColor: color, brightness: Brightness.dark);
+  }
 
   static const ColorScheme lightColorScheme = ColorScheme(
     primary: Color.fromRGBO(211, 85, 165, 1),
@@ -43,10 +66,4 @@ class GlobalThemeData {
     onSurface: Color.fromRGBO(241, 214, 245, 1),
     brightness: Brightness.dark,
   );
-
-  static ColorScheme light = ColorScheme.fromSeed(
-      seedColor: Colors.green, brightness: Brightness.light);
-
-  static ColorScheme dark = ColorScheme.fromSeed(
-      seedColor: Colors.green, brightness: Brightness.dark);
 }
