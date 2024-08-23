@@ -10,7 +10,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
@@ -90,16 +89,20 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _changeAuthStatus(AuthenticationStatus status) {
-    _authProvider.setAuthStatus(status, context);
+    _authProvider.setAuthStatus(status);
+
+    // if (status == AuthenticationStatus.signedIn) {
+    //   GoRouter.of(context).goNamed(RouterConstants.userFeed);
+    // } else if (status == AuthenticationStatus.signedOut) {
+    //   GoRouter.of(context).goNamed(RouterConstants.login);
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context);
-    final authProvider = Provider.of<AuthenticationProvider>(context);
 
     ThemeMode themeMode;
-
     switch (theme.themeMode) {
       case UserTheme.light:
         themeMode = ThemeMode.light;
@@ -111,22 +114,26 @@ class _MyAppState extends State<MyApp> {
         themeMode = ThemeMode.system;
     }
 
-    GoRouter router;
-    if (authProvider.authStatus == AuthenticationStatus.loading) {
-      router = loadingConfig;
-    } else if (authProvider.authStatus == AuthenticationStatus.signedIn) {
-      router = homeRouterConfig;
-    } else {
-      router = authRouterConfig;
-    }
+    return Consumer<AuthenticationProvider>(
+      builder: (context, authProvider, child) {
+        GoRouter router;
+        if (authProvider.authStatus == AuthenticationStatus.loading) {
+          router = loadingConfig;
+        } else if (authProvider.authStatus == AuthenticationStatus.signedIn) {
+          router = homeRouterConfig;
+        } else {
+          router = authRouterConfig;
+        }
 
-    return MaterialApp.router(
-      routerConfig: router,
-      debugShowCheckedModeBanner: false,
-      title: 'Dokii',
-      themeMode: themeMode,
-      theme: GlobalThemeData.lightThemeData,
-      darkTheme: GlobalThemeData.darkThemeData,
+        return MaterialApp.router(
+          routerConfig: router,
+          debugShowCheckedModeBanner: false,
+          title: 'Dokii',
+          themeMode: themeMode,
+          theme: GlobalThemeData.lightThemeData,
+          darkTheme: GlobalThemeData.darkThemeData,
+        );
+      },
     );
   }
 }
