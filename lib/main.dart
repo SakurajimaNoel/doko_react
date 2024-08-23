@@ -3,7 +3,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/aws/amplifyconfiguration.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
 import 'package:doko_react/core/provider/theme_provider.dart';
-import 'package:doko_react/core/router/router_config.dart';
+import 'package:doko_react/core/configs/router/router_config.dart';
 import 'package:doko_react/core/theme/theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

@@ -1,4 +1,4 @@
-import 'package:doko_react/core/router/router_constants.dart';
+import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/widgets/loader.dart';
 import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/User/Nearby/presentation/nearby_page.dart';

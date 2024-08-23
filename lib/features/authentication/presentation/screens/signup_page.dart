@@ -1,5 +1,5 @@
 import 'package:doko_react/core/helpers/input.dart';
-import 'package:doko_react/core/router/router_constants.dart';
+import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/gestures.dart';
