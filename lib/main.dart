@@ -122,20 +122,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context);
-
-    ThemeMode themeMode;
-    switch (theme.themeMode) {
-      case UserTheme.light:
-        themeMode = ThemeMode.light;
-        break;
-      case UserTheme.dark:
-        themeMode = ThemeMode.dark;
-        break;
-      default:
-        themeMode = ThemeMode.system;
-    }
-
     return Consumer<AuthenticationProvider>(
       builder: (context, authProvider, child) {
         GoRouter router;
@@ -147,13 +133,30 @@ class _MyAppState extends State<MyApp> {
           router = AppRouterConfig.authConfig();
         }
 
-        return MaterialApp.router(
-          routerConfig: router,
-          debugShowCheckedModeBanner: false,
-          title: 'Dokii',
-          themeMode: themeMode,
-          theme: GlobalThemeData.lightThemeData,
-          darkTheme: GlobalThemeData.darkThemeData,
+        return Consumer<ThemeProvider>(
+          builder: (context, theme, child) {
+            ThemeMode themeMode;
+            Color accent = theme.accent;
+            switch (theme.themeMode) {
+              case UserTheme.light:
+                themeMode = ThemeMode.light;
+                break;
+              case UserTheme.dark:
+                themeMode = ThemeMode.dark;
+                break;
+              default:
+                themeMode = ThemeMode.system;
+            }
+
+            return MaterialApp.router(
+              routerConfig: router,
+              debugShowCheckedModeBanner: false,
+              title: 'Dokii',
+              themeMode: themeMode,
+              theme: GlobalThemeData.lightCustomThemeData(accent),
+              darkTheme: GlobalThemeData.darkCustomThemeData(accent),
+            );
+          },
         );
       },
     );
