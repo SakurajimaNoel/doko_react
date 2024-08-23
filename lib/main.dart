@@ -2,6 +2,7 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/aws/amplifyconfiguration.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
+import 'package:doko_react/core/provider/mfa_status_provider.dart';
 import 'package:doko_react/core/provider/theme_provider.dart';
 import 'package:doko_react/core/configs/router/app_router_config.dart';
 import 'package:doko_react/core/theme/theme_data.dart';
@@ -22,7 +23,10 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (context) => AuthenticationProvider(),
-      )
+      ),
+      ChangeNotifierProvider(
+        create: (context) => AuthenticationMFAProvider(),
+      ),
     ], child: const MyApp()));
   } on AmplifyException catch (e) {
     runApp(Text("Error configuring Amplify: ${e.message}"));
@@ -48,11 +52,14 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late final AuthenticationProvider _authProvider;
+  late final AuthenticationMFAProvider _authMFAProvider;
 
   @override
   void initState() {
     super.initState();
     _authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
+    _authMFAProvider =
+        Provider.of<AuthenticationMFAProvider>(context, listen: false);
 
     fetchAuthSession();
     Amplify.Hub.listen(HubChannel.Auth, (AuthHubEvent event) {
@@ -88,8 +95,23 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  void fetchMfaStatus() async {
+    final cognitoPlugin = Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
+    final currentPreference = await cognitoPlugin.fetchMfaPreference();
+
+    AuthenticationMFAStatus mfaStatus = currentPreference.preferred != null
+        ? AuthenticationMFAStatus.setUpped
+        : AuthenticationMFAStatus.notSetUpped;
+    _authMFAProvider.setMFAStatus(mfaStatus);
+  }
+
   void _changeAuthStatus(AuthenticationStatus status) {
     _authProvider.setAuthStatus(status);
+    if (status == AuthenticationStatus.signedIn) {
+      fetchMfaStatus();
+    } else {
+      _authMFAProvider.setMFAStatus(AuthenticationMFAStatus.undefined);
+    }
 
     // if (status == AuthenticationStatus.signedIn) {
     //   GoRouter.of(context).goNamed(RouterConstants.userFeed);

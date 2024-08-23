@@ -1,7 +1,9 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/provider/mfa_status_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/helpers/input.dart';
 import '../../../authentication/data/auth.dart';
@@ -20,6 +22,13 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
   String _confirmString = "";
   bool _loading = false;
   String _errorMessage = "";
+  late final AuthenticationMFAProvider _authMFAProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    _authMFAProvider = Provider.of<AuthenticationMFAProvider>(context, listen: false);
+  }
 
   void _submit() async {
     final isValid = _formKey.currentState?.validate();
@@ -48,13 +57,15 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
   }
 
   void _handleSuccess() {
-    // Show the Snackbar
+    // Show the SnackBar
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Successfully added MFA to this account!'),
-        duration: Duration(milliseconds: 500), // Duration for the Snackbar
+        duration: Duration(milliseconds: 500), // Duration for the SnackBar
       ),
     );
+
+    _authMFAProvider.setMFAStatus(AuthenticationMFAStatus.setUpped);
 
     // Delay the navigation
     Future.delayed(
