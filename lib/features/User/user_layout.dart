@@ -1,3 +1,4 @@
+import 'package:doko_react/features/authentication/data/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,6 +12,12 @@ class UserLayout extends StatefulWidget {
 }
 
 class _UserLayoutState extends State<UserLayout> {
+  @override
+  void initState() {
+    super.initState();
+    AuthenticationActions.getAccessToken();
+  }
+
   List<Widget> _getDestinations() {
     ColorScheme currTheme = Theme.of(context).colorScheme;
 
