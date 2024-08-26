@@ -13,7 +13,12 @@
     },
     "categories": {
       "auth": {
-        "dokoreact": {}
+        "dokoreact": {
+          "userPoolId": "ap-south-1_8FDnHEsKB",
+          "userPoolName": "doki_users",
+          "webClientId": "5kl98seknsnmvdg307nhmip21c",
+          "nativeClientId": "5kl98seknsnmvdg307nhmip21c"
+        }
       }
     }
   }
