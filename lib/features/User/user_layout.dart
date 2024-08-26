@@ -44,9 +44,12 @@ class _UserLayoutState extends State<UserLayout> {
 
   @override
   Widget build(BuildContext context) {
+    ColorScheme currTheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: widget.navigationShell,
       bottomNavigationBar: NavigationBar(
+        indicatorColor: currTheme.primary,
         selectedIndex: widget.navigationShell.currentIndex,
         destinations: _getDestinations(),
         onDestinationSelected: _onDestinationSelected,
