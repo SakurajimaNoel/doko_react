@@ -172,6 +172,24 @@ class _UserSettingsState extends State<UserSettings> {
                 ),
               ),
             ],
+            const SizedBox(height: 8),
+            const SettingsHeading(
+              "Update password",
+              size: 16,
+              fontWeight: FontWeight.w500,
+            ),
+            const Text(
+                "Consider changing your password every few months to enhance security."),
+            TextButton(
+              style: const ButtonStyle(
+                  padding: WidgetStatePropertyAll(EdgeInsets.zero)),
+              onPressed: () {
+                context.goNamed(RouterConstants.changePassword);
+              },
+              child: const Text(
+                "Update password",
+              ),
+            ),
           ],
         );
       },

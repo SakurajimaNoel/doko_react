@@ -4,6 +4,7 @@ import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/User/Nearby/presentation/nearby_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/profile_page.dart';
 import 'package:doko_react/features/User/user_layout.dart';
+import 'package:doko_react/features/application/settings/presentation/change_password_page.dart';
 import 'package:doko_react/features/application/settings/presentation/mfa_setup_page.dart';
 import 'package:doko_react/features/application/settings/presentation/settings_page.dart';
 import 'package:doko_react/features/application/settings/presentation/verify_mfa_page.dart';
@@ -139,6 +140,13 @@ class AppRouterConfig {
                                   const VerifyMfaPage(),
                             ),
                           ],
+                        ),
+                        GoRoute(
+                          parentNavigatorKey: homeRouterRootNavigatorKey,
+                          name: RouterConstants.changePassword,
+                          path: "change-password",
+                          builder: (context, state) =>
+                              const ChangePasswordPage(),
                         ),
                       ],
                     ),
