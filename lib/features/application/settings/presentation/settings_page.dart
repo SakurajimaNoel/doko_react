@@ -3,20 +3,10 @@ import 'package:flutter/material.dart';
 import '../widgets/theme_settings.dart';
 import '../widgets/user_settings.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
-  @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
   static const double _padding = 16;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,5 +27,3 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 }
-
-
