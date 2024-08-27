@@ -101,6 +101,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       if (value == null || value.isEmpty) {
                         return "Password can't be empty";
                       }
+                      final RegExp finalPasswordRegex =
+                          RegExp(r"^[\S\+.*[\S]+$");
+                      if (!finalPasswordRegex.hasMatch(value)) {
+                        return "Invalid password entered.";
+                      }
                       return null;
                     },
                     autovalidateMode: AutovalidateMode.onUserInteraction,
