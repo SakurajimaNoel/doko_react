@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/configs/router/router_constants.dart';
+import '../../../../core/data/auth.dart';
 import '../../../../core/provider/mfa_status_provider.dart';
-import '../../../authentication/data/auth.dart';
 
 class UserSettings extends StatefulWidget {
   const UserSettings({super.key});

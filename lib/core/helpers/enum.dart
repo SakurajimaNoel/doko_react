@@ -1,3 +1,5 @@
+enum ResponseStatus { success, error }
+
 class EnumHelpers {
   static String enumToString<T>(T value) {
     return value.toString();

@@ -1,11 +1,13 @@
 import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/error_widget.dart';
-import 'package:doko_react/features/authentication/data/auth.dart';
+
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../../core/data/auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

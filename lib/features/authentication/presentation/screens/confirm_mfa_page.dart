@@ -1,8 +1,9 @@
-import 'package:doko_react/features/authentication/data/auth.dart';
+
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/data/auth.dart';
 import '../../../../core/helpers/input.dart';
 import '../widgets/error_widget.dart';
 

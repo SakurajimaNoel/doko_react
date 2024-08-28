@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/data/auth.dart';
 import '../../../../core/helpers/input.dart';
-import '../../data/auth.dart';
 import '../widgets/error_widget.dart';
 
 class PasswordResetConfirmPage extends StatefulWidget {

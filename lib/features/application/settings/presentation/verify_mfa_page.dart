@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/data/auth.dart';
 import '../../../../core/helpers/input.dart';
-import '../../../authentication/data/auth.dart';
 import '../../../authentication/presentation/widgets/error_widget.dart';
 
 class VerifyMfaPage extends StatefulWidget {

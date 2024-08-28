@@ -1,4 +1,7 @@
+
 import 'package:flutter/material.dart';
+
+import '../../../../core/data/auth.dart';
 
 class CompleteProfilePage extends StatefulWidget {
   const CompleteProfilePage({super.key});
@@ -14,7 +17,11 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
       appBar: AppBar(
         title: const Text("complete profile"),
       ),
-      body: const Text("lol this works"),
+      body: ElevatedButton(
+          onPressed: () {
+            AuthenticationActions.signOutUser();
+          },
+          child: const Text("signout")),
     );
   }
 }

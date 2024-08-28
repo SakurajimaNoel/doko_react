@@ -1,7 +1,11 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../authentication/data/auth.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../core/data/auth.dart';
+
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -19,7 +23,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Profile"),
+        title: Consumer<UserProvider>(
+          builder: (context, user, child) {
+            return Text(user.username);
+          },
+        ),
         actions: [
           IconButton(
             onPressed: () {

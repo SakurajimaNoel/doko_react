@@ -1,6 +1,8 @@
-import 'package:doko_react/features/authentication/data/auth.dart';
+
 import 'package:doko_react/secret/secrets.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+
+import '../../data/auth.dart';
 
 class GraphqlConfig {
   static final _httpLink = HttpLink(Secrets.endpoint);
