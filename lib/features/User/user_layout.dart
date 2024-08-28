@@ -25,6 +25,7 @@ class UserLayout extends StatefulWidget {
 class _UserLayoutState extends State<UserLayout> {
   late final UserProvider _userProvider;
   final UserGraphqlService _graphqlService = UserGraphqlService();
+  String _profile = "";
 
   @override
   void initState() {
@@ -61,6 +62,19 @@ class _UserLayoutState extends State<UserLayout> {
       username: user.username,
       profilePicture: user.profilePicture,
     );
+    _getProfile(user.profilePicture);
+  }
+
+  void _getProfile(String path) async {
+    var result = await StorageActions.getDownloadUrl(path);
+
+    if (result.status == ResponseStatus.success) {
+      if (mounted) {
+        setState(() {
+          _profile = result.value;
+        });
+      }
+    }
   }
 
   @override
@@ -82,10 +96,6 @@ class _UserLayoutState extends State<UserLayout> {
     ColorScheme currTheme = Theme.of(context).colorScheme;
 
     List<Widget> getDestinations() {
-      if (userProvider.status == ProfileStatus.complete) {
-        StorageActions.getDownloadUrl(userProvider.profilePicture);
-      }
-
       return <Widget>[
         NavigationDestination(
           selectedIcon: Icon(
@@ -104,11 +114,25 @@ class _UserLayoutState extends State<UserLayout> {
           label: "Nearby",
         ),
         NavigationDestination(
-          selectedIcon: Icon(
-            Icons.account_circle,
-            color: currTheme.onPrimary,
-          ),
-          icon: const Icon(Icons.account_circle_outlined),
+          enabled: true,
+          selectedIcon: _profile.isEmpty
+              ? Icon(
+                  Icons.account_circle,
+                  color: currTheme.onPrimary,
+                )
+              : CircleAvatar(
+                  radius: 20,
+                  backgroundColor: currTheme.primary,
+                  child: CircleAvatar(
+                    radius: 17,
+                    backgroundImage: NetworkImage(_profile),
+                  ),
+                ),
+          icon: _profile.isEmpty
+              ? const Icon(Icons.account_circle_outlined)
+              : CircleAvatar(
+                  backgroundImage: NetworkImage(_profile),
+                ),
           label: DisplayText.trimText(_userProvider.name, len: 10),
         ),
       ];
@@ -117,7 +141,11 @@ class _UserLayoutState extends State<UserLayout> {
     return Scaffold(
       body: widget.navigationShell,
       bottomNavigationBar: NavigationBar(
-        indicatorColor: currTheme.primary,
+        indicatorColor: widget.navigationShell.currentIndex != 2
+            ? currTheme.primary
+            : _profile.isEmpty
+                ? currTheme.primary
+                : Colors.transparent,
         selectedIndex: widget.navigationShell.currentIndex,
         destinations: getDestinations(),
         onDestinationSelected: _onDestinationSelected,
