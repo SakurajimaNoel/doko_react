@@ -1,3 +1,4 @@
+import 'package:doko_react/features/User/Complete%20Profile/Presentation/complete_profile_page.dart';
 import 'package:doko_react/features/authentication/data/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -51,6 +52,8 @@ class _UserLayoutState extends State<UserLayout> {
 
   @override
   Widget build(BuildContext context) {
+    return const CompleteProfilePage();
+
     ColorScheme currTheme = Theme.of(context).colorScheme;
 
     return Scaffold(
