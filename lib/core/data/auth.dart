@@ -242,7 +242,7 @@ class AuthenticationActions {
           Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
       final result = await cognitoPlugin.fetchAuthSession();
       String token = (result.userPoolTokensResult.value.accessToken.raw);
-      safePrint(token);
+
       Clipboard.setData(ClipboardData(text: token)).then((value) {});
       return AuthenticationToken(
         status: AuthStatus.done,
