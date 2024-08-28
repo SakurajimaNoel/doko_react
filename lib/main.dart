@@ -5,6 +5,7 @@ import 'package:doko_react/core/provider/authentication_provider.dart';
 import 'package:doko_react/core/provider/mfa_status_provider.dart';
 import 'package:doko_react/core/provider/theme_provider.dart';
 import 'package:doko_react/core/configs/router/app_router_config.dart';
+import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/theme/theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +27,9 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (context) => AuthenticationMFAProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => UserProvider(),
       ),
     ], child: const MyApp()));
   } on AmplifyException catch (e) {
