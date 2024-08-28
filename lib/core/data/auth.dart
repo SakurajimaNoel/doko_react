@@ -9,14 +9,21 @@ class AuthenticationResult {
   final String? message;
   final Uri? url;
 
-  AuthenticationResult({required this.status, this.message, this.url});
+  AuthenticationResult({
+    required this.status,
+    this.message,
+    this.url,
+  });
 }
 
 class AuthenticationToken {
   final AuthStatus status;
   final String value;
 
-  AuthenticationToken({required this.status, required this.value});
+  AuthenticationToken({
+    required this.status,
+    required this.value,
+  });
 }
 
 class AuthenticationActions {
@@ -26,13 +33,21 @@ class AuthenticationActions {
       final result =
           await Amplify.Auth.signIn(username: email, password: password);
 
-      return _handleSignInResult(result, email);
+      return _handleSignInResult(
+        result,
+        email,
+      );
     } on AuthException catch (e) {
-      return AuthenticationResult(status: AuthStatus.error, message: e.message);
+      return AuthenticationResult(
+        status: AuthStatus.error,
+        message: e.message,
+      );
     } catch (e) {
       safePrint(e);
       return AuthenticationResult(
-          status: AuthStatus.error, message: "Oops! Something went wrong.");
+        status: AuthStatus.error,
+        message: "Oops! Something went wrong.",
+      );
     }
   }
 
@@ -41,13 +56,20 @@ class AuthenticationActions {
     try {
       await Amplify.Auth.confirmSignIn(confirmationValue: confirmString);
 
-      return AuthenticationResult(status: AuthStatus.done);
+      return AuthenticationResult(
+        status: AuthStatus.done,
+      );
     } on AuthException catch (e) {
-      return AuthenticationResult(status: AuthStatus.error, message: e.message);
+      return AuthenticationResult(
+        status: AuthStatus.error,
+        message: e.message,
+      );
     } catch (e) {
       safePrint(e);
       return AuthenticationResult(
-          status: AuthStatus.error, message: "Oops! Something went wrong.");
+        status: AuthStatus.error,
+        message: "Oops! Something went wrong.",
+      );
     }
   }
 
@@ -66,13 +88,20 @@ class AuthenticationActions {
     try {
       await Amplify.Auth.signUp(username: email, password: password);
 
-      return AuthenticationResult(status: AuthStatus.done);
+      return AuthenticationResult(
+        status: AuthStatus.done,
+      );
     } on AuthException catch (e) {
-      return AuthenticationResult(status: AuthStatus.error, message: e.message);
+      return AuthenticationResult(
+        status: AuthStatus.error,
+        message: e.message,
+      );
     } catch (e) {
       safePrint(e);
       return AuthenticationResult(
-          status: AuthStatus.error, message: "Oops! Something went wrong.");
+        status: AuthStatus.error,
+        message: "Oops! Something went wrong.",
+      );
     }
   }
 
@@ -80,13 +109,20 @@ class AuthenticationActions {
     try {
       await Amplify.Auth.resetPassword(username: email);
 
-      return AuthenticationResult(status: AuthStatus.done);
+      return AuthenticationResult(
+        status: AuthStatus.done,
+      );
     } on AuthException catch (e) {
-      return AuthenticationResult(status: AuthStatus.error, message: e.message);
+      return AuthenticationResult(
+        status: AuthStatus.error,
+        message: e.message,
+      );
     } catch (e) {
       safePrint(e);
       return AuthenticationResult(
-          status: AuthStatus.error, message: "Oops! Something went wrong.");
+        status: AuthStatus.error,
+        message: "Oops! Something went wrong.",
+      );
     }
   }
 
@@ -96,13 +132,20 @@ class AuthenticationActions {
       await Amplify.Auth.confirmResetPassword(
           username: email, confirmationCode: code, newPassword: password);
 
-      return AuthenticationResult(status: AuthStatus.done);
+      return AuthenticationResult(
+        status: AuthStatus.done,
+      );
     } on AuthException catch (e) {
-      return AuthenticationResult(status: AuthStatus.error, message: e.message);
+      return AuthenticationResult(
+        status: AuthStatus.error,
+        message: e.message,
+      );
     } catch (e) {
       safePrint(e);
       return AuthenticationResult(
-          status: AuthStatus.error, message: "Oops! Something went wrong.");
+        status: AuthStatus.error,
+        message: "Oops! Something went wrong.",
+      );
     }
   }
 
@@ -110,18 +153,24 @@ class AuthenticationActions {
       SignInResult result, String username) {
     switch (result.nextStep.signInStep) {
       case AuthSignInStep.confirmSignInWithTotpMfaCode:
-        return AuthenticationResult(status: AuthStatus.confirmMFA);
+        return AuthenticationResult(
+          status: AuthStatus.confirmMFA,
+        );
       case AuthSignInStep.done:
-        return AuthenticationResult(status: AuthStatus.done);
+        return AuthenticationResult(
+          status: AuthStatus.done,
+        );
       case AuthSignInStep.confirmSignUp:
         // handle sending user confirm mail
         Amplify.Auth.resendSignUpCode(username: username);
         return AuthenticationResult(
-            status: AuthStatus.error,
-            message:
-                "Your account is not verified. Please verify it to proceed.");
+          status: AuthStatus.error,
+          message: "Your account is not verified. Please verify it to proceed.",
+        );
       default:
-        return AuthenticationResult(status: AuthStatus.done);
+        return AuthenticationResult(
+          status: AuthStatus.done,
+        );
     }
   }
 
@@ -139,9 +188,10 @@ class AuthenticationActions {
           appName: 'Doki', accountName: email.value);
 
       return AuthenticationResult(
-          status: AuthStatus.done,
-          url: setupUri,
-          message: totpSetupDetails.sharedSecret);
+        status: AuthStatus.done,
+        url: setupUri,
+        message: totpSetupDetails.sharedSecret,
+      );
     } on AuthException catch (e) {
       return AuthenticationResult(status: AuthStatus.error, message: e.message);
     } catch (e) {
@@ -161,13 +211,20 @@ class AuthenticationActions {
         totp: MfaPreference.preferred,
       );
 
-      return AuthenticationResult(status: AuthStatus.done);
+      return AuthenticationResult(
+        status: AuthStatus.done,
+      );
     } on AuthException catch (e) {
-      return AuthenticationResult(status: AuthStatus.error, message: e.message);
+      return AuthenticationResult(
+        status: AuthStatus.error,
+        message: e.message,
+      );
     } catch (e) {
       safePrint(e);
       return AuthenticationResult(
-          status: AuthStatus.error, message: "Oops! Something went wrong.");
+        status: AuthStatus.error,
+        message: "Oops! Something went wrong.",
+      );
     }
   }
 
@@ -187,13 +244,21 @@ class AuthenticationActions {
       String token = (result.userPoolTokensResult.value.accessToken.raw);
       safePrint(token);
       Clipboard.setData(ClipboardData(text: token)).then((value) {});
-      return AuthenticationToken(status: AuthStatus.done, value: token);
+      return AuthenticationToken(
+        status: AuthStatus.done,
+        value: token,
+      );
     } on AuthException catch (e) {
-      return AuthenticationToken(status: AuthStatus.error, value: e.message);
+      return AuthenticationToken(
+        status: AuthStatus.error,
+        value: e.message,
+      );
     } catch (e) {
       safePrint(e);
       return AuthenticationToken(
-          status: AuthStatus.error, value: "Oops! Something went wrong.");
+        status: AuthStatus.error,
+        value: "Oops! Something went wrong.",
+      );
     }
   }
 
@@ -205,13 +270,41 @@ class AuthenticationActions {
         newPassword: newPassword,
       );
 
-      return AuthenticationResult(status: AuthStatus.done);
+      return AuthenticationResult(
+        status: AuthStatus.done,
+      );
     } on AuthException catch (e) {
-      return AuthenticationResult(status: AuthStatus.error, message: e.message);
+      return AuthenticationResult(
+        status: AuthStatus.error,
+        message: e.message,
+      );
     } catch (e) {
       safePrint(e);
       return AuthenticationResult(
-          status: AuthStatus.error, message: "Oops! Something went wrong.");
+        status: AuthStatus.error,
+        message: "Oops! Something went wrong.",
+      );
+    }
+  }
+
+  static Future<AuthenticationResult> getUserId() async {
+    try {
+      final user = await Amplify.Auth.getCurrentUser();
+      return AuthenticationResult(
+        status: AuthStatus.done,
+        message: user.userId,
+      );
+    } on AuthException catch (e) {
+      return AuthenticationResult(
+        status: AuthStatus.error,
+        message: e.message,
+      );
+    } catch (e) {
+      safePrint(e);
+      return AuthenticationResult(
+        status: AuthStatus.error,
+        message: "Oops! Something went wrong.",
+      );
     }
   }
 }
