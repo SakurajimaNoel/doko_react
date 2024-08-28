@@ -12,12 +12,25 @@
       "AmplifyAppId": "d1n4rjx5z659iu"
     },
     "categories": {
+      "storage": {
+        "dokoreactd2e14c2a": {
+          "bucketName": "dokiuserprofile",
+          "region": "ap-south-1"
+        }
+      },
       "auth": {
-        "dokoreact": {
+        "dokoreact20865141": {
           "userPoolId": "ap-south-1_8FDnHEsKB",
           "userPoolName": "doki_users",
           "webClientId": "5kl98seknsnmvdg307nhmip21c",
-          "nativeClientId": "5kl98seknsnmvdg307nhmip21c"
+          "nativeClientId": "5kl98seknsnmvdg307nhmip21c",
+          "identityPoolId": "ap-south-1:be985ba0-fa08-4b08-933a-4bdabaa2fcc2",
+          "identityPoolName": "doki-iam",
+          "allowUnauthenticatedIdentities": false,
+          "authRoleArn": "arn:aws:iam::019253667737:role/service-role/doki_user_iam",
+          "authRoleName": "doki_user_iam",
+          "unauthRoleArn": "arn:aws:iam::019253667737:role/service-role/unauthenticated-role",
+          "unauthRoleName": "unauthenticated-role"
         }
       }
     }
