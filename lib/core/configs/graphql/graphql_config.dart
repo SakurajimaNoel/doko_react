@@ -14,12 +14,17 @@ class GraphqlConfig {
     return "Bearer ${result.value}";
   });
 
-  GraphQLClient clientToQuery() {
-    Link link = _authLink.concat(_httpLink);
+  static GraphQLClient? _client;
 
-    return GraphQLClient(
-      link: link,
-      cache: GraphQLCache(),
-    );
+  GraphQLClient clientToQuery() {
+    if (_client == null) {
+      Link link = _authLink.concat(_httpLink);
+
+      _client = GraphQLClient(
+        link: link,
+        cache: GraphQLCache(),
+      );
+    }
+    return _client!;
   }
 }
