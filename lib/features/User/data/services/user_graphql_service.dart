@@ -9,7 +9,20 @@ class UserResponse {
   final ResponseStatus status;
   final UserModel? user;
 
-  const UserResponse({required this.status, required this.user});
+  const UserResponse({
+    required this.status,
+    required this.user,
+  });
+}
+
+class UsernameResponse {
+  final ResponseStatus status;
+  final bool available;
+
+  const UsernameResponse({
+    required this.status,
+    required this.available,
+  });
 }
 
 class UserGraphqlService {
@@ -61,6 +74,52 @@ class UserGraphqlService {
       return const UserResponse(
         status: ResponseStatus.error,
         user: null,
+      );
+    }
+  }
+
+  Future<UsernameResponse> checkUsername(String username) async {
+    try {
+      QueryResult result = await client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.cacheAndNetwork,
+          document: gql("""
+          query Query(\$where: UserWhere) {
+            users(where: \$where) {
+              id
+            }
+          }
+        """),
+          variables: {
+            "where": {
+              "username": username,
+            }
+          },
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      List? res = result.data?["users"];
+
+      if (res == null || res.isEmpty) {
+        return const UsernameResponse(
+          status: ResponseStatus.success,
+          available: true,
+        );
+      }
+
+      return const UsernameResponse(
+        status: ResponseStatus.success,
+        available: false,
+      );
+    } catch (e) {
+      safePrint(e);
+      return const UsernameResponse(
+        status: ResponseStatus.error,
+        available: false,
       );
     }
   }

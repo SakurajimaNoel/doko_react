@@ -104,4 +104,24 @@ class ValidateInput {
 
     return InputStatus(isValid: true);
   }
+
+  static InputStatus validateUsername(String? username) {
+    final RegExp usernameRegex = RegExp(r"^[a-zA-Z][a-zA-Z0-9_.-]{2,19}$");
+
+    if (username == null || username.isEmpty) {
+      return InputStatus(
+        isValid: false,
+        message: "Username can't be empty.",
+      );
+    }
+
+    if (!usernameRegex.hasMatch(username)) {
+      return InputStatus(
+        isValid: false,
+        message: "Username is invalid.",
+      );
+    }
+
+    return InputStatus(isValid: true);
+  }
 }
