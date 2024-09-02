@@ -34,27 +34,22 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   Future<void> _isAvailable(String username) async {
     safePrint(username);
     var usernameResponse = await _graphqlService.checkUsername(username);
+    String message = "";
+    bool available = true;
 
     if (usernameResponse.status == ResponseStatus.error) {
-      setState(() {
-        _apiErrorMessage =
-            "Oops! Something went wrong. Please try again later.";
-        _usernameAvailable = false;
-      });
-      return;
+      message = "Oops! Something went wrong. Please try again later.";
+      available = false;
     }
 
     if (!usernameResponse.available) {
-      setState(() {
-        _apiErrorMessage = "'$_username' is already taken.";
-        _usernameAvailable = false;
-      });
-      return;
+      message = "'$_username' is already taken.";
+      available = false;
     }
 
     setState(() {
-      _apiErrorMessage = "";
-      _usernameAvailable = true;
+      _apiErrorMessage = message;
+      _usernameAvailable = available;
     });
   }
 
@@ -122,15 +117,16 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                             _username = value;
                           },
                           onChanged: (value) {
+                            setState(() {
+                              _usernameAvailable = false;
+                              _apiErrorMessage = "";
+                              _username = value;
+                            });
                             var usernameStatus =
                                 ValidateInput.validateUsername(value);
 
                             if (!usernameStatus.isValid) {
                               _usernameDebounce.dispose();
-                              setState(() {
-                                _usernameAvailable = false;
-                                _username = value;
-                              });
                               return;
                             }
 
@@ -147,9 +143,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                         ),
                         if (_apiErrorMessage.isNotEmpty)
                           ErrorText(_apiErrorMessage),
-                        if (_apiErrorMessage.isEmpty &&
-                            _usernameAvailable &&
-                            _username.length >= 3)
+                        if (_usernameAvailable)
                           ErrorText(
                             "'$_username' is available.",
                             color: Colors.green,
@@ -157,7 +151,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                       ],
                     ),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: !_usernameAvailable ? null : () {} ,
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 24),
                         backgroundColor: currTheme.primary,
