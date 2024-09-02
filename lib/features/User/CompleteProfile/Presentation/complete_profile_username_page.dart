@@ -8,19 +8,22 @@ import 'package:doko_react/features/application/settings/widgets/settings_headin
 import 'package:doko_react/features/authentication/presentation/widgets/error_widget.dart';
 import 'package:flutter/material.dart';
 
-class CompleteProfilePage extends StatefulWidget {
-  const CompleteProfilePage({super.key});
+class CompleteProfileUsernamePage extends StatefulWidget {
+  const CompleteProfileUsernamePage({super.key});
 
   @override
-  State<CompleteProfilePage> createState() => _CompleteProfilePageState();
+  State<CompleteProfileUsernamePage> createState() =>
+      _CompleteProfileUsernamePageState();
 }
 
-class _CompleteProfilePageState extends State<CompleteProfilePage> {
+class _CompleteProfileUsernamePageState
+    extends State<CompleteProfileUsernamePage> {
   final UserGraphqlService _graphqlService = UserGraphqlService();
   final _formKey = GlobalKey<FormState>();
   final Debounce _usernameDebounce =
       Debounce(const Duration(milliseconds: 500));
-  bool _loading = false;
+
+  // bool _loading = false;
   String _username = "";
   String _apiErrorMessage = "";
   bool _usernameAvailable = false;
@@ -151,22 +154,16 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                       ],
                     ),
                     ElevatedButton(
-                      onPressed: !_usernameAvailable ? null : () {} ,
+                      onPressed: !_usernameAvailable ? null : () {},
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 24),
                         backgroundColor: currTheme.primary,
                         foregroundColor: currTheme.onPrimary,
                         disabledBackgroundColor: Colors.grey,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12.0),
-                        child: _loading
-                            ? const SizedBox(
-                                height: 25,
-                                width: 25,
-                                child: CircularProgressIndicator(),
-                              )
-                            : const Text("Continue"),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12.0),
+                        child: Text("Continue"),
                       ),
                     ),
                   ],

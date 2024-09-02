@@ -3,7 +3,7 @@ import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/loader.dart';
-import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_page.dart';
+import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 
 import 'package:doko_react/features/authentication/presentation/widgets/error_widget.dart';
@@ -90,7 +90,7 @@ class _UserLayoutState extends State<UserLayout> {
     }
 
     if (userProvider.status == ProfileStatus.incomplete) {
-      return const CompleteProfilePage();
+      return const CompleteProfileUsernamePage();
     }
 
     ColorScheme currTheme = Theme.of(context).colorScheme;
