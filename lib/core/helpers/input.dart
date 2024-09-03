@@ -124,4 +124,24 @@ class ValidateInput {
 
     return InputStatus(isValid: true);
   }
+
+  static InputStatus validateName(String? name) {
+    final nameRegex = RegExp(r'^[A-Za-z\s]{2,}$');
+
+    if (name == null || name.isEmpty) {
+      return InputStatus(
+        isValid: false,
+        message: "Name can't be empty.",
+      );
+    }
+
+    if (!nameRegex.hasMatch(name)) {
+      return InputStatus(
+        isValid: false,
+        message: "Invalid name.",
+      );
+    }
+
+    return InputStatus(isValid: true);
+  }
 }

@@ -122,7 +122,7 @@ class _CompleteProfileUsernamePageState
                               return;
                             }
 
-                            _username = value;
+                            _username = value.trim();
                           },
                           onChanged: (value) {
                             setState(() {
