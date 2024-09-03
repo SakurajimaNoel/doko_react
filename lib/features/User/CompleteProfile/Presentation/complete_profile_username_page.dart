@@ -3,10 +3,13 @@ import 'package:doko_react/core/helpers/debounce.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/core/widgets/bullet_list.dart';
+import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:doko_react/features/application/settings/widgets/settings_heading.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/error_widget.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../core/data/auth.dart';
 
 class CompleteProfileUsernamePage extends StatefulWidget {
   const CompleteProfileUsernamePage({super.key});
@@ -65,7 +68,9 @@ class _CompleteProfileUsernamePageState
         title: const Text("Complete profile"),
         actions: [
           TextButton(
-              onPressed: () {},
+              onPressed: () {
+                AuthenticationActions.signOutUser();
+              },
               child: Text(
                 "Sign out",
                 style: TextStyle(
@@ -154,7 +159,18 @@ class _CompleteProfileUsernamePageState
                       ],
                     ),
                     ElevatedButton(
-                      onPressed: !_usernameAvailable ? null : () {},
+                      onPressed: !_usernameAvailable
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CompleteProfileInfoPage(
+                                    username: _username,
+                                  ),
+                                ),
+                              );
+                            },
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 24),
                         backgroundColor: currTheme.primary,

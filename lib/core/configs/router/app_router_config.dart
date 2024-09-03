@@ -1,5 +1,6 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/widgets/loader.dart';
+import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/User/Nearby/presentation/nearby_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/profile_page.dart';
@@ -80,6 +81,22 @@ class AppRouterConfig {
       ],
     );
   }
+
+  // static GoRouter completeProfile() {
+  //   final rootNavigatorKey = GlobalKey<NavigatorState>();
+  //
+  //   return GoRouter(
+  //     navigatorKey: rootNavigatorKey,
+  //     initialLocation: "/complete-profile-username",
+  //     routes: [
+  //       GoRoute(
+  //         name: RouterConstants.completeProfileUsername,
+  //         path: "/complete-profile-username",
+  //         builder: (context, state) => const CompleteProfileUsernamePage(),
+  //       )
+  //     ],
+  //   );
+  // }
 
   static GoRouter homeConfig() {
     final homeRouterRootNavigatorKey = GlobalKey<NavigatorState>();

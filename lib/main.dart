@@ -118,12 +118,6 @@ class _MyAppState extends State<MyApp> {
     } else {
       _authMFAProvider.setMFAStatus(AuthenticationMFAStatus.undefined);
     }
-
-    // if (status == AuthenticationStatus.signedIn) {
-    //   GoRouter.of(context).goNamed(RouterConstants.userFeed);
-    // } else if (status == AuthenticationStatus.signedOut) {
-    //   GoRouter.of(context).goNamed(RouterConstants.login);
-    // }
   }
 
   @override
