@@ -5,7 +5,7 @@ import '../../../../core/data/auth.dart';
 class CompleteProfilePicturePage extends StatefulWidget {
   final String username;
   final String name;
-  final DateTime dob;
+  final String dob;
 
   const CompleteProfilePicturePage(
       {super.key,
@@ -30,7 +30,7 @@ class _CompleteProfilePicturePageState
 
     _username = widget.username;
     _name = widget.name;
-    _dob = widget.dob;
+    _dob = DateTime.parse(widget.dob);
   }
 
   @override

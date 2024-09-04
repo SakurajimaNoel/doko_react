@@ -1,8 +1,8 @@
 import 'package:doko_react/core/helpers/display.dart';
-import 'package:doko_react/core/helpers/input.dart';
-import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
-import 'package:flutter/material.dart';
+import 'package:doko_react/core/helpers/input.dart';import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/configs/router/router_constants.dart';
 import '../../../../core/data/auth.dart';
 import '../../../application/settings/widgets/settings_heading.dart';
 
@@ -36,15 +36,12 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
 
     if (_date == null) return;
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CompleteProfilePicturePage(
-          username: _username,
-          name: _name,
-          dob: _date!,
-        ),
-      ),
+    context.goNamed(
+      RouterConstants.completeProfilePicture,
+      pathParameters: {
+        "name": _name,
+        "dob": _date.toString(),
+      },
     );
   }
 

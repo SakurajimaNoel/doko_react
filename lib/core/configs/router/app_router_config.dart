@@ -1,5 +1,8 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/widgets/loader.dart';
+import 'package:doko_react/core/widgets/error.dart';
+import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
+import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/User/Nearby/presentation/nearby_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/profile_page.dart';
@@ -16,6 +19,8 @@ import 'package:doko_react/features/authentication/presentation/screens/signup_p
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
+
 class AppRouterConfig {
   static GoRouter loadingConfig() {
     return GoRouter(
@@ -25,6 +30,19 @@ class AppRouterConfig {
           path: "/",
           name: "loading",
           builder: (context, state) => const Loader(),
+        ),
+      ],
+    );
+  }
+
+  static GoRouter errorConfig() {
+    return GoRouter(
+      initialLocation: "/error",
+      routes: [
+        GoRoute(
+          path: "/error",
+          name: "error",
+          builder: (context, state) => const Error(),
         ),
       ],
     );
@@ -81,21 +99,47 @@ class AppRouterConfig {
     );
   }
 
-  // static GoRouter completeProfile() {
-  //   final rootNavigatorKey = GlobalKey<NavigatorState>();
-  //
-  //   return GoRouter(
-  //     navigatorKey: rootNavigatorKey,
-  //     initialLocation: "/complete-profile-username",
-  //     routes: [
-  //       GoRoute(
-  //         name: RouterConstants.completeProfileUsername,
-  //         path: "/complete-profile-username",
-  //         builder: (context, state) => const CompleteProfileUsernamePage(),
-  //       )
-  //     ],
-  //   );
-  // }
+  static GoRouter completeProfile() {
+    final rootNavigatorKey = GlobalKey<NavigatorState>();
+
+    return GoRouter(
+      navigatorKey: rootNavigatorKey,
+      initialLocation: "/complete-profile-username",
+      routes: [
+        GoRoute(
+            name: RouterConstants.completeProfileUsername,
+            path: "/complete-profile-username",
+            builder: (context, state) => const CompleteProfileUsernamePage(),
+            routes: [
+              GoRoute(
+                  name: RouterConstants.completeProfileInfo,
+                  path: "complete-profile-info/:username",
+                  builder: (context, state) {
+                    final usernameValue = state.pathParameters["username"]!;
+                    return CompleteProfileInfoPage(username: usernameValue);
+                  },
+                  routes: [
+                    GoRoute(
+                        name: RouterConstants.completeProfilePicture,
+                        path: "complete-profile-picture/:name/:dob",
+                        builder: (context, state) {
+                          final usernameValue =
+                              state.pathParameters["username"]!;
+                          final nameValue = state.pathParameters["name"]!;
+                          final dobValue =
+                              state.pathParameters["dob"]!;
+
+                          return CompleteProfilePicturePage(
+                            username: usernameValue,
+                            name: nameValue,
+                            dob: dobValue,
+                          );
+                        })
+                  ])
+            ])
+      ],
+    );
+  }
 
   static GoRouter homeConfig() {
     final homeRouterRootNavigatorKey = GlobalKey<NavigatorState>();
