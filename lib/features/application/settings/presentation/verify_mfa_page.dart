@@ -1,5 +1,5 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
-import 'package:doko_react/core/provider/mfa_status_provider.dart';
+import 'package:doko_react/core/provider/authentication_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -22,15 +22,15 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
   String _confirmString = "";
   bool _loading = false;
   String _errorMessage = "";
-  late final AuthenticationMFAProvider _authMFAProvider;
+  late final AuthenticationProvider _authProvider;
 
   @override
   void initState() {
     super.initState();
-    _authMFAProvider = Provider.of<AuthenticationMFAProvider>(context, listen: false);
+    _authProvider = context.read<AuthenticationProvider>();
   }
 
-  void _submit() async {
+  Future<void> _submit() async {
     final isValid = _formKey.currentState?.validate();
     if (isValid == null || !isValid) {
       return;
@@ -65,7 +65,7 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
       ),
     );
 
-    _authMFAProvider.setMFAStatus(AuthenticationMFAStatus.setUpped);
+    _authProvider.setMFAStatus(AuthenticationMFAStatus.setUpped);
 
     // Delay the navigation
     Future.delayed(

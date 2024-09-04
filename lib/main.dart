@@ -2,8 +2,9 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:doko_react/aws/amplifyconfiguration.dart';
+import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
-import 'package:doko_react/core/provider/mfa_status_provider.dart';
+
 import 'package:doko_react/core/provider/theme_provider.dart';
 import 'package:doko_react/core/configs/router/app_router_config.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
@@ -12,6 +13,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'core/helpers/enum.dart';
+import 'features/User/data/services/user_graphql_service.dart';
 
 void main() async {
   try {
@@ -25,9 +29,6 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (context) => AuthenticationProvider(),
-      ),
-      ChangeNotifierProvider(
-        create: (context) => AuthenticationMFAProvider(),
       ),
       ChangeNotifierProvider(
         create: (context) => UserProvider(),
@@ -58,14 +59,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late final AuthenticationProvider _authProvider;
-  late final AuthenticationMFAProvider _authMFAProvider;
+  late final UserProvider _userProvider;
 
   @override
   void initState() {
     super.initState();
-    _authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
-    _authMFAProvider =
-        Provider.of<AuthenticationMFAProvider>(context, listen: false);
+    _authProvider = context.read<AuthenticationProvider>();
+    _userProvider = context.read<UserProvider>();
 
     fetchAuthSession();
     Amplify.Hub.listen(HubChannel.Auth, (AuthHubEvent event) {
@@ -101,62 +101,99 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  void fetchMfaStatus() async {
+  Future<void> _fetchMfaStatus() async {
     final cognitoPlugin = Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
     final currentPreference = await cognitoPlugin.fetchMfaPreference();
 
     AuthenticationMFAStatus mfaStatus = currentPreference.preferred != null
         ? AuthenticationMFAStatus.setUpped
         : AuthenticationMFAStatus.notSetUpped;
-    _authMFAProvider.setMFAStatus(mfaStatus);
+    _authProvider.setMFAStatus(mfaStatus);
+  }
+
+  Future<void> _getCompleteUser() async {
+    var result = await AuthenticationActions.getUserId();
+    if (result.status == AuthStatus.error) {
+      _userProvider.apiError();
+      return;
+    }
+
+    String userId = result.message!;
+    final UserGraphqlService graphqlService = UserGraphqlService();
+    var userDetails = await graphqlService.getUser(userId);
+
+    if (userDetails.status == ResponseStatus.error) {
+      _userProvider.apiError();
+      return;
+    }
+
+    var user = userDetails.user;
+    if (user == null) {
+      _userProvider.incompleteUser();
+      return;
+    }
+
+    _userProvider.addUser(
+      name: user.name,
+      username: user.username,
+      profilePicture: user.profilePicture,
+    );
   }
 
   void _changeAuthStatus(AuthenticationStatus status) {
     _authProvider.setAuthStatus(status);
     if (status == AuthenticationStatus.signedIn) {
-      fetchMfaStatus();
+      _fetchMfaStatus();
+      _getCompleteUser();
     } else {
-      _authMFAProvider.setMFAStatus(AuthenticationMFAStatus.undefined);
+      _authProvider.setMFAStatus(AuthenticationMFAStatus.undefined);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthenticationProvider>(
-      builder: (context, authProvider, child) {
-        GoRouter router;
-        if (authProvider.authStatus == AuthenticationStatus.loading) {
-          router = AppRouterConfig.loadingConfig();
-        } else if (authProvider.authStatus == AuthenticationStatus.signedIn) {
-          router = AppRouterConfig.homeConfig();
-        } else {
-          router = AppRouterConfig.authConfig();
+    final authStatus =
+        context.select((AuthenticationProvider auth) => auth.authStatus);
+    final userStatus = context.select((UserProvider user) => user.status);
+
+    GoRouter router;
+    if (authStatus == AuthenticationStatus.loading ||
+        userStatus == ProfileStatus.loading) {
+      router = AppRouterConfig.loadingConfig();
+    } else if (authStatus == AuthenticationStatus.signedOut) {
+      router = AppRouterConfig.authConfig();
+    } else if (authStatus == AuthenticationStatus.signedIn &&
+        userStatus == ProfileStatus.incomplete) {
+      router = AppRouterConfig.completeProfile();
+    } else if (authStatus == AuthenticationStatus.signedIn &&
+        userStatus == ProfileStatus.complete) {
+      router = AppRouterConfig.homeConfig();
+    } else {
+      router = AppRouterConfig.errorConfig();
+    }
+
+    return Consumer<ThemeProvider>(
+      builder: (context, theme, child) {
+        ThemeMode themeMode;
+        Color accent = theme.accent;
+        switch (theme.themeMode) {
+          case UserTheme.light:
+            themeMode = ThemeMode.light;
+            break;
+          case UserTheme.dark:
+            themeMode = ThemeMode.dark;
+            break;
+          default:
+            themeMode = ThemeMode.system;
         }
 
-        return Consumer<ThemeProvider>(
-          builder: (context, theme, child) {
-            ThemeMode themeMode;
-            Color accent = theme.accent;
-            switch (theme.themeMode) {
-              case UserTheme.light:
-                themeMode = ThemeMode.light;
-                break;
-              case UserTheme.dark:
-                themeMode = ThemeMode.dark;
-                break;
-              default:
-                themeMode = ThemeMode.system;
-            }
-
-            return MaterialApp.router(
-              routerConfig: router,
-              debugShowCheckedModeBanner: false,
-              title: 'Dokii',
-              themeMode: themeMode,
-              theme: GlobalThemeData.lightCustomThemeData(accent),
-              darkTheme: GlobalThemeData.darkCustomThemeData(accent),
-            );
-          },
+        return MaterialApp.router(
+          routerConfig: router,
+          debugShowCheckedModeBanner: false,
+          title: 'Dokii',
+          themeMode: themeMode,
+          theme: GlobalThemeData.lightCustomThemeData(accent),
+          darkTheme: GlobalThemeData.darkCustomThemeData(accent),
         );
       },
     );

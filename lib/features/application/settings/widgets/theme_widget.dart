@@ -7,8 +7,8 @@ class ThemeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProviderModel = Provider.of<ThemeProvider>(context);
-    UserTheme userThemeView = themeProviderModel.themeMode;
+    final userThemeView =
+        context.select((ThemeProvider theme) => theme.themeMode);
 
     return Row(
       children: [
@@ -30,7 +30,7 @@ class ThemeWidget extends StatelessWidget {
             ],
             selected: <UserTheme>{userThemeView},
             onSelectionChanged: (Set<UserTheme> newSelection) {
-              themeProviderModel.toggleTheme(newSelection.first);
+              context.read<ThemeProvider>().toggleTheme(newSelection.first);
             },
           ),
         ),

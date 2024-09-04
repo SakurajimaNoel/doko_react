@@ -19,7 +19,7 @@ class _AccentWidgetState extends State<AccentWidget> {
   void initState() {
     super.initState();
 
-    _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    _themeProvider = context.read<ThemeProvider>();
     _currentColor = _themeProvider.accent;
     _tempColor = _currentColor;
   }
