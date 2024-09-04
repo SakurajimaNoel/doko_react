@@ -155,15 +155,12 @@ class _MfaSetupPageState extends State<MfaSetupPage> {
                         const SizedBox(
                           height: 30,
                         ),
-                        ElevatedButton(
+                        FilledButton(
                           onPressed: () {
                             context.goNamed(RouterConstants.verifyMfa);
                           },
-                          style: ElevatedButton.styleFrom(
+                          style: FilledButton.styleFrom(
                             minimumSize: const Size(double.infinity, 24),
-                            backgroundColor: currTheme.primary,
-                            foregroundColor: currTheme.onPrimary,
-                            disabledBackgroundColor: Colors.grey,
                           ),
                           child: const Padding(
                             padding: EdgeInsets.symmetric(vertical: 12.0),

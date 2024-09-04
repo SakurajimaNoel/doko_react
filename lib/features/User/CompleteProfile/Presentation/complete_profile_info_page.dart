@@ -1,5 +1,6 @@
 import 'package:doko_react/core/helpers/display.dart';
-import 'package:doko_react/core/helpers/input.dart';import 'package:flutter/material.dart';
+import 'package:doko_react/core/helpers/input.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/configs/router/router_constants.dart';
@@ -39,6 +40,7 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
     context.goNamed(
       RouterConstants.completeProfilePicture,
       pathParameters: {
+        "username": _username,
         "name": _name,
         "dob": _date.toString(),
       },
@@ -181,13 +183,10 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
                         ),
                       ],
                     ),
-                    ElevatedButton(
+                    FilledButton(
                       onPressed: _next,
-                      style: ElevatedButton.styleFrom(
+                      style: FilledButton.styleFrom(
                         minimumSize: const Size(double.infinity, 24),
-                        backgroundColor: currTheme.primary,
-                        foregroundColor: currTheme.onPrimary,
-                        disabledBackgroundColor: Colors.grey,
                       ),
                       child: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 12.0),

@@ -1,3 +1,4 @@
+import 'package:doko_react/core/helpers/display.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/data/auth.dart';
@@ -7,11 +8,12 @@ class CompleteProfilePicturePage extends StatefulWidget {
   final String name;
   final String dob;
 
-  const CompleteProfilePicturePage(
-      {super.key,
-      required this.username,
-      required this.name,
-      required this.dob});
+  const CompleteProfilePicturePage({
+    super.key,
+    required this.username,
+    required this.name,
+    required this.dob,
+  });
 
   @override
   State<CompleteProfilePicturePage> createState() =>
@@ -54,7 +56,7 @@ class _CompleteProfilePicturePageState
           )
         ],
       ),
-      body: const Text("image picker"),
+      body: Text(DisplayText.dateString(_dob)),
     );
   }
 }

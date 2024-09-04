@@ -160,12 +160,10 @@ class _SignupPageState extends State<SignupPage> {
                         hintText: "Confirm Password..."),
                   ),
                   const SizedBox(height: 30),
-                  ElevatedButton(
+                  FilledButton(
                     onPressed: _loading ? null : _submit,
-                    style: ElevatedButton.styleFrom(
+                    style: FilledButton.styleFrom(
                       minimumSize: const Size(double.infinity, 24),
-                      backgroundColor: currTheme.primary,
-                      foregroundColor: currTheme.onPrimary,
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12.0),

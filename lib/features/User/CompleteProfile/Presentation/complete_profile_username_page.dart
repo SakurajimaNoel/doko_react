@@ -2,7 +2,8 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/helpers/debounce.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/input.dart';
-import 'package:doko_react/core/widgets/bullet_list.dart';import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
+import 'package:doko_react/core/widgets/bullet_list.dart';
+import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:doko_react/features/application/settings/widgets/settings_heading.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/error_widget.dart';
 import 'package:flutter/material.dart';
@@ -158,20 +159,17 @@ class _CompleteProfileUsernamePageState
                           ),
                       ],
                     ),
-                    ElevatedButton(
+                    FilledButton(
                       onPressed: !_usernameAvailable
                           ? null
                           : () {
-                        context.goNamed(
-                          RouterConstants.completeProfileInfo,
-                          pathParameters: {"username": _username},
-                        );
+                              context.goNamed(
+                                RouterConstants.completeProfileInfo,
+                                pathParameters: {"username": _username},
+                              );
                             },
-                      style: ElevatedButton.styleFrom(
+                      style: FilledButton.styleFrom(
                         minimumSize: const Size(double.infinity, 24),
-                        backgroundColor: currTheme.primary,
-                        foregroundColor: currTheme.onPrimary,
-                        disabledBackgroundColor: Colors.grey,
                       ),
                       child: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 12.0),
