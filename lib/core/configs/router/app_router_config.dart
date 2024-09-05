@@ -104,7 +104,8 @@ class AppRouterConfig {
 
     return GoRouter(
       navigatorKey: rootNavigatorKey,
-      initialLocation: "/complete-profile-username",
+      // TODO: correct the default route
+      initialLocation: "/complete-profile-username/complete-profile-info/rohan/complete-profile-picture/rohan/2001-10-11T14:48:00.000Z",
       routes: [
         GoRoute(
             name: RouterConstants.completeProfileUsername,
@@ -125,9 +126,9 @@ class AppRouterConfig {
                         builder: (context, state) {
                           final usernameValue =
                               state.pathParameters["username"]!;
-                          final nameValue = state.pathParameters["name"]!;
-                          final dobValue =
-                              state.pathParameters["dob"]!;
+                          final nameValue =
+                              state.pathParameters["name"]!;
+                          final dobValue = state.pathParameters["dob"]!;
 
                           return CompleteProfilePicturePage(
                             username: usernameValue,
