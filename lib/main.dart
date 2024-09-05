@@ -98,6 +98,9 @@ class _MyAppState extends State<MyApp> {
       safePrint('Error retrieving auth session: ${e.message}');
 
       _changeAuthStatus(AuthenticationStatus.signedOut);
+    } catch (e) {
+      safePrint(e);
+      _changeAuthStatus(AuthenticationStatus.error);
     }
   }
 
@@ -157,17 +160,26 @@ class _MyAppState extends State<MyApp> {
     final userStatus = context.select((UserProvider user) => user.status);
 
     GoRouter router;
-    if (authStatus == AuthenticationStatus.loading ||
-        userStatus == ProfileStatus.loading) {
+
+    if (authStatus == AuthenticationStatus.loading) {
       router = AppRouterConfig.loadingConfig();
     } else if (authStatus == AuthenticationStatus.signedOut) {
       router = AppRouterConfig.authConfig();
-    } else if (authStatus == AuthenticationStatus.signedIn &&
-        userStatus == ProfileStatus.incomplete) {
-      router = AppRouterConfig.completeProfile();
-    } else if (authStatus == AuthenticationStatus.signedIn &&
-        userStatus == ProfileStatus.complete) {
-      router = AppRouterConfig.homeConfig();
+    } else if (authStatus == AuthenticationStatus.signedIn) {
+      switch (userStatus) {
+        case ProfileStatus.loading:
+          router = AppRouterConfig.loadingConfig();
+          break;
+        case ProfileStatus.incomplete:
+          router = AppRouterConfig.completeProfile();
+          break;
+        case ProfileStatus.complete:
+          router = AppRouterConfig.homeConfig();
+          break;
+        default:
+          router = AppRouterConfig.errorConfig();
+          break;
+      }
     } else {
       router = AppRouterConfig.errorConfig();
     }

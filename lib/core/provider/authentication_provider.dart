@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-enum AuthenticationStatus { loading, signedIn, signedOut }
+enum AuthenticationStatus { loading, signedIn, signedOut, error }
 
 enum AuthenticationMFAStatus { undefined, setUpped, notSetUpped }
 
