@@ -83,8 +83,6 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme currTheme = Theme.of(context).colorScheme;
-
     return Scaffold(
         appBar: AppBar(),
         body: Padding(

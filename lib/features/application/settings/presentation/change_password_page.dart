@@ -67,8 +67,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    var currTheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       appBar: AppBar(),
       body: Padding(

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/mime_type.dart';

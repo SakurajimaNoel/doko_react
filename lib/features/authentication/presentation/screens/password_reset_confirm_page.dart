@@ -77,8 +77,6 @@ class _PasswordResetConfirmPage extends State<PasswordResetConfirmPage> {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme currTheme = Theme.of(context).colorScheme;
-
     return Scaffold(
         appBar: AppBar(),
         body: Padding(

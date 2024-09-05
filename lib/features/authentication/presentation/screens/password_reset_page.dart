@@ -45,7 +45,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
   }
 
   void _handleResetCode() {
-   context.goNamed(
+    context.goNamed(
       RouterConstants.passwordResetConfirm,
       pathParameters: {"email": _email},
     );
@@ -53,8 +53,6 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme currTheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       appBar: AppBar(),
       body: Padding(

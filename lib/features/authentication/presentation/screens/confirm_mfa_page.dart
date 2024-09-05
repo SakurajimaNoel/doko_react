@@ -1,4 +1,3 @@
-
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -45,8 +44,6 @@ class _ConfirmMfaPageState extends State<ConfirmMfaPage> {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme currTheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 150),
