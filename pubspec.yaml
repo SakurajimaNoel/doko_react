@@ -23,6 +23,7 @@ dependencies:
   go_router: ^14.2.6
   graphql_flutter: ^5.1.2
   flex_color_picker: ^3.5.1
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
