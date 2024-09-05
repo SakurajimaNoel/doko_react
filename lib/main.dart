@@ -99,7 +99,7 @@ class _MyAppState extends State<MyApp> {
 
       _changeAuthStatus(AuthenticationStatus.signedOut);
     } catch (e) {
-      safePrint(e);
+      safePrint(e.toString());
       _changeAuthStatus(AuthenticationStatus.error);
     }
   }

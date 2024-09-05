@@ -70,4 +70,9 @@ class DisplayText {
 
     return "${_getWeekDayName(weekDay)}, $day ${_getMonthName(month)} $year";
   }
+
+  static String date(DateTime date) {
+    String dateOnly = date.toIso8601String().split('T').first;
+    return dateOnly;
+  }
 }

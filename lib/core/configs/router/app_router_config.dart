@@ -104,8 +104,7 @@ class AppRouterConfig {
 
     return GoRouter(
       navigatorKey: rootNavigatorKey,
-      // TODO: correct the default route
-      initialLocation: "/complete-profile-username/complete-profile-info/rohan/complete-profile-picture/rohan/2001-10-11T14:48:00.000Z",
+      initialLocation: "/complete-profile-username",
       routes: [
         GoRoute(
             name: RouterConstants.completeProfileUsername,

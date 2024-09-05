@@ -1,5 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
+import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
@@ -11,7 +12,7 @@ class UserResponse {
 
   const UserResponse({
     required this.status,
-    required this.user,
+    this.user,
   });
 }
 
@@ -60,7 +61,6 @@ class UserGraphqlService {
       if (res == null || res.isEmpty) {
         return const UserResponse(
           status: ResponseStatus.success,
-          user: null,
         );
       }
 
@@ -70,10 +70,9 @@ class UserGraphqlService {
         user: user,
       );
     } catch (e) {
-      safePrint(e);
+      safePrint(e.toString());
       return const UserResponse(
         status: ResponseStatus.error,
-        user: null,
       );
     }
   }
@@ -116,10 +115,55 @@ class UserGraphqlService {
         available: false,
       );
     } catch (e) {
-      safePrint(e);
+      safePrint(e.toString());
       return const UsernameResponse(
         status: ResponseStatus.error,
         available: false,
+      );
+    }
+  }
+
+  Future<UserResponse> completeUserProfile(String id, String username,
+      String email, DateTime dob, String name, String profilePicture) async {
+    try {
+      QueryResult result = await client.mutate(
+        MutationOptions(
+          fetchPolicy: FetchPolicy.noCache,
+          document: gql("""
+        mutation Mutation(\$input: [UserCreateInput!]!) {
+          createUsers(input: \$input) {
+            info {
+              nodesCreated
+            }
+          }
+        }        
+        """),
+          variables: {
+            "input": [
+              {
+                "id": id,
+                "username": username,
+                "email": email,
+                "dob": DisplayText.date(dob),
+                "name": name,
+                "profilePicture": profilePicture,
+              }
+            ]
+          },
+        ),
+      );
+
+      if(result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      return const UserResponse(
+        status: ResponseStatus.success,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return const UserResponse(
+        status: ResponseStatus.error,
       );
     }
   }

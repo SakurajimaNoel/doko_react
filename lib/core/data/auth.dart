@@ -43,7 +43,7 @@ class AuthenticationActions {
         message: e.message,
       );
     } catch (e) {
-      safePrint(e);
+      safePrint(e.toString());
       return AuthenticationResult(
         status: AuthStatus.error,
         message: "Oops! Something went wrong.",
@@ -65,7 +65,7 @@ class AuthenticationActions {
         message: e.message,
       );
     } catch (e) {
-      safePrint(e);
+      safePrint(e.toString());
       return AuthenticationResult(
         status: AuthStatus.error,
         message: "Oops! Something went wrong.",
@@ -97,7 +97,7 @@ class AuthenticationActions {
         message: e.message,
       );
     } catch (e) {
-      safePrint(e);
+      safePrint(e.toString());
       return AuthenticationResult(
         status: AuthStatus.error,
         message: "Oops! Something went wrong.",
@@ -118,7 +118,7 @@ class AuthenticationActions {
         message: e.message,
       );
     } catch (e) {
-      safePrint(e);
+      safePrint(e.toString());
       return AuthenticationResult(
         status: AuthStatus.error,
         message: "Oops! Something went wrong.",
@@ -141,7 +141,7 @@ class AuthenticationActions {
         message: e.message,
       );
     } catch (e) {
-      safePrint(e);
+      safePrint(e.toString());
       return AuthenticationResult(
         status: AuthStatus.error,
         message: "Oops! Something went wrong.",
@@ -174,18 +174,50 @@ class AuthenticationActions {
     }
   }
 
-  static Future<AuthenticationResult> setupMfa() async {
+  static Future<AuthenticationResult> getEmail() async {
     try {
       final userAttributes = await Amplify.Auth.fetchUserAttributes();
       var email = userAttributes.firstWhere(
-          (attribute) =>
-              attribute.userAttributeKey == CognitoUserAttributeKey.email,
-          orElse: () => const AuthUserAttribute(
-              userAttributeKey: CognitoUserAttributeKey.email, value: "dokii"));
+        (attribute) =>
+            attribute.userAttributeKey == CognitoUserAttributeKey.email,
+        orElse: () => const AuthUserAttribute(
+          userAttributeKey: CognitoUserAttributeKey.email,
+          value: "dokii",
+        ),
+      );
+
+      return AuthenticationResult(
+        status: AuthStatus.done,
+        message: email.value,
+      );
+    } on AuthException catch (e) {
+      return AuthenticationResult(
+        status: AuthStatus.error,
+        message: e.message,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return AuthenticationResult(
+        status: AuthStatus.error,
+        message: "Oops! Something went wrong.",
+      );
+    }
+  }
+
+  static Future<AuthenticationResult> setupMfa() async {
+    try {
+      var emailResult = await getEmail();
+      if (emailResult.status == AuthStatus.error) {
+        throw Exception(emailResult.message);
+      }
+
+      String email = emailResult.message!;
 
       final totpSetupDetails = await Amplify.Auth.setUpTotp();
       final setupUri = totpSetupDetails.getSetupUri(
-          appName: 'Doki', accountName: email.value);
+        appName: 'Doki',
+        accountName: email,
+      );
 
       return AuthenticationResult(
         status: AuthStatus.done,
@@ -193,11 +225,16 @@ class AuthenticationActions {
         message: totpSetupDetails.sharedSecret,
       );
     } on AuthException catch (e) {
-      return AuthenticationResult(status: AuthStatus.error, message: e.message);
-    } catch (e) {
-      safePrint(e);
       return AuthenticationResult(
-          status: AuthStatus.error, message: "Oops! Something went wrong.");
+        status: AuthStatus.error,
+        message: e.message,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return AuthenticationResult(
+        status: AuthStatus.error,
+        message: "Oops! Something went wrong.",
+      );
     }
   }
 
@@ -220,7 +257,7 @@ class AuthenticationActions {
         message: e.message,
       );
     } catch (e) {
-      safePrint(e);
+      safePrint(e.toString());
       return AuthenticationResult(
         status: AuthStatus.error,
         message: "Oops! Something went wrong.",
@@ -254,7 +291,7 @@ class AuthenticationActions {
         value: e.message,
       );
     } catch (e) {
-      safePrint(e);
+      safePrint(e.toString());
       return AuthenticationToken(
         status: AuthStatus.error,
         value: "Oops! Something went wrong.",
@@ -279,7 +316,7 @@ class AuthenticationActions {
         message: e.message,
       );
     } catch (e) {
-      safePrint(e);
+      safePrint(e.toString());
       return AuthenticationResult(
         status: AuthStatus.error,
         message: "Oops! Something went wrong.",
@@ -300,7 +337,7 @@ class AuthenticationActions {
         message: e.message,
       );
     } catch (e) {
-      safePrint(e);
+      safePrint(e.toString());
       return AuthenticationResult(
         status: AuthStatus.error,
         message: "Oops! Something went wrong.",

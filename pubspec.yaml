@@ -24,6 +24,7 @@ dependencies:
   graphql_flutter: ^5.1.2
   flex_color_picker: ^3.5.1
   image_picker: ^1.1.2
+  aws_common: ^0.7.3
 
 dev_dependencies:
   flutter_test:
