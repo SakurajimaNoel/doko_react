@@ -152,7 +152,7 @@ class AppRouterConfig {
 
     return GoRouter(
       navigatorKey: homeRouterRootNavigatorKey,
-      initialLocation: "/profile/settings/mfa-setup/verify-mfa",
+      initialLocation: "/user-feed",
       routes: [
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
