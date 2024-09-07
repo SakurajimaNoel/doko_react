@@ -136,9 +136,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     _userProvider.addUser(
-      name: user.name,
-      username: user.username,
-      profilePicture: user.profilePicture,
+      user: user,
     );
   }
 

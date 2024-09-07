@@ -1,3 +1,4 @@
+import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:flutter/material.dart';
 
 enum ProfileStatus { complete, incomplete, loading, error }
@@ -7,8 +8,11 @@ class UserProvider extends ChangeNotifier {
   String _name = "";
   String _username = "";
   String _profilePicture = "";
+  String _id = "";
 
   ProfileStatus get status => _status;
+
+  String get id => _id;
 
   String get name => _name;
 
@@ -21,15 +25,12 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addUser({
-    required String name,
-    required String username,
-    required String profilePicture,
-  }) {
+  void addUser({required UserModel user}) {
     _status = ProfileStatus.complete;
-    _name = name;
-    _username = username;
-    _profilePicture = profilePicture;
+    _name = user.name;
+    _username = user.username;
+    _profilePicture = user.profilePicture;
+    _id = user.id;
 
     notifyListeners();
   }
