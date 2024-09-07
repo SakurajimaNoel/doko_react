@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AccentWidget extends StatefulWidget {
-  const AccentWidget({super.key});
+  const AccentWidget({
+    super.key,
+  });
 
   @override
   State<AccentWidget> createState() => _AccentWidgetState();

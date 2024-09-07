@@ -1,3 +1,4 @@
+import 'package:doko_react/core/widgets/loader_button.dart';
 import 'package:doko_react/features/application/settings/widgets/settings_heading.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -5,10 +6,13 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/configs/router/router_constants.dart';
 import '../../../../core/data/auth.dart';
+import '../../../../core/helpers/constants.dart';
 import '../../../../core/provider/authentication_provider.dart';
 
 class UserSettings extends StatefulWidget {
-  const UserSettings({super.key});
+  const UserSettings({
+    super.key,
+  });
 
   @override
   State<UserSettings> createState() => _UserSettingsState();
@@ -43,8 +47,9 @@ class _UserSettingsState extends State<UserSettings> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration:
-            const Duration(milliseconds: 300), // Duration for the SnackBar
+        duration: const Duration(
+          milliseconds: 300,
+        ),
       ),
     );
   }
@@ -59,10 +64,12 @@ class _UserSettingsState extends State<UserSettings> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SettingsHeading("User Settings"),
-        const SizedBox(height: 8),
+        const SizedBox(
+          height: Constants.gap * 0.5,
+        ),
         const SettingsHeading(
           "Multi-factor Authentication",
-          size: 16,
+          size: Constants.fontSize,
           fontWeight: FontWeight.w500,
         ),
         if (mfaStatus == AuthenticationMFAStatus.undefined) ...[
@@ -73,15 +80,14 @@ class _UserSettingsState extends State<UserSettings> {
               "This account is already protected by multi-factor authentication."),
           TextButton(
             style: const ButtonStyle(
-                padding: WidgetStatePropertyAll(EdgeInsets.zero)),
+              padding: WidgetStatePropertyAll(EdgeInsets.zero),
+            ),
             onPressed: _removing ? null : _handleRemoveMFA,
             child: _removing
-                ? SizedBox(
-                    height: 15,
-                    width: 15,
-                    child: CircularProgressIndicator(
-                      color: currScheme.error,
-                    ),
+                ? LoaderButton(
+                    width: Constants.width,
+                    height: Constants.height,
+                    color: currScheme.error,
                   )
                 : Text(
                     "Remove MFA",
@@ -95,7 +101,8 @@ class _UserSettingsState extends State<UserSettings> {
               "Enhance your account security by enabling multi-factor authentication. It's quick and easy to set up."),
           TextButton(
             style: const ButtonStyle(
-                padding: WidgetStatePropertyAll(EdgeInsets.zero)),
+              padding: WidgetStatePropertyAll(EdgeInsets.zero),
+            ),
             onPressed: () {
               context.goNamed(RouterConstants.mfaSetup);
             },
@@ -104,17 +111,20 @@ class _UserSettingsState extends State<UserSettings> {
             ),
           ),
         ],
-        const SizedBox(height: 8),
+        const SizedBox(
+          height: Constants.gap * 0.5,
+        ),
         const SettingsHeading(
           "Update password",
-          size: 16,
+          size: Constants.fontSize,
           fontWeight: FontWeight.w500,
         ),
         const Text(
             "Consider changing your password every few months to enhance security."),
         TextButton(
           style: const ButtonStyle(
-              padding: WidgetStatePropertyAll(EdgeInsets.zero)),
+            padding: WidgetStatePropertyAll(EdgeInsets.zero),
+          ),
           onPressed: () {
             context.goNamed(RouterConstants.changePassword);
           },

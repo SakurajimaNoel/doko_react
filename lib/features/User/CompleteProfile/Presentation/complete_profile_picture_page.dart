@@ -142,7 +142,7 @@ class _CompleteProfilePicturePageState
     var currTheme = Theme.of(context).colorScheme;
     final double radius = min(
       MediaQuery.sizeOf(context).width / 2 - Constants.padding,
-      Constants.radius,
+      Constants.radius * 10,
     );
 
     return Scaffold(

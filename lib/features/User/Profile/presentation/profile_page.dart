@@ -5,17 +5,27 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/data/auth.dart';
-
+import '../../../../core/helpers/constants.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({
+    super.key,
+  });
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  static const double _padding = 16;
+  late final UserProvider _userProvider;
+  late final String _username;
+
+  @override
+  void initState() {
+    super.initState();
+    _userProvider = context.read<UserProvider>();
+    _username = _userProvider.username;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Consumer<UserProvider>(
-          builder: (context, user, child) {
-            return Text(user.username);
-          },
-        ),
+        title: Text(_username),
         actions: [
           IconButton(
             onPressed: () {
@@ -42,14 +48,15 @@ class _ProfilePageState extends State<ProfilePage> {
               },
               child: Text(
                 "Sign out",
-                style: TextStyle(color: currScheme.error),
+                style: TextStyle(
+                  color: currScheme.error,
+                ),
               ))
         ],
       ),
       body: const SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(
-              left: _padding, right: _padding, bottom: _padding),
+          padding: EdgeInsets.all(Constants.padding),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
