@@ -1,3 +1,5 @@
+import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/core/widgets/loader_button.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,7 +9,9 @@ import '../../../../core/helpers/input.dart';
 import '../widgets/error_widget.dart';
 
 class ConfirmMfaPage extends StatefulWidget {
-  const ConfirmMfaPage({super.key});
+  const ConfirmMfaPage({
+    super.key,
+  });
 
   @override
   State<ConfirmMfaPage> createState() => _ConfirmMfaPageState();
@@ -46,13 +50,22 @@ class _ConfirmMfaPageState extends State<ConfirmMfaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 150),
+        padding: const EdgeInsets.only(
+          left: Constants.gap,
+          right: Constants.gap,
+          top: Constants.gap * 10,
+        ),
         child: SafeArea(
             child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Heading("Two-factor authentication", size: 26),
-            const SizedBox(height: 30),
+            const Heading(
+              "Two-factor authentication",
+              size: Constants.heading3,
+            ),
+            const SizedBox(
+              height: Constants.gap * 1.5,
+            ),
             Form(
               key: _formKey,
               child: Column(
@@ -86,25 +99,23 @@ class _ConfirmMfaPageState extends State<ConfirmMfaPage> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: Constants.gap * 1.5),
                   FilledButton(
                     onPressed: _loading ? null : _submit,
                     style: FilledButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 24),
+                      minimumSize: const Size(
+                        Constants.buttonWidth,
+                        Constants.buttonHeight,
+                      ),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: _loading
-                          ? const SizedBox(
-                              height: 25,
-                              width: 25,
-                              child: CircularProgressIndicator(),
-                            )
-                          : const Text("Continue"),
-                    ),
+                    child: _loading
+                        ? const LoaderButton()
+                        : const Text("Continue"),
                   ),
                   if (_errorMessage.isNotEmpty) ...[
-                    const SizedBox(height: 10),
+                    const SizedBox(
+                      height: Constants.gap * 0.75,
+                    ),
                     ErrorText(_errorMessage),
                   ],
                 ],

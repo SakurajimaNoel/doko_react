@@ -1,10 +1,15 @@
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:flutter/material.dart';
 
 class Heading extends StatelessWidget {
   final String text;
   final double? size;
 
-  const Heading(this.text, {super.key, this.size});
+  const Heading(
+    this.text, {
+    super.key,
+    this.size,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +17,7 @@ class Heading extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-          fontSize: size ?? 48,
+          fontSize: size ?? Constants.heading1,
           fontWeight: FontWeight.w500,
         ),
         textAlign: TextAlign.center,

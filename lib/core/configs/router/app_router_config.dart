@@ -1,6 +1,6 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
-import 'package:doko_react/core/widgets/loader.dart';
 import 'package:doko_react/core/widgets/error.dart';
+import 'package:doko_react/core/widgets/loader.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
@@ -88,7 +88,9 @@ class AppRouterConfig {
                   path: "password-reset-confirm/:email",
                   builder: (context, state) {
                     final emailValue = state.pathParameters["email"]!;
-                    return PasswordResetConfirmPage(email: emailValue);
+                    return PasswordResetConfirmPage(
+                      email: emailValue,
+                    );
                   },
                 ),
               ],
@@ -125,8 +127,7 @@ class AppRouterConfig {
                         builder: (context, state) {
                           final usernameValue =
                               state.pathParameters["username"]!;
-                          final nameValue =
-                              state.pathParameters["name"]!;
+                          final nameValue = state.pathParameters["name"]!;
                           final dobValue = state.pathParameters["dob"]!;
 
                           return CompleteProfilePicturePage(

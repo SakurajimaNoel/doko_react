@@ -2,11 +2,10 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:doko_react/aws/amplifyconfiguration.dart';
+import 'package:doko_react/core/configs/router/app_router_config.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
-
 import 'package:doko_react/core/provider/theme_provider.dart';
-import 'package:doko_react/core/configs/router/app_router_config.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/theme/theme_data.dart';
 import 'package:flutter/material.dart';

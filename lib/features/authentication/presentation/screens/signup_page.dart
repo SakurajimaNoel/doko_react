@@ -1,16 +1,19 @@
-import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
-
+import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/core/widgets/loader_button.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/data/auth.dart';
+import '../../../../core/helpers/constants.dart';
 import '../widgets/error_widget.dart';
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+  const SignupPage({
+    super.key,
+  });
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -57,8 +60,9 @@ class _SignupPageState extends State<SignupPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration:
-            const Duration(milliseconds: 500), // Duration for the Snackbar
+        duration: const Duration(
+          milliseconds: 500,
+        ),
       ),
     );
     _formKey.currentState?.reset();
@@ -73,13 +77,15 @@ class _SignupPageState extends State<SignupPage> {
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(Constants.padding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(),
             const Heading("Signup"),
-            const SizedBox(height: 30),
+            const SizedBox(
+              height: Constants.gap * 1.5,
+            ),
             Form(
               key: _formKey,
               child: Column(
@@ -104,11 +110,14 @@ class _SignupPageState extends State<SignupPage> {
                     },
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Email",
-                        hintText: "Email..."),
+                      border: OutlineInputBorder(),
+                      labelText: "Email",
+                      hintText: "Email...",
+                    ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(
+                    height: Constants.gap * 1.5,
+                  ),
                   TextFormField(
                     enabled: !_loading,
                     obscureText: true,
@@ -134,11 +143,14 @@ class _SignupPageState extends State<SignupPage> {
                     },
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Password",
-                        hintText: "Password..."),
+                      border: OutlineInputBorder(),
+                      labelText: "Password",
+                      hintText: "Password...",
+                    ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(
+                    height: Constants.gap * 1.5,
+                  ),
                   TextFormField(
                     enabled: !_loading,
                     obscureText: true,
@@ -155,54 +167,55 @@ class _SignupPageState extends State<SignupPage> {
                     },
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Confirm Password",
-                        hintText: "Confirm Password..."),
+                      border: OutlineInputBorder(),
+                      labelText: "Confirm Password",
+                      hintText: "Confirm Password...",
+                    ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(
+                    height: Constants.gap * 1.5,
+                  ),
                   FilledButton(
                     onPressed: _loading ? null : _submit,
                     style: FilledButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 24),
+                      minimumSize: const Size(
+                        Constants.buttonWidth,
+                        Constants.buttonHeight,
+                      ),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: _loading
-                          ? const SizedBox(
-                              height: 25,
-                              width: 25,
-                              child: CircularProgressIndicator(),
-                            )
-                          : const Text("Sign Up"),
-                    ),
+                    child:
+                        _loading ? const LoaderButton() : const Text("Sign Up"),
                   ),
                   if (_errorMessage.isNotEmpty) ...[
-                    const SizedBox(height: 10),
+                    const SizedBox(
+                      height: Constants.gap * 0.75,
+                    ),
                     ErrorText(_errorMessage),
                   ],
                 ],
               ),
             ),
             const Spacer(),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: RichText(
-                  text: TextSpan(
-                text: "Already have the account? ",
-                style: TextStyle(color: currTheme.onSurface),
-                children: [
-                  TextSpan(
-                      text: "Login.",
-                      style: TextStyle(
-                          color: currTheme.primary,
-                          fontWeight: FontWeight.w500),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          context.goNamed(RouterConstants.login);
-                        })
-                ],
-              )),
-            ),
+            RichText(
+                text: TextSpan(
+              text: "Already have the account? ",
+              style: TextStyle(
+                color: currTheme.onSurface,
+              ),
+              children: [
+                TextSpan(
+                  text: "Login.",
+                  style: TextStyle(
+                    color: currTheme.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      context.goNamed(RouterConstants.login);
+                    },
+                )
+              ],
+            )),
           ],
         ),
       ),

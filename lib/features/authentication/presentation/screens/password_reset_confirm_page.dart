@@ -1,17 +1,22 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/widgets/loader_button.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/data/auth.dart';
+import '../../../../core/helpers/constants.dart';
 import '../../../../core/helpers/input.dart';
 import '../widgets/error_widget.dart';
 
 class PasswordResetConfirmPage extends StatefulWidget {
   final String email;
 
-  const PasswordResetConfirmPage({super.key, required this.email});
+  const PasswordResetConfirmPage({
+    super.key,
+    required this.email,
+  });
 
   @override
   State<PasswordResetConfirmPage> createState() => _PasswordResetConfirmPage();
@@ -62,13 +67,17 @@ class _PasswordResetConfirmPage extends State<PasswordResetConfirmPage> {
       const SnackBar(
         content: Text(
             'Password reset successful. You can now login using new password.'),
-        duration: Duration(milliseconds: 500), // Duration for the Snackbar
+        duration: Duration(
+          milliseconds: 500,
+        ),
       ),
     );
 
     // Delay the navigation
     Future.delayed(
-      const Duration(milliseconds: 500),
+      const Duration(
+        milliseconds: 500,
+      ),
       () {
         context.goNamed(RouterConstants.login);
       },
@@ -78,18 +87,20 @@ class _PasswordResetConfirmPage extends State<PasswordResetConfirmPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: SafeArea(
-              child: Column(
+      appBar: AppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(Constants.padding),
+        child: SafeArea(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Heading(
                 "Password Reset",
-                size: 36,
+                size: Constants.heading2,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(
+                height: Constants.gap * 1.5,
+              ),
               Form(
                 key: _formKey,
                 child: Column(
@@ -126,7 +137,9 @@ class _PasswordResetConfirmPage extends State<PasswordResetConfirmPage> {
                         counterText: '',
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(
+                      height: Constants.gap * 1.5,
+                    ),
                     TextFormField(
                       enabled: !_loading,
                       obscureText: true,
@@ -152,11 +165,14 @@ class _PasswordResetConfirmPage extends State<PasswordResetConfirmPage> {
                       },
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: "New Password",
-                          hintText: "New Password..."),
+                        border: OutlineInputBorder(),
+                        labelText: "New Password",
+                        hintText: "New Password...",
+                      ),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(
+                      height: Constants.gap * 1.5,
+                    ),
                     TextFormField(
                       enabled: !_loading,
                       obscureText: true,
@@ -173,36 +189,38 @@ class _PasswordResetConfirmPage extends State<PasswordResetConfirmPage> {
                       },
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: "Confirm Password",
-                          hintText: "Confirm Password..."),
+                        border: OutlineInputBorder(),
+                        labelText: "Confirm Password",
+                        hintText: "Confirm Password...",
+                      ),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(
+                      height: Constants.gap * 1.5,
+                    ),
                     FilledButton(
                       onPressed: _loading ? null : _submit,
                       style: FilledButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 24),
+                        minimumSize: const Size(
+                          Constants.buttonWidth,
+                          Constants.buttonHeight,
+                        ),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12.0),
-                        child: _loading
-                            ? const SizedBox(
-                                height: 25,
-                                width: 25,
-                                child: CircularProgressIndicator(),
-                              )
-                            : const Text("Reset"),
-                      ),
+                      child:
+                          _loading ? const LoaderButton() : const Text("Reset"),
                     ),
                     if (_errorMessage.isNotEmpty) ...[
-                      const SizedBox(height: 10),
+                      const SizedBox(
+                        height: Constants.gap * 0.75,
+                      ),
                       ErrorText(_errorMessage),
                     ],
                   ],
                 ),
               )
             ],
-          )),
-        ));
+          ),
+        ),
+      ),
+    );
   }
 }
