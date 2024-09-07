@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class Constants {
   static const double padding = 16;
   static const double gap = 16;
+  static const double radius = 175;
 
   static const double buttonHeight = 48;
   static const double buttonWidth = double.infinity;

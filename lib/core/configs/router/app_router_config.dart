@@ -109,35 +109,39 @@ class AppRouterConfig {
       initialLocation: "/complete-profile-username",
       routes: [
         GoRoute(
-            name: RouterConstants.completeProfileUsername,
-            path: "/complete-profile-username",
-            builder: (context, state) => const CompleteProfileUsernamePage(),
-            routes: [
-              GoRoute(
-                  name: RouterConstants.completeProfileInfo,
-                  path: "complete-profile-info/:username",
+          name: RouterConstants.completeProfileUsername,
+          path: "/complete-profile-username",
+          builder: (context, state) => const CompleteProfileUsernamePage(),
+          routes: [
+            GoRoute(
+              name: RouterConstants.completeProfileInfo,
+              path: "complete-profile-info/:username",
+              builder: (context, state) {
+                final usernameValue = state.pathParameters["username"]!;
+                return CompleteProfileInfoPage(
+                  username: usernameValue,
+                );
+              },
+              routes: [
+                GoRoute(
+                  name: RouterConstants.completeProfilePicture,
+                  path: "complete-profile-picture/:name/:dob",
                   builder: (context, state) {
                     final usernameValue = state.pathParameters["username"]!;
-                    return CompleteProfileInfoPage(username: usernameValue);
-                  },
-                  routes: [
-                    GoRoute(
-                        name: RouterConstants.completeProfilePicture,
-                        path: "complete-profile-picture/:name/:dob",
-                        builder: (context, state) {
-                          final usernameValue =
-                              state.pathParameters["username"]!;
-                          final nameValue = state.pathParameters["name"]!;
-                          final dobValue = state.pathParameters["dob"]!;
+                    final nameValue = state.pathParameters["name"]!;
+                    final dobValue = state.pathParameters["dob"]!;
 
-                          return CompleteProfilePicturePage(
-                            username: usernameValue,
-                            name: nameValue,
-                            dob: dobValue,
-                          );
-                        })
-                  ])
-            ])
+                    return CompleteProfilePicturePage(
+                      username: usernameValue,
+                      name: nameValue,
+                      dob: dobValue,
+                    );
+                  },
+                )
+              ],
+            )
+          ],
+        )
       ],
     );
   }

@@ -1,4 +1,3 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/helpers/debounce.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/input.dart';
@@ -11,9 +10,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/configs/router/router_constants.dart';
 import '../../../../core/data/auth.dart';
+import '../../../../core/helpers/constants.dart';
 
 class CompleteProfileUsernamePage extends StatefulWidget {
-  const CompleteProfileUsernamePage({super.key});
+  const CompleteProfileUsernamePage({
+    super.key,
+  });
 
   @override
   State<CompleteProfileUsernamePage> createState() =>
@@ -24,8 +26,9 @@ class _CompleteProfileUsernamePageState
     extends State<CompleteProfileUsernamePage> {
   final UserGraphqlService _graphqlService = UserGraphqlService();
   final _formKey = GlobalKey<FormState>();
-  final Debounce _usernameDebounce =
-      Debounce(const Duration(milliseconds: 500));
+  final Debounce _usernameDebounce = Debounce(const Duration(
+    milliseconds: 500,
+  ));
 
   // bool _loading = false;
   String _username = "";
@@ -39,7 +42,6 @@ class _CompleteProfileUsernamePageState
   ];
 
   Future<void> _isAvailable(String username) async {
-    safePrint(username);
     var usernameResponse = await _graphqlService.checkUsername(username);
     String message = "";
     bool available = true;
@@ -49,7 +51,8 @@ class _CompleteProfileUsernamePageState
       available = false;
     }
 
-    if (!usernameResponse.available) {
+    if (usernameResponse.status == ResponseStatus.success &&
+        !usernameResponse.available) {
       message = "'$_username' is already taken.";
       available = false;
     }
@@ -69,19 +72,20 @@ class _CompleteProfileUsernamePageState
         title: const Text("Complete profile"),
         actions: [
           TextButton(
-              onPressed: () {
-                AuthenticationActions.signOutUser();
-              },
-              child: Text(
-                "Sign out",
-                style: TextStyle(
-                  color: currTheme.error,
-                ),
-              ))
+            onPressed: () {
+              AuthenticationActions.signOutUser();
+            },
+            child: Text(
+              "Sign out",
+              style: TextStyle(
+                color: currTheme.error,
+              ),
+            ),
+          )
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(Constants.padding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -89,15 +93,15 @@ class _CompleteProfileUsernamePageState
             const Text(
                 "Your username, is a unique identifier that allows others to find and connect with your profile. Once created, your username cannot be changed."),
             const SizedBox(
-              height: 8,
+              height: Constants.gap * 0.5,
             ),
             const SettingsHeading(
               "Your username must:",
-              size: 14,
+              size: Constants.fontSize,
             ),
             BulletList(usernamePattern),
             const SizedBox(
-              height: 24,
+              height: Constants.gap * 1.5,
             ),
             Expanded(
               child: Form(
@@ -148,7 +152,7 @@ class _CompleteProfileUsernamePageState
                           ),
                         ),
                         const SizedBox(
-                          height: 8,
+                          height: Constants.gap * 0.5,
                         ),
                         if (_apiErrorMessage.isNotEmpty)
                           ErrorText(_apiErrorMessage),
@@ -165,16 +169,18 @@ class _CompleteProfileUsernamePageState
                           : () {
                               context.goNamed(
                                 RouterConstants.completeProfileInfo,
-                                pathParameters: {"username": _username},
+                                pathParameters: {
+                                  "username": _username,
+                                },
                               );
                             },
                       style: FilledButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 24),
+                        minimumSize: const Size(
+                          Constants.buttonWidth,
+                          Constants.buttonHeight,
+                        ),
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12.0),
-                        child: Text("Continue"),
-                      ),
+                      child: const Text("Continue"),
                     ),
                   ],
                 ),

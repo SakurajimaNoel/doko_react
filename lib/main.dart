@@ -183,6 +183,8 @@ class _MyAppState extends State<MyApp> {
       router = AppRouterConfig.errorConfig();
     }
 
+    router = AppRouterConfig.completeProfile();
+
     return Consumer<ThemeProvider>(
       builder: (context, theme, child) {
         ThemeMode themeMode;

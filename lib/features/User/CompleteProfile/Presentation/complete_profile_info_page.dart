@@ -5,12 +5,16 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/configs/router/router_constants.dart';
 import '../../../../core/data/auth.dart';
+import '../../../../core/helpers/constants.dart';
 import '../../../application/settings/widgets/settings_heading.dart';
 
 class CompleteProfileInfoPage extends StatefulWidget {
   final String username;
 
-  const CompleteProfileInfoPage({super.key, required this.username});
+  const CompleteProfileInfoPage({
+    super.key,
+    required this.username,
+  });
 
   @override
   State<CompleteProfileInfoPage> createState() =>
@@ -51,7 +55,9 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
   void initState() {
     super.initState();
     _username = widget.username;
-    _usernameController = TextEditingController(text: _username);
+    _usernameController = TextEditingController(
+      text: _username,
+    );
   }
 
   @override
@@ -76,7 +82,7 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(Constants.padding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -84,7 +90,7 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
             const Text(
                 "Let's get started! Please fill in the information below to complete your profile. We're excited to have you join Doki."),
             const SizedBox(
-              height: 24,
+              height: Constants.gap * 1.5,
             ),
             Expanded(
               child: Form(
@@ -115,7 +121,7 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
                           ),
                         ),
                         const SizedBox(
-                          height: 16,
+                          height: Constants.gap * 1.25,
                         ),
                         TextFormField(
                           validator: (value) {
@@ -143,7 +149,7 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
                           ),
                         ),
                         const SizedBox(
-                          height: 16,
+                          height: Constants.gap * 1.25,
                         ),
                         GestureDetector(
                           onTap: _selectDate,
@@ -186,12 +192,12 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
                     FilledButton(
                       onPressed: _next,
                       style: FilledButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 24),
+                        minimumSize: const Size(
+                          Constants.buttonWidth,
+                          Constants.buttonHeight,
+                        ),
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12.0),
-                        child: Text("Next"),
-                      ),
+                      child: const Text("Next"),
                     ),
                   ],
                 ),
@@ -204,7 +210,9 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
   }
 
   Future<void> _selectDate() async {
-    DateTime currDate = DateTime.now().subtract(const Duration(days: _years13));
+    DateTime currDate = DateTime.now().subtract(const Duration(
+      days: _years13,
+    ));
     final DateTime selected = await showDatePicker(
           context: context,
           initialDate: currDate,

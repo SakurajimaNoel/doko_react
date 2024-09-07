@@ -2,10 +2,12 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:doko_react/core/data/storage.dart';
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/mime_type.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/image_picker_widget.dart';
+import 'package:doko_react/core/widgets/loader_button.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/error_widget.dart';
 import 'package:flutter/material.dart';
@@ -138,9 +140,10 @@ class _CompleteProfilePicturePageState
   @override
   Widget build(BuildContext context) {
     var currTheme = Theme.of(context).colorScheme;
-    const double padding = 16;
-    final double radius =
-        min(MediaQuery.sizeOf(context).width / 2 - padding, 175.00);
+    final double radius = min(
+      MediaQuery.sizeOf(context).width / 2 - Constants.padding,
+      Constants.radius,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -160,7 +163,7 @@ class _CompleteProfilePicturePageState
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(padding),
+        padding: const EdgeInsets.all(Constants.padding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -168,7 +171,7 @@ class _CompleteProfilePicturePageState
             const Text(
                 "Almost there! Select an image to add as your profile picture."),
             const SizedBox(
-              height: 8,
+              height: Constants.gap * 0.5,
             ),
             Expanded(
               child: Column(
@@ -193,7 +196,7 @@ class _CompleteProfilePicturePageState
                               ),
                             ),
                       const SizedBox(
-                        height: 8,
+                        height: Constants.gap * 0.5,
                       ),
                       ImagePickerWidget(
                         _profilePicture == null ? "Select" : "Change",
@@ -206,26 +209,22 @@ class _CompleteProfilePicturePageState
                       if (_errorMessage.isNotEmpty) ...[
                         ErrorText(_errorMessage),
                         const SizedBox(
-                          height: 8,
-                        )
+                          height: Constants.gap * 0.5,
+                        ),
                       ],
                       FilledButton(
                         onPressed: _completing || _profilePicture == null
                             ? null
                             : _completeProfile,
                         style: FilledButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 24),
+                          minimumSize: const Size(
+                            Constants.buttonWidth,
+                            Constants.buttonHeight,
+                          ),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                          child: _completing
-                              ? const SizedBox(
-                                  height: 25,
-                                  width: 25,
-                                  child: CircularProgressIndicator(),
-                                )
-                              : const Text("Complete"),
-                        ),
+                        child: _completing
+                            ? const LoaderButton()
+                            : const Text("Complete"),
                       ),
                     ],
                   ),
