@@ -1,5 +1,7 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
+import 'package:doko_react/core/widgets/loader_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -8,16 +10,18 @@ import 'package:provider/provider.dart';
 import '../../../../core/data/auth.dart';
 import '../../../../core/helpers/input.dart';
 import '../../../authentication/presentation/widgets/error_widget.dart';
+import '../widgets/settings_heading.dart';
 
 class VerifyMfaPage extends StatefulWidget {
-  const VerifyMfaPage({super.key});
+  const VerifyMfaPage({
+    super.key,
+  });
 
   @override
   State<VerifyMfaPage> createState() => _VerifyMfaPage();
 }
 
 class _VerifyMfaPage extends State<VerifyMfaPage> {
-  static const double _padding = 16;
   final _formKey = GlobalKey<FormState>();
   String _confirmString = "";
   bool _loading = false;
@@ -61,7 +65,9 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Successfully added MFA to this account!'),
-        duration: Duration(milliseconds: 500), // Duration for the SnackBar
+        duration: Duration(
+          milliseconds: 500,
+        ),
       ),
     );
 
@@ -84,73 +90,78 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
-        body: Padding(
-          padding: const EdgeInsets.all(_padding),
-          child: Column(
-            children: [
-              const Text(
-                  "Enter the code from your authenticator app to complete the MFA setup and strengthen your account security."),
-              const SizedBox(height: 30),
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      keyboardType: TextInputType.number,
-                      enabled: !_loading,
-                      maxLength: 6,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(6),
-                      ],
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Code",
-                        hintText: "Code...",
-                      ),
-                      onSaved: (value) {
-                        if (value == null || value.isEmpty) {
-                          return;
-                        }
-                        _confirmString = value;
-                      },
-                      validator: (value) {
-                        InputStatus status =
-                            ValidateInput.validateConfirmCode(value);
-                        if (!status.isValid) {
-                          return status.message;
-                        }
-
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 30),
-                    FilledButton(
-                      onPressed: _loading ? null : _submit,
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 24),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12.0),
-                        child: _loading
-                            ? const SizedBox(
-                                height: 25,
-                                width: 25,
-                                child: CircularProgressIndicator(),
-                              )
-                            : const Text("Complete"),
-                      ),
-                    ),
-                    if (_errorMessage.isNotEmpty) ...[
-                      const SizedBox(height: 10),
-                      ErrorText(_errorMessage),
+      appBar: AppBar(
+        title: const SettingsHeading(
+          "MFA Setup",
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(Constants.padding),
+        child: Column(
+          children: [
+            const Text(
+                "Enter the code from your authenticator app to complete the MFA setup and strengthen your account security."),
+            const SizedBox(
+              height: Constants.gap * 1.5,
+            ),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    enabled: !_loading,
+                    maxLength: 6,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(6),
                     ],
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: "Code",
+                      hintText: "Code...",
+                    ),
+                    onSaved: (value) {
+                      if (value == null || value.isEmpty) {
+                        return;
+                      }
+                      _confirmString = value;
+                    },
+                    validator: (value) {
+                      InputStatus status =
+                          ValidateInput.validateConfirmCode(value);
+                      if (!status.isValid) {
+                        return status.message;
+                      }
+
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: Constants.gap * 1.5),
+                  FilledButton(
+                    onPressed: _loading ? null : _submit,
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(
+                        Constants.buttonWidth,
+                        Constants.buttonHeight,
+                      ),
+                    ),
+                    child: _loading
+                        ? const LoaderButton()
+                        : const Text("Complete"),
+                  ),
+                  if (_errorMessage.isNotEmpty) ...[
+                    const SizedBox(
+                      height: Constants.gap * 0.75,
+                    ),
+                    ErrorText(_errorMessage),
                   ],
-                ),
+                ],
               ),
-            ],
-          ),
-        ));
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

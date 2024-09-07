@@ -1,8 +1,8 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/features/application/settings/widgets/settings_heading.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -13,7 +13,9 @@ import '../../../../core/data/auth.dart';
 import '../../../authentication/presentation/widgets/error_widget.dart';
 
 class MfaSetupPage extends StatefulWidget {
-  const MfaSetupPage({super.key});
+  const MfaSetupPage({
+    super.key,
+  });
 
   @override
   State<MfaSetupPage> createState() => _MfaSetupPageState();
@@ -24,7 +26,6 @@ class _MfaSetupPageState extends State<MfaSetupPage> {
   bool _loading = true;
   String _key = "";
   String _uri = "";
-  static const double _padding = 16;
 
   @override
   void initState() {
@@ -81,94 +82,104 @@ class _MfaSetupPageState extends State<MfaSetupPage> {
           ? const Center(
               // Centering the CircularProgressIndicator
               child: SizedBox(
-                height: 25,
-                width: 25,
+                height: Constants.width * 1.5,
+                width: Constants.width * 1.5,
                 child: CircularProgressIndicator(),
               ),
             )
           : _errorMessage.isNotEmpty
               ? Center(
-                  // Centering the CircularProgressIndicator
                   child: ErrorText(_errorMessage),
                 )
-              : Padding(
-                  padding: const EdgeInsets.all(_padding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_uri.isNotEmpty) ...[
-                        const Text(
-                            "To enable extra security, scan the QR code with your authenticator app"),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Center(
-                          child: QrImageView(
-                            data: _uri,
-                            version: QrVersions.auto,
-                            size: 225.0,
-                            backgroundColor: currTheme.surface,
-                            eyeStyle: QrEyeStyle(
-                              color: currTheme.onSurface,
-                              eyeShape: QrEyeShape.square,
-                            ),
-                            dataModuleStyle: QrDataModuleStyle(
-                              color: currTheme.onSurface,
-                              dataModuleShape: QrDataModuleShape.square,
+              : SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(Constants.padding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_uri.isNotEmpty) ...[
+                          const Text(
+                              "To enable extra security, scan the QR code with your authenticator app"),
+                          const SizedBox(
+                            height: Constants.gap,
+                          ),
+                          Center(
+                            child: QrImageView(
+                              data: _uri,
+                              version: QrVersions.auto,
+                              size: 225.0,
+                              backgroundColor: currTheme.surface,
+                              eyeStyle: QrEyeStyle(
+                                color: currTheme.onSurface,
+                                eyeShape: QrEyeShape.square,
+                              ),
+                              dataModuleStyle: QrDataModuleStyle(
+                                color: currTheme.onSurface,
+                                dataModuleShape: QrDataModuleShape.square,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        RichText(
-                          text: TextSpan(
-                            text: "or manually enter the secret key ",
-                            style: TextStyle(color: currTheme.onSurface),
-                            children: [
-                              TextSpan(
+                          const SizedBox(
+                            height: Constants.gap * 1.5,
+                          ),
+                          RichText(
+                            text: TextSpan(
+                              text: "or manually enter the secret key ",
+                              style: TextStyle(
+                                color: currTheme.onSurface,
+                              ),
+                              children: [
+                                TextSpan(
                                   text: trimKey,
                                   style: TextStyle(
                                     color: currTheme.primary,
                                     fontWeight: FontWeight.w500,
-                                  )),
-                              const TextSpan(
-                                  text:
-                                      " into the authenticator app to set up multi-factor authentication for your account.")
-                            ],
+                                  ),
+                                ),
+                                const TextSpan(
+                                    text:
+                                        " into the authenticator app to set up multi-factor authentication for your account.")
+                              ],
+                            ),
                           ),
-                        ),
-                        TextButton(
-                            style: const ButtonStyle(
+                          TextButton(
+                              style: const ButtonStyle(
                                 padding:
-                                    WidgetStatePropertyAll(EdgeInsets.zero)),
-                            onPressed: () {
-                              Clipboard.setData(ClipboardData(text: _key))
-                                  .then((value) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    WidgetStatePropertyAll(EdgeInsets.zero),
+                              ),
+                              onPressed: () {
+                                Clipboard.setData(ClipboardData(text: _key))
+                                    .then(
+                                  (value) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
                                         content: Text(
-                                            "successfully copied secret to clipboard")));
-                              });
+                                            "successfully copied secret to clipboard"),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: const Text("Copy secret code")),
+                          const SizedBox(
+                            height: Constants.gap * 2,
+                          ),
+                          const Spacer(),
+                          FilledButton(
+                            onPressed: () {
+                              context.goNamed(RouterConstants.verifyMfa);
                             },
-                            child: const Text("Copy secret code")),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        FilledButton(
-                          onPressed: () {
-                            context.goNamed(RouterConstants.verifyMfa);
-                          },
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 24),
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size(
+                                Constants.buttonWidth,
+                                Constants.buttonHeight,
+                              ),
+                            ),
+                            child: const Text("Continue"),
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 12.0),
-                            child: Text("Continue"),
-                          ),
-                        ),
-                      ]
-                    ],
+                        ]
+                      ],
+                    ),
                   ),
                 ),
     );
