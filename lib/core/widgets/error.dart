@@ -1,3 +1,4 @@
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +26,7 @@ class Error extends StatelessWidget {
                 "Oops! Something went wrong. Please try again later."),
             if (authStatus == AuthenticationStatus.signedIn) ...[
               const SizedBox(
-                height: 16,
+                height: Constants.gap,
               ),
               ElevatedButton(
                 onPressed: () {

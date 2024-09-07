@@ -1,10 +1,15 @@
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:flutter/material.dart';
 
 class ErrorText extends StatelessWidget {
   final String errorText;
   final Color? color;
 
-  const ErrorText(this.errorText, {super.key, this.color});
+  const ErrorText(
+    this.errorText, {
+    super.key,
+    this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +20,7 @@ class ErrorText extends StatelessWidget {
       style: TextStyle(
         color: color ?? currTheme.error,
         fontWeight: FontWeight.w500,
-        fontSize: 14,
+        fontSize: Constants.smallFontSize,
       ),
       textAlign: TextAlign.center,
     );
