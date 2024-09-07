@@ -1,14 +1,14 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/core/widgets/heading.dart';
 import 'package:doko_react/core/widgets/loader_button.dart';
-import 'package:doko_react/features/authentication/presentation/widgets/heading.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/data/auth.dart';
 import '../../../../core/helpers/constants.dart';
-import '../widgets/error_widget.dart';
+import '../../../../core/widgets/error_widget.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({

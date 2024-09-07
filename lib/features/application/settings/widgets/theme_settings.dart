@@ -1,4 +1,4 @@
-import 'package:doko_react/features/application/settings/widgets/settings_heading.dart';
+import 'package:doko_react/core/widgets/settings_heading.dart';
 import 'package:doko_react/features/application/settings/widgets/theme_widget.dart';
 import 'package:flutter/material.dart';
 

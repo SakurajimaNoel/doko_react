@@ -1,12 +1,11 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/data/auth.dart';
 import '../../../../core/helpers/input.dart';
-import '../../../authentication/presentation/widgets/error_widget.dart';
-import '../../../authentication/presentation/widgets/heading.dart';
+import '../../../../core/widgets/error_widget.dart';
+import '../../../../core/widgets/heading.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});

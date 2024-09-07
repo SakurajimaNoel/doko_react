@@ -2,9 +2,9 @@ import 'package:doko_react/core/helpers/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../features/authentication/presentation/widgets/error_widget.dart';
 import '../data/auth.dart';
 import '../provider/authentication_provider.dart';
+import 'error_widget.dart';
 
 class Error extends StatelessWidget {
   const Error({

@@ -9,8 +9,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/data/auth.dart';
 import '../../../../core/helpers/input.dart';
-import '../../../authentication/presentation/widgets/error_widget.dart';
-import '../widgets/settings_heading.dart';
+import '../../../../core/widgets/error_widget.dart';
+import '../../../../core/widgets/settings_heading.dart';
 
 class VerifyMfaPage extends StatefulWidget {
   const VerifyMfaPage({

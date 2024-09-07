@@ -6,16 +6,16 @@ import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/mime_type.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
+import 'package:doko_react/core/widgets/error_widget.dart';
 import 'package:doko_react/core/widgets/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loader_button.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
-import 'package:doko_react/features/authentication/presentation/widgets/error_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/data/auth.dart';
-import '../../../application/settings/widgets/settings_heading.dart';
+import '../../../../core/widgets/settings_heading.dart';
 
 class CompleteProfilePicturePage extends StatefulWidget {
   final String username;
