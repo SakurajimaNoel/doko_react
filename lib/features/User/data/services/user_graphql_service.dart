@@ -38,6 +38,7 @@ class UserGraphqlService {
           document: gql("""
         query Query(\$where: UserWhere) {
           users(where: \$where) {
+            id
             name
             username
             profilePicture
@@ -153,7 +154,7 @@ class UserGraphqlService {
         ),
       );
 
-      if(result.hasException) {
+      if (result.hasException) {
         throw Exception(result.exception);
       }
 
