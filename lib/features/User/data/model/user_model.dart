@@ -44,7 +44,7 @@ class CompleteUserModel extends UserModel {
 
   static CompleteUserModel createModel({required Map map}) {
     return CompleteUserModel(
-      bio: map["bio"],
+      bio: map["bio"] ?? "",
       dob: DateTime.parse(map["dob"]),
       createdOn: DateTime.parse(map["createdOn"]),
       name: map["name"],
