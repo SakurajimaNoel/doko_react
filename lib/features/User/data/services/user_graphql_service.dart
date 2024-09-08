@@ -269,4 +269,84 @@ class UserGraphqlService {
       );
     }
   }
+
+  Future<FriendResponse> getPendingOutgoingFriendsByUserId(
+      String id, String? cursor) async {
+    try {
+      QueryResult result = await client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.cacheAndNetwork,
+          document: gql(UserQueries.getPendingOutgoingFriendsByUserId(cursor)),
+          variables: UserQueries.getPendingOutgoingFriendsByUserIdVariables(
+              id, cursor),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      List? res = result.data?["users"];
+
+      if (res == null || res.isEmpty) {
+        return const FriendResponse(
+          status: ResponseStatus.success,
+        );
+      }
+
+      ProfileFriendInfo info = ProfileFriendInfo.createModel(
+        map: res[0]["postsConnection"],
+      );
+
+      return FriendResponse(
+        status: ResponseStatus.success,
+        info: info,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return const FriendResponse(
+        status: ResponseStatus.error,
+      );
+    }
+  }
+
+  Future<FriendResponse> getPendingIncomingFriendsByUserId(
+      String id, String? cursor) async {
+    try {
+      QueryResult result = await client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.cacheAndNetwork,
+          document: gql(UserQueries.getPendingIncomingFriendsByUserId(cursor)),
+          variables: UserQueries.getPendingIncomingFriendsByUserIdVariables(
+              id, cursor),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      List? res = result.data?["users"];
+
+      if (res == null || res.isEmpty) {
+        return const FriendResponse(
+          status: ResponseStatus.success,
+        );
+      }
+
+      ProfileFriendInfo info = ProfileFriendInfo.createModel(
+        map: res[0]["postsConnection"],
+      );
+
+      return FriendResponse(
+        status: ResponseStatus.success,
+        info: info,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return const FriendResponse(
+        status: ResponseStatus.error,
+      );
+    }
+  }
 }
