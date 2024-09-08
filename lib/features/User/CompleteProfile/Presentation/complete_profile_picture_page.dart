@@ -9,6 +9,7 @@ import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error_widget.dart';
 import 'package:doko_react/core/widgets/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loader_button.dart';
+import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
@@ -118,8 +119,15 @@ class _CompleteProfilePicturePageState
       return;
     }
 
-    var profileResponse = await _graphqlService.completeUserProfile(
-        id, _username, email, _dob, _name, bucketPath);
+    var variables = CompleteUserProfileVariables(
+      id: id,
+      username: _username,
+      email: email,
+      dob: _dob,
+      name: _name,
+      profilePicture: bucketPath,
+    );
+    var profileResponse = await _graphqlService.completeUserProfile(variables);
 
     if (profileResponse.status == ResponseStatus.error) {
       setState(() {
