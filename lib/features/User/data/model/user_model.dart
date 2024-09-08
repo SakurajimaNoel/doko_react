@@ -1,5 +1,8 @@
 import 'package:doko_react/features/User/data/model/post_model.dart';
 
+import 'model.dart';
+
+// basic user info
 class UserModel {
   final String id;
   final String name;
@@ -23,18 +26,43 @@ class UserModel {
   }
 }
 
+// user profile friend info
+class ProfileFriendInfo {
+  final List<UserModel> friends;
+  final NodeInfo info;
+
+  const ProfileFriendInfo({
+    required this.friends,
+    required this.info,
+  });
+
+  static ProfileFriendInfo createModel({required Map map}) {
+    return ProfileFriendInfo(
+      friends: (map["edges"] as List)
+          .map((post) => UserModel.createModel(
+                map: post["node"],
+              ))
+          .toList(),
+      info: NodeInfo.createModel(
+        map: map["pageInfo"],
+      ),
+    );
+  }
+}
+
+// complete user info
 class CompleteUserModel extends UserModel {
   final String bio;
   final DateTime dob;
   final DateTime createdOn;
-  final List<PostModel> posts;
-  final List<UserModel> friends;
+  final ProfilePostInfo postsInfo;
+  final ProfileFriendInfo friendsInfo;
 
   const CompleteUserModel({
     required this.bio,
     required this.dob,
-    required this.posts,
-    required this.friends,
+    required this.postsInfo,
+    required this.friendsInfo,
     required this.createdOn,
     required super.name,
     required super.username,
@@ -51,16 +79,12 @@ class CompleteUserModel extends UserModel {
       username: map["username"],
       profilePicture: map["profilePicture"],
       id: map["id"],
-      posts: (map["posts"] as List)
-          .map((postMap) => PostModel.createModel(
-                map: postMap,
-              ))
-          .toList(),
-      friends: (map["friends"] as List)
-          .map((userMap) => UserModel.createModel(
-                map: userMap,
-              ))
-          .toList(),
+      postsInfo: ProfilePostInfo.createModel(
+        map: map["postsConnection"],
+      ),
+      friendsInfo: ProfileFriendInfo.createModel(
+        map: map["friendsConnection"],
+      ),
     );
   }
 }

@@ -1,9 +1,10 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
-import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
+import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+import '../model/post_model.dart';
 import '../model/user_model.dart';
 
 class UserResponse {
@@ -36,6 +37,26 @@ class CompleteUserResponse {
   });
 }
 
+class FriendResponse {
+  final ResponseStatus status;
+  final List<UserModel> friends;
+
+  const FriendResponse({
+    required this.status,
+    this.friends = const [],
+  });
+}
+
+class PostResponse {
+  final ResponseStatus status;
+  final List<ProfilePostModel> posts;
+
+  const PostResponse({
+    required this.status,
+    this.posts = const [],
+  });
+}
+
 class UserGraphqlService {
   static GraphqlConfig config = GraphqlConfig();
   GraphQLClient client = config.clientToQuery();
@@ -45,21 +66,8 @@ class UserGraphqlService {
       QueryResult result = await client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.cacheAndNetwork,
-          document: gql("""
-        query Query(\$where: UserWhere) {
-          users(where: \$where) {
-            id
-            name
-            username
-            profilePicture
-          }
-        }
-        """),
-          variables: {
-            "where": {
-              "id": id,
-            }
-          },
+          document: gql(UserQueries.getUser()),
+          variables: UserQueries.getUserVariables(id),
         ),
       );
 
@@ -93,18 +101,8 @@ class UserGraphqlService {
       QueryResult result = await client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.cacheAndNetwork,
-          document: gql("""
-          query Query(\$where: UserWhere) {
-            users(where: \$where) {
-              id
-            }
-          }
-        """),
-          variables: {
-            "where": {
-              "username": username,
-            }
-          },
+          document: gql(UserQueries.checkUsername()),
+          variables: UserQueries.checkUsernameVariables(username),
         ),
       );
 
@@ -134,33 +132,14 @@ class UserGraphqlService {
     }
   }
 
-  Future<UserResponse> completeUserProfile(String id, String username,
-      String email, DateTime dob, String name, String profilePicture) async {
+  Future<UserResponse> completeUserProfile(
+      CompleteUserProfileVariables userDetails) async {
     try {
       QueryResult result = await client.mutate(
         MutationOptions(
           fetchPolicy: FetchPolicy.noCache,
-          document: gql("""
-        mutation Mutation(\$input: [UserCreateInput!]!) {
-          createUsers(input: \$input) {
-            info {
-              nodesCreated
-            }
-          }
-        }        
-        """),
-          variables: {
-            "input": [
-              {
-                "id": id,
-                "username": username,
-                "email": email,
-                "dob": DisplayText.date(dob),
-                "name": name,
-                "profilePicture": profilePicture,
-              }
-            ]
-          },
+          document: gql(UserQueries.completeUserProfile()),
+          variables: UserQueries.completeUserProfileVariables(userDetails),
         ),
       );
 
@@ -184,49 +163,12 @@ class UserGraphqlService {
       QueryResult result = await client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.cacheAndNetwork,
-          document: gql("""
-        query Query(\$options: PostOptions, \$where: UserWhere, \$friendsOptions2: UserOptions) {
-          users(where: \$where) {
-            id
-            username
-            name
-            profilePicture
-            bio
-            createdOn
-            dob
-            posts(options: \$options) {
-              id
-              content
-              caption
-              createdOn
-            }
-            friends(options: \$friendsOptions2) {
-              id
-              name
-              profilePicture
-              username
-            }
-          }
-        }
-        """),
-          variables: {
-            "options": const {
-              "limit": 3,
-              "sort": [
-                {
-                  "createdOn": "DESC",
-                }
-              ],
-            },
-            "where": {
-              "id": id,
-            },
-            "friendsOptions2": const {
-              "limit": 3,
-            }
-          },
+          document: gql(UserQueries.getCompleteUser()),
+          variables: UserQueries.getCompleteUserVariables(id),
         ),
       );
+
+      // throw Exception("not implemented");
 
       if (result.hasException) {
         throw Exception(result.exception);
@@ -249,6 +191,67 @@ class UserGraphqlService {
     } catch (e) {
       safePrint(e.toString());
       return const CompleteUserResponse(
+        status: ResponseStatus.error,
+      );
+    }
+  }
+
+  Future<FriendResponse> getFriendsByUserId(String id, String cursor) async {
+    try {
+      QueryResult result = await client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.cacheAndNetwork,
+          document: gql(UserQueries.getFriendsByUserId()),
+          variables: UserQueries.getFriendsByUserIdVariables(id, cursor),
+        ),
+      );
+
+      throw Exception("not implemented");
+    } catch (e) {
+      safePrint(e.toString());
+      return const FriendResponse(
+        status: ResponseStatus.error,
+      );
+    }
+  }
+
+  Future<PostResponse> getPostsByUserId(String id, String cursor) async {
+    try {
+      QueryResult result = await client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.cacheAndNetwork,
+          document: gql(UserQueries.getUserPostsByUserId()),
+          variables: UserQueries.getUserPostsByUserIdVariables(id, cursor),
+        ),
+      );
+
+      throw Exception("not implemented");
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      List? res = result.data?["posts"];
+
+      if (res == null || res.isEmpty) {
+        return const PostResponse(
+          status: ResponseStatus.success,
+        );
+      }
+
+      List<ProfilePostModel> posts = res
+          .map((postMap) => ProfilePostModel.createModel(
+                map: postMap,
+              ))
+          .toList();
+
+      return PostResponse(
+        status: ResponseStatus.success,
+        posts: posts,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return const PostResponse(
         status: ResponseStatus.error,
       );
     }
