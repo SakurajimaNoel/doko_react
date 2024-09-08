@@ -39,21 +39,21 @@ class CompleteUserResponse {
 
 class FriendResponse {
   final ResponseStatus status;
-  final List<UserModel> friends;
+  final ProfileFriendInfo? info;
 
   const FriendResponse({
     required this.status,
-    this.friends = const [],
+    this.info,
   });
 }
 
 class PostResponse {
   final ResponseStatus status;
-  final List<ProfilePostModel> posts;
+  final ProfilePostInfo? info;
 
   const PostResponse({
     required this.status,
-    this.posts = const [],
+    this.info,
   });
 }
 
@@ -168,8 +168,6 @@ class UserGraphqlService {
         ),
       );
 
-      // throw Exception("not implemented");
-
       if (result.hasException) {
         throw Exception(result.exception);
       }
@@ -206,7 +204,26 @@ class UserGraphqlService {
         ),
       );
 
-      throw Exception("not implemented");
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      List? res = result.data?["users"];
+
+      if (res == null || res.isEmpty) {
+        return const FriendResponse(
+          status: ResponseStatus.success,
+        );
+      }
+
+      ProfileFriendInfo info = ProfileFriendInfo.createModel(
+        map: res[0]["postsConnection"],
+      );
+
+      return FriendResponse(
+        status: ResponseStatus.success,
+        info: info,
+      );
     } catch (e) {
       safePrint(e.toString());
       return const FriendResponse(
@@ -225,13 +242,11 @@ class UserGraphqlService {
         ),
       );
 
-      throw Exception("not implemented");
-
       if (result.hasException) {
         throw Exception(result.exception);
       }
 
-      List? res = result.data?["posts"];
+      List? res = result.data?["users"];
 
       if (res == null || res.isEmpty) {
         return const PostResponse(
@@ -239,15 +254,13 @@ class UserGraphqlService {
         );
       }
 
-      List<ProfilePostModel> posts = res
-          .map((postMap) => ProfilePostModel.createModel(
-                map: postMap,
-              ))
-          .toList();
+      ProfilePostInfo info = ProfilePostInfo.createModel(
+        map: res[0]["postsConnection"],
+      );
 
       return PostResponse(
         status: ResponseStatus.success,
-        posts: posts,
+        info: info,
       );
     } catch (e) {
       safePrint(e.toString());
