@@ -6,7 +6,7 @@ import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/mime_type.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
-import 'package:doko_react/core/widgets/error_widget.dart';
+import 'package:doko_react/core/widgets/error_text.dart';
 import 'package:doko_react/core/widgets/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loader_button.dart';
 import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';

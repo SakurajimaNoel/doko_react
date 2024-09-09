@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../data/auth.dart';
 import '../provider/authentication_provider.dart';
-import 'error_widget.dart';
+import 'error_text.dart';
 
 class Error extends StatelessWidget {
   const Error({

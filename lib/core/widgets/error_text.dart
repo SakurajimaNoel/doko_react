@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class ErrorText extends StatelessWidget {
   final String errorText;
   final Color? color;
+  final double? fontSize;
 
   const ErrorText(
     this.errorText, {
     super.key,
     this.color,
+    this.fontSize,
   });
 
   @override
@@ -20,7 +22,7 @@ class ErrorText extends StatelessWidget {
       style: TextStyle(
         color: color ?? currTheme.error,
         fontWeight: FontWeight.w500,
-        fontSize: Constants.smallFontSize,
+        fontSize: fontSize ?? Constants.smallFontSize,
       ),
       textAlign: TextAlign.center,
     );

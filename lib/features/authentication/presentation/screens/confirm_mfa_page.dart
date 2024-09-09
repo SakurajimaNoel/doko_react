@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/data/auth.dart';
 import '../../../../core/helpers/input.dart';
-import '../../../../core/widgets/error_widget.dart';
+import '../../../../core/widgets/error_text.dart';
 
 class ConfirmMfaPage extends StatefulWidget {
   const ConfirmMfaPage({

@@ -1,7 +1,7 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/input.dart';
-import 'package:doko_react/core/widgets/error_widget.dart';
+import 'package:doko_react/core/widgets/error_text.dart';
 import 'package:doko_react/core/widgets/heading.dart';
 import 'package:doko_react/core/widgets/loader_button.dart';
 import 'package:flutter/gestures.dart';

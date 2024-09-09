@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/data/auth.dart';
 import '../../../../core/helpers/constants.dart';
-import '../../../../core/widgets/error_widget.dart';
+import '../../../../core/widgets/error_text.dart';
 
 class PasswordResetPage extends StatefulWidget {
   const PasswordResetPage({
