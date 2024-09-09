@@ -1,15 +1,14 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/loader.dart';
-import 'package:doko_react/features/User/data/services/post_graphql_service.dart';
+import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
-import 'package:doko_react/features/User/widgets/profile.dart';
+import 'package:doko_react/features/User/widgets/profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/configs/router/router_constants.dart';
 import '../../../../core/data/auth.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -25,8 +24,8 @@ class _ProfilePageState extends State<ProfilePage> {
   late final UserProvider _userProvider;
   late final String _username;
   final UserGraphqlService _userGraphqlService = UserGraphqlService();
-  final PostGraphqlService _postGraphqlService = PostGraphqlService();
   bool _loading = true;
+  CompleteUserModel? _user;
 
   @override
   void initState() {
@@ -34,78 +33,73 @@ class _ProfilePageState extends State<ProfilePage> {
     _userProvider = context.read<UserProvider>();
     _username = _userProvider.username;
 
-    // _trial();
+    _fetchCompleteUser();
   }
 
-  // TODO: remove this after completing
-  Future<void> _trial() async {
+  Future<void> _fetchCompleteUser() async {
+    setState(() {
+      _loading = true;
+    });
+
     var completeUser =
         await _userGraphqlService.getCompleteUser(_userProvider.id);
 
     if (completeUser.status == ResponseStatus.error) {
-      safePrint("error");
+      setState(() {
+        _loading = false;
+      });
       return;
     }
 
     if (completeUser.user == null) {
-      safePrint("user null");
+      setState(() {
+        _loading = false;
+      });
       return;
     }
 
     var user = completeUser.user!;
-
-    var tempPosts = user.posts;
-    int len = tempPosts.length;
-
-    if (len <= 0) {
-      safePrint("no posts");
-      return;
-    }
-
-    DateTime cursor = tempPosts[len - 1].createdOn;
-    var posts =
-        await _postGraphqlService.getPostsByUserId(_userProvider.id, cursor);
-
-    if (posts.status == ResponseStatus.error) {
-      safePrint("posts error");
-      return;
-    }
-
-    var postsValues = posts.posts;
-    len = postsValues.length;
-    safePrint(postsValues[len - 1].caption);
+    setState(() {
+      _loading = false;
+      _user = user;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     var currScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      // extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text(_username),
-        actions: [
-          IconButton(
-            onPressed: () {
-              context.goNamed(RouterConstants.settings);
-            },
-            icon: const Icon(Icons.settings),
-            tooltip: "Settings",
-          ),
-          TextButton(
-              onPressed: () {
-                AuthenticationActions.signOutUser();
-              },
-              child: Text(
-                "Sign out",
-                style: TextStyle(
-                  color: currScheme.error,
+    return _loading
+        ? Scaffold(
+            appBar: AppBar(
+              title: Text(_userProvider.username),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    context.goNamed(RouterConstants.settings);
+                  },
+                  icon: const Icon(Icons.settings),
+                  tooltip: "Settings",
                 ),
-              ))
-        ],
-      ),
-      body: _loading ? const Loader() : const Profile(),
-    );
+                TextButton(
+                  onPressed: () {
+                    AuthenticationActions.signOutUser();
+                  },
+                  child: Text(
+                    "Sign out",
+                    style: TextStyle(
+                      color: currScheme.error,
+                    ),
+                  ),
+                )
+              ],
+            ),
+            body: const Loader(),
+          )
+        : ProfileWidget(
+            user: _user,
+            refreshUser: _fetchCompleteUser,
+            self: true,
+          );
   }
 }

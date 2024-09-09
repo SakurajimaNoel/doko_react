@@ -22,4 +22,5 @@ class Constants {
   static const double heading4 = fontSize * 1.5; // 24px
 
   static const double appBarHeight = kToolbarHeight;
+  static const double expandedAppBarHeight = _root * 22.5;
 }
