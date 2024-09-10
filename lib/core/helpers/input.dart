@@ -126,12 +126,19 @@ class ValidateInput {
   }
 
   static InputStatus validateName(String? name) {
-    final nameRegex = RegExp(r'^[A-Za-z\s]{2,}$');
+    final nameRegex = RegExp(r'^[A-Za-z\s]{2,30}$');
 
     if (name == null || name.isEmpty) {
       return InputStatus(
         isValid: false,
         message: "Name can't be empty.",
+      );
+    }
+
+    if (name.length > 30) {
+      return InputStatus(
+        isValid: false,
+        message: "Name too long.",
       );
     }
 
