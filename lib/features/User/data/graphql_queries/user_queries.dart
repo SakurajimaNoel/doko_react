@@ -443,4 +443,33 @@ class UserQueries {
       ],
     };
   }
+
+  // update user profile
+  static String updateUserProfile() {
+    return """
+    mutation Mutation(\$where: UserWhere, \$update: UserUpdateInput) {
+      updateUsers(where: \$where, update: \$update) {
+        users {
+          name
+          profilePicture
+          bio
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> updateUserProfileVariables(
+      String id, String name, String bio, String profilePicture) {
+    return {
+      "where": {
+        "id": id,
+      },
+      "update": {
+        "name": name,
+        "bio": bio,
+        "profilePicture": profilePicture,
+      }
+    };
+  }
 }

@@ -349,4 +349,31 @@ class UserGraphqlService {
       );
     }
   }
+
+  Future<UserResponse> updateUserProfile(
+      String id, String name, String bio, String profilePicture) async {
+    try {
+      QueryResult result = await client.mutate(
+        MutationOptions(
+          fetchPolicy: FetchPolicy.noCache,
+          document: gql(UserQueries.updateUserProfile()),
+          variables: UserQueries.updateUserProfileVariables(
+              id, name, bio, profilePicture),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      return const UserResponse(
+        status: ResponseStatus.success,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return const UserResponse(
+        status: ResponseStatus.error,
+      );
+    }
+  }
 }
