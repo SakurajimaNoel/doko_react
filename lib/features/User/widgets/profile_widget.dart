@@ -239,10 +239,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(_user.bio),
-                            const SizedBox(
-                              height: 16,
-                            ),
+                            if (_user.bio.isNotEmpty) ...[
+                              Text(_user.bio),
+                              const SizedBox(
+                                height: 16,
+                              ),
+                            ],
                             _userProfileAction(),
                           ],
                         ),
