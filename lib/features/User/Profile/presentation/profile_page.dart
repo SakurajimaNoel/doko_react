@@ -22,7 +22,6 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late final UserProvider _userProvider;
-  late final String _username;
   final UserGraphqlService _userGraphqlService = UserGraphqlService();
   bool _loading = true;
   CompleteUserModel? _user;
@@ -31,7 +30,6 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _userProvider = context.read<UserProvider>();
-    _username = _userProvider.username;
 
     _fetchCompleteUser();
   }

@@ -1,8 +1,10 @@
 import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error_text.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/configs/router/router_constants.dart';
 import '../../../core/data/auth.dart';
@@ -30,23 +32,43 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   late final bool _self;
   late final Future<void> Function() _refreshUser;
   String _profile = "";
+  late final UserProvider _userProvider;
 
   @override
   void initState() {
     super.initState();
 
+    _userProvider = context.read<UserProvider>();
+
     _user = widget.user;
     _self = widget.self;
     _refreshUser = widget.refreshUser;
 
-    _getProfile();
+    _getProfile(_user?.profilePicture);
   }
 
-  Future<void> _getProfile() async {
-    if (_user == null) return;
+  void _updateUser(
+      String profilePicture, String bio, String name, bool profileUpdated) {
+    if (profileUpdated) {
+      _getProfile(profilePicture);
+    }
 
-    String path = _user.profilePicture;
-    if (path.isEmpty) return;
+    setState(() {
+      _user!.profilePicture = profilePicture;
+      _user.name = name;
+      _user.bio = bio;
+    });
+    _userProvider.updateUser(name, profilePicture);
+  }
+
+  Future<void> _getProfile(String? path) async {
+    if (_user == null) return;
+    if (path == null || path.isEmpty) {
+      setState(() {
+        _profile = "";
+      });
+      return;
+    }
 
     var result = await StorageActions.getDownloadUrl(path);
 
@@ -120,7 +142,21 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   Widget _userProfileAction() {
     if (_self) {
       return OutlinedButton(
-        onPressed: () {},
+        onPressed: () {
+          // go to edit page
+          EditUserModel editUser = EditUserModel(
+            name: _user!.name,
+            bio: _user.bio,
+            profilePicture: _user.profilePicture,
+            imgURL: _profile,
+            id: _user.id,
+          );
+          Map<String, dynamic> data = {
+            "callback": _updateUser,
+            "user": editUser,
+          };
+          context.goNamed(RouterConstants.editProfile, extra: data);
+        },
         child: const Text("Edit"),
       );
     }
@@ -157,7 +193,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                             _profile.isNotEmpty
                                 ? Image.network(
                                     _profile,
-                                    fit: BoxFit.fitWidth,
+                                    fit: BoxFit.cover,
                                   )
                                 : Container(
                                     color: currTheme.onSecondary,

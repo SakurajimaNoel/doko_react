@@ -10,6 +10,7 @@ class RouterConstants {
   static const String userFeed = "userFeed";
   static const String nearby = "nearby";
   static const String profile = "profile";
+  static const String editProfile = "editProfile";
 
   // settings page
   static const String settings = "settings";

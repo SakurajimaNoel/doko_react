@@ -5,6 +5,7 @@ import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_p
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/User/Nearby/presentation/nearby_page.dart';
+import 'package:doko_react/features/User/Profile/presentation/edit_profile_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/profile_page.dart';
 import 'package:doko_react/features/User/user_layout.dart';
 import 'package:doko_react/features/application/settings/presentation/change_password_page.dart';
@@ -20,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
+import '../../../features/User/data/model/user_model.dart';
 
 class AppRouterConfig {
   static GoRouter loadingConfig() {
@@ -214,6 +216,22 @@ class AppRouterConfig {
                               const ChangePasswordPage(),
                         ),
                       ],
+                    ),
+                    GoRoute(
+                      parentNavigatorKey: homeRouterRootNavigatorKey,
+                      name: RouterConstants.editProfile,
+                      path: "edit-profile",
+                      builder: (context, state) {
+                        final Map<String, dynamic> data =
+                            state.extra as Map<String, dynamic>;
+                        final Function(String, String, String, bool) callback =
+                            data["callback"];
+                        final EditUserModel user = data["user"];
+                        return EditProfilePage(
+                          callback: callback,
+                          user: user,
+                        );
+                      },
                     ),
                   ],
                 ),
