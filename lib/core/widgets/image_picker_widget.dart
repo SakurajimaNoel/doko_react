@@ -5,12 +5,14 @@ class ImagePickerWidget extends StatelessWidget {
   final Function(List<XFile>) onSelection;
   final bool multiple;
   final String displayText;
+  final Icon? icon;
 
   const ImagePickerWidget(
     this.displayText, {
     super.key,
     required this.onSelection,
     this.multiple = false,
+    this.icon,
   });
 
   // function to select multiple images from device gallery
@@ -94,11 +96,20 @@ class ImagePickerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
+    if (icon == null) {
+      return TextButton(
+        onPressed: () {
+          _selectOptions(context);
+        },
+        child: Text(displayText),
+      );
+    }
+
+    return IconButton.filled(
       onPressed: () {
         _selectOptions(context);
       },
-      child: Text(displayText),
+      icon: icon!,
     );
   }
 }

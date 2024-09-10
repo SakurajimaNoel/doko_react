@@ -151,4 +151,15 @@ class ValidateInput {
 
     return InputStatus(isValid: true);
   }
+
+  static InputStatus validateBio(String? bio) {
+    if (bio != null && bio.length > 160) {
+      return InputStatus(
+        isValid: false,
+        message: "Bio too long.",
+      );
+    }
+
+    return InputStatus(isValid: true);
+  }
 }
