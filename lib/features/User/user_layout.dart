@@ -26,11 +26,25 @@ class _UserLayoutState extends State<UserLayout> {
 
     _userProvider = context.read<UserProvider>();
     _getProfile();
+
+    _userProvider.addListener(_getProfile);
+  }
+
+  @override
+  void dispose() {
+    // Remove listener to prevent memory leaks
+    _userProvider.removeListener(_getProfile);
+    super.dispose();
   }
 
   Future<void> _getProfile() async {
     String path = _userProvider.profilePicture;
-    if (path.isEmpty) return;
+    if (path.isEmpty) {
+      setState(() {
+        _profile = "";
+        return;
+      });
+    }
 
     var result = await StorageActions.getDownloadUrl(path);
 
@@ -46,6 +60,7 @@ class _UserLayoutState extends State<UserLayout> {
   @override
   Widget build(BuildContext context) {
     ColorScheme currTheme = Theme.of(context).colorScheme;
+    final UserProvider userProvider = context.watch<UserProvider>();
 
     List<Widget> getDestinations() {
       return <Widget>[
@@ -85,7 +100,7 @@ class _UserLayoutState extends State<UserLayout> {
               : CircleAvatar(
                   backgroundImage: NetworkImage(_profile),
                 ),
-          label: DisplayText.trimText(_userProvider.name, len: 10),
+          label: DisplayText.trimText(userProvider.name, len: 10),
         ),
       ];
     }

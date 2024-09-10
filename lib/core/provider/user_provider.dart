@@ -39,4 +39,11 @@ class UserProvider extends ChangeNotifier {
     _status = ProfileStatus.error;
     notifyListeners();
   }
+
+  void updateUser(String name, String profilePicture) {
+    _name = name;
+    _profilePicture = profilePicture;
+
+    notifyListeners();
+  }
 }
