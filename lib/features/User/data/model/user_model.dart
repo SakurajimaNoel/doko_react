@@ -5,11 +5,11 @@ import 'model.dart';
 // basic user info
 class UserModel {
   final String id;
-  final String name;
+  String name;
   final String username;
-  final String profilePicture;
+  String profilePicture;
 
-  const UserModel({
+  UserModel({
     required this.name,
     required this.username,
     required this.profilePicture,
@@ -52,13 +52,13 @@ class ProfileFriendInfo {
 
 // complete user info
 class CompleteUserModel extends UserModel {
-  final String bio;
+  String bio;
   final DateTime dob;
   final DateTime createdOn;
   final ProfilePostInfo postsInfo;
   final ProfileFriendInfo friendsInfo;
 
-  const CompleteUserModel({
+  CompleteUserModel({
     required this.bio,
     required this.dob,
     required this.postsInfo,
@@ -87,4 +87,20 @@ class CompleteUserModel extends UserModel {
       ),
     );
   }
+}
+
+class EditUserModel {
+  final String name;
+  final String bio;
+  final String profilePicture;
+  final String imgURL;
+  final String id;
+
+  const EditUserModel({
+    required this.name,
+    required this.bio,
+    required this.profilePicture,
+    required this.imgURL,
+    required this.id,
+  });
 }
