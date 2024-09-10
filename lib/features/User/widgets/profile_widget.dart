@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error_text.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
+import 'package:doko_react/features/User/widgets/post_container_profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +33,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   late final CompleteUserModel? _user;
   late final bool _self;
   late final Future<void> Function() _refreshUser;
+
   String _profile = "";
   late final UserProvider _userProvider;
 
@@ -191,9 +194,16 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           fit: StackFit.expand,
                           children: [
                             _profile.isNotEmpty
-                                ? Image.network(
-                                    _profile,
+                                ? CachedNetworkImage(
+                                    cacheKey: _user.profilePicture,
+                                    imageUrl: _profile,
                                     fit: BoxFit.cover,
+                                    placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                    height: Constants.expandedAppBarHeight,
                                   )
                                 : Container(
                                     color: currTheme.onSecondary,
@@ -258,18 +268,26 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           unselectedLabelColor: currTheme.onSurface,
                           indicatorColor: currTheme.primary,
                           tabs: const [
-                            Tab(text: "Posts"),
-                            Tab(text: "Friends"),
+                            Tab(
+                              text: "Posts",
+                            ),
+                            Tab(
+                              text: "Friends",
+                            ),
                           ],
                         ),
                       ),
                     )
                   ];
                 },
-                body: const TabBarView(
+                body: TabBarView(
                   children: [
-                    Text("posts"),
-                    Text("friends"),
+                    PostContainerProfileWidget(
+                      postInfo: _user.postsInfo,
+                      user: _user,
+                      img: _profile,
+                    ),
+                    const Text("friends"),
                   ],
                 ),
               ),

@@ -39,21 +39,21 @@ class CompleteUserResponse {
 
 class FriendResponse {
   final ResponseStatus status;
-  final ProfileFriendInfo? info;
+  final ProfileFriendInfo? friendInfo;
 
   const FriendResponse({
     required this.status,
-    this.info,
+    this.friendInfo,
   });
 }
 
 class PostResponse {
   final ResponseStatus status;
-  final ProfilePostInfo? info;
+  final ProfilePostInfo? postInfo;
 
   const PostResponse({
     required this.status,
-    this.info,
+    this.postInfo,
   });
 }
 
@@ -180,7 +180,7 @@ class UserGraphqlService {
         );
       }
 
-      CompleteUserModel user = CompleteUserModel.createModel(map: res[0]);
+      CompleteUserModel user = await CompleteUserModel.createModel(map: res[0]);
 
       return CompleteUserResponse(
         status: ResponseStatus.success,
@@ -222,7 +222,7 @@ class UserGraphqlService {
 
       return FriendResponse(
         status: ResponseStatus.success,
-        info: info,
+        friendInfo: info,
       );
     } catch (e) {
       safePrint(e.toString());
@@ -254,13 +254,13 @@ class UserGraphqlService {
         );
       }
 
-      ProfilePostInfo info = ProfilePostInfo.createModel(
+      ProfilePostInfo info = await ProfilePostInfo.createModel(
         map: res[0]["postsConnection"],
       );
 
       return PostResponse(
         status: ResponseStatus.success,
-        info: info,
+        postInfo: info,
       );
     } catch (e) {
       safePrint(e.toString());
@@ -300,7 +300,7 @@ class UserGraphqlService {
 
       return FriendResponse(
         status: ResponseStatus.success,
-        info: info,
+        friendInfo: info,
       );
     } catch (e) {
       safePrint(e.toString());
@@ -340,7 +340,7 @@ class UserGraphqlService {
 
       return FriendResponse(
         status: ResponseStatus.success,
-        info: info,
+        friendInfo: info,
       );
     } catch (e) {
       safePrint(e.toString());

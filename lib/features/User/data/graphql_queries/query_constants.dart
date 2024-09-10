@@ -1,6 +1,6 @@
 class QueryConstants {
-  static const int postLimit = 3;
-  static const int friendLimit = 3;
+  static const int postLimit = 5;
+  static const int friendLimit = 5;
 }
 
 class FriendStatus {

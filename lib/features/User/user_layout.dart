@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
@@ -92,7 +93,20 @@ class _UserLayoutState extends State<UserLayout> {
                   backgroundColor: currTheme.primary,
                   child: CircleAvatar(
                     radius: 17,
-                    backgroundImage: NetworkImage(_profile),
+                    child: ClipOval(
+                      child: CachedNetworkImage(
+                        cacheKey: _userProvider.profilePicture,
+                        imageUrl: _profile,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                        fit: BoxFit.cover,
+                        width: 34,
+                        height: 34,
+                      ),
+                    ),
                   ),
                 ),
           icon: _profile.isEmpty

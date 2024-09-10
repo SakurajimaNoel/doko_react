@@ -70,7 +70,11 @@ class CompleteUserModel extends UserModel {
     required super.id,
   });
 
-  static CompleteUserModel createModel({required Map map}) {
+  static Future<CompleteUserModel> createModel({required Map map}) async {
+    ProfilePostInfo postInfo = await ProfilePostInfo.createModel(
+      map: map["postsConnection"],
+    );
+
     return CompleteUserModel(
       bio: map["bio"] ?? "",
       dob: DateTime.parse(map["dob"]),
@@ -79,9 +83,7 @@ class CompleteUserModel extends UserModel {
       username: map["username"],
       profilePicture: map["profilePicture"],
       id: map["id"],
-      postsInfo: ProfilePostInfo.createModel(
-        map: map["postsConnection"],
-      ),
+      postsInfo: postInfo,
       friendsInfo: ProfileFriendInfo.createModel(
         map: map["friendsConnection"],
       ),

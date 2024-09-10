@@ -7,19 +7,25 @@ class ProfilePostModel {
   final List<String> content;
   final String caption;
   final DateTime createdOn;
+  final List<String> signedContent;
 
   const ProfilePostModel({
     required this.content,
     required this.caption,
     required this.createdOn,
     required this.id,
+    required this.signedContent,
   });
 
-  static ProfilePostModel createModel({required Map map}) {
+  static Future<ProfilePostModel> createModel({required Map map}) async {
+    List<String> content =
+        (map["content"] as List).map((element) => element.toString()).toList();
+
+    List<String> signedContent =
+        await StorageUtils.generatePreSignedURL(content);
     return ProfilePostModel(
-      content: (map["content"] as List)
-          .map((element) => element.toString())
-          .toList(),
+      content: content,
+      signedContent: signedContent,
       caption: map["caption"],
       createdOn: DateTime.parse(map["createdOn"]),
       id: map["id"],
@@ -29,21 +35,27 @@ class ProfilePostModel {
 
 // user profile posts response
 class ProfilePostInfo {
-  final List<ProfilePostModel> posts;
+  List<ProfilePostModel> posts;
   final NodeInfo info;
 
-  const ProfilePostInfo({
+  ProfilePostInfo({
     required this.posts,
     required this.info,
   });
 
-  static ProfilePostInfo createModel({required Map map}) {
+  void addPosts(List<ProfilePostModel> newPosts) {
+    posts.addAll(newPosts);
+  }
+
+  static Future<ProfilePostInfo> createModel({required Map map}) async {
+    var postFutures = (map["edges"] as List)
+        .map((post) => ProfilePostModel.createModel(map: post["node"]))
+        .toList();
+
+    List<ProfilePostModel> posts = await Future.wait(postFutures);
+
     return ProfilePostInfo(
-      posts: (map["edges"] as List)
-          .map((post) => ProfilePostModel.createModel(
-                map: post["node"],
-              ))
-          .toList(),
+      posts: posts,
       info: NodeInfo.createModel(
         map: map["pageInfo"],
       ),
@@ -61,13 +73,29 @@ class PostModel extends ProfilePostModel {
     required super.caption,
     required super.createdOn,
     required super.id,
+    required super.signedContent,
   });
 
-  static PostModel createModel({required Map map}) {
+  PostModel.fromProfilePost({
+    required ProfilePostModel post,
+    required this.createdBy,
+  }) : super(
+          caption: post.caption,
+          content: post.content,
+          createdOn: post.createdOn,
+          id: post.id,
+          signedContent: post.signedContent,
+        );
+
+  static Future<PostModel> createModel({required Map map}) async {
+    List<String> content =
+        (map["content"] as List).map((element) => element.toString()).toList();
+
+    List<String> signedContent =
+        await StorageUtils.generatePreSignedURL(content);
     return PostModel(
-      content: (map["content"] as List)
-          .map((element) => element.toString())
-          .toList(),
+      content: content,
+      signedContent: signedContent,
       caption: map["caption"],
       createdOn: DateTime.parse(map["createdOn"]),
       id: map["id"],

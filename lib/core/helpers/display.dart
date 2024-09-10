@@ -1,4 +1,29 @@
 class DisplayText {
+  static const List<String> daysOfWeek = [
+    'Sun',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat'
+  ];
+
+  static const List<String> months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
   static String trimText(String text, {int? len}) {
     int trimLen = len ?? 50;
 
@@ -74,5 +99,28 @@ class DisplayText {
   static String date(DateTime date) {
     String dateOnly = date.toIso8601String().split('T').first;
     return dateOnly;
+  }
+
+  static String displayDateDiff(DateTime date) {
+    Duration difference = DateTime.now().difference(date);
+
+    if (difference.inSeconds < 60) {
+      return 'a few seconds ago';
+    } else if (difference.inMinutes < 5) {
+      return 'a few minutes ago';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} minutes ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} hours ago';
+    } else {
+      // For dates older than 24 hours, format as "Fri, 6 Aug"
+
+      String dayOfWeek = daysOfWeek[date.weekday % 7];
+      String month = months[date.month - 1];
+      String day = date.day.toString();
+      String year = date.year.toString();
+
+      return '$dayOfWeek, $day $month $year';
+    }
   }
 }

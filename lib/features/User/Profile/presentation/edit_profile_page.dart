@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/core/widgets/error_text.dart';
@@ -223,9 +224,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               fit: BoxFit.cover,
                             )
                           : _user.imgURL.isNotEmpty
-                              ? Image.network(
-                                  _user.imgURL,
+                              ? CachedNetworkImage(
+                                  imageUrl: _user.imgURL,
                                   fit: BoxFit.cover,
+                                  placeholder: (context, url) => const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                  height: Constants.height * 15,
                                 )
                               : Container(
                                   color: currTheme.onSecondary,

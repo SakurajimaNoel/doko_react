@@ -1,3 +1,6 @@
+import '../../../../core/data/storage.dart';
+import '../../../../core/helpers/enum.dart';
+
 class NodeInfo {
   String? endCursor;
   bool hasNextPage;
@@ -7,7 +10,7 @@ class NodeInfo {
     required this.hasNextPage,
   });
 
-  void updateInfo(String endCursor, bool hasNextPage) {
+  void updateInfo(String? endCursor, bool hasNextPage) {
     this.endCursor = endCursor;
     this.hasNextPage = hasNextPage;
   }
@@ -17,5 +20,19 @@ class NodeInfo {
       endCursor: map["endCursor"],
       hasNextPage: map["hasNextPage"],
     );
+  }
+}
+
+class StorageUtils {
+  static Future<List<String>> generatePreSignedURL(List<String> content) async {
+    List<String> signedContent = List.filled(content.length, "");
+    for (int i = 0; i < content.length; i++) {
+      String path = content[i];
+      var result = await StorageActions.getDownloadUrl(path);
+      if (result.status == ResponseStatus.success) {
+        signedContent[i] = result.value;
+      }
+    }
+    return signedContent;
   }
 }
