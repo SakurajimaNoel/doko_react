@@ -79,9 +79,6 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
       () {
         context.goNamed(
           RouterConstants.settings,
-          extra: {
-            "clearStack": true,
-          },
         );
       },
     );
