@@ -3,13 +3,13 @@ import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/loader.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
-import 'package:doko_react/features/User/widgets/profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/configs/router/router_constants.dart';
 import '../../../../core/data/auth.dart';
+import '../../widgets/profile_widget.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({
@@ -23,6 +23,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late final UserProvider _userProvider;
   final UserGraphqlService _userGraphqlService = UserGraphqlService();
+
   bool _loading = true;
   CompleteUserModel? _user;
 

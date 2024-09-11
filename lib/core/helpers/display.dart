@@ -1,3 +1,5 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
+
 class DisplayText {
   static const List<String> daysOfWeek = [
     'Sun',
@@ -122,5 +124,9 @@ class DisplayText {
 
       return '$dayOfWeek, $day $month $year';
     }
+  }
+
+  static String generateRandomString() {
+    return UUID.getUUID();
   }
 }

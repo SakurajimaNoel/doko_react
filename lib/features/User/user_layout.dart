@@ -82,7 +82,6 @@ class _UserLayoutState extends State<UserLayout> {
           label: "Nearby",
         ),
         NavigationDestination(
-          enabled: true,
           selectedIcon: _profile.isEmpty
               ? Icon(
                   Icons.account_circle,
@@ -93,26 +92,19 @@ class _UserLayoutState extends State<UserLayout> {
                   backgroundColor: currTheme.primary,
                   child: CircleAvatar(
                     radius: 17,
-                    child: ClipOval(
-                      child: CachedNetworkImage(
-                        cacheKey: _userProvider.profilePicture,
-                        imageUrl: _profile,
-                        placeholder: (context, url) => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                        fit: BoxFit.cover,
-                        width: 34,
-                        height: 34,
-                      ),
+                    backgroundImage: CachedNetworkImageProvider(
+                      _profile,
+                      cacheKey: userProvider.profilePicture,
                     ),
                   ),
                 ),
           icon: _profile.isEmpty
               ? const Icon(Icons.account_circle_outlined)
               : CircleAvatar(
-                  backgroundImage: NetworkImage(_profile),
+                  backgroundImage: CachedNetworkImageProvider(
+                    _profile,
+                    cacheKey: userProvider.profilePicture,
+                  ),
                 ),
           label: DisplayText.trimText(userProvider.name, len: 10),
         ),

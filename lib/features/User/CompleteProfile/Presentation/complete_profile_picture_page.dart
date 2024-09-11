@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/mime_type.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
@@ -107,7 +108,8 @@ class _CompleteProfilePicturePageState
 
     String email = emailResult.message!;
     String id = idResult.message!;
-    String bucketPath = "$id/profile$imageExtension";
+    String imageString = DisplayText.generateRandomString();
+    String bucketPath = "$id/profile/$imageString$imageExtension";
 
     var pictureResult = await StorageActions.uploadFile(
         File(_profilePicture!.path), bucketPath);

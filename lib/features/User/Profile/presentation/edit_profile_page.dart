@@ -14,6 +14,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/configs/router/router_constants.dart';
 import '../../../../core/data/storage.dart';
+import '../../../../core/helpers/display.dart';
 import '../../../../core/helpers/enum.dart';
 import '../../../../core/helpers/mime_type.dart';
 
@@ -86,7 +87,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         return;
       }
 
-      bucketPath = "$id/profile$imageExtension";
+      String imageString = DisplayText.generateRandomString();
+      bucketPath = "$id/profile/$imageString$imageExtension";
 
       var imageResult = await _handleImage(bucketPath);
       if (!imageResult) {
@@ -97,9 +99,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         return;
       }
 
-      if (_user.profilePicture != bucketPath) {
-        StorageActions.deleteFile(_user.profilePicture);
-      }
+      // if (_user.profilePicture != bucketPath) {
+      StorageActions.deleteFile(_user.profilePicture);
+      // }
     }
 
     if (_removeProfile) {
@@ -225,6 +227,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             )
                           : _user.imgURL.isNotEmpty
                               ? CachedNetworkImage(
+                                  cacheKey: _user.profilePicture,
                                   imageUrl: _user.imgURL,
                                   fit: BoxFit.cover,
                                   placeholder: (context, url) => const Center(
