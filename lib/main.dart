@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'core/configs/graphql/graphql_config.dart';
 import 'core/helpers/enum.dart';
 import 'features/User/data/services/user_graphql_service.dart';
 
@@ -147,6 +148,7 @@ class _MyAppState extends State<MyApp> {
       _getCompleteUser();
     } else {
       _authProvider.setMFAStatus(AuthenticationMFAStatus.undefined);
+      GraphqlConfig.clearCache();
     }
   }
 

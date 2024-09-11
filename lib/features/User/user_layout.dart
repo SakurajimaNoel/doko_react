@@ -18,6 +18,7 @@ class UserLayout extends StatefulWidget {
 
 class _UserLayoutState extends State<UserLayout> {
   late final UserProvider _userProvider;
+  late int _index;
 
   String _profile = "";
 
@@ -26,6 +27,8 @@ class _UserLayoutState extends State<UserLayout> {
     super.initState();
 
     _userProvider = context.read<UserProvider>();
+    _index = widget.navigationShell.currentIndex;
+
     _getProfile();
 
     _userProvider.addListener(_getProfile);
@@ -101,9 +104,14 @@ class _UserLayoutState extends State<UserLayout> {
           icon: _profile.isEmpty
               ? const Icon(Icons.account_circle_outlined)
               : CircleAvatar(
-                  backgroundImage: CachedNetworkImageProvider(
-                    _profile,
-                    cacheKey: userProvider.profilePicture,
+                  radius: 20,
+                  backgroundColor: currTheme.primary,
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundImage: CachedNetworkImageProvider(
+                      _profile,
+                      cacheKey: userProvider.profilePicture,
+                    ),
                   ),
                 ),
           label: DisplayText.trimText(userProvider.name, len: 10),
@@ -114,7 +122,7 @@ class _UserLayoutState extends State<UserLayout> {
     return Scaffold(
       body: widget.navigationShell,
       bottomNavigationBar: NavigationBar(
-        indicatorColor: widget.navigationShell.currentIndex != 2
+        indicatorColor: _index != 2
             ? currTheme.primary
             : _profile.isEmpty
                 ? currTheme.primary
@@ -128,9 +136,26 @@ class _UserLayoutState extends State<UserLayout> {
   }
 
   void _onDestinationSelected(index) {
+    int prevInd = widget.navigationShell.currentIndex;
+
     widget.navigationShell.goBranch(
       index,
       initialLocation: index == widget.navigationShell.currentIndex,
     );
+
+    if (prevInd == 2 && _profile.isNotEmpty) {
+      Future.delayed(
+        const Duration(milliseconds: 100),
+        () {
+          setState(() {
+            _index = index;
+          });
+        },
+      );
+    } else {
+      setState(() {
+        _index = index;
+      });
+    }
   }
 }

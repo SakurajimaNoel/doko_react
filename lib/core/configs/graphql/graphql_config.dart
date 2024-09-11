@@ -1,4 +1,4 @@
-
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/secret/secrets.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
@@ -18,6 +18,17 @@ class GraphqlConfig {
 
   static GraphQLClient? _client;
 
+  static void clearCache() {
+    if (_client != null) {
+      // use when need to refetch queries
+      safePrint("cache cleared");
+      _client!.resetStore(
+        refetchQueries: false,
+      );
+      _client!.cache.store.reset();
+    }
+  }
+
   GraphQLClient clientToQuery() {
     if (_client == null) {
       Link link = _authLink.concat(_httpLink);
@@ -25,6 +36,14 @@ class GraphqlConfig {
       _client = GraphQLClient(
         link: link,
         cache: GraphQLCache(),
+        defaultPolicies: DefaultPolicies(
+          query: Policies(
+            fetch: FetchPolicy.cacheAndNetwork,
+          ),
+          mutate: Policies(
+            fetch: FetchPolicy.noCache,
+          ),
+        ),
       );
     }
     return _client!;

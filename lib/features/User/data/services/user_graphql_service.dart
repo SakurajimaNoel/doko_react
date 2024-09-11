@@ -65,7 +65,6 @@ class UserGraphqlService {
     try {
       QueryResult result = await client.query(
         QueryOptions(
-          fetchPolicy: FetchPolicy.cacheAndNetwork,
           document: gql(UserQueries.getUser()),
           variables: UserQueries.getUserVariables(id),
         ),
@@ -100,7 +99,6 @@ class UserGraphqlService {
     try {
       QueryResult result = await client.query(
         QueryOptions(
-          fetchPolicy: FetchPolicy.cacheAndNetwork,
           document: gql(UserQueries.checkUsername()),
           variables: UserQueries.checkUsernameVariables(username),
         ),
@@ -137,7 +135,6 @@ class UserGraphqlService {
     try {
       QueryResult result = await client.mutate(
         MutationOptions(
-          fetchPolicy: FetchPolicy.noCache,
           document: gql(UserQueries.completeUserProfile()),
           variables: UserQueries.completeUserProfileVariables(userDetails),
         ),
@@ -162,7 +159,6 @@ class UserGraphqlService {
     try {
       QueryResult result = await client.query(
         QueryOptions(
-          fetchPolicy: FetchPolicy.cacheAndNetwork,
           document: gql(UserQueries.getCompleteUser()),
           variables: UserQueries.getCompleteUserVariables(id),
         ),
@@ -198,7 +194,6 @@ class UserGraphqlService {
     try {
       QueryResult result = await client.query(
         QueryOptions(
-          fetchPolicy: FetchPolicy.cacheAndNetwork,
           document: gql(UserQueries.getFriendsByUserId()),
           variables: UserQueries.getFriendsByUserIdVariables(id, cursor),
         ),
@@ -236,7 +231,6 @@ class UserGraphqlService {
     try {
       QueryResult result = await client.query(
         QueryOptions(
-          fetchPolicy: FetchPolicy.cacheAndNetwork,
           document: gql(UserQueries.getUserPostsByUserId()),
           variables: UserQueries.getUserPostsByUserIdVariables(id, cursor),
         ),
@@ -275,7 +269,6 @@ class UserGraphqlService {
     try {
       QueryResult result = await client.query(
         QueryOptions(
-          fetchPolicy: FetchPolicy.cacheAndNetwork,
           document: gql(UserQueries.getPendingOutgoingFriendsByUserId(cursor)),
           variables: UserQueries.getPendingOutgoingFriendsByUserIdVariables(
               id, cursor),
@@ -315,7 +308,6 @@ class UserGraphqlService {
     try {
       QueryResult result = await client.query(
         QueryOptions(
-          fetchPolicy: FetchPolicy.cacheAndNetwork,
           document: gql(UserQueries.getPendingIncomingFriendsByUserId(cursor)),
           variables: UserQueries.getPendingIncomingFriendsByUserIdVariables(
               id, cursor),
@@ -355,7 +347,6 @@ class UserGraphqlService {
     try {
       QueryResult result = await client.mutate(
         MutationOptions(
-          fetchPolicy: FetchPolicy.noCache,
           document: gql(UserQueries.updateUserProfile()),
           variables: UserQueries.updateUserProfileVariables(
               id, name, bio, profilePicture),
