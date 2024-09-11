@@ -1,6 +1,6 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/secret/secrets.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:hive/hive.dart';
 
 import '../../data/auth.dart';
 
@@ -17,25 +17,39 @@ class GraphqlConfig {
   });
 
   static GraphQLClient? _client;
+  static Box? _userBox;
 
-  static void clearCache() {
+  static Future<void> clearCache() async {
     if (_client != null) {
-      // use when need to refetch queries
-      safePrint("cache cleared");
-      _client!.resetStore(
-        refetchQueries: false,
-      );
-      _client!.cache.store.reset();
+      _client = null;
+
+      if (_userBox != null && _userBox!.isOpen) {
+        await _userBox!.clear();
+        await _userBox!.close();
+        // await Hive.deleteBoxFromDisk(_userBox!.name);
+        _userBox = null;
+      }
     }
   }
 
-  GraphQLClient clientToQuery() {
+  Future<GraphQLClient> clientToQuery() async {
     if (_client == null) {
       Link link = _authLink.concat(_httpLink);
+      var userStatus = await AuthenticationActions.getUserId();
+      String userId = "";
+
+      if (userStatus.status == AuthStatus.done) {
+        userId = userStatus.message!;
+      }
+
+      final boxName = "graphql_cache_$userId";
+      final userBox = await Hive.openBox<Map<dynamic, dynamic>?>(boxName);
+      _userBox = userBox;
+      final store = HiveStore(userBox);
 
       _client = GraphQLClient(
         link: link,
-        cache: GraphQLCache(),
+        cache: GraphQLCache(store: store),
         defaultPolicies: DefaultPolicies(
           query: Policies(
             fetch: FetchPolicy.cacheAndNetwork,

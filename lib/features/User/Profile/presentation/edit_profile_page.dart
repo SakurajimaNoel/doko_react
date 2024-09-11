@@ -224,6 +224,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           ? Image.file(
                               File(_profilePicture!.path),
                               fit: BoxFit.cover,
+                              cacheHeight: Constants.editProfileCachedHeight,
                             )
                           : _user.imgURL.isNotEmpty
                               ? CachedNetworkImage(
@@ -236,6 +237,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   errorWidget: (context, url, error) =>
                                       const Icon(Icons.error),
                                   height: Constants.height * 15,
+                                  memCacheHeight:
+                                      Constants.editProfileCachedHeight,
                                 )
                               : Container(
                                   color: currTheme.onSecondary,

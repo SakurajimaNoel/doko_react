@@ -3,7 +3,7 @@ import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error_text.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
-import 'package:doko_react/features/User/widgets/post_container_profile_widget.dart';
+import 'package:doko_react/features/User/widgets/posts/post_container_profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -195,6 +195,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           children: [
                             _profile.isNotEmpty
                                 ? CachedNetworkImage(
+                                    memCacheHeight:
+                                        Constants.profileCacheHeight,
                                     cacheKey: _user.profilePicture,
                                     imageUrl: _profile,
                                     fit: BoxFit.cover,

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/data/storage.dart';
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
@@ -95,9 +96,20 @@ class _UserLayoutState extends State<UserLayout> {
                   backgroundColor: currTheme.primary,
                   child: CircleAvatar(
                     radius: 17,
-                    backgroundImage: CachedNetworkImageProvider(
-                      _profile,
-                      cacheKey: userProvider.profilePicture,
+                    child: ClipOval(
+                      child: CachedNetworkImage(
+                        cacheKey: userProvider.profilePicture,
+                        imageUrl: _profile,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                        fit: BoxFit.cover,
+                        width: 34,
+                        height: 34,
+                        memCacheHeight: Constants.thumbnailCacheHeight,
+                      ),
                     ),
                   ),
                 ),
@@ -108,9 +120,20 @@ class _UserLayoutState extends State<UserLayout> {
                   backgroundColor: currTheme.primary,
                   child: CircleAvatar(
                     radius: 20,
-                    backgroundImage: CachedNetworkImageProvider(
-                      _profile,
-                      cacheKey: userProvider.profilePicture,
+                    child: ClipOval(
+                      child: CachedNetworkImage(
+                        cacheKey: userProvider.profilePicture,
+                        imageUrl: _profile,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                        fit: BoxFit.cover,
+                        width: 40,
+                        height: 40,
+                        memCacheHeight: Constants.thumbnailCacheHeight,
+                      ),
                     ),
                   ),
                 ),

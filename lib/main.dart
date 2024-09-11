@@ -10,6 +10,7 @@ import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/theme/theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,6 +23,7 @@ void main() async {
     WidgetsFlutterBinding.ensureInitialized();
     await SharedPreferences.getInstance();
     await _configureAmplify();
+    await initHiveForFlutter();
 
     runApp(MultiProvider(providers: [
       ChangeNotifierProvider(
@@ -141,14 +143,15 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void _changeAuthStatus(AuthenticationStatus status) {
-    _authProvider.setAuthStatus(status);
+  Future<void> _changeAuthStatus(AuthenticationStatus status) async {
     if (status == AuthenticationStatus.signedIn) {
       _fetchMfaStatus();
       _getCompleteUser();
+      _authProvider.setAuthStatus(status);
     } else {
+      await GraphqlConfig.clearCache();
+      _authProvider.setAuthStatus(status);
       _authProvider.setMFAStatus(AuthenticationMFAStatus.undefined);
-      GraphqlConfig.clearCache();
     }
   }
 

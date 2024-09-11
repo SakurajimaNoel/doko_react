@@ -4,7 +4,7 @@ import 'package:doko_react/core/widgets/loader_button.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
-import 'package:doko_react/features/User/widgets/post_widget.dart';
+import 'package:doko_react/features/User/widgets/posts/post_widget.dart';
 import 'package:flutter/material.dart';
 
 class PostContainerProfileWidget extends StatefulWidget {
@@ -109,7 +109,7 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
         PostModel.fromProfilePost(post: _posts[index], createdBy: _user);
     return PostWidget(
       post: postItem,
-      key: PageStorageKey("post$index"),
+      profileImage: _profile,
     );
   }
 

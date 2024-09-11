@@ -23,4 +23,10 @@ class Constants {
 
   static const double appBarHeight = kToolbarHeight;
   static const double expandedAppBarHeight = _root * 22.5;
+
+  // images
+  static int postCacheHeight = (_root * 50).round();
+  static int profileCacheHeight = (_root * 75).round();
+  static int thumbnailCacheHeight = (_root * 5).round();
+  static int editProfileCachedHeight = (_root * 75).round();
 }

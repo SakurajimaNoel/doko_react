@@ -59,10 +59,15 @@ class PostResponse {
 
 class UserGraphqlService {
   static GraphqlConfig config = GraphqlConfig();
-  GraphQLClient client = config.clientToQuery();
+
+  Future<GraphQLClient> _getGraphqlClient() async {
+    return await config.clientToQuery();
+  }
 
   Future<UserResponse> getUser(String id) async {
     try {
+      var client = await _getGraphqlClient();
+
       QueryResult result = await client.query(
         QueryOptions(
           document: gql(UserQueries.getUser()),
@@ -97,6 +102,7 @@ class UserGraphqlService {
 
   Future<UsernameResponse> checkUsername(String username) async {
     try {
+      var client = await _getGraphqlClient();
       QueryResult result = await client.query(
         QueryOptions(
           document: gql(UserQueries.checkUsername()),
@@ -133,6 +139,7 @@ class UserGraphqlService {
   Future<UserResponse> completeUserProfile(
       CompleteUserProfileVariables userDetails) async {
     try {
+      var client = await _getGraphqlClient();
       QueryResult result = await client.mutate(
         MutationOptions(
           document: gql(UserQueries.completeUserProfile()),
@@ -157,6 +164,7 @@ class UserGraphqlService {
 
   Future<CompleteUserResponse> getCompleteUser(String id) async {
     try {
+      var client = await _getGraphqlClient();
       QueryResult result = await client.query(
         QueryOptions(
           document: gql(UserQueries.getCompleteUser()),
@@ -192,6 +200,7 @@ class UserGraphqlService {
 
   Future<FriendResponse> getFriendsByUserId(String id, String cursor) async {
     try {
+      var client = await _getGraphqlClient();
       QueryResult result = await client.query(
         QueryOptions(
           document: gql(UserQueries.getFriendsByUserId()),
@@ -229,6 +238,7 @@ class UserGraphqlService {
 
   Future<PostResponse> getPostsByUserId(String id, String cursor) async {
     try {
+      var client = await _getGraphqlClient();
       QueryResult result = await client.query(
         QueryOptions(
           document: gql(UserQueries.getUserPostsByUserId()),
@@ -267,6 +277,7 @@ class UserGraphqlService {
   Future<FriendResponse> getPendingOutgoingFriendsByUserId(
       String id, String? cursor) async {
     try {
+      var client = await _getGraphqlClient();
       QueryResult result = await client.query(
         QueryOptions(
           document: gql(UserQueries.getPendingOutgoingFriendsByUserId(cursor)),
@@ -306,6 +317,7 @@ class UserGraphqlService {
   Future<FriendResponse> getPendingIncomingFriendsByUserId(
       String id, String? cursor) async {
     try {
+      var client = await _getGraphqlClient();
       QueryResult result = await client.query(
         QueryOptions(
           document: gql(UserQueries.getPendingIncomingFriendsByUserId(cursor)),
@@ -345,6 +357,7 @@ class UserGraphqlService {
   Future<UserResponse> updateUserProfile(
       String id, String name, String bio, String profilePicture) async {
     try {
+      var client = await _getGraphqlClient();
       QueryResult result = await client.mutate(
         MutationOptions(
           document: gql(UserQueries.updateUserProfile()),
