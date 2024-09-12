@@ -68,37 +68,39 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     var currScheme = Theme.of(context).colorScheme;
 
-    return _loading
-        ? Scaffold(
-            appBar: AppBar(
-              title: Text(_userProvider.username),
-              actions: [
-                IconButton(
-                  onPressed: () {
-                    context.goNamed(RouterConstants.settings);
-                  },
-                  icon: const Icon(Icons.settings),
-                  tooltip: "Settings",
-                ),
-                TextButton(
-                  onPressed: () {
-                    AuthenticationActions.signOutUser();
-                  },
-                  child: Text(
-                    "Sign out",
-                    style: TextStyle(
-                      color: currScheme.error,
-                    ),
-                  ),
-                )
-              ],
+    if (_loading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(_userProvider.username),
+          actions: [
+            IconButton(
+              onPressed: () {
+                context.goNamed(RouterConstants.settings);
+              },
+              icon: const Icon(Icons.settings),
+              tooltip: "Settings",
             ),
-            body: const Loader(),
-          )
-        : ProfileWidget(
-            user: _user,
-            refreshUser: _fetchCompleteUser,
-            self: true,
-          );
+            TextButton(
+              onPressed: () {
+                AuthenticationActions.signOutUser();
+              },
+              child: Text(
+                "Sign out",
+                style: TextStyle(
+                  color: currScheme.error,
+                ),
+              ),
+            )
+          ],
+        ),
+        body: const Loader(),
+      );
+    } else {
+      return ProfileWidget(
+        user: _user,
+        refreshUser: _fetchCompleteUser,
+        self: true,
+      );
+    }
   }
 }

@@ -61,7 +61,7 @@ class PostWidget extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.1,
                   child: const _PostAction(),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: Constants.gap * 0.125,
                 ),
               ],
