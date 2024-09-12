@@ -123,29 +123,35 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         title: const Text("Profile"),
         actions: _appBarActions(),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(Constants.padding),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const ErrorText(
-                "Oops! Something went wrong.",
-                fontSize: Constants.fontSize,
-              ),
-              const SizedBox(
-                height: Constants.gap * 0.5,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _refreshUser(
-                    force: true,
-                  );
-                },
-                child: const Text("Refresh"),
-              ),
-            ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await _refreshUser(
+            force: true,
+          );
+        },
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.only(
+            left: Constants.padding,
+            right: Constants.padding,
+            top: MediaQuery.sizeOf(context).height * 0.4,
           ),
+          children: const [
+            ErrorText(
+              "Oops! Something went wrong.",
+              fontSize: Constants.fontSize,
+            ),
+            SizedBox(
+              height: Constants.height * 0.5,
+            ),
+            Text(
+              "Pull to refresh",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: Constants.smallFontSize,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -194,7 +200,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             return notification.depth == 2;
           },
           onRefresh: () async {
-            _refreshUser(
+            await _refreshUser(
               force: true,
             );
           },

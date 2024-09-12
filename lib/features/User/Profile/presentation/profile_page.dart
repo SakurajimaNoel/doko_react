@@ -36,32 +36,24 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _fetchCompleteUser({bool force = false}) async {
-    setState(() {
-      _loading = true;
-    });
-
     var completeUser = await _userGraphqlService.getCompleteUser(
       _userProvider.id,
       force: force,
     );
 
-    if (completeUser.status == ResponseStatus.error) {
+    if (_loading) {
       setState(() {
         _loading = false;
       });
-      return;
     }
 
-    if (completeUser.user == null) {
-      setState(() {
-        _loading = false;
-      });
+    if (completeUser.status == ResponseStatus.error ||
+        completeUser.user == null) {
       return;
     }
 
     var user = completeUser.user!;
     setState(() {
-      _loading = false;
       _user = user;
     });
   }
