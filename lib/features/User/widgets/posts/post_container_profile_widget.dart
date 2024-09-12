@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/widgets/loader_button.dart';
@@ -10,13 +11,11 @@ import 'package:flutter/material.dart';
 class PostContainerProfileWidget extends StatefulWidget {
   final ProfilePostInfo postInfo;
   final UserModel user;
-  final String img;
 
   const PostContainerProfileWidget({
-    super.key,
+    required super.key,
     required this.postInfo,
     required this.user,
-    required this.img,
   });
 
   @override
@@ -28,12 +27,12 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
     with AutomaticKeepAliveClientMixin {
   late final ProfilePostInfo _postInfo;
   late final UserModel _user;
-  late final String _profile;
 
   final UserGraphqlService _userGraphqlService = UserGraphqlService();
 
   bool _loading = false;
-  String _errorMessage = "";
+
+  // String _errorMessage = "";
   late List<ProfilePostModel> _posts;
 
   @override
@@ -42,7 +41,6 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
 
     _postInfo = widget.postInfo;
     _user = widget.user;
-    _profile = widget.img;
 
     _posts = _postInfo.posts;
   }
@@ -57,9 +55,9 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
     _loading = false;
 
     if (postResponse.status == ResponseStatus.error) {
-      setState(() {
-        _errorMessage = "Error fetching user posts.";
-      });
+      // setState(() {
+      //   _errorMessage = "Error fetching user posts.";
+      // });
       return;
     }
 
@@ -81,14 +79,14 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
       // fetch more posts if available
       if (!_postInfo.info.hasNextPage) {
         // no more posts available
-        return const Padding(
-          padding: EdgeInsets.only(
+        return Padding(
+          padding: const EdgeInsets.only(
             bottom: Constants.padding,
           ),
           child: Center(
             child: Text(
-              "User has no more posts.",
-              style: TextStyle(
+              "${_user.name} has no more posts.",
+              style: const TextStyle(
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -109,13 +107,14 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
         PostModel.fromProfilePost(post: _posts[index], createdBy: _user);
     return PostWidget(
       post: postItem,
-      profileImage: _profile,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
+    safePrint("profile post ${_user.profilePicture}");
 
     if (_posts.isEmpty) {
       return Padding(

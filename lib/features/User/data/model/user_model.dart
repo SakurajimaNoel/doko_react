@@ -8,20 +8,26 @@ class UserModel {
   String name;
   final String username;
   String profilePicture;
+  String signedProfilePicture;
 
   UserModel({
     required this.name,
     required this.username,
     required this.profilePicture,
     required this.id,
+    required this.signedProfilePicture,
   });
 
-  static UserModel createModel({required Map map}) {
+  static Future<UserModel> createModel({required Map map}) async {
+    String signedProfilePicture =
+        await StorageUtils.generatePreSignedURL(map["profilePicture"]);
+
     return UserModel(
       name: map["name"],
       username: map["username"],
       profilePicture: map["profilePicture"],
       id: map["id"],
+      signedProfilePicture: signedProfilePicture,
     );
   }
 }
@@ -40,13 +46,17 @@ class ProfileFriendInfo {
     friends.addAll(newFriends);
   }
 
-  static ProfileFriendInfo createModel({required Map map}) {
+  static Future<ProfileFriendInfo> createModel({required Map map}) async {
+    List<Future<UserModel>> futureFriendsModel =
+        (map["edges"] as List).map((user) async {
+      UserModel friend = await UserModel.createModel(map: user["node"]);
+      return friend;
+    }).toList();
+
+    List<UserModel> friends = await Future.wait(futureFriendsModel);
+
     return ProfileFriendInfo(
-      friends: (map["edges"] as List)
-          .map((post) => UserModel.createModel(
-                map: post["node"],
-              ))
-          .toList(),
+      friends: friends,
       info: NodeInfo.createModel(
         map: map["pageInfo"],
       ),
@@ -72,12 +82,25 @@ class CompleteUserModel extends UserModel {
     required super.username,
     required super.profilePicture,
     required super.id,
+    required super.signedProfilePicture,
   });
 
   static Future<CompleteUserModel> createModel({required Map map}) async {
-    ProfilePostInfo postInfo = await ProfilePostInfo.createModel(
+    Future<ProfilePostInfo> futurePostInfo = ProfilePostInfo.createModel(
       map: map["postsConnection"],
     );
+
+    Future<String> futureSignedProfilePicture =
+        StorageUtils.generatePreSignedURL(map["profilePicture"]);
+
+    Future<ProfileFriendInfo> futureFriendInfo =
+        ProfileFriendInfo.createModel(map: map["friendsConnection"]);
+
+    final results = await Future.wait([
+      futureSignedProfilePicture,
+      futurePostInfo,
+      futureFriendInfo,
+    ]);
 
     return CompleteUserModel(
       bio: map["bio"] ?? "",
@@ -86,27 +109,10 @@ class CompleteUserModel extends UserModel {
       name: map["name"],
       username: map["username"],
       profilePicture: map["profilePicture"],
+      signedProfilePicture: results[0] as String,
       id: map["id"],
-      postsInfo: postInfo,
-      friendsInfo: ProfileFriendInfo.createModel(
-        map: map["friendsConnection"],
-      ),
+      postsInfo: results[1] as ProfilePostInfo,
+      friendsInfo: results[2] as ProfileFriendInfo,
     );
   }
-}
-
-class EditUserModel {
-  final String name;
-  final String bio;
-  final String profilePicture;
-  final String imgURL;
-  final String id;
-
-  const EditUserModel({
-    required this.name,
-    required this.bio,
-    required this.profilePicture,
-    required this.imgURL,
-    required this.id,
-  });
 }

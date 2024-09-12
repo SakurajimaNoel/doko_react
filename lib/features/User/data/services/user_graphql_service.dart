@@ -87,7 +87,7 @@ class UserGraphqlService {
         );
       }
 
-      UserModel user = UserModel.createModel(map: res[0]);
+      UserModel user = await UserModel.createModel(map: res[0]);
       return UserResponse(
         status: ResponseStatus.success,
         user: user,
@@ -151,8 +151,13 @@ class UserGraphqlService {
         throw Exception(result.exception);
       }
 
-      return const UserResponse(
+      List res = result.data?["createUsers"]["users"];
+
+      UserModel user = await UserModel.createModel(map: res[0]);
+
+      return UserResponse(
         status: ResponseStatus.success,
+        user: user,
       );
     } catch (e) {
       safePrint(e.toString());
@@ -227,7 +232,7 @@ class UserGraphqlService {
         );
       }
 
-      ProfileFriendInfo info = ProfileFriendInfo.createModel(
+      ProfileFriendInfo info = await ProfileFriendInfo.createModel(
         map: res[0]["postsConnection"],
       );
 
@@ -305,7 +310,7 @@ class UserGraphqlService {
         );
       }
 
-      ProfileFriendInfo info = ProfileFriendInfo.createModel(
+      ProfileFriendInfo info = await ProfileFriendInfo.createModel(
         map: res[0]["postsConnection"],
       );
 
@@ -345,7 +350,7 @@ class UserGraphqlService {
         );
       }
 
-      ProfileFriendInfo info = ProfileFriendInfo.createModel(
+      ProfileFriendInfo info = await ProfileFriendInfo.createModel(
         map: res[0]["postsConnection"],
       );
 
@@ -377,8 +382,13 @@ class UserGraphqlService {
         throw Exception(result.exception);
       }
 
-      return const UserResponse(
+      List res = result.data?["updateUsers"]["users"];
+
+      UserModel user = await UserModel.createModel(map: res[0]);
+
+      return UserResponse(
         status: ResponseStatus.success,
+        user: user,
       );
     } catch (e) {
       safePrint(e.toString());

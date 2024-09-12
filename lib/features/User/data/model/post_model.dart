@@ -22,7 +22,7 @@ class ProfilePostModel {
         (map["content"] as List).map((element) => element.toString()).toList();
 
     List<String> signedContent =
-        await StorageUtils.generatePreSignedURL(content);
+        await StorageUtils.generatePreSignedURLs(content);
     return ProfilePostModel(
       content: content,
       signedContent: signedContent,
@@ -92,14 +92,17 @@ class PostModel extends ProfilePostModel {
         (map["content"] as List).map((element) => element.toString()).toList();
 
     List<String> signedContent =
-        await StorageUtils.generatePreSignedURL(content);
+        await StorageUtils.generatePreSignedURLs(content);
+
+    UserModel createdBy = await UserModel.createModel(map: map["createdBy"]);
+
     return PostModel(
       content: content,
       signedContent: signedContent,
       caption: map["caption"],
       createdOn: DateTime.parse(map["createdOn"]),
       id: map["id"],
-      createdBy: UserModel.createModel(map: map["createdBy"]),
+      createdBy: createdBy,
     );
   }
 }

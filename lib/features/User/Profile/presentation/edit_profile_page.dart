@@ -3,14 +3,15 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error_text.dart';
 import 'package:doko_react/core/widgets/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loader_button.dart';
-import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/configs/router/router_constants.dart';
 import '../../../../core/data/storage.dart';
@@ -19,19 +20,20 @@ import '../../../../core/helpers/enum.dart';
 import '../../../../core/helpers/mime_type.dart';
 
 class EditProfilePage extends StatefulWidget {
-  final Function(String, String, String, bool) callback;
-  final EditUserModel user;
+  final String bio;
 
-  const EditProfilePage(
-      {super.key, required this.callback, required this.user});
+  const EditProfilePage({
+    super.key,
+    required this.bio,
+  });
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  late final Function(String, String, String, bool) _callback;
-  late final EditUserModel _user;
+  late final String _currentUserBio;
+  late final UserProvider _userProvider;
 
   final UserGraphqlService _userGraphqlService = UserGraphqlService();
 
@@ -47,14 +49,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    _callback = widget.callback;
-    _user = widget.user;
+
+    _currentUserBio = widget.bio;
+    _userProvider = context.read<UserProvider>();
 
     _nameController = TextEditingController(
-      text: _user.name,
+      text: _userProvider.name,
     );
     _bioController = TextEditingController(
-      text: _user.bio,
+      text: _currentUserBio,
     );
   }
 
@@ -70,10 +73,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       _errorMessage = "";
     });
 
-    String id = _user.id;
+    String id = _userProvider.id;
     String name = _nameController.text;
     String bio = _bioController.text;
-    String bucketPath = _user.profilePicture;
+    String bucketPath = _userProvider.profilePicture;
 
     if (!_removeProfile && _profilePicture != null) {
       String? imageExtension =
@@ -99,28 +102,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
         return;
       }
 
-      // if (_user.profilePicture != bucketPath) {
-      StorageActions.deleteFile(_user.profilePicture);
-      // }
+      StorageActions.deleteFile(_userProvider.profilePicture);
     }
 
     if (_removeProfile) {
-      StorageActions.deleteFile(_user.profilePicture);
+      StorageActions.deleteFile(_userProvider.profilePicture);
       bucketPath = "";
     }
 
-    // updating graph
+    // update graph
     var updateResult =
         await _userGraphqlService.updateUserProfile(id, name, bio, bucketPath);
 
     if (updateResult.status == ResponseStatus.error) {
       String message =
           "Updated user profile image. Error updating other fields.";
+
       if (_profilePicture == null) {
         message = "Error updating user profile fields.";
-      } else {
-        _callback(bucketPath, _user.bio, _user.name, true);
       }
+      // else {
+      //   _callback(bucketPath, _user.bio, _user.name, true);
+      // }
 
       setState(() {
         _errorMessage = message;
@@ -129,8 +132,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
       return;
     }
 
-    bool updateProfile = _removeProfile ? true : _profilePicture != null;
-    _callback(bucketPath, bio, name, updateProfile);
+    // bool updateProfile = _removeProfile ? true : _profilePicture != null;
+    // _callback(bucketPath, bio, name, updateProfile);
+    _userProvider.addUser(user: updateResult.user!);
     _handleSuccess();
   }
 
@@ -196,7 +200,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       body: PopScope(
         canPop: false,
-        onPopInvoked: (bool didPop) {
+        onPopInvokedWithResult: (bool didPop, var result) {
           if (didPop) return;
 
           if (_updating) return;
@@ -226,10 +230,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               fit: BoxFit.cover,
                               cacheHeight: Constants.editProfileCachedHeight,
                             )
-                          : _user.imgURL.isNotEmpty
+                          : _userProvider.profilePicture.isNotEmpty
                               ? CachedNetworkImage(
-                                  cacheKey: _user.profilePicture,
-                                  imageUrl: _user.imgURL,
+                                  cacheKey: _userProvider.profilePicture,
+                                  imageUrl: _userProvider.signedProfilePicture,
                                   fit: BoxFit.cover,
                                   placeholder: (context, url) => const Center(
                                     child: CircularProgressIndicator(),

@@ -452,7 +452,8 @@ class UserQueries {
         users {
           name
           profilePicture
-          bio
+          username
+          id
         }
       }
     }

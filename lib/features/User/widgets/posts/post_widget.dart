@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
@@ -7,12 +9,10 @@ import 'package:flutter/material.dart';
 
 class PostWidget extends StatelessWidget {
   final PostModel post;
-  final String? profileImage;
 
   const PostWidget({
     super.key,
     required this.post,
-    this.profileImage,
   });
 
   @override
@@ -31,7 +31,6 @@ class PostWidget extends StatelessWidget {
               children: [
                 PostUserWidget(
                   user: post.createdBy,
-                  profileImg: profileImage,
                 ),
                 Text(
                   DisplayText.displayDateDiff(post.createdOn),
@@ -49,15 +48,17 @@ class PostWidget extends StatelessWidget {
             Row(
               children: [
                 SizedBox(
-                  height: Constants.height * 16,
+                  height: max(Constants.height * 16,
+                      MediaQuery.of(context).size.height * 0.25),
                   width: MediaQuery.of(context).size.width * 0.9 - 2,
-                  child: _PostContentCarouseView(
+                  child: _PostContent(
                     content: post.content,
                     signedContent: post.signedContent,
                   ),
                 ),
                 SizedBox(
-                  height: Constants.height * 16,
+                  height: max(Constants.height * 16,
+                      MediaQuery.of(context).size.height * 0.25),
                   width: MediaQuery.of(context).size.width * 0.1,
                   child: const _PostAction(),
                 ),
@@ -88,12 +89,11 @@ class PostWidget extends StatelessWidget {
 }
 
 // post content carousel view
-class _PostContentCarouseView extends StatelessWidget {
+class _PostContent extends StatelessWidget {
   final List<String> content;
   final List<String> signedContent;
 
-  const _PostContentCarouseView({
-    super.key,
+  const _PostContent({
     required this.content,
     required this.signedContent,
   });
@@ -130,56 +130,9 @@ class _PostContentCarouseView extends StatelessWidget {
   }
 }
 
-// post content
-class _PostContent extends StatelessWidget {
-  final List<String> content;
-  final List<String> signedContent;
-
-  const _PostContent({
-    super.key,
-    required this.content,
-    required this.signedContent,
-  });
-
-  Widget _postContentItem(BuildContext context, int index) {
-    return SizedBox(
-      height: double.infinity,
-      width: MediaQuery.of(context).size.width * 0.9 - 2,
-      child: signedContent[index].isEmpty
-          ? const Center(
-              child: Icon(Icons.error),
-            )
-          : CachedNetworkImage(
-              cacheKey: content[index],
-              fit: BoxFit.cover,
-              imageUrl: signedContent[index],
-              placeholder: (context, url) => const Center(
-                child: CircularProgressIndicator(),
-              ),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-              // height: Constants.height * 20,
-              height: double.infinity,
-              filterQuality: FilterQuality.high,
-              memCacheHeight: Constants.postCacheHeight,
-            ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      physics: const PageScrollPhysics(),
-      itemCount: content.length,
-      itemBuilder: (BuildContext context, int index) =>
-          _postContentItem(context, index),
-    );
-  }
-}
-
 // post actions
 class _PostAction extends StatelessWidget {
-  const _PostAction({super.key});
+  const _PostAction();
 
   @override
   Widget build(BuildContext context) {

@@ -9,6 +9,7 @@ class UserProvider extends ChangeNotifier {
   String _username = "";
   String _profilePicture = "";
   String _id = "";
+  String _signedProfilePicture = "";
 
   ProfileStatus get status => _status;
 
@@ -19,6 +20,8 @@ class UserProvider extends ChangeNotifier {
   String get username => _username;
 
   String get profilePicture => _profilePicture;
+
+  String get signedProfilePicture => _signedProfilePicture;
 
   void incompleteUser() {
     _status = ProfileStatus.incomplete;
@@ -31,6 +34,7 @@ class UserProvider extends ChangeNotifier {
     _username = user.username;
     _profilePicture = user.profilePicture;
     _id = user.id;
+    _signedProfilePicture = user.signedProfilePicture;
 
     notifyListeners();
   }

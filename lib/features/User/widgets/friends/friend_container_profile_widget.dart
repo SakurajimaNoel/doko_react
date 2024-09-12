@@ -30,7 +30,8 @@ class _FriendContainerProfileWidgetState
   final UserGraphqlService _userGraphqlService = UserGraphqlService();
 
   bool _loading = false;
-  String _errorMessage = "";
+
+  // String _errorMessage = "";
   late final List<UserModel> _friends;
 
   @override
@@ -54,9 +55,9 @@ class _FriendContainerProfileWidgetState
     _loading = false;
 
     if (friendResponse.status == ResponseStatus.error) {
-      setState(() {
-        _errorMessage = "Error fetching user friends.";
-      });
+      // setState(() {
+      //   _errorMessage = "Error fetching user friends.";
+      // });
       return;
     }
 
@@ -78,14 +79,14 @@ class _FriendContainerProfileWidgetState
       // fetch more friends if available
       if (!_friendInfo.info.hasNextPage) {
         // no more posts available
-        return const Padding(
-          padding: EdgeInsets.only(
+        return Padding(
+          padding: const EdgeInsets.only(
             bottom: Constants.padding,
           ),
           child: Center(
             child: Text(
-              "User has no more friends.",
-              style: TextStyle(
+              "${_user.name} has no more friends.",
+              style: const TextStyle(
                 fontWeight: FontWeight.w500,
               ),
             ),

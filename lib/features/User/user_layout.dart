@@ -1,8 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
-import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -21,45 +19,12 @@ class _UserLayoutState extends State<UserLayout> {
   late final UserProvider _userProvider;
   late int _index;
 
-  String _profile = "";
-
   @override
   void initState() {
     super.initState();
 
     _userProvider = context.read<UserProvider>();
     _index = widget.navigationShell.currentIndex;
-
-    _getProfile();
-
-    _userProvider.addListener(_getProfile);
-  }
-
-  @override
-  void dispose() {
-    // Remove listener to prevent memory leaks
-    _userProvider.removeListener(_getProfile);
-    super.dispose();
-  }
-
-  Future<void> _getProfile() async {
-    String path = _userProvider.profilePicture;
-    if (path.isEmpty) {
-      setState(() {
-        _profile = "";
-        return;
-      });
-    }
-
-    var result = await StorageActions.getDownloadUrl(path);
-
-    if (result.status == ResponseStatus.success) {
-      if (mounted) {
-        setState(() {
-          _profile = result.value;
-        });
-      }
-    }
   }
 
   @override
@@ -86,7 +51,7 @@ class _UserLayoutState extends State<UserLayout> {
           label: "Nearby",
         ),
         NavigationDestination(
-          selectedIcon: _profile.isEmpty
+          selectedIcon: userProvider.profilePicture.isEmpty
               ? Icon(
                   Icons.account_circle,
                   color: currTheme.onPrimary,
@@ -99,7 +64,7 @@ class _UserLayoutState extends State<UserLayout> {
                     child: ClipOval(
                       child: CachedNetworkImage(
                         cacheKey: userProvider.profilePicture,
-                        imageUrl: _profile,
+                        imageUrl: userProvider.signedProfilePicture,
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(),
                         ),
@@ -113,7 +78,7 @@ class _UserLayoutState extends State<UserLayout> {
                     ),
                   ),
                 ),
-          icon: _profile.isEmpty
+          icon: userProvider.profilePicture.isEmpty
               ? const Icon(Icons.account_circle_outlined)
               : CircleAvatar(
                   radius: 20,
@@ -123,7 +88,7 @@ class _UserLayoutState extends State<UserLayout> {
                     child: ClipOval(
                       child: CachedNetworkImage(
                         cacheKey: userProvider.profilePicture,
-                        imageUrl: _profile,
+                        imageUrl: userProvider.signedProfilePicture,
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(),
                         ),
@@ -147,7 +112,7 @@ class _UserLayoutState extends State<UserLayout> {
       bottomNavigationBar: NavigationBar(
         indicatorColor: _index != 2
             ? currTheme.primary
-            : _profile.isEmpty
+            : userProvider.profilePicture.isEmpty
                 ? currTheme.primary
                 : Colors.transparent,
         selectedIndex: widget.navigationShell.currentIndex,
@@ -166,7 +131,7 @@ class _UserLayoutState extends State<UserLayout> {
       initialLocation: index == widget.navigationShell.currentIndex,
     );
 
-    if (prevInd == 2 && _profile.isNotEmpty) {
+    if (prevInd == 2 && _userProvider.profilePicture.isNotEmpty) {
       Future.delayed(
         const Duration(milliseconds: 100),
         () {

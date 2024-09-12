@@ -21,7 +21,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
-import '../../../features/User/data/model/user_model.dart';
 
 class AppRouterConfig {
   static GoRouter loadingConfig() {
@@ -224,12 +223,9 @@ class AppRouterConfig {
                       builder: (context, state) {
                         final Map<String, dynamic> data =
                             state.extra as Map<String, dynamic>;
-                        final Function(String, String, String, bool) callback =
-                            data["callback"];
-                        final EditUserModel user = data["user"];
+                        final String bio = data["bio"];
                         return EditProfilePage(
-                          callback: callback,
-                          user: user,
+                          bio: bio,
                         );
                       },
                     ),

@@ -24,7 +24,8 @@ class NodeInfo {
 }
 
 class StorageUtils {
-  static Future<List<String>> generatePreSignedURL(List<String> content) async {
+  static Future<List<String>> generatePreSignedURLs(
+      List<String> content) async {
     List<String> signedContent = List.filled(content.length, "");
     for (int i = 0; i < content.length; i++) {
       String path = content[i];
@@ -34,5 +35,10 @@ class StorageUtils {
       }
     }
     return signedContent;
+  }
+
+  static Future<String> generatePreSignedURL(String path) async {
+    var result = await StorageActions.getDownloadUrl(path);
+    return result.value;
   }
 }

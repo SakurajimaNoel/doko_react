@@ -11,7 +11,6 @@ import 'package:doko_react/core/widgets/error_text.dart';
 import 'package:doko_react/core/widgets/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loader_button.dart';
 import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
-import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -142,12 +141,7 @@ class _CompleteProfilePicturePageState
     }
 
     _userProvider.addUser(
-      user: UserModel(
-        name: _name,
-        username: _username,
-        profilePicture: bucketPath,
-        id: id,
-      ),
+      user: profileResponse.user!,
     );
   }
 
