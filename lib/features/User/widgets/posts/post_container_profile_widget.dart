@@ -116,6 +116,23 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
+    if (_posts.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(
+          bottom: Constants.padding,
+        ),
+        child: Center(
+          child: Text(
+            "${_user.name} has not uploaded any posts.",
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      );
+    }
+
     return ListView.builder(
       itemCount: _posts.length + 1,
       itemBuilder: (BuildContext context, int index) =>

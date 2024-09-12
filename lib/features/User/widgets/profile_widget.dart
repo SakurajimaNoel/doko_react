@@ -3,6 +3,7 @@ import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error_text.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
+import 'package:doko_react/features/User/widgets/friends/friend_container_profile_widget.dart';
 import 'package:doko_react/features/User/widgets/posts/post_container_profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,7 +17,9 @@ import '../../../core/helpers/enum.dart';
 class ProfileWidget extends StatefulWidget {
   final CompleteUserModel? user;
   final bool self;
-  final Future<void> Function() refreshUser;
+  final Future<void> Function({
+    bool force,
+  }) refreshUser;
 
   const ProfileWidget({
     super.key,
@@ -32,7 +35,9 @@ class ProfileWidget extends StatefulWidget {
 class _ProfileWidgetState extends State<ProfileWidget> {
   late final CompleteUserModel? _user;
   late final bool _self;
-  late final Future<void> Function() _refreshUser;
+  late final Future<void> Function({
+    bool force,
+  }) _refreshUser;
 
   String _profile = "";
   late final UserProvider _userProvider;
@@ -132,7 +137,11 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 height: Constants.gap * 0.5,
               ),
               ElevatedButton(
-                onPressed: _refreshUser,
+                onPressed: () {
+                  _refreshUser(
+                    force: true,
+                  );
+                },
                 child: const Text("Refresh"),
               ),
             ],
@@ -177,10 +186,20 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     if (_user == null) {
       return _noUser();
     } else {
-      return Scaffold(
-        body: DefaultTabController(
-          length: 2,
+      return DefaultTabController(
+        length: 2,
+        child: RefreshIndicator(
+          notificationPredicate: (notification) {
+            // with NestedScrollView local(depth == 2) OverscrollNotification are not sent
+            return notification.depth == 2;
+          },
+          onRefresh: () async {
+            _refreshUser(
+              force: true,
+            );
+          },
           child: NestedScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) {
               return [
@@ -265,11 +284,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 SliverPersistentHeader(
                   pinned: true,
                   delegate: _SliverAppBarDelegate(
-                    TabBar(
-                      labelColor: currTheme.primary,
-                      unselectedLabelColor: currTheme.onSurface,
-                      indicatorColor: currTheme.primary,
-                      tabs: const [
+                    const TabBar(
+                      tabs: [
                         Tab(
                           text: "Posts",
                         ),
@@ -289,7 +305,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                   user: _user,
                   img: _profile,
                 ),
-                const Text("friends"),
+                FriendContainerProfileWidget(
+                  friendInfo: _user.friendsInfo,
+                  user: _user,
+                ),
               ],
             ),
           ),

@@ -36,6 +36,10 @@ class ProfileFriendInfo {
     required this.info,
   });
 
+  void addFriends(List<UserModel> newFriends) {
+    friends.addAll(newFriends);
+  }
+
   static ProfileFriendInfo createModel({required Map map}) {
     return ProfileFriendInfo(
       friends: (map["edges"] as List)

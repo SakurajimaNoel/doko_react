@@ -162,11 +162,18 @@ class UserGraphqlService {
     }
   }
 
-  Future<CompleteUserResponse> getCompleteUser(String id) async {
+  Future<CompleteUserResponse> getCompleteUser(
+    String id, {
+    bool force = false,
+  }) async {
     try {
+      FetchPolicy policy =
+          force ? FetchPolicy.networkOnly : FetchPolicy.cacheAndNetwork;
+
       var client = await _getGraphqlClient();
       QueryResult result = await client.query(
         QueryOptions(
+          fetchPolicy: policy,
           document: gql(UserQueries.getCompleteUser()),
           variables: UserQueries.getCompleteUserVariables(id),
         ),
