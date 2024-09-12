@@ -46,12 +46,26 @@ class PostWidget extends StatelessWidget {
             const SizedBox(
               height: Constants.gap * 0.5,
             ),
-            SizedBox(
-                height: 320,
-                child: _PostContent(
-                  content: post.content,
-                  signedContent: post.signedContent,
-                )),
+            Row(
+              children: [
+                SizedBox(
+                  height: Constants.height * 16,
+                  width: MediaQuery.of(context).size.width * 0.9 - 2,
+                  child: _PostContent(
+                    content: post.content,
+                    signedContent: post.signedContent,
+                  ),
+                ),
+                SizedBox(
+                  height: Constants.height * 16,
+                  width: MediaQuery.of(context).size.width * 0.1,
+                  child: const _PostAction(),
+                ),
+                SizedBox(
+                  width: Constants.gap * 0.125,
+                ),
+              ],
+            ),
           ],
           const SizedBox(
             height: Constants.gap * 0.5,
@@ -66,7 +80,7 @@ class PostWidget extends StatelessWidget {
           const SizedBox(
             height: Constants.gap * 0.5,
           ),
-          const _PostAction(),
+          // const _PostAction(),
         ],
       ),
     );
@@ -86,9 +100,8 @@ class _PostContent extends StatelessWidget {
 
   Widget _postContentItem(BuildContext context, int index) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      height: Constants.height * 18,
-      // child: Text("content"),
+      height: double.infinity,
+      width: MediaQuery.of(context).size.width * 0.9 - 2,
       child: signedContent[index].isEmpty
           ? const Center(
               child: Icon(Icons.error),
@@ -101,7 +114,8 @@ class _PostContent extends StatelessWidget {
                 child: CircularProgressIndicator(),
               ),
               errorWidget: (context, url, error) => const Icon(Icons.error),
-              height: Constants.height * 18,
+              // height: Constants.height * 20,
+              height: double.infinity,
               filterQuality: FilterQuality.high,
               memCacheHeight: Constants.postCacheHeight,
             ),
@@ -126,6 +140,22 @@ class _PostAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text("Post actions here");
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.share),
+        ),
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.insert_comment_outlined),
+        ),
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.thumb_up_alt_outlined),
+        ),
+      ],
+    );
   }
 }
