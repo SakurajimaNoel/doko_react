@@ -51,7 +51,7 @@ class PostWidget extends StatelessWidget {
                 SizedBox(
                   height: Constants.height * 16,
                   width: MediaQuery.of(context).size.width * 0.9 - 2,
-                  child: _PostContent(
+                  child: _PostContentCarouseView(
                     content: post.content,
                     signedContent: post.signedContent,
                   ),
@@ -83,6 +83,49 @@ class PostWidget extends StatelessWidget {
           // const _PostAction(),
         ],
       ),
+    );
+  }
+}
+
+// post content carousel view
+class _PostContentCarouseView extends StatelessWidget {
+  final List<String> content;
+  final List<String> signedContent;
+
+  const _PostContentCarouseView({
+    super.key,
+    required this.content,
+    required this.signedContent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CarouselView(
+      itemExtent: MediaQuery.of(context).size.width * 0.9 - 2,
+      shrinkExtent: Constants.width * 10,
+      itemSnapping: true,
+      padding: const EdgeInsets.symmetric(
+        horizontal: Constants.padding * 0.5,
+      ),
+      children: signedContent.map(
+        (item) {
+          int index = signedContent.indexOf(item);
+          String cacheKey = content[index];
+
+          return CachedNetworkImage(
+            cacheKey: cacheKey,
+            fit: BoxFit.cover,
+            imageUrl: item,
+            placeholder: (context, url) => const Center(
+              child: CircularProgressIndicator(),
+            ),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+            // height: double.infinity,
+            filterQuality: FilterQuality.high,
+            memCacheHeight: Constants.postCacheHeight,
+          );
+        },
+      ).toList(),
     );
   }
 }
@@ -146,14 +189,17 @@ class _PostAction extends StatelessWidget {
         IconButton(
           onPressed: () {},
           icon: const Icon(Icons.share),
+          iconSize: Constants.width * 1.25,
         ),
         IconButton(
           onPressed: () {},
           icon: const Icon(Icons.insert_comment_outlined),
+          iconSize: Constants.width * 1.25,
         ),
         IconButton(
           onPressed: () {},
           icon: const Icon(Icons.thumb_up_alt_outlined),
+          iconSize: Constants.width * 1.25,
         ),
       ],
     );
