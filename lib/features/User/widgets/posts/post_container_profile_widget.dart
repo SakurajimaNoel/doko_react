@@ -1,4 +1,3 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/widgets/loader_button.dart';
@@ -113,8 +112,6 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
-    safePrint("profile post ${_user.profilePicture}");
 
     if (_posts.isEmpty) {
       return Padding(

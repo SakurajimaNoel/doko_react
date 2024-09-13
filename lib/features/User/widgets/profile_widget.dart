@@ -72,7 +72,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     var user = completeUser.user!;
     if (_self) {
-      _userProvider.addUser(user: user);
+      _userProvider.updateUser(updatedUser: user);
     }
     setState(() {
       _user = user;
@@ -148,12 +148,16 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   Widget _userProfileAction() {
     if (_self) {
       return OutlinedButton(
-        onPressed: () {
+        onPressed: () async {
           // go to edit page
           Map<String, dynamic> data = {
             "bio": _user!.bio,
           };
-          context.goNamed(RouterConstants.editProfile, extra: data);
+          String? newBio = await context
+              .pushNamed<String>(RouterConstants.editProfile, extra: data);
+          setState(() {
+            _user?.bio = newBio ?? "";
+          });
         },
         child: const Text("Edit"),
       );
@@ -224,7 +228,14 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       child: RefreshIndicator(
         notificationPredicate: (notification) {
           // with NestedScrollView local(depth == 2) OverscrollNotification are not sent
-          return notification.depth == 2;
+          int depth;
+          if (user.postsInfo.posts.isNotEmpty ||
+              user.friendsInfo.friends.isNotEmpty) {
+            depth = 2;
+          } else {
+            depth = 0;
+          }
+          return notification.depth == depth;
         },
         onRefresh: () async {
           await _fetchCompleteUser(force: true);

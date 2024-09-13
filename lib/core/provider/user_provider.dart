@@ -44,9 +44,10 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateUser(String name, String profilePicture) {
-    _name = name;
-    _profilePicture = profilePicture;
+  void updateUser({required UserModel updatedUser}) {
+    _name = updatedUser.name;
+    _profilePicture = updatedUser.profilePicture;
+    _signedProfilePicture = updatedUser.signedProfilePicture;
 
     notifyListeners();
   }

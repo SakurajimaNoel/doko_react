@@ -13,7 +13,6 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../core/configs/router/router_constants.dart';
 import '../../../../core/data/storage.dart';
 import '../../../../core/helpers/display.dart';
 import '../../../../core/helpers/enum.dart';
@@ -78,6 +77,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     String bio = _bioController.text;
     String bucketPath = _userProvider.profilePicture;
 
+    // when new profile picture is selected
     if (!_removeProfile && _profilePicture != null) {
       String? imageExtension =
           MimeType.getExtensionFromFileName(_profilePicture!.path);
@@ -105,6 +105,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       StorageActions.deleteFile(_userProvider.profilePicture);
     }
 
+    // when profile picture is removed
     if (_removeProfile) {
       StorageActions.deleteFile(_userProvider.profilePicture);
       bucketPath = "";
@@ -121,9 +122,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (_profilePicture == null) {
         message = "Error updating user profile fields.";
       }
-      // else {
-      //   _callback(bucketPath, _user.bio, _user.name, true);
-      // }
 
       setState(() {
         _errorMessage = message;
@@ -132,9 +130,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       return;
     }
 
-    // bool updateProfile = _removeProfile ? true : _profilePicture != null;
-    // _callback(bucketPath, bio, name, updateProfile);
-    _userProvider.addUser(user: updateResult.user!);
+    _userProvider.updateUser(updatedUser: updateResult.user!);
     _handleSuccess();
   }
 
@@ -162,9 +158,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     Future.delayed(
       const Duration(milliseconds: 500),
       () {
-        context.goNamed(
-          RouterConstants.profile,
-        );
+        context.pop(_bioController.text);
       },
     );
   }
