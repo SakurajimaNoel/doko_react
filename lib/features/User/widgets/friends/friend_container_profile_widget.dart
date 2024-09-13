@@ -32,7 +32,7 @@ class _FriendContainerProfileWidgetState
   bool _loading = false;
 
   // String _errorMessage = "";
-  late final List<UserModel> _friends;
+  late final List<FriendUserModel> _friends;
 
   @override
   void initState() {
@@ -103,8 +103,8 @@ class _FriendContainerProfileWidgetState
       );
     }
 
-    String name = _friends[index].name;
-    return Text(name);
+    var friend = _friends[index];
+    return Text(friend.requestedBy);
   }
 
   @override

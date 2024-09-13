@@ -155,9 +155,11 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           };
           String? newBio = await context
               .pushNamed<String>(RouterConstants.editProfile, extra: data);
-          setState(() {
-            _user?.bio = newBio ?? "";
-          });
+          if (_user!.bio != newBio) {
+            setState(() {
+              _user!.bio = newBio ?? "";
+            });
+          }
         },
         child: const Text("Edit"),
       );

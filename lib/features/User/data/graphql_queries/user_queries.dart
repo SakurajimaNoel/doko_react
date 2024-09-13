@@ -128,6 +128,7 @@ class UserQueries {
                   username
                   profilePicture
                 }
+                 requestedBy
               }
               pageInfo {
                 endCursor

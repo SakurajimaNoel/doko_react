@@ -32,9 +32,38 @@ class UserModel {
   }
 }
 
+// user friend model
+class FriendUserModel extends UserModel {
+  final String requestedBy;
+
+  FriendUserModel({
+    required this.requestedBy,
+    required super.name,
+    required super.username,
+    required super.profilePicture,
+    required super.id,
+    required super.signedProfilePicture,
+  });
+
+  static Future<FriendUserModel> createModel({required Map map}) async {
+    Map user = map["node"];
+    String signedProfilePicture =
+        await StorageUtils.generatePreSignedURL(user["profilePicture"]);
+
+    return FriendUserModel(
+      name: user["name"],
+      username: user["username"],
+      profilePicture: user["profilePicture"],
+      id: user["id"],
+      signedProfilePicture: signedProfilePicture,
+      requestedBy: map["requestedBy"],
+    );
+  }
+}
+
 // user profile friend info
 class ProfileFriendInfo {
-  final List<UserModel> friends;
+  final List<FriendUserModel> friends;
   final NodeInfo info;
 
   const ProfileFriendInfo({
@@ -42,18 +71,18 @@ class ProfileFriendInfo {
     required this.info,
   });
 
-  void addFriends(List<UserModel> newFriends) {
+  void addFriends(List<FriendUserModel> newFriends) {
     friends.addAll(newFriends);
   }
 
   static Future<ProfileFriendInfo> createModel({required Map map}) async {
-    List<Future<UserModel>> futureFriendsModel =
+    List<Future<FriendUserModel>> futureFriendsModel =
         (map["edges"] as List).map((user) async {
-      UserModel friend = await UserModel.createModel(map: user["node"]);
+      FriendUserModel friend = await FriendUserModel.createModel(map: user);
       return friend;
     }).toList();
 
-    List<UserModel> friends = await Future.wait(futureFriendsModel);
+    List<FriendUserModel> friends = await Future.wait(futureFriendsModel);
 
     return ProfileFriendInfo(
       friends: friends,
