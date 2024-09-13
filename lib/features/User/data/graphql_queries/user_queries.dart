@@ -67,8 +67,11 @@ class UserQueries {
     return """
         mutation Mutation(\$input: [UserCreateInput!]!) {
           createUsers(input: \$input) {
-            info {
-              nodesCreated
+             users {
+              id
+              name
+              profilePicture
+              username
             }
           }
         }        
