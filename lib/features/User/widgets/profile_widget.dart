@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
@@ -13,6 +14,7 @@ import '../../../core/configs/router/router_constants.dart';
 import '../../../core/data/auth.dart';
 import '../../../core/helpers/enum.dart';
 import '../../../core/widgets/loader.dart';
+import '../data/graphql_queries/friend_relation.dart';
 import '../data/services/user_graphql_service.dart';
 
 class ProfileWidget extends StatefulWidget {
@@ -54,9 +56,11 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   Future<void> _fetchCompleteUser({bool force = false}) async {
     if (_userId.isEmpty) return;
 
+    String userId = "0abbcfed-04b9-4f54-9c6b-46fadbc51442";
     var completeUser = await _userGraphqlService.getCompleteUser(
-      _userId,
+      userId,
       force: force,
+      currentUserId: _userProvider.id,
     );
 
     if (_loading) {
@@ -71,12 +75,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     }
 
     var user = completeUser.user!;
+    var status = FriendRelation.getFriendRelationStatus(
+        user.friendRelationDetail, _userProvider.id);
+    safePrint(status.toString());
+
     if (_self) {
       _userProvider.updateUser(updatedUser: user);
     }
-    setState(() {
-      _user = user;
-    });
+    if (mounted) {
+      setState(() {
+        _user = user;
+      });
+    }
   }
 
   List<Widget> _appBarActions() {

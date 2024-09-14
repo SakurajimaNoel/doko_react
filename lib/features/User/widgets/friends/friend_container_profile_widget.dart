@@ -1,9 +1,13 @@
+import 'package:doko_react/core/provider/user_provider.dart';
+import 'package:doko_react/features/User/data/graphql_queries/friend_relation.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/helpers/constants.dart';
 import '../../../../core/helpers/enum.dart';
 import '../../../../core/widgets/loader_button.dart';
+import '../../data/model/friend_modal.dart';
 import '../../data/services/user_graphql_service.dart';
 
 class FriendContainerProfileWidget extends StatefulWidget {
@@ -26,13 +30,14 @@ class _FriendContainerProfileWidgetState
     with AutomaticKeepAliveClientMixin {
   late final ProfileFriendInfo _friendInfo;
   late final UserModel _user;
+  late final UserProvider _userProvider;
 
   final UserGraphqlService _userGraphqlService = UserGraphqlService();
 
   bool _loading = false;
 
   // String _errorMessage = "";
-  late final List<FriendUserModel> _friends;
+  late List<FriendUserModel> _friends;
 
   @override
   void initState() {
@@ -40,6 +45,8 @@ class _FriendContainerProfileWidgetState
 
     _friendInfo = widget.friendInfo;
     _user = widget.user;
+
+    _userProvider = context.read<UserProvider>();
 
     _friends = _friendInfo.friends;
   }
@@ -49,8 +56,11 @@ class _FriendContainerProfileWidgetState
     String id = _user.id;
     String cursor = _friendInfo.info.endCursor!;
 
-    var friendResponse =
-        await _userGraphqlService.getFriendsByUserId(id, cursor);
+    var friendResponse = await _userGraphqlService.getFriendsByUserId(
+      id,
+      cursor,
+      currentUserId: _userProvider.id,
+    );
 
     _loading = false;
 
@@ -104,7 +114,10 @@ class _FriendContainerProfileWidgetState
     }
 
     var friend = _friends[index];
-    return Text(friend.requestedBy);
+    var status = FriendRelation.getFriendRelationStatus(
+        friend.friendRelationDetail, _userProvider.id);
+    var name = friend.id == _userProvider.id ? "me" : friend.name;
+    return Text("$name: ${status.toString()}");
   }
 
   @override

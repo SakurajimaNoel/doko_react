@@ -97,50 +97,66 @@ class UserQueries {
   // get complete user
   static String getCompleteUser() {
     return """
-        query Query(\$where: UserWhere, \$first: Int, \$sort: [UserPostsConnectionSort!], \$friendsConnectionFirst2: Int, \$friendsConnectionSort2: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
-          users(where: \$where) {
-            username
-            profilePicture
-            name
-            id
-            bio
-            dob
-            createdOn
-            postsConnection(first: \$first, sort: \$sort) {
-              edges {
-                node {
-                  content
-                  id
-                  createdOn
-                  caption
-                }
-              }
-              pageInfo {
-                endCursor
-                hasNextPage
+      query Query(\$where: UserWhere, \$first: Int, \$sort: [UserPostsConnectionSort!], \$friendsConnectionFirst2: Int, \$friendsConnectionSort2: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$friendsWhere2: UserWhere, \$friendsConnectionWhere4: UserFriendsConnectionWhere) {
+        users(where: \$where) {
+          username
+          profilePicture
+          name
+          id
+          bio
+          dob
+          createdOn
+          postsConnection(first: \$first, sort: \$sort) {
+            edges {
+              node {
+                content
+                id
+                createdOn
+                caption
               }
             }
-            friendsConnection(first: \$friendsConnectionFirst2, sort: \$friendsConnectionSort2, where: \$friendsConnectionWhere2) {
-              edges {
-                node {
-                  id
-                  name
-                  username
-                  profilePicture
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+          }
+          friendsConnection(first: \$friendsConnectionFirst2, sort: \$friendsConnectionSort2, where: \$friendsConnectionWhere2) {
+            edges {
+              node {
+                id
+                name
+                username
+                profilePicture
+                friendsConnection(where: \$friendsConnectionWhere3) {
+                  edges {
+                    requestedBy
+                    status
+                  }
                 }
-                 requestedBy
               }
-              pageInfo {
-                endCursor
-                hasNextPage
+            }
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+          }
+          friends(where: \$friendsWhere2) {
+            friendsConnection(where: \$friendsConnectionWhere4) {
+              edges {
+                requestedBy
+                status
               }
             }
           }
         }
+      }
         """;
   }
 
-  static Map<String, dynamic> getCompleteUserVariables(String id) {
+  static Map<String, dynamic> getCompleteUserVariables(
+    String id, {
+    required String currentUserId,
+  }) {
     return {
       "where": {
         "id": id,
@@ -165,14 +181,27 @@ class UserQueries {
         "edge": {
           "status": "ACCEPTED",
         }
-      }
+      },
+      "friendsConnectionWhere3": {
+        "node": {
+          "id": currentUserId,
+        }
+      },
+      "friendsWhere2": {
+        "id": currentUserId,
+      },
+      "friendsConnectionWhere4": {
+        "node": {
+          "id": id,
+        }
+      },
     };
   }
 
   // get user accepted friends by user id
   static String getFriendsByUserId() {
     return """
-        query Query(\$where: UserWhere, \$after: String, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+        query Query(\$where: UserWhere, \$after: String, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
           users(where: \$where) {
             friendsConnection(after: \$after, first: \$first, sort: \$sort, where: \$friendsConnectionWhere2) {
               edges {
@@ -181,6 +210,12 @@ class UserQueries {
                   name
                   username
                   profilePicture
+                  friendsConnection(where: \$friendsConnectionWhere3) {
+                    edges {
+                      requestedBy
+                      status
+                    }
+                  }
                 }
               }
               pageInfo {
@@ -194,7 +229,8 @@ class UserQueries {
   }
 
   static Map<String, dynamic> getFriendsByUserIdVariables(
-      String id, String cursor) {
+      String id, String cursor,
+      {required String currentUserId}) {
     return {
       "where": {
         "id": id,
@@ -211,6 +247,11 @@ class UserQueries {
       "friendsConnectionWhere2": const {
         "edge": {
           "status": FriendStatus.accepted,
+        }
+      },
+      "friendsConnectionWhere3": {
+        "node": {
+          "id": currentUserId,
         }
       }
     };

@@ -1,5 +1,6 @@
 import 'package:doko_react/features/User/data/model/post_model.dart';
 
+import 'friend_modal.dart';
 import 'model.dart';
 
 // basic user info
@@ -32,69 +33,9 @@ class UserModel {
   }
 }
 
-// user friend model
-class FriendUserModel extends UserModel {
-  final String requestedBy;
-
-  FriendUserModel({
-    required this.requestedBy,
-    required super.name,
-    required super.username,
-    required super.profilePicture,
-    required super.id,
-    required super.signedProfilePicture,
-  });
-
-  static Future<FriendUserModel> createModel({required Map map}) async {
-    Map user = map["node"];
-    String signedProfilePicture =
-        await StorageUtils.generatePreSignedURL(user["profilePicture"]);
-
-    return FriendUserModel(
-      name: user["name"],
-      username: user["username"],
-      profilePicture: user["profilePicture"],
-      id: user["id"],
-      signedProfilePicture: signedProfilePicture,
-      requestedBy: map["requestedBy"],
-    );
-  }
-}
-
-// user profile friend info
-class ProfileFriendInfo {
-  final List<FriendUserModel> friends;
-  final NodeInfo info;
-
-  const ProfileFriendInfo({
-    required this.friends,
-    required this.info,
-  });
-
-  void addFriends(List<FriendUserModel> newFriends) {
-    friends.addAll(newFriends);
-  }
-
-  static Future<ProfileFriendInfo> createModel({required Map map}) async {
-    List<Future<FriendUserModel>> futureFriendsModel =
-        (map["edges"] as List).map((user) async {
-      FriendUserModel friend = await FriendUserModel.createModel(map: user);
-      return friend;
-    }).toList();
-
-    List<FriendUserModel> friends = await Future.wait(futureFriendsModel);
-
-    return ProfileFriendInfo(
-      friends: friends,
-      info: NodeInfo.createModel(
-        map: map["pageInfo"],
-      ),
-    );
-  }
-}
-
 // complete user info
 class CompleteUserModel extends UserModel {
+  FriendConnectionDetail? friendRelationDetail;
   String bio;
   final DateTime dob;
   final DateTime createdOn;
@@ -102,6 +43,7 @@ class CompleteUserModel extends UserModel {
   final ProfileFriendInfo friendsInfo;
 
   CompleteUserModel({
+    required this.friendRelationDetail,
     required this.bio,
     required this.dob,
     required this.postsInfo,
@@ -115,13 +57,16 @@ class CompleteUserModel extends UserModel {
   });
 
   static Future<CompleteUserModel> createModel({required Map map}) async {
+    // user profile picture
+    Future<String> futureSignedProfilePicture =
+        StorageUtils.generatePreSignedURL(map["profilePicture"]);
+
+    // user posts
     Future<ProfilePostInfo> futurePostInfo = ProfilePostInfo.createModel(
       map: map["postsConnection"],
     );
 
-    Future<String> futureSignedProfilePicture =
-        StorageUtils.generatePreSignedURL(map["profilePicture"]);
-
+    // user friends
     Future<ProfileFriendInfo> futureFriendInfo =
         ProfileFriendInfo.createModel(map: map["friendsConnection"]);
 
@@ -131,7 +76,16 @@ class CompleteUserModel extends UserModel {
       futureFriendInfo,
     ]);
 
+    List friendConnection = map["friends"] as List;
+    FriendConnectionDetail? friendConnectionDetail;
+
+    if (friendConnection.isNotEmpty) {
+      friendConnectionDetail = FriendConnectionDetail.createModel(
+          friendConnection[0]["friendsConnection"]["edges"][0]);
+    }
+
     return CompleteUserModel(
+      friendRelationDetail: friendConnectionDetail,
       bio: map["bio"] ?? "",
       dob: DateTime.parse(map["dob"]),
       createdOn: DateTime.parse(map["createdOn"]),

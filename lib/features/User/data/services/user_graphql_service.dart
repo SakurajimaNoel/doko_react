@@ -4,6 +4,7 @@ import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+import '../model/friend_modal.dart';
 import '../model/post_model.dart';
 import '../model/user_model.dart';
 
@@ -170,6 +171,7 @@ class UserGraphqlService {
   Future<CompleteUserResponse> getCompleteUser(
     String id, {
     bool force = false,
+    required String currentUserId,
   }) async {
     try {
       FetchPolicy policy =
@@ -180,7 +182,10 @@ class UserGraphqlService {
         QueryOptions(
           fetchPolicy: policy,
           document: gql(UserQueries.getCompleteUser()),
-          variables: UserQueries.getCompleteUserVariables(id),
+          variables: UserQueries.getCompleteUserVariables(
+            id,
+            currentUserId: currentUserId,
+          ),
         ),
       );
 
@@ -210,13 +215,21 @@ class UserGraphqlService {
     }
   }
 
-  Future<FriendResponse> getFriendsByUserId(String id, String cursor) async {
+  Future<FriendResponse> getFriendsByUserId(
+    String id,
+    String cursor, {
+    required String currentUserId,
+  }) async {
     try {
       var client = await _getGraphqlClient();
       QueryResult result = await client.query(
         QueryOptions(
           document: gql(UserQueries.getFriendsByUserId()),
-          variables: UserQueries.getFriendsByUserIdVariables(id, cursor),
+          variables: UserQueries.getFriendsByUserIdVariables(
+            id,
+            cursor,
+            currentUserId: currentUserId,
+          ),
         ),
       );
 
@@ -233,7 +246,7 @@ class UserGraphqlService {
       }
 
       ProfileFriendInfo info = await ProfileFriendInfo.createModel(
-        map: res[0]["postsConnection"],
+        map: res[0]["friendsConnection"],
       );
 
       return FriendResponse(
