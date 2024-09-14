@@ -56,9 +56,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   Future<void> _fetchCompleteUser({bool force = false}) async {
     if (_userId.isEmpty) return;
 
-    String userId = "0abbcfed-04b9-4f54-9c6b-46fadbc51442";
     var completeUser = await _userGraphqlService.getCompleteUser(
-      userId,
+      _userId,
       force: force,
       currentUserId: _userProvider.id,
     );
