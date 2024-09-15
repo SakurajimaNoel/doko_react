@@ -324,7 +324,7 @@ class UserGraphqlService {
       }
 
       ProfileFriendInfo info = await ProfileFriendInfo.createModel(
-        map: res[0]["postsConnection"],
+        map: res[0]["friendsConnection"],
       );
 
       return FriendResponse(
@@ -364,7 +364,7 @@ class UserGraphqlService {
       }
 
       ProfileFriendInfo info = await ProfileFriendInfo.createModel(
-        map: res[0]["postsConnection"],
+        map: res[0]["friendsConnection"],
       );
 
       return FriendResponse(

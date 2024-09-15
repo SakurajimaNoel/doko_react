@@ -303,7 +303,7 @@ class UserQueries {
   static String getPendingOutgoingFriendsByUserId(String? cursor) {
     if (cursor == null || cursor.isEmpty) {
       return """
-    query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!]) {
+    query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
       users(where: \$where) {
         friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort) {
           edges {
@@ -312,6 +312,12 @@ class UserQueries {
               username
               name
               profilePicture
+              friendsConnection(where: \$friendsConnectionWhere3) {
+                edges {
+                  requestedBy
+                  status
+                }
+              }
             }
           }
           pageInfo {
@@ -325,24 +331,30 @@ class UserQueries {
     }
 
     return """
-    query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$after: String) {
-  users(where: \$where) {
-    friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort, after: \$after) {
-      edges {
-        node {
-          id
-          username
-          name
-          profilePicture
+    query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$after: String, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
+      users(where: \$where) {
+        friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort, after: \$after) {
+          edges {
+            node {
+              id
+              username
+              name
+              profilePicture
+              friendsConnection(where: \$friendsConnectionWhere3) {
+                edges {
+                  requestedBy
+                  status
+                }
+              }
+            }
+          }
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
         }
       }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
     }
-  }
-}
     """;
   }
 
@@ -366,7 +378,12 @@ class UserQueries {
               "addedOn": "DESC",
             }
           }
-        ]
+        ],
+        "friendsConnectionWhere3": {
+          "node": {
+            "id": id,
+          }
+        },
       };
     }
 
@@ -389,6 +406,11 @@ class UserQueries {
           }
         }
       ],
+      "friendsConnectionWhere3": {
+        "node": {
+          "id": id,
+        }
+      },
     };
   }
 
@@ -396,7 +418,7 @@ class UserQueries {
   static String getPendingIncomingFriendsByUserId(String? cursor) {
     if (cursor == null || cursor.isEmpty) {
       return """
-      query Query(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!]) {
+      query Query(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
         users(where: \$where) {
           friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort) {
             edges {
@@ -405,6 +427,12 @@ class UserQueries {
                 name
                 username
                 profilePicture
+                friendsConnection(where: \$friendsConnectionWhere3) {
+                  edges {
+                    requestedBy
+                    status
+                  }
+                }
               }
             }
             pageInfo {
@@ -413,12 +441,12 @@ class UserQueries {
             }
           }
         }
-      }      
+      }     
     """;
     }
 
     return """
-    query Query(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$after: String) {
+    query Query(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$after: String) {
       users(where: \$where) {
         friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort, after: \$after) {
           edges {
@@ -427,6 +455,12 @@ class UserQueries {
               name
               username
               profilePicture
+              friendsConnection(where: \$friendsConnectionWhere3) {
+                edges {
+                  requestedBy
+                  status
+                }
+              }
             }
           }
           pageInfo {
@@ -486,6 +520,11 @@ class UserQueries {
           }
         }
       ],
+      "friendsConnectionWhere3": {
+        "node": {
+          "id": id,
+        }
+      }
     };
   }
 
@@ -515,6 +554,115 @@ class UserQueries {
         "name": name,
         "bio": bio,
         "profilePicture": profilePicture,
+      }
+    };
+  }
+
+  // user send friend request
+  // TODO: search for method to merge to avoid duplicate relationship
+  static String userSendFriendRequest() {
+    return """
+    mutation Mutation(\$where: UserWhere, \$connect: UserConnectInput) {
+      updateUsers(where: \$where, connect: \$connect) {
+        info {
+          relationshipsCreated
+        }
+      }
+    }    
+    """;
+  }
+
+  static Map<String, dynamic> userSendFriendRequestVariables(
+      String requestedBy, String requestedTo) {
+    return {
+      "where": {
+        "id": requestedBy,
+      },
+      "connect": {
+        "friends": [
+          {
+            "where": {
+              "node": {
+                "id": requestedTo,
+              },
+            },
+            "edge": {
+              "requestedBy": requestedBy,
+              "status": "PENDING",
+            }
+          }
+        ]
+      }
+    };
+  }
+
+  // user accept friend request
+  static String userAcceptFriendRequest() {
+    return """
+      mutation Mutation(\$where: UserWhere, \$update: UserUpdateInput) {
+        updateUsers(where: \$where, update: \$update) {
+          info {
+            relationshipsCreated
+          }
+        }
+      }      
+    """;
+  }
+
+  static Map<String, dynamic> userAcceptFriendRequestVariables(
+      String requestedBy, String requestedTo) {
+    return {
+      "where": {
+        "id": requestedBy,
+      },
+      "update": {
+        "friends": [
+          {
+            "where": {
+              "node": {
+                "id": requestedTo,
+              },
+            },
+            "update": {
+              "edge": {
+                "status": "ACCEPTED",
+              },
+            }
+          }
+        ]
+      }
+    };
+  }
+
+  // user remove friend relation
+  static String userRemoveFriendRelation() {
+    return """
+    mutation Mutation(\$where: UserWhere, \$disconnect: UserDisconnectInput) {
+      updateUsers(where: \$where, disconnect: \$disconnect) {
+        info {
+          relationshipsDeleted
+        }
+      }
+    }
+  """;
+  }
+
+  static Map<String, dynamic> userRemoveFriendRelationVariables(
+      String requestedBy, String requestedTo) {
+    return {
+      "where": {
+        "id": requestedBy,
+      },
+      "disconnect": {
+        "friends": [
+          {
+            "where": {
+              "node": {
+                "id": requestedTo,
+              }
+            }
+          }
+        ]
       }
     };
   }

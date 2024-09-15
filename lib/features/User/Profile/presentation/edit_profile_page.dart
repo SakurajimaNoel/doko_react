@@ -199,7 +199,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
           if (_updating) return;
 
-          context.pop();
+          context.pop(_bioController.text);
         },
         child: ListView(
           padding: const EdgeInsets.all(Constants.padding),

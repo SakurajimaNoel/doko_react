@@ -120,7 +120,6 @@ class _PostContent extends StatelessWidget {
               child: CircularProgressIndicator(),
             ),
             errorWidget: (context, url, error) => const Icon(Icons.error),
-            // height: double.infinity,
             filterQuality: FilterQuality.high,
             memCacheHeight: Constants.postCacheHeight,
           );

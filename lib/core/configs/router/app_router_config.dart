@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
+import '../../../features/User/Profile/presentation/user_profile_page.dart';
 
 class AppRouterConfig {
   static GoRouter loadingConfig() {
@@ -227,6 +228,14 @@ class AppRouterConfig {
                         return EditProfilePage(
                           bio: bio,
                         );
+                      },
+                    ),
+                    GoRoute(
+                      name: RouterConstants.userProfile,
+                      path: ":userId",
+                      builder: (context, state) {
+                        String userId = state.pathParameters["userId"]!;
+                        return UserProfilePage(userId: userId);
                       },
                     ),
                   ],

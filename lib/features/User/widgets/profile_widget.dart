@@ -19,12 +19,10 @@ import '../data/services/user_graphql_service.dart';
 
 class ProfileWidget extends StatefulWidget {
   final String userId;
-  final bool self;
 
   const ProfileWidget({
     super.key,
     required this.userId,
-    this.self = false,
   });
 
   @override
@@ -45,10 +43,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   void initState() {
     super.initState();
 
-    _userId = widget.userId;
-    _self = widget.self;
-
     _userProvider = context.read<UserProvider>();
+
+    _userId = widget.userId;
+    _self = _userProvider.id == _userId;
 
     _fetchCompleteUser();
   }
@@ -74,9 +72,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     }
 
     var user = completeUser.user!;
-    var status = FriendRelation.getFriendRelationStatus(
-        user.friendRelationDetail, _userProvider.id);
-    safePrint(status.toString());
 
     if (_self) {
       _userProvider.updateUser(updatedUser: user);
@@ -173,6 +168,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         child: const Text("Edit"),
       );
     }
+
+    var status = FriendRelation.getFriendRelationStatus(
+        _user!.friendRelationDetail, _userProvider.id);
+    safePrint(status.toString());
+
+    // friends
+
+    // un related
+
+    // outgoing
+
+    // incoming
 
     return OutlinedButton(
       onPressed: () {},

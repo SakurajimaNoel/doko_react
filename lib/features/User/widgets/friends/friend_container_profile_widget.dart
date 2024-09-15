@@ -1,7 +1,9 @@
+import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/features/User/data/graphql_queries/friend_relation.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/helpers/constants.dart';
@@ -117,7 +119,17 @@ class _FriendContainerProfileWidgetState
     var status = FriendRelation.getFriendRelationStatus(
         friend.friendRelationDetail, _userProvider.id);
     var name = friend.id == _userProvider.id ? "me" : friend.name;
-    return Text("$name: ${status.toString()}");
+    return GestureDetector(
+      onTap: () {
+        context.pushNamed(
+          RouterConstants.userProfile,
+          pathParameters: {
+            "userId": friend.id,
+          },
+        );
+      },
+      child: Text("$name: ${status.toString()}"),
+    );
   }
 
   @override

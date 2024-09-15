@@ -11,6 +11,7 @@ class RouterConstants {
   static const String nearby = "nearby";
   static const String profile = "profile";
   static const String editProfile = "editProfile";
+  static const String userProfile = "userProfile";
 
   // settings page
   static const String settings = "settings";

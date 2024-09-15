@@ -15,7 +15,6 @@ class ProfilePage extends StatelessWidget {
 
     return ProfileWidget(
       userId: userId,
-      self: true,
     );
   }
 }
