@@ -170,17 +170,13 @@ class UserGraphqlService {
 
   Future<CompleteUserResponse> getCompleteUser(
     String id, {
-    bool force = false,
     required String currentUserId,
   }) async {
     try {
-      FetchPolicy policy =
-          force ? FetchPolicy.networkOnly : FetchPolicy.cacheAndNetwork;
-
       var client = await _getGraphqlClient();
       QueryResult result = await client.query(
         QueryOptions(
-          fetchPolicy: policy,
+          fetchPolicy: FetchPolicy.networkOnly,
           document: gql(UserQueries.getCompleteUser()),
           variables: UserQueries.getCompleteUserVariables(
             id,
@@ -408,6 +404,89 @@ class UserGraphqlService {
       return const UserResponse(
         status: ResponseStatus.error,
       );
+    }
+  }
+
+  Future<ResponseStatus> userSendFriendRequest(
+      String requestedBy, String requestedTo) async {
+    try {
+      var client = await _getGraphqlClient();
+      QueryResult result = await client.mutate(
+        MutationOptions(
+          document: gql(UserQueries.userSendFriendRequest()),
+          variables: UserQueries.userSendFriendRequestVariables(
+              requestedBy, requestedTo),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      int relationCreated =
+          result.data?["updateUsers"]["info"]["relationshipsCreated"];
+
+      if (relationCreated != 1) {
+        return ResponseStatus.error;
+      }
+
+      return ResponseStatus.success;
+    } catch (e) {
+      safePrint(e.toString());
+      return ResponseStatus.error;
+    }
+  }
+
+  Future<ResponseStatus> userAcceptFriendRequest(
+      String requestedBy, String requestedTo) async {
+    try {
+      var client = await _getGraphqlClient();
+      QueryResult result = await client.mutate(
+        MutationOptions(
+          document: gql(UserQueries.userAcceptFriendRequest()),
+          variables: UserQueries.userAcceptFriendRequestVariables(
+              requestedBy, requestedTo),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      return ResponseStatus.success;
+    } catch (e) {
+      safePrint(e.toString());
+      return ResponseStatus.error;
+    }
+  }
+
+  Future<ResponseStatus> userRemoveFriendRelation(
+      String requestedBy, String requestedTo) async {
+    try {
+      var client = await _getGraphqlClient();
+      QueryResult result = await client.mutate(
+        MutationOptions(
+          document: gql(UserQueries.userRemoveFriendRelation()),
+          variables: UserQueries.userRemoveFriendRelationVariables(
+              requestedBy, requestedTo),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      int relationDeleted =
+          result.data?["updateUsers"]["info"]["relationshipsDeleted"];
+
+      if (relationDeleted != 1) {
+        return ResponseStatus.error;
+      }
+
+      return ResponseStatus.success;
+    } catch (e) {
+      safePrint(e.toString());
+      return ResponseStatus.error;
     }
   }
 }

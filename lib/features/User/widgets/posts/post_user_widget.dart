@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/helpers/constants.dart';
 import '../../data/model/user_model.dart';
@@ -20,22 +22,31 @@ class PostUserWidget extends StatelessWidget {
           user: user,
         ),
         const SizedBox(
-          width: Constants.gap * 0.5,
+          width: Constants.gap,
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(user.name),
-            Text(
-              // TODO: make it clickable
-              "@${user.username}",
-              style: const TextStyle(
-                fontSize: Constants.smallFontSize,
-                fontWeight: FontWeight.w500,
+            GestureDetector(
+              onTap: () {
+                context.pushNamed(
+                  RouterConstants.userProfile,
+                  pathParameters: {
+                    "userId": user.id,
+                  },
+                );
+              },
+              child: Text(
+                "@${user.username}",
+                style: const TextStyle(
+                  fontSize: Constants.smallFontSize,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
-        )
+        ),
       ],
     );
   }

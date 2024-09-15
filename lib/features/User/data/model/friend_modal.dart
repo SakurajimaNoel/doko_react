@@ -25,7 +25,7 @@ class FriendConnectionDetail {
 
 // user friend model
 class FriendUserModel extends UserModel {
-  final FriendConnectionDetail? friendRelationDetail;
+  FriendConnectionDetail? friendRelationDetail;
 
   FriendUserModel({
     required this.friendRelationDetail,

@@ -2,6 +2,7 @@ import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/features/User/data/graphql_queries/friend_relation.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
+import 'package:doko_react/features/User/widgets/friends/friend_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -128,7 +129,9 @@ class _FriendContainerProfileWidgetState
           },
         );
       },
-      child: Text("$name: ${status.toString()}"),
+      child: FriendWidget(
+        friend: friend,
+      ),
     );
   }
 
@@ -151,10 +154,15 @@ class _FriendContainerProfileWidgetState
         ),
       );
     }
-    return ListView.builder(
-      itemCount: _friends.length + 1,
-      itemBuilder: (BuildContext context, int index) =>
-          _buildItem(context, index),
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Constants.padding,
+      ),
+      child: ListView.builder(
+        itemCount: _friends.length + 1,
+        itemBuilder: (BuildContext context, int index) =>
+            _buildItem(context, index),
+      ),
     );
   }
 
