@@ -423,12 +423,12 @@ class UserGraphqlService {
         throw Exception(result.exception);
       }
 
-      int relationCreated =
-          result.data?["updateUsers"]["info"]["relationshipsCreated"];
-
-      if (relationCreated != 1) {
-        return ResponseStatus.error;
-      }
+      // int relationCreated =
+      //     result.data?["updateUsers"]["info"]["relationshipsCreated"];
+      //
+      // if (relationCreated != 1) {
+      //   return ResponseStatus.error;
+      // }
 
       return ResponseStatus.success;
     } catch (e) {
@@ -476,12 +476,12 @@ class UserGraphqlService {
         throw Exception(result.exception);
       }
 
-      int relationDeleted =
-          result.data?["updateUsers"]["info"]["relationshipsDeleted"];
-
-      if (relationDeleted != 1) {
-        return ResponseStatus.error;
-      }
+      // int relationDeleted =
+      //     result.data?["updateUsers"]["info"]["relationshipsDeleted"];
+      //
+      // if (relationDeleted != 1) {
+      //   return ResponseStatus.error;
+      // }
 
       return ResponseStatus.success;
     } catch (e) {

@@ -399,7 +399,6 @@ class _UserProfileAction extends StatefulWidget {
   final CompleteUserModel user;
 
   const _UserProfileAction({
-    super.key,
     required this.status,
     required this.user,
   });
@@ -552,7 +551,7 @@ class _UserProfileActionState extends State<_UserProfileAction> {
             : () {
                 _handleAdd();
               },
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.person_add_alt_1),
         label: const Text("Add"),
       );
     }

@@ -82,7 +82,6 @@ class _UserAction extends StatefulWidget {
   final FriendUserModel friend;
 
   const _UserAction({
-    super.key,
     required this.friend,
   });
 
@@ -242,7 +241,7 @@ class _UserActionState extends State<_UserAction> {
                 _handleAdd();
               },
         icon: Icon(
-          Icons.add,
+          Icons.person_add_alt_1,
           color: currScheme.primary,
         ),
         style: IconButton.styleFrom(

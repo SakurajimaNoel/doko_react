@@ -57,6 +57,8 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
       // setState(() {
       //   _errorMessage = "Error fetching user posts.";
       // });
+      String message = "Error fetching more user posts";
+      _handleError(message);
       return;
     }
 
@@ -71,6 +73,17 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
     });
     _postInfo.info.updateInfo(postResponse.postInfo!.info.endCursor,
         postResponse.postInfo!.info.hasNextPage);
+  }
+
+  void _handleError(String message) {
+    var snackBar = SnackBar(
+      content: Text(message),
+      duration: const Duration(
+        milliseconds: 1500,
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Widget _buildItem(BuildContext context, int index) {

@@ -1,6 +1,5 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
-import 'package:doko_react/features/User/data/graphql_queries/friend_relation.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/widgets/friends/friend_widget.dart';
 import 'package:flutter/material.dart';
@@ -68,9 +67,8 @@ class _FriendContainerProfileWidgetState
     _loading = false;
 
     if (friendResponse.status == ResponseStatus.error) {
-      // setState(() {
-      //   _errorMessage = "Error fetching user friends.";
-      // });
+      String message = "Error fetching more user friends";
+      _handleError(message);
       return;
     }
 
@@ -85,6 +83,17 @@ class _FriendContainerProfileWidgetState
     });
     _friendInfo.info.updateInfo(friendResponse.friendInfo!.info.endCursor,
         friendResponse.friendInfo!.info.hasNextPage);
+  }
+
+  void _handleError(String message) {
+    var snackBar = SnackBar(
+      content: Text(message),
+      duration: const Duration(
+        milliseconds: 1500,
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Widget _buildItem(BuildContext context, int index) {
@@ -117,9 +126,6 @@ class _FriendContainerProfileWidgetState
     }
 
     var friend = _friends[index];
-    var status = FriendRelation.getFriendRelationStatus(
-        friend.friendRelationDetail, _userProvider.id);
-    var name = friend.id == _userProvider.id ? "me" : friend.name;
     return GestureDetector(
       onTap: () {
         context.pushNamed(

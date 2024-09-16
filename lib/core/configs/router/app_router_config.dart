@@ -3,6 +3,7 @@ import 'package:doko_react/core/widgets/error.dart';
 import 'package:doko_react/core/widgets/loader.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
+import 'package:doko_react/features/User/Feed/presentation/pending_request_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/User/Nearby/presentation/nearby_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/edit_profile_page.dart';
@@ -168,6 +169,14 @@ class AppRouterConfig {
                   name: RouterConstants.userFeed,
                   path: "/user-feed",
                   builder: (context, state) => const UserFeedPage(),
+                  routes: [
+                    GoRoute(
+                      // parentNavigatorKey: homeRouterRootNavigatorKey,
+                      name: RouterConstants.pendingRequests,
+                      path: "pending-requests",
+                      builder: (context, state) => const PendingRequestPage(),
+                    ),
+                  ],
                 ),
               ],
             ),

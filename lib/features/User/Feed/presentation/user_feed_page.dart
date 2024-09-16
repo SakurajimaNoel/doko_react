@@ -1,4 +1,6 @@
+import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/helpers/constants.dart';
 
@@ -17,6 +19,14 @@ class _UserFeedPageState extends State<UserFeedPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Dokii"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              context.pushNamed(RouterConstants.pendingRequests);
+            },
+            icon: const Icon(Icons.person),
+          )
+        ],
       ),
       body: const SafeArea(
         child: Padding(
