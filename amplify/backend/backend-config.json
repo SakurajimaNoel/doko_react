@@ -1,0 +1,125 @@
+{
+  "auth": {
+    "dokoreact20865141": {
+      "customAuth": false,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "serviceType": "imported"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_auth_dokoreact20865141_allowUnauthenticatedIdentities": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dokoreact20865141"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dokoreact20865141_authRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dokoreact20865141"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dokoreact20865141_authRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dokoreact20865141"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dokoreact20865141_identityPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dokoreact20865141"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dokoreact20865141_identityPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dokoreact20865141"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dokoreact20865141_nativeClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dokoreact20865141"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dokoreact20865141_unauthRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dokoreact20865141"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dokoreact20865141_unauthRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dokoreact20865141"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dokoreact20865141_userPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dokoreact20865141"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dokoreact20865141_userPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dokoreact20865141"
+        }
+      ]
+    },
+    "AMPLIFY_auth_dokoreact20865141_webClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "dokoreact20865141"
+        }
+      ]
+    },
+    "AMPLIFY_storage_dokoreactd2e14c2a_bucketName": {
+      "usedBy": [
+        {
+          "category": "storage",
+          "resourceName": "dokoreactd2e14c2a"
+        }
+      ]
+    },
+    "AMPLIFY_storage_dokoreactd2e14c2a_region": {
+      "usedBy": [
+        {
+          "category": "storage",
+          "resourceName": "dokoreactd2e14c2a"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "dokoreactd2e14c2a": {
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "S3",
+      "serviceType": "imported"
+    }
+  }
+}
