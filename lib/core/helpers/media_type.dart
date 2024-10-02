@@ -1,4 +1,6 @@
-class MimeType {
+enum MediaTypeValue { image, video, unknown }
+
+class MediaType {
   static const Map<String, String> _mimeToExtension = {
     // Image types
     'image/jpeg': '.jpg',
@@ -84,6 +86,25 @@ class MimeType {
     'application/x-sqlite3': '.sqlite',
     'application/x-java-archive': '.jar',
   };
+  static const List<String> _imageExtensions = [
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+    'bmp',
+    'webp',
+    'svg'
+  ];
+  static const List<String> _videoExtensions = [
+    'mp4',
+    'avi',
+    'mov',
+    'mkv',
+    'flv',
+    'wmv',
+    'webm',
+    '3gp'
+  ];
 
   static String? getExtension(String? mimeType) {
     if (mimeType == null) return null;
@@ -100,5 +121,19 @@ class MimeType {
 
     final String extension = fileName.substring(lastDot + 1);
     return ".$extension";
+  }
+
+  static MediaTypeValue getMediaType(String path) {
+    String extension = path.split('.').last.toLowerCase();
+
+    if (_imageExtensions.contains(extension)) {
+      return MediaTypeValue.image;
+    }
+
+    if (_videoExtensions.contains(extension)) {
+      return MediaTypeValue.video;
+    }
+
+    return MediaTypeValue.unknown;
   }
 }

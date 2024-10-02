@@ -29,4 +29,11 @@ class Constants {
   static int profileCacheHeight = (_root * 75).round();
   static int thumbnailCacheHeight = (_root * 5).round();
   static int editProfileCachedHeight = (_root * 75).round();
+
+  // video
+  static Duration videoDuration = const Duration(seconds: 90);
+
+  // post
+  static const double actionWidth = _root * 2.5;
+  static const double actionEdgeGap = _root * 0.125;
 }

@@ -16,7 +16,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/data/storage.dart';
 import '../../../../core/helpers/display.dart';
 import '../../../../core/helpers/enum.dart';
-import '../../../../core/helpers/mime_type.dart';
+import '../../../../core/helpers/media_type.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String bio;
@@ -80,7 +80,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     // when new profile picture is selected
     if (!_removeProfile && _profilePicture != null) {
       String? imageExtension =
-          MimeType.getExtensionFromFileName(_profilePicture!.path);
+          MediaType.getExtensionFromFileName(_profilePicture!.path);
 
       if (imageExtension == null) {
         setState(() {

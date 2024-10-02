@@ -1,34 +1,63 @@
+import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/features/User/data/model/model.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
+
+// individual item for user post
+class Content {
+  final MediaTypeValue mediaType;
+  final String key;
+  String signedURL;
+
+  Content({
+    required this.mediaType,
+    required this.key,
+    required this.signedURL,
+  });
+
+  static Future<Content> createContentObject(String key) async {
+    String signedURL = await StorageUtils.generatePreSignedURL(key);
+    MediaTypeValue mediaType = MediaType.getMediaType(key);
+
+    return Content(
+      mediaType: mediaType,
+      key: key,
+      signedURL: signedURL,
+    );
+  }
+
+  Future<void> refresh() async {
+    signedURL = await StorageUtils.generatePreSignedURL(key);
+  }
+}
 
 // this class is used for response when fetching posts for individual profile information
 class ProfilePostModel {
   final String id;
-  final List<String> content;
   final String caption;
   final DateTime createdOn;
-  final List<String> signedContent;
+  final List<Content> content;
 
   const ProfilePostModel({
-    required this.content,
     required this.caption,
     required this.createdOn,
     required this.id,
-    required this.signedContent,
+    required this.content,
   });
 
   static Future<ProfilePostModel> createModel({required Map map}) async {
-    List<String> content =
-        (map["content"] as List).map((element) => element.toString()).toList();
+    List<Future<Content>> contentFuture = (map["content"] as List)
+        .map((element) => Content.createContentObject(
+              element.toString(),
+            ))
+        .toList();
 
-    List<String> signedContent =
-        await StorageUtils.generatePreSignedURLs(content);
+    List<Content> content = await Future.wait(contentFuture);
+
     return ProfilePostModel(
-      content: content,
-      signedContent: signedContent,
       caption: map["caption"],
       createdOn: DateTime.parse(map["createdOn"]),
       id: map["id"],
+      content: content,
     );
   }
 }
@@ -69,11 +98,10 @@ class PostModel extends ProfilePostModel {
 
   const PostModel({
     required this.createdBy,
-    required super.content,
     required super.caption,
     required super.createdOn,
     required super.id,
-    required super.signedContent,
+    required super.content,
   });
 
   PostModel.fromProfilePost({
@@ -81,28 +109,35 @@ class PostModel extends ProfilePostModel {
     required this.createdBy,
   }) : super(
           caption: post.caption,
-          content: post.content,
           createdOn: post.createdOn,
           id: post.id,
-          signedContent: post.signedContent,
+          content: post.content,
         );
 
   static Future<PostModel> createModel({required Map map}) async {
-    List<String> content =
-        (map["content"] as List).map((element) => element.toString()).toList();
+    Future<UserModel> createdByFuture =
+        UserModel.createModel(map: map["createdBy"]);
 
-    List<String> signedContent =
-        await StorageUtils.generatePreSignedURLs(content);
+    List<Future<Content>> postContentFuture = (map["content"] as List)
+        .map((element) => Content.createContentObject(
+              element.toString(),
+            ))
+        .toList();
 
-    UserModel createdBy = await UserModel.createModel(map: map["createdBy"]);
+    List results = await Future.wait([
+      createdByFuture,
+      ...postContentFuture,
+    ]);
+
+    UserModel createdBy = results[0] as UserModel;
+    List<Content> content = results.sublist(1).cast<Content>();
 
     return PostModel(
-      content: content,
-      signedContent: signedContent,
       caption: map["caption"],
       createdOn: DateTime.parse(map["createdOn"]),
       id: map["id"],
       createdBy: createdBy,
+      content: content,
     );
   }
 }

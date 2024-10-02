@@ -5,7 +5,7 @@ import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
-import 'package:doko_react/core/helpers/mime_type.dart';
+import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error_text.dart';
 import 'package:doko_react/core/widgets/image_picker_widget.dart';
@@ -66,7 +66,7 @@ class _CompleteProfilePicturePageState
 
   Future<void> _completeProfile() async {
     String? imageExtension =
-        MimeType.getExtensionFromFileName(_profilePicture!.path);
+        MediaType.getExtensionFromFileName(_profilePicture!.path);
     if (imageExtension == null) {
       setState(() {
         _errorMessage = "Invalid image selected.";

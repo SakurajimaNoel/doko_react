@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
+import 'package:doko_react/core/helpers/media_type.dart';
+import 'package:doko_react/core/widgets/error_text.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/widgets/posts/post_user_widget.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +59,6 @@ class PostWidget extends StatelessWidget {
                   width: contentWidth,
                   child: _PostContent(
                     content: post.content,
-                    signedContent: post.signedContent,
                   ),
                 ),
                 SizedBox(
@@ -95,13 +96,37 @@ class PostWidget extends StatelessWidget {
 
 // post content carousel view
 class _PostContent extends StatelessWidget {
-  final List<String> content;
-  final List<String> signedContent;
+  final List<Content> content;
 
   const _PostContent({
     required this.content,
-    required this.signedContent,
   });
+
+  Widget _handleImageContent(Content item) {
+    return CachedNetworkImage(
+      cacheKey: item.key,
+      fit: BoxFit.cover,
+      imageUrl: item.signedURL,
+      placeholder: (context, url) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+      errorWidget: (context, url, error) => const Icon(Icons.error),
+      filterQuality: FilterQuality.high,
+      memCacheHeight: Constants.postCacheHeight,
+    );
+  }
+
+  Widget _handleVideoContent(Content item) {
+    return Container(
+      color: Colors.deepPurple,
+    );
+  }
+
+  Widget _handleUnknownContent(Content item) {
+    return const Center(
+      child: ErrorText("Oops! Something went wrong."),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,22 +147,16 @@ class _PostContent extends StatelessWidget {
           Radius.circular(Constants.radius),
         ),
       ),
-      children: signedContent.map(
+      children: content.map(
         (item) {
-          int index = signedContent.indexOf(item);
-          String cacheKey = content[index];
-
-          return CachedNetworkImage(
-            cacheKey: cacheKey,
-            fit: BoxFit.cover,
-            imageUrl: item,
-            placeholder: (context, url) => const Center(
-              child: CircularProgressIndicator(),
-            ),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-            filterQuality: FilterQuality.high,
-            memCacheHeight: Constants.postCacheHeight,
-          );
+          switch (item.mediaType) {
+            case MediaTypeValue.image:
+              return _handleImageContent(item);
+            case MediaTypeValue.video:
+              return _handleVideoContent(item);
+            default:
+              return _handleUnknownContent(item);
+          }
         },
       ).toList(),
     );
