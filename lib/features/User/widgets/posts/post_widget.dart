@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
@@ -17,6 +15,12 @@ class PostWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.sizeOf(context).width;
+
+    var contentWidth =
+        width - (Constants.actionWidth + Constants.actionEdgeGap);
+    var height = contentWidth * 3 / 4;
+
     return Container(
       margin: const EdgeInsets.only(bottom: Constants.gap * 1.5),
       child: Column(
@@ -48,22 +52,23 @@ class PostWidget extends StatelessWidget {
             Row(
               children: [
                 SizedBox(
-                  height: max(Constants.height * 16,
-                      MediaQuery.of(context).size.height * 0.25),
-                  width: MediaQuery.of(context).size.width * 0.9 - 2,
+                  // content carousel
+                  height: height,
+                  width: contentWidth,
                   child: _PostContent(
                     content: post.content,
                     signedContent: post.signedContent,
                   ),
                 ),
                 SizedBox(
-                  height: max(Constants.height * 16,
-                      MediaQuery.of(context).size.height * 0.25),
-                  width: MediaQuery.of(context).size.width * 0.1,
+                  // post action
+                  height: height,
+                  width: Constants.actionWidth,
                   child: const _PostAction(),
                 ),
                 const SizedBox(
-                  width: Constants.gap * 0.125,
+                  // gap from edge
+                  width: Constants.actionEdgeGap,
                 ),
               ],
             ),
@@ -100,12 +105,22 @@ class _PostContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.sizeOf(context).width;
+
+    var contentWidth =
+        width - (Constants.actionWidth + Constants.actionEdgeGap);
+
     return CarouselView(
-      itemExtent: MediaQuery.of(context).size.width * 0.9 - 2,
-      shrinkExtent: Constants.width * 10,
+      itemExtent: contentWidth,
+      shrinkExtent: contentWidth * 0.5,
       itemSnapping: true,
       padding: const EdgeInsets.symmetric(
         horizontal: Constants.padding * 0.5,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(Constants.radius),
+        ),
       ),
       children: signedContent.map(
         (item) {
