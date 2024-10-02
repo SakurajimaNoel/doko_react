@@ -235,133 +235,117 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     return DefaultTabController(
       length: 2,
-      child: RefreshIndicator(
-        notificationPredicate: (notification) {
-          // with NestedScrollView local(depth == 2) OverscrollNotification are not sent
-          int depth;
-          if (user.postsInfo.posts.isNotEmpty ||
-              user.friendsInfo.friends.isNotEmpty) {
-            depth = 2;
-          } else {
-            depth = 0;
-          }
-          return notification.depth == depth;
-        },
-        onRefresh: () async {
-          await _fetchCompleteUser();
-        },
-        child: NestedScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return [
-              SliverAppBar(
-                floating: false,
-                pinned: true,
-                expandedHeight: Constants.expandedAppBarHeight,
-                title: Text(user.username),
-                actions: _appBarActions(),
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      user.profilePicture.isNotEmpty
-                          ? CachedNetworkImage(
-                              memCacheHeight: Constants.profileCacheHeight,
-                              cacheKey: user.profilePicture,
-                              imageUrl: user.signedProfilePicture,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
-                              height: Constants.expandedAppBarHeight,
-                            )
-                          : Container(
-                              color: currTheme.onSecondary,
-                              child: const Icon(
-                                Icons.person,
-                                size: Constants.expandedAppBarHeight,
-                              ),
+      child: NestedScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              floating: false,
+              pinned: true,
+              expandedHeight: Constants.expandedAppBarHeight,
+              title: Text(user.username),
+              actions: _appBarActions(),
+              flexibleSpace: FlexibleSpaceBar(
+                background: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    user.profilePicture.isNotEmpty
+                        ? CachedNetworkImage(
+                            memCacheHeight: Constants.profileCacheHeight,
+                            cacheKey: user.profilePicture,
+                            imageUrl: user.signedProfilePicture,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(),
                             ),
-                      Container(
-                        padding: const EdgeInsets.only(
-                          bottom: Constants.padding,
-                          left: Constants.padding,
-                        ),
-                        alignment: Alignment.bottomLeft,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              currTheme.surface.withOpacity(0.5),
-                              currTheme.surface.withOpacity(0.25),
-                              currTheme.surface.withOpacity(0.25),
-                              currTheme.surface.withOpacity(0.5),
-                            ],
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                            height: Constants.expandedAppBarHeight,
+                          )
+                        : Container(
+                            color: currTheme.onSecondary,
+                            child: const Icon(
+                              Icons.person,
+                              size: Constants.expandedAppBarHeight,
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          user.name,
-                          style: TextStyle(
-                            color: currTheme.onSurface,
-                            fontSize: Constants.heading2,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(Constants.padding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (user.bio.isNotEmpty) ...[
-                        Text(user.bio),
-                        const SizedBox(
-                          height: 16,
-                        ),
-                      ],
-                      _userProfileAction(),
-                    ],
-                  ),
-                ),
-              ),
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _SliverAppBarDelegate(
-                  const TabBar(
-                    tabs: [
-                      Tab(
-                        text: "Posts",
+                    Container(
+                      padding: const EdgeInsets.only(
+                        bottom: Constants.padding,
+                        left: Constants.padding,
                       ),
-                      Tab(
-                        text: "Friends",
+                      alignment: Alignment.bottomLeft,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            currTheme.surface.withOpacity(0.5),
+                            currTheme.surface.withOpacity(0.25),
+                            currTheme.surface.withOpacity(0.25),
+                            currTheme.surface.withOpacity(0.5),
+                          ],
+                        ),
+                      ),
+                      child: Text(
+                        user.name,
+                        style: TextStyle(
+                          color: currTheme.onSurface,
+                          fontSize: Constants.heading2,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(Constants.padding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (user.bio.isNotEmpty) ...[
+                      Text(user.bio),
+                      const SizedBox(
+                        height: 16,
                       ),
                     ],
-                  ),
+                    _userProfileAction(),
+                  ],
                 ),
-              )
-            ];
-          },
-          body: TabBarView(
-            children: [
-              PostContainerProfileWidget(
-                postInfo: user.postsInfo,
-                user: user,
-                key: ValueKey(user.profilePicture),
               ),
-              FriendContainerProfileWidget(
-                friendInfo: user.friendsInfo,
-                user: user,
+            ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SliverAppBarDelegate(
+                const TabBar(
+                  tabs: [
+                    Tab(
+                      text: "Posts",
+                    ),
+                    Tab(
+                      text: "Friends",
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            )
+          ];
+        },
+        body: TabBarView(
+          children: [
+            PostContainerProfileWidget(
+              postInfo: user.postsInfo,
+              user: user,
+              key: ValueKey(user.profilePicture),
+            ),
+            FriendContainerProfileWidget(
+              friendInfo: user.friendsInfo,
+              user: user,
+            ),
+          ],
         ),
       ),
     );
