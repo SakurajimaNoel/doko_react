@@ -32,8 +32,11 @@ class Constants {
 
   // video
   static Duration videoDuration = const Duration(seconds: 90);
+  static const double landscape = 16 / 9;
+  static const double portrait = 9 / 16;
 
   // post
+  static const double postContainer = 4 / 3;
   static const double actionWidth = _root * 2.5;
   static const double actionEdgeGap = _root * 0.125;
 }

@@ -20,12 +20,18 @@ class _UserFeedPageState extends State<UserFeedPage> {
       appBar: AppBar(
         title: const Text("Dokii"),
         actions: [
+          TextButton(
+            onPressed: () {
+              context.pushNamed(RouterConstants.createPost);
+            },
+            child: const Text("Create"),
+          ),
           IconButton(
             onPressed: () {
               context.pushNamed(RouterConstants.pendingRequests);
             },
             icon: const Icon(Icons.person),
-          )
+          ),
         ],
       ),
       body: const SafeArea(

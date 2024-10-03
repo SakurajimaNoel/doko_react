@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/helpers/constants.dart';
 import '../../../../core/helpers/enum.dart';
-import '../../../../core/widgets/loader_button.dart';
+import '../../../../core/widgets/loader/loader_button.dart';
 import '../../data/model/friend_modal.dart';
 import '../../data/services/user_graphql_service.dart';
 

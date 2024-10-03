@@ -7,9 +7,9 @@ import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
-import 'package:doko_react/core/widgets/error_text.dart';
-import 'package:doko_react/core/widgets/image_picker_widget.dart';
-import 'package:doko_react/core/widgets/loader_button.dart';
+import 'package:doko_react/core/widgets/error/error_text.dart';
+import 'package:doko_react/core/widgets/image_picker/image_picker_widget.dart';
+import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/data/auth.dart';
-import '../../../../core/widgets/settings_heading.dart';
+import '../../../../core/widgets/heading/settings_heading.dart';
 
 class CompleteProfilePicturePage extends StatefulWidget {
   final String username;

@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/configs/router/router_constants.dart';
 import '../../../../core/data/auth.dart';
 import '../../../../core/helpers/constants.dart';
-import '../../../../core/widgets/settings_heading.dart';
+import '../../../../core/widgets/heading/settings_heading.dart';
 
 class CompleteProfileInfoPage extends StatefulWidget {
   final String username;

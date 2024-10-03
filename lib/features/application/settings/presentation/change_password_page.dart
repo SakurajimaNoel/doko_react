@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/data/auth.dart';
 import '../../../../core/helpers/input.dart';
-import '../../../../core/widgets/error_text.dart';
-import '../../../../core/widgets/heading.dart';
+import '../../../../core/widgets/error/error_text.dart';
+import '../../../../core/widgets/heading/heading.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});

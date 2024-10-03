@@ -1,5 +1,5 @@
-import 'package:doko_react/core/widgets/loader_button.dart';
-import 'package:doko_react/core/widgets/settings_heading.dart';
+import 'package:doko_react/core/widgets/loader/loader_button.dart';
+import 'package:doko_react/core/widgets/heading/settings_heading.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';

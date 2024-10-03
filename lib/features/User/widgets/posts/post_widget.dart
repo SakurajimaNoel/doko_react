@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
-import 'package:doko_react/core/widgets/error_text.dart';
+import 'package:doko_react/core/widgets/error/error_text.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/widgets/posts/post_user_widget.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +21,7 @@ class PostWidget extends StatelessWidget {
 
     var contentWidth =
         width - (Constants.actionWidth + Constants.actionEdgeGap);
-    var height = contentWidth * 3 / 4;
+    var height = contentWidth * (1 / Constants.postContainer);
 
     return Container(
       margin: const EdgeInsets.only(bottom: Constants.gap * 1.5),

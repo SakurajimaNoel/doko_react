@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
-import 'package:doko_react/core/widgets/error_text.dart';
+import 'package:doko_react/core/widgets/error/error_text.dart';
 import 'package:doko_react/features/User/data/graphql_queries/query_constants.dart';
 import 'package:doko_react/features/User/data/model/friend_modal.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 import '../../../core/configs/router/router_constants.dart';
 import '../../../core/data/auth.dart';
 import '../../../core/helpers/enum.dart';
-import '../../../core/widgets/loader.dart';
+import '../../../core/widgets/loader/loader.dart';
 import '../data/graphql_queries/friend_relation.dart';
 import '../data/services/user_graphql_service.dart';
 

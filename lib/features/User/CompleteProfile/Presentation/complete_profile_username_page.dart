@@ -1,9 +1,9 @@
 import 'package:doko_react/core/helpers/debounce.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/input.dart';
-import 'package:doko_react/core/widgets/bullet_list.dart';
-import 'package:doko_react/core/widgets/error_text.dart';
-import 'package:doko_react/core/widgets/settings_heading.dart';
+import 'package:doko_react/core/widgets/general/bullet_list.dart';
+import 'package:doko_react/core/widgets/error/error_text.dart';
+import 'package:doko_react/core/widgets/heading/settings_heading.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
