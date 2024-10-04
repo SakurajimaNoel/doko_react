@@ -1,3 +1,4 @@
+import 'package:doko_react/core/data/cache.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/features/User/data/model/model.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
@@ -15,8 +16,16 @@ class Content {
   });
 
   static Future<Content> createContentObject(String key) async {
-    String signedURL = await StorageUtils.generatePreSignedURL(key);
     MediaTypeValue mediaType = MediaType.getMediaType(key);
+    String? signedURL;
+
+    if (mediaType == MediaTypeValue.video) {
+      signedURL = await Cache.getFileFromCache(key);
+    }
+
+    if (signedURL == null || signedURL.isEmpty) {
+      signedURL = await StorageUtils.generatePreSignedURL(key);
+    }
 
     return Content(
       mediaType: mediaType,

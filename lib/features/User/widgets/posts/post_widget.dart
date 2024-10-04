@@ -3,6 +3,7 @@ import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
+import 'package:doko_react/core/widgets/video_player/video_player.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/widgets/posts/post_user_widget.dart';
 import 'package:flutter/material.dart';
@@ -117,8 +118,8 @@ class _PostContent extends StatelessWidget {
   }
 
   Widget _handleVideoContent(Content item) {
-    return Container(
-      color: Colors.deepPurple,
+    return VideoPlayer(
+      path: item.signedURL,
     );
   }
 
