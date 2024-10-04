@@ -1,15 +1,23 @@
 import 'dart:io';
 
-enum MediaTypeValue { image, video, unknown }
+enum MediaTypeValue {
+  image,
+  video,
+  thumbnail,
+  unknown,
+}
 
 class PostContent {
   final MediaTypeValue type;
-  final File file;
+  final File? file;
 
   PostContent({
     required this.type,
     required this.file,
-  });
+  }) : assert(
+          type == MediaTypeValue.unknown || file != null,
+          "File cannot be null for MediaTypeValue: $type.",
+        );
 }
 
 class MediaType {
@@ -139,7 +147,7 @@ class MediaType {
     if (withDot) {
       return ".$extension";
     } else {
-      extension;
+      return extension;
     }
   }
 

@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:image_picker_android/image_picker_android.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,6 +24,8 @@ import 'features/User/data/services/user_graphql_service.dart';
 void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
+
+    MediaKit.ensureInitialized();
     await SharedPreferences.getInstance();
     await _configureAmplify();
     await initHiveForFlutter();

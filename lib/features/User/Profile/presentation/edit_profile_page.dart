@@ -249,6 +249,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     padding: const EdgeInsets.only(
                       bottom: Constants.padding,
                       left: Constants.padding,
+                      right: Constants.padding,
                     ),
                     alignment: Alignment.bottomLeft,
                     decoration: BoxDecoration(
@@ -256,8 +257,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          currTheme.surface.withOpacity(opacity),
-                          currTheme.surface.withOpacity(opacity),
                           currTheme.surface.withOpacity(opacity),
                           currTheme.surface.withOpacity(opacity),
                         ],

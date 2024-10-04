@@ -34,7 +34,12 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
     _path = widget.path;
 
-    player.open(Media(_path)).then((_) {
+    player
+        .open(
+      Media(_path),
+      play: false,
+    )
+        .then((_) {
       _handleRatio();
     });
   }
@@ -123,7 +128,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
         seekBarPositionColor: currTheme.primary,
         seekBarThumbColor: currTheme.primary,
         seekBarColor: currTheme.onPrimary,
-        seekBarThumbSize: 0,
+        seekBarThumbSize: 8,
         seekBarHeight: 3,
       ),
       fullscreen: const MaterialVideoControlsThemeData(),

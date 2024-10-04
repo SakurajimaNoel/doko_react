@@ -38,6 +38,8 @@ class ImagePickerWidget extends StatelessWidget {
 
   // function to select video from gallery
   Future<void> _selectVideoFromGallery() async {
+    if (multipleLimit <= 0) return;
+
     final ImagePicker picker = ImagePicker();
     final XFile? selectedVideo = await picker.pickVideo(
       source: ImageSource.gallery,
@@ -96,7 +98,7 @@ class ImagePickerWidget extends StatelessWidget {
   }
 
   void _handleGallery(BuildContext context) {
-    if (multiple) {
+    if (multiple && multipleLimit > 1) {
       _selectMultipleImagesFromGallery();
     } else {
       _selectImageFromGallery();

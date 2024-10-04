@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:video_compress/video_compress.dart';
 
@@ -8,7 +9,7 @@ class VideoActions {
       Constants.videoDuration.inMilliseconds.toDouble();
   static const VideoQuality _quality = VideoQuality.DefaultQuality;
 
-  static Future<String?> handleVideo(String videoPath) async {
+  static Future<String?> compressVideo(String videoPath) async {
     MediaInfo videoInfo = await VideoCompress.getMediaInfo(videoPath);
     double? videoDuration = videoInfo.duration;
 
@@ -36,5 +37,26 @@ class VideoActions {
   static VideoOrientation getVideoOrientation(int width, int height) {
     if (width > height) return VideoOrientation.landscape;
     return VideoOrientation.portrait;
+  }
+
+  static Future<String?> getVideoThumbnail(String videoPath) async {
+    try {
+      final thumbnailFile = await VideoCompress.getFileThumbnail(
+        videoPath,
+        quality: 50,
+        position: -1,
+      );
+
+      return thumbnailFile.path;
+    } catch (err) {
+      safePrint("error getting video thumbnail");
+      safePrint(err.toString());
+
+      return null;
+    }
+  }
+
+  static Future<void> cancelCurrentlyActiveVideoCompression() async {
+    await VideoCompress.cancelCompression();
   }
 }

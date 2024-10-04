@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/data/video.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/widgets/heading/settings_heading.dart';
 import 'package:doko_react/core/widgets/image_picker/image_picker_widget.dart';
@@ -56,22 +57,90 @@ class _PostContentWidget extends StatefulWidget {
 }
 
 class _PostContentWidgetState extends State<_PostContentWidget> {
-  List<PostContent> _content = [];
+  final List<PostContent> _content = [];
+  bool _compressingVideo = false;
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(
+          milliseconds: 750,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleVideo(XFile item) async {
+    setState(() {
+      _compressingVideo = true;
+    });
+
+    String? thumbnail = await VideoActions.getVideoThumbnail(item.path);
+
+    PostContent tempContent;
+    if (thumbnail == null) {
+      tempContent = PostContent(
+        type: MediaTypeValue.unknown,
+        file: null,
+      );
+    } else {
+      tempContent = PostContent(
+        type: MediaTypeValue.thumbnail,
+        file: File(thumbnail),
+      );
+    }
+
+    setState(() {
+      _content.add(tempContent);
+    });
+
+    String? compressedVideo = await VideoActions.compressVideo(item.path);
+
+    setState(() {
+      _compressingVideo = false;
+    });
+
+    if (compressedVideo == null) {
+      // handle failed case
+      String message =
+          "Uh-oh, looks like we couldn't add that video. Please try selecting it again.";
+      _showMessage(message);
+      setState(() {
+        _content.removeLast();
+      });
+      return;
+    }
+
+    int tempIndex = _content.length - 1;
+    setState(() {
+      _content[tempIndex] = PostContent(
+        type: MediaTypeValue.video,
+        file: File(compressedVideo),
+      );
+    });
+  }
 
   void _handleMediaInfo(XFile item) {
     MediaTypeValue type = MediaType.getMediaType(item.path);
     File file = File(item.path);
 
-    if (type == MediaTypeValue.video) return;
+    if (type == MediaTypeValue.video) {
+      _handleVideo(item);
+      return;
+    }
 
-    _content.add(PostContent(
-      type: type,
-      file: file,
-    ));
-    setState(() {});
+    setState(() {
+      _content.add(PostContent(
+        type: type,
+        file: file,
+      ));
+    });
   }
 
   void onSelection(List<XFile> selectedFiles) {
+    if (_content.length >= Constants.postLimit) return;
+
     // handle selected files
     for (var item in selectedFiles) {
       _handleMediaInfo(item);
@@ -86,51 +155,118 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
       multiple: true,
       video: true,
       multipleLimit: Constants.postLimit - _content.length,
-      disabled: _content.length == Constants.postLimit,
+      disabled: _compressingVideo || _content.length == Constants.postLimit,
     );
   }
 
   Widget _postItemWrapper({required Widget item, required int index}) {
     var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
+    var currTheme = Theme.of(context).colorScheme;
 
     return SizedBox(
       width: width,
-      child: item,
+      child: Stack(
+        children: [
+          item,
+          IconButton.filledTonal(
+            color: currTheme.onError,
+            style: IconButton.styleFrom(
+              backgroundColor: currTheme.error,
+            ),
+            onPressed: () async {
+              var type = _content[index].type;
+              if (type == MediaTypeValue.thumbnail ||
+                  type == MediaTypeValue.unknown) {
+                await VideoActions.cancelCurrentlyActiveVideoCompression();
+              }
+
+              setState(() {
+                _content.removeAt(index);
+              });
+            },
+            icon: const Icon(
+              Icons.delete,
+            ),
+          )
+        ],
+      ),
     );
   }
 
   List<Widget> _handleDisplayMedia() {
+    var currTheme = Theme.of(context).colorScheme;
+    double opacity = 0.5;
+    var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
+    var height = width * (1 / Constants.postContainer);
+
     List<Widget> mediaWidgets = [];
 
     for (int i = 0; i < _content.length; i++) {
       var item = _content[i];
       var type = item.type;
+      var index = i;
 
       switch (type) {
         case MediaTypeValue.image:
           mediaWidgets.add(
             _postItemWrapper(
               item: Image.file(
-                item.file,
+                item.file!,
                 fit: BoxFit.cover,
                 cacheHeight: Constants.postCacheHeight,
               ),
-              index: 0,
+              index: index,
             ),
           );
           break;
         case MediaTypeValue.video:
           mediaWidgets.add(
             _postItemWrapper(
-              item: VideoPlayer(path: item.file.path),
-              index: 0,
+              item: VideoPlayer(path: item.file!.path),
+              index: index,
             ),
           );
           break;
+        case MediaTypeValue.thumbnail:
+          mediaWidgets.add(
+            _postItemWrapper(
+              item: Stack(
+                children: [
+                  Center(
+                    child: Image.file(
+                      item.file!,
+                      fit: BoxFit.cover,
+                      cacheHeight: Constants.postCacheHeight,
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          currTheme.surface.withOpacity(opacity),
+                          currTheme.surface.withOpacity(opacity),
+                        ],
+                      ),
+                    ),
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                ],
+              ),
+              index: index,
+            ),
+          );
         default:
           mediaWidgets.add(
             Container(
-              color: Colors.red,
+              width: width,
+              color: currTheme.outlineVariant,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
             ),
           );
           break;
@@ -142,66 +278,77 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.sizeOf(context).width;
+    var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
     var height = width * (1 / Constants.postContainer);
-    width = width - Constants.padding * 2;
 
     var currTheme = Theme.of(context).colorScheme;
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: Constants.gap,
-            ),
-            SizedBox(
-              height: height,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                physics: const PageScrollPhysics(),
-                children: [
-                  if (_content.isNotEmpty) ..._handleDisplayMedia(),
-                  if (_content.length < Constants.postLimit)
-                    Container(
-                      width: width,
-                      color: currTheme.outlineVariant,
-                      child: Center(
-                        child: _mediaSelect(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, var result) {
+        VideoActions.cancelCurrentlyActiveVideoCompression();
+
+        if (!didPop) {
+          context.pop();
+        }
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: Constants.gap,
+              ),
+              SizedBox(
+                height: height,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const PageScrollPhysics(),
+                  children: [
+                    if (_content.isNotEmpty) ..._handleDisplayMedia(),
+                    if (_content.length < Constants.postLimit)
+                      Container(
+                        width: width,
+                        color: currTheme.outlineVariant,
+                        child: Center(
+                          child: _mediaSelect(),
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: Constants.gap,
+              ),
+              Text(
+                  "Selected media items: ${_content.length} / ${Constants.postLimit}."),
+            ],
+          ),
+          FilledButton(
+            onPressed: _compressingVideo
+                ? null
+                : () {
+                    Map<String, dynamic> data = {
+                      "postContent": _content,
+                    };
+
+                    context.pushNamed(
+                      RouterConstants.postPublish,
+                      extra: data,
+                    );
+                  },
+            style: FilledButton.styleFrom(
+              minimumSize: const Size(
+                Constants.buttonWidth,
+                Constants.buttonHeight,
               ),
             ),
-            const SizedBox(
-              height: Constants.gap,
-            ),
-            Text(
-                "Selected media items: ${_content.length} / ${Constants.postLimit}."),
-          ],
-        ),
-        FilledButton(
-          onPressed: () {
-            Map<String, dynamic> data = {
-              "postContent": _content,
-            };
-
-            context.pushNamed(
-              RouterConstants.postPublish,
-              extra: data,
-            );
-          },
-          style: FilledButton.styleFrom(
-            minimumSize: const Size(
-              Constants.buttonWidth,
-              Constants.buttonHeight,
-            ),
+            child: const Text("Continue"),
           ),
-          child: const Text("Continue"),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
