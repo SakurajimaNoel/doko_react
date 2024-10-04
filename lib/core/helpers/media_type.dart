@@ -111,7 +111,10 @@ class MediaType {
     return _mimeToExtension[mimeType];
   }
 
-  static String? getExtensionFromFileName(String fileName) {
+  static String? getExtensionFromFileName(
+    String fileName, {
+    bool withDot = true,
+  }) {
     if (fileName.isEmpty) {
       return null;
     }
@@ -120,7 +123,12 @@ class MediaType {
     if (lastDot == -1) return null;
 
     final String extension = fileName.substring(lastDot + 1);
-    return ".$extension";
+
+    if (withDot) {
+      return ".$extension";
+    } else {
+      extension;
+    }
   }
 
   static MediaTypeValue getMediaType(String path) {

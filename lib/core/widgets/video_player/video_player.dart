@@ -31,7 +31,12 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   void initState() {
     super.initState();
+
     _path = widget.path;
+
+    player.open(Media(_path)).then((_) {
+      _handleRatio();
+    });
   }
 
   @override
