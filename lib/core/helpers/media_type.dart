@@ -1,4 +1,16 @@
+import 'dart:io';
+
 enum MediaTypeValue { image, video, unknown }
+
+class PostContent {
+  final MediaTypeValue type;
+  final File file;
+
+  PostContent({
+    required this.type,
+    required this.file,
+  });
+}
 
 class MediaType {
   static const Map<String, String> _mimeToExtension = {

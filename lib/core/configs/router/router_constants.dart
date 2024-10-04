@@ -14,6 +14,7 @@ class RouterConstants {
   static const String userProfile = "user-profile";
   static const String pendingRequests = "pending-requests";
   static const String createPost = "create-post";
+  static const String postPublish = "publish";
 
   // settings page
   static const String settings = "settings";

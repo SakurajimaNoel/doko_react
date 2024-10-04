@@ -1,14 +1,28 @@
-import 'package:doko_react/core/data/video.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImagePickerWidget extends StatelessWidget {
+  // function to call when media item is selected
   final Function(List<XFile>) onSelection;
+
+  // boolean field when allowing multiple images to select
   final bool multiple;
+
+  // boolean field for disabling the main widget button
+  final bool disabled;
+
+  // boolean field to allow selecting video files
   final bool video;
+
+  // text for text button when icon is not provided
   final String displayText;
+
+  // icon to user for icon button otherwise default to text button
   final Icon? icon;
+
+  // limiting the number of selection for images
   final int multipleLimit;
+
   final int _imageQuality = 75;
 
   const ImagePickerWidget(
@@ -19,6 +33,7 @@ class ImagePickerWidget extends StatelessWidget {
     this.video = false,
     this.icon,
     this.multipleLimit = 10,
+    this.disabled = false,
   });
 
   // function to select video from gallery
@@ -29,8 +44,6 @@ class ImagePickerWidget extends StatelessWidget {
     );
 
     if (selectedVideo == null) return;
-
-    await VideoActions.handleVideo(selectedVideo.path);
 
     onSelection([selectedVideo]);
   }
@@ -144,17 +157,21 @@ class ImagePickerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     if (icon == null) {
       return TextButton(
-        onPressed: () {
-          _selectOptions(context);
-        },
+        onPressed: disabled
+            ? null
+            : () {
+                _selectOptions(context);
+              },
         child: Text(displayText),
       );
     }
 
     return IconButton.filled(
-      onPressed: () {
-        _selectOptions(context);
-      },
+      onPressed: disabled
+          ? null
+          : () {
+              _selectOptions(context);
+            },
       icon: icon!,
     );
   }

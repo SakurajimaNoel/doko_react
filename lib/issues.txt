@@ -1,1 +1,1 @@
-update profile to future builder
+profile page hande post and friend tab to have different scroller

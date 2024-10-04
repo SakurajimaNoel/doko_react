@@ -1,9 +1,11 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/widgets/error/error.dart';
 import 'package:doko_react/core/widgets/loader/loader.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/create_post_page.dart';
+import 'package:doko_react/features/User/Feed/presentation/create_post_publish_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/pending_request_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/User/Nearby/presentation/nearby_page.dart';
@@ -156,7 +158,7 @@ class AppRouterConfig {
 
     return GoRouter(
       navigatorKey: homeRouterRootNavigatorKey,
-      initialLocation: "/user-feed",
+      initialLocation: "/user-feed/create-post",
       routes: [
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
@@ -181,6 +183,22 @@ class AppRouterConfig {
                       name: RouterConstants.createPost,
                       path: "create-post",
                       builder: (context, state) => const CreatePostPage(),
+                      routes: [
+                        GoRoute(
+                            parentNavigatorKey: homeRouterRootNavigatorKey,
+                            name: RouterConstants.postPublish,
+                            path: "publish",
+                            builder: (context, state) {
+                              final Map<String, dynamic> data =
+                                  state.extra as Map<String, dynamic>;
+                              final List<PostContent> postContent =
+                                  data["postContent"];
+
+                              return CreatePostPublishPage(
+                                postContent: postContent,
+                              );
+                            }),
+                      ],
                     ),
                   ],
                 ),

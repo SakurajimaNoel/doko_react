@@ -157,8 +157,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           Map<String, dynamic> data = {
             "bio": _user!.bio,
           };
-          String? newBio = await context
-              .pushNamed<String>(RouterConstants.editProfile, extra: data);
+          String? newBio = await context.pushNamed<String>(
+            RouterConstants.editProfile,
+            extra: data,
+          );
           if (_user!.bio != newBio) {
             setState(() {
               _user!.bio = newBio ?? "";
