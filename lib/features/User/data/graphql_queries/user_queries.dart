@@ -666,4 +666,43 @@ class UserQueries {
       }
     };
   }
+
+  // use create post
+  static String userCreatePost() {
+    return """
+    mutation Mutation(\$input: [PostCreateInput!]!) {
+      createPosts(input: \$input) {
+        info {
+          nodesCreated
+          relationshipsCreated
+        }
+      }
+    }        
+    """;
+  }
+
+  static Map<String, dynamic> userCreatePostVariables({
+    required String userId,
+    required String caption,
+    required List<String> content,
+  }) {
+    return {
+      "input": [
+        {
+          "caption": caption,
+          "content": content,
+          "createdBy": {
+            "connect": {
+              "where": {
+                "node": {
+                  "id": userId,
+                }
+              }
+            }
+          },
+          "likes": 0,
+        }
+      ],
+    };
+  }
 }

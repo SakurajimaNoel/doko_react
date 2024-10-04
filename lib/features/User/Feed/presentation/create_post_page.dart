@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/video.dart';
+import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/widgets/heading/settings_heading.dart';
 import 'package:doko_react/core/widgets/image_picker/image_picker_widget.dart';
@@ -9,8 +10,10 @@ import 'package:doko_react/core/widgets/video_player/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/helpers/constants.dart';
+import '../../../../core/provider/user_provider.dart';
 import '../../../../core/widgets/general/bullet_list.dart';
 
 class CreatePostPage extends StatelessWidget {
@@ -50,15 +53,24 @@ class CreatePostPage extends StatelessWidget {
 }
 
 class _PostContentWidget extends StatefulWidget {
-  const _PostContentWidget({super.key});
+  const _PostContentWidget();
 
   @override
   State<_PostContentWidget> createState() => _PostContentWidgetState();
 }
 
 class _PostContentWidgetState extends State<_PostContentWidget> {
+  late final UserProvider _userProvider;
+
   final List<PostContent> _content = [];
   bool _compressingVideo = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _userProvider = context.read<UserProvider>();
+  }
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -69,6 +81,14 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
         ),
       ),
     );
+  }
+
+  String _generateAWSPath(String path) {
+    String userId = _userProvider.id;
+    String randomString = DisplayText.generateRandomString();
+    String extension = MediaType.getExtensionFromFileName(path) ?? "";
+
+    return "$userId/posts/$randomString$extension";
   }
 
   Future<void> _handleVideo(XFile item) async {
@@ -83,11 +103,13 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
       tempContent = PostContent(
         type: MediaTypeValue.unknown,
         file: null,
+        path: "",
       );
     } else {
       tempContent = PostContent(
         type: MediaTypeValue.thumbnail,
         file: File(thumbnail),
+        path: "",
       );
     }
 
@@ -113,10 +135,12 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
     }
 
     int tempIndex = _content.length - 1;
+
     setState(() {
       _content[tempIndex] = PostContent(
         type: MediaTypeValue.video,
         file: File(compressedVideo),
+        path: _generateAWSPath(compressedVideo),
       );
     });
   }
@@ -134,6 +158,7 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
       _content.add(PostContent(
         type: type,
         file: file,
+        path: _generateAWSPath(item.path),
       ));
     });
   }
@@ -214,6 +239,8 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
                 item.file!,
                 fit: BoxFit.cover,
                 cacheHeight: Constants.postCacheHeight,
+                width: width,
+                height: height,
               ),
               index: index,
             ),

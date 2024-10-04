@@ -10,10 +10,12 @@ enum MediaTypeValue {
 class PostContent {
   final MediaTypeValue type;
   final File? file;
+  final String path;
 
   PostContent({
     required this.type,
     required this.file,
+    required this.path,
   }) : assert(
           type == MediaTypeValue.unknown || file != null,
           "File cannot be null for MediaTypeValue: $type.",

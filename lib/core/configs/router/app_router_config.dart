@@ -158,7 +158,7 @@ class AppRouterConfig {
 
     return GoRouter(
       navigatorKey: homeRouterRootNavigatorKey,
-      initialLocation: "/user-feed/create-post",
+      initialLocation: "/user-feed",
       routes: [
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
