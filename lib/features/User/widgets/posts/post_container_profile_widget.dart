@@ -1,6 +1,6 @@
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
-import 'package:doko_react/core/widgets/loader_button.dart';
+import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';

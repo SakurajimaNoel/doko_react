@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/helpers/constants.dart';
-import '../../../../core/widgets/settings_heading.dart';
+import '../../../../core/widgets/heading/settings_heading.dart';
 import '../widgets/theme_settings.dart';
 import '../widgets/user_settings.dart';
 

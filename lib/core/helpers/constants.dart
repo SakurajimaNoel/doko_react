@@ -23,10 +23,24 @@ class Constants {
 
   static const double appBarHeight = kToolbarHeight;
   static const double expandedAppBarHeight = _root * 22.5;
+  static const double profile = 10 / 9;
 
   // images
   static int postCacheHeight = (_root * 50).round();
   static int profileCacheHeight = (_root * 75).round();
   static int thumbnailCacheHeight = (_root * 5).round();
   static int editProfileCachedHeight = (_root * 75).round();
+
+  // video
+  static Duration videoDuration = const Duration(seconds: 90);
+  static const double landscape = 16 / 9;
+  static const double portrait = 9 / 16;
+
+  // post
+  static const double postContainer =
+      3 / 2; // for height use 1/postContainer and for width use postContainer
+  static const double actionWidth = _root * 2.5;
+  static const double actionEdgeGap = _root * 0.125;
+  static const int postLimit = 10;
+  static const int postCaptionDisplayLimit = 125;
 }

@@ -4,9 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
-import 'package:doko_react/core/widgets/error_text.dart';
-import 'package:doko_react/core/widgets/image_picker_widget.dart';
-import 'package:doko_react/core/widgets/loader_button.dart';
+import 'package:doko_react/core/widgets/error/error_text.dart';
+import 'package:doko_react/core/widgets/image_picker/image_picker_widget.dart';
+import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,7 +16,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/data/storage.dart';
 import '../../../../core/helpers/display.dart';
 import '../../../../core/helpers/enum.dart';
-import '../../../../core/helpers/mime_type.dart';
+import '../../../../core/helpers/media_type.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String bio;
@@ -80,7 +80,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     // when new profile picture is selected
     if (!_removeProfile && _profilePicture != null) {
       String? imageExtension =
-          MimeType.getExtensionFromFileName(_profilePicture!.path);
+          MediaType.getExtensionFromFileName(_profilePicture!.path);
 
       if (imageExtension == null) {
         setState(() {
@@ -177,6 +177,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     var currTheme = Theme.of(context).colorScheme;
     double opacity = _profilePicture != null ? 0.25 : 0.5;
 
+    var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
+    var height = width * (1 / Constants.profile);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit profile"),
@@ -205,8 +208,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           padding: const EdgeInsets.all(Constants.padding),
           children: [
             SizedBox(
-              height: Constants.height * 15,
-              width: double.maxFinite,
+              height: height,
+              width: width,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -249,6 +252,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     padding: const EdgeInsets.only(
                       bottom: Constants.padding,
                       left: Constants.padding,
+                      right: Constants.padding,
                     ),
                     alignment: Alignment.bottomLeft,
                     decoration: BoxDecoration(
@@ -256,8 +260,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          currTheme.surface.withOpacity(opacity),
-                          currTheme.surface.withOpacity(opacity),
                           currTheme.surface.withOpacity(opacity),
                           currTheme.surface.withOpacity(opacity),
                         ],

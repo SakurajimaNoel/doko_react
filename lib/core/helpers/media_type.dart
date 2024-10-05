@@ -1,4 +1,28 @@
-class MimeType {
+import 'dart:io';
+
+enum MediaTypeValue {
+  image,
+  video,
+  thumbnail,
+  unknown,
+}
+
+class PostContent {
+  final MediaTypeValue type;
+  final File? file;
+  final String path;
+
+  PostContent({
+    required this.type,
+    required this.file,
+    required this.path,
+  }) : assert(
+          type == MediaTypeValue.unknown || file != null,
+          "File cannot be null for MediaTypeValue: $type.",
+        );
+}
+
+class MediaType {
   static const Map<String, String> _mimeToExtension = {
     // Image types
     'image/jpeg': '.jpg',
@@ -84,13 +108,35 @@ class MimeType {
     'application/x-sqlite3': '.sqlite',
     'application/x-java-archive': '.jar',
   };
+  static const List<String> _imageExtensions = [
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+    'bmp',
+    'webp',
+    'svg'
+  ];
+  static const List<String> _videoExtensions = [
+    'mp4',
+    'avi',
+    'mov',
+    'mkv',
+    'flv',
+    'wmv',
+    'webm',
+    '3gp'
+  ];
 
   static String? getExtension(String? mimeType) {
     if (mimeType == null) return null;
     return _mimeToExtension[mimeType];
   }
 
-  static String? getExtensionFromFileName(String fileName) {
+  static String? getExtensionFromFileName(
+    String fileName, {
+    bool withDot = true,
+  }) {
     if (fileName.isEmpty) {
       return null;
     }
@@ -99,6 +145,25 @@ class MimeType {
     if (lastDot == -1) return null;
 
     final String extension = fileName.substring(lastDot + 1);
-    return ".$extension";
+
+    if (withDot) {
+      return ".$extension";
+    } else {
+      return extension;
+    }
+  }
+
+  static MediaTypeValue getMediaType(String path) {
+    String extension = path.split('.').last.toLowerCase();
+
+    if (_imageExtensions.contains(extension)) {
+      return MediaTypeValue.image;
+    }
+
+    if (_videoExtensions.contains(extension)) {
+      return MediaTypeValue.video;
+    }
+
+    return MediaTypeValue.unknown;
   }
 }

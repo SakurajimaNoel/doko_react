@@ -51,5 +51,12 @@
     <string>Doki needs access to your camera to capture new images.</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Doki needs access to your microphone to record videos.</string>
+
+    <key>NSAppTransportSecurity</key>
+    <dict>
+      <key>NSAllowsArbitraryLoads</key>
+      <true/>
+    </dict>
 </dict>
+
 </plist>

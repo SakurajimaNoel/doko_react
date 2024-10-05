@@ -1,5 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
+import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -482,6 +483,51 @@ class UserGraphqlService {
       // if (relationDeleted != 1) {
       //   return ResponseStatus.error;
       // }
+
+      return ResponseStatus.success;
+    } catch (e) {
+      safePrint(e.toString());
+      return ResponseStatus.error;
+    }
+  }
+
+  Future<ResponseStatus> userCreatePost({
+    required String caption,
+    required List<String> content,
+  }) async {
+    try {
+      var userIdResult = await AuthenticationActions.getUserId();
+      if (userIdResult.status == AuthStatus.error) {
+        throw Exception(userIdResult.message);
+      }
+
+      String userId = userIdResult.message!;
+      var client = await _getGraphqlClient();
+
+      QueryResult result = await client.mutate(
+        MutationOptions(
+          document: gql(UserQueries.userCreatePost()),
+          variables: UserQueries.userCreatePostVariables(
+            userId: userId,
+            caption: caption,
+            content: content,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      // Map<String, dynamic>? res = result.data?["createPosts"]["info"];
+      //
+      // if (res == null) {
+      //   // something went wrong or getting wrong response from api
+      // }
+
+      // int nodesCreated = res?["nodesCreated"] ?? 0;
+      // int relationshipCreated = res?["relationshipCreated"] ?? 0;
+      // check if both are 1
 
       return ResponseStatus.success;
     } catch (e) {

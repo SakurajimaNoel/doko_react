@@ -1,12 +1,12 @@
 import 'package:doko_react/core/helpers/constants.dart';
-import 'package:doko_react/core/widgets/heading.dart';
-import 'package:doko_react/core/widgets/loader_button.dart';
+import 'package:doko_react/core/widgets/heading/heading.dart';
+import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/data/auth.dart';
 import '../../../../core/helpers/input.dart';
-import '../../../../core/widgets/error_text.dart';
+import '../../../../core/widgets/error/error_text.dart';
 
 class ConfirmMfaPage extends StatefulWidget {
   const ConfirmMfaPage({
