@@ -182,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                             : () async {
                                 context.goNamed(RouterConstants.signUp);
                               },
-                    )
+                    ),
                   ],
                 ),
               ),

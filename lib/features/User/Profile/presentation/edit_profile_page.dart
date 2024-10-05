@@ -177,6 +177,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     var currTheme = Theme.of(context).colorScheme;
     double opacity = _profilePicture != null ? 0.25 : 0.5;
 
+    var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
+    var height = width * (1 / Constants.profile);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit profile"),
@@ -205,8 +208,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           padding: const EdgeInsets.all(Constants.padding),
           children: [
             SizedBox(
-              height: Constants.height * 15,
-              width: double.maxFinite,
+              height: height,
+              width: width,
               child: Stack(
                 fit: StackFit.expand,
                 children: [

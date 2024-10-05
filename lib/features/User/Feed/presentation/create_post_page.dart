@@ -331,6 +331,9 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
               SizedBox(
                 height: height,
                 child: ListView(
+                  padding: const EdgeInsets.only(
+                    bottom: Constants.padding * 0.5,
+                  ),
                   scrollDirection: Axis.horizontal,
                   physics: const PageScrollPhysics(),
                   children: [

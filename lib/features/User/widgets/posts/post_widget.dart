@@ -6,6 +6,7 @@ import 'package:doko_react/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/widgets/video_player/video_player.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/widgets/posts/post_user_widget.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class PostWidget extends StatelessWidget {
@@ -83,12 +84,15 @@ class PostWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
               horizontal: Constants.padding,
             ),
-            child: Text(post.caption),
+            child: _PostCaption(caption: post.caption),
           ),
           const SizedBox(
             height: Constants.gap * 0.5,
           ),
-          // const _PostAction(),
+          if (post.content.isEmpty)
+            const _PostAction(
+              row: true,
+            ),
         ],
       ),
     );
@@ -120,6 +124,7 @@ class _PostContent extends StatelessWidget {
   Widget _handleVideoContent(Content item) {
     return VideoPlayer(
       path: item.signedURL,
+      autoplay: true,
     );
   }
 
@@ -164,31 +169,106 @@ class _PostContent extends StatelessWidget {
   }
 }
 
-// post actions
-class _PostAction extends StatelessWidget {
-  const _PostAction();
+// post caption
+class _PostCaption extends StatefulWidget {
+  final String caption;
+
+  const _PostCaption({
+    required this.caption,
+  });
+
+  @override
+  State<_PostCaption> createState() => _PostCaptionState();
+}
+
+class _PostCaptionState extends State<_PostCaption> {
+  bool _viewMore = false;
 
   @override
   Widget build(BuildContext context) {
+    var displayText = _viewMore
+        ? widget.caption
+        : DisplayText.trimText(
+            widget.caption,
+            len: Constants.postCaptionDisplayLimit,
+          );
+
+    var buttonText = _viewMore ? "View less" : "View More";
+    bool showButton = widget.caption.length > Constants.postCaptionDisplayLimit;
+    var currTheme = Theme.of(context).colorScheme;
+
+    return RichText(
+      text: TextSpan(
+        text: displayText,
+        style: TextStyle(
+          color: currTheme.onSurface,
+          fontSize: Constants.fontSize,
+        ),
+        children: showButton
+            ? [
+                TextSpan(
+                    text: " $buttonText",
+                    style: TextStyle(
+                      color: currTheme.primary,
+                      fontWeight: FontWeight.w500,
+                      fontSize: Constants.smallFontSize,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        setState(() {
+                          _viewMore = !_viewMore;
+                        });
+                      }),
+              ]
+            : [],
+      ),
+    );
+  }
+}
+
+// post actions
+class _PostAction extends StatelessWidget {
+  final bool row;
+
+  const _PostAction({
+    this.row = false,
+  });
+
+  Widget _actionAlignment(List<Widget> actionChildren) {
+    if (row) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        textDirection: TextDirection.rtl,
+        children: actionChildren,
+      );
+    }
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.share),
-          iconSize: Constants.width * 1.25,
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.insert_comment_outlined),
-          iconSize: Constants.width * 1.25,
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.thumb_up_alt_outlined),
-          iconSize: Constants.width * 1.25,
-        ),
-      ],
+      children: actionChildren,
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> actionChildren = [
+      IconButton(
+        onPressed: () {},
+        icon: const Icon(Icons.share),
+        iconSize: Constants.width * 1.25,
+      ),
+      IconButton(
+        onPressed: () {},
+        icon: const Icon(Icons.insert_comment_outlined),
+        iconSize: Constants.width * 1.25,
+      ),
+      IconButton(
+        onPressed: () {},
+        icon: const Icon(Icons.thumb_up_alt_outlined),
+        iconSize: Constants.width * 1.25,
+      ),
+    ];
+
+    return _actionAlignment(actionChildren);
   }
 }

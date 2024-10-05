@@ -8,10 +8,12 @@ import 'package:media_kit_video/media_kit_video.dart';
 
 class VideoPlayer extends StatefulWidget {
   final String path;
+  final bool autoplay;
 
   const VideoPlayer({
     super.key,
     required this.path,
+    this.autoplay = false,
   });
 
   @override
@@ -37,7 +39,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
     player
         .open(
       Media(_path),
-      play: false,
+      play: widget.autoplay,
     )
         .then((_) {
       _handleRatio();
@@ -85,7 +87,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    var currTheme = Theme.of(context).colorScheme;
+    var currTheme = Theme
+        .of(context)
+        .colorScheme;
 
     return MaterialVideoControlsTheme(
       normal: MaterialVideoControlsThemeData(

@@ -218,6 +218,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   Widget build(BuildContext context) {
     var currTheme = Theme.of(context).colorScheme;
     var userProvider = context.watch<UserProvider>();
+    var width = MediaQuery.sizeOf(context).width;
+    var height = width * (1 / Constants.profile);
 
     var user = _user;
 
@@ -244,7 +246,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             SliverAppBar(
               floating: false,
               pinned: true,
-              expandedHeight: Constants.expandedAppBarHeight,
+              expandedHeight: height,
               title: Text(user.username),
               actions: _appBarActions(),
               flexibleSpace: FlexibleSpaceBar(
@@ -262,13 +264,13 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                             ),
                             errorWidget: (context, url, error) =>
                                 const Icon(Icons.error),
-                            height: Constants.expandedAppBarHeight,
+                            height: height,
                           )
                         : Container(
                             color: currTheme.onSecondary,
-                            child: const Icon(
+                            child: Icon(
                               Icons.person,
-                              size: Constants.expandedAppBarHeight,
+                              size: height,
                             ),
                           ),
                     Container(
