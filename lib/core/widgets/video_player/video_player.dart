@@ -87,9 +87,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    var currTheme = Theme
-        .of(context)
-        .colorScheme;
+    var currTheme = Theme.of(context).colorScheme;
 
     return MaterialVideoControlsTheme(
       normal: MaterialVideoControlsThemeData(
@@ -132,7 +130,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
         seekBarPositionColor: currTheme.primary,
         seekBarThumbColor: currTheme.primary,
         seekBarColor: currTheme.onPrimary,
-        seekBarThumbSize: 8,
+        seekBarThumbSize: 0,
         seekBarHeight: 3,
       ),
       fullscreen: const MaterialVideoControlsThemeData(),
