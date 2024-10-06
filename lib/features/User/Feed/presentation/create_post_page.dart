@@ -4,6 +4,7 @@ import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/video.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
+import 'package:doko_react/core/widgets/general/custom_carousel_view.dart';
 import 'package:doko_react/core/widgets/heading/settings_heading.dart';
 import 'package:doko_react/core/widgets/image_picker/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/video_player/video_player.dart';
@@ -330,12 +331,18 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
               ),
               SizedBox(
                 height: height,
-                child: ListView(
-                  padding: const EdgeInsets.only(
-                    bottom: Constants.padding * 0.5,
+                child: CustomCarouselView(
+                  itemExtent: width,
+                  shrinkExtent: width * 0.5,
+                  itemSnapping: true,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Constants.padding * 0.5,
                   ),
-                  scrollDirection: Axis.horizontal,
-                  physics: const PageScrollPhysics(),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(Constants.radius * 0.5),
+                    ),
+                  ),
                   children: [
                     if (_content.isNotEmpty) ..._handleDisplayMedia(),
                     if (_content.length < Constants.postLimit)

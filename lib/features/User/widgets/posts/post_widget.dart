@@ -3,6 +3,7 @@ import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
+import 'package:doko_react/core/widgets/general/custom_carousel_view.dart';
 import 'package:doko_react/core/widgets/video_player/video_player.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/widgets/posts/post_user_widget.dart';
@@ -124,7 +125,7 @@ class _PostContent extends StatelessWidget {
   Widget _handleVideoContent(Content item) {
     return VideoPlayer(
       path: item.signedURL,
-      autoplay: true,
+      autoplay: false,
     );
   }
 
@@ -141,7 +142,7 @@ class _PostContent extends StatelessWidget {
     var contentWidth =
         width - (Constants.actionWidth + Constants.actionEdgeGap);
 
-    return CarouselView(
+    return CustomCarouselView(
       itemExtent: contentWidth,
       shrinkExtent: contentWidth * 0.5,
       itemSnapping: true,
@@ -150,7 +151,7 @@ class _PostContent extends StatelessWidget {
       ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
-          Radius.circular(Constants.radius),
+          Radius.circular(Constants.radius * 0.5),
         ),
       ),
       children: content.map(
