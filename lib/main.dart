@@ -86,7 +86,10 @@ class _MyAppState extends State<MyApp> {
     _authProvider = context.read<AuthenticationProvider>();
     _userProvider = context.read<UserProvider>();
 
+    // fetch user auth status on application startup
     fetchAuthSession();
+
+    // listen for auth events fired by amplify
     Amplify.Hub.listen(HubChannel.Auth, (AuthHubEvent event) {
       switch (event.type) {
         case AuthHubEventType.signedIn:
