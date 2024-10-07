@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/input.dart';
@@ -55,12 +57,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       ),
     );
 
-    Future.delayed(
-      const Duration(milliseconds: 500),
-      () {
-        context.goNamed(RouterConstants.settings);
-      },
-    );
+    Timer(const Duration(milliseconds: 500), () {
+      context.goNamed(RouterConstants.settings);
+    });
   }
 
   @override

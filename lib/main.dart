@@ -35,19 +35,26 @@ void main() async {
       imagePickerImplementation.useAndroidPhotoPicker = true;
     }
 
-    runApp(MultiProvider(providers: [
-      ChangeNotifierProvider(
-        create: (context) => ThemeProvider(),
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => ThemeProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => AuthenticationProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => UserProvider(),
+          ),
+        ],
+        child: const MyApp(),
       ),
-      ChangeNotifierProvider(
-        create: (context) => AuthenticationProvider(),
-      ),
-      ChangeNotifierProvider(
-        create: (context) => UserProvider(),
-      ),
-    ], child: const MyApp()));
+    );
   } on AmplifyException catch (e) {
-    runApp(Text("Error configuring Amplify: ${e.message}"));
+    runApp(
+      Text("Error configuring Amplify: ${e.message}"),
+    );
   }
 }
 
@@ -56,7 +63,7 @@ Future<void> _configureAmplify() async {
     await Amplify.addPlugin(AmplifyAuthCognito());
     await Amplify.addPlugin(AmplifyStorageS3());
     await Amplify.configure(amplifyconfig);
-    safePrint('Successfully configured');
+    safePrint('Successfully configured amplify');
   } on Exception catch (e) {
     safePrint('Error configuring Amplify: $e');
   }

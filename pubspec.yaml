@@ -33,6 +33,7 @@ dependencies:
   media_kit_video: ^1.2.5 # For video rendering.
   media_kit_libs_video: ^1.0.5 # Native video dependencies.
   flutter_cache_manager: ^3.4.1
+  image_picker_android: ^0.8.12+15
 
 dev_dependencies:
   flutter_test:

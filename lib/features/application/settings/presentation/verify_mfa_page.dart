@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -72,15 +74,11 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
 
     _authProvider.setMFAStatus(AuthenticationMFAStatus.setUpped);
 
-    // Delay the navigation
-    Future.delayed(
-      const Duration(milliseconds: 500),
-      () {
-        context.goNamed(
-          RouterConstants.settings,
-        );
-      },
-    );
+    Timer(const Duration(milliseconds: 500), () {
+      context.goNamed(
+        RouterConstants.settings,
+      );
+    });
   }
 
   @override

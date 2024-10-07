@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -153,13 +154,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     );
 
-    // Delay the navigation
-    Future.delayed(
-      const Duration(milliseconds: 500),
-      () {
-        context.pop(_bioController.text);
-      },
-    );
+    Timer(const Duration(milliseconds: 500), () {
+      context.pop(_bioController.text);
+    });
   }
 
   void onSelection(List<XFile> image) {

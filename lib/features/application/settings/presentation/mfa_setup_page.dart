@@ -33,6 +33,17 @@ class _MfaSetupPageState extends State<MfaSetupPage> {
     _setupMFA();
   }
 
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(
+          milliseconds: 1500,
+        ),
+      ),
+    );
+  }
+
   void _setupMFA() async {
     var setupMfaResult = await AuthenticationActions.setupMfa();
 
@@ -150,12 +161,9 @@ class _MfaSetupPageState extends State<MfaSetupPage> {
                                 Clipboard.setData(ClipboardData(text: _key))
                                     .then(
                                   (value) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            "successfully copied secret to clipboard"),
-                                      ),
-                                    );
+                                    String message =
+                                        "Successfully copied secret to clipboard";
+                                    _showMessage(message);
                                   },
                                 );
                               },

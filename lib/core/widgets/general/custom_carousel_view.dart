@@ -209,7 +209,7 @@ class _CustomCarouselViewState extends State<CustomCarouselView> {
         assert(debugCheckHasDirectionality(context));
         final TextDirection textDirection = Directionality.of(context);
         final AxisDirection axisDirection =
-        textDirectionToAxisDirection(textDirection);
+            textDirectionToAxisDirection(textDirection);
         return widget.reverse
             ? flipAxisDirection(axisDirection)
             : axisDirection;
@@ -220,7 +220,6 @@ class _CustomCarouselViewState extends State<CustomCarouselView> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     final AxisDirection axisDirection = _getDirection(context);
     final ScrollPhysics physics = widget.itemSnapping
         ? const CarouselScrollPhysics()
@@ -228,10 +227,7 @@ class _CustomCarouselViewState extends State<CustomCarouselView> {
     final EdgeInsets effectivePadding =
         widget.padding ?? const EdgeInsets.all(4.0);
     final Color effectiveBackgroundColor =
-        widget.backgroundColor ?? Theme
-            .of(context)
-            .colorScheme
-            .surface;
+        widget.backgroundColor ?? Theme.of(context).colorScheme.surface;
     final double effectiveElevation = widget.elevation ?? 0.0;
     final ShapeBorder effectiveShape = widget.shape ??
         const RoundedRectangleBorder(
@@ -239,81 +235,81 @@ class _CustomCarouselViewState extends State<CustomCarouselView> {
 
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          final double mainAxisExtent = switch (widget.scrollDirection) {
-            Axis.horizontal => constraints.maxWidth,
-            Axis.vertical => constraints.maxHeight,
-          };
-          _itemExtent = clampDouble(_itemExtent, 0, mainAxisExtent);
+      final double mainAxisExtent = switch (widget.scrollDirection) {
+        Axis.horizontal => constraints.maxWidth,
+        Axis.vertical => constraints.maxHeight,
+      };
+      _itemExtent = clampDouble(_itemExtent, 0, mainAxisExtent);
 
-          return Scrollable(
+      return Scrollable(
+        axisDirection: axisDirection,
+        controller: _controller,
+        physics: physics,
+        viewportBuilder: (BuildContext context, ViewportOffset position) {
+          return Viewport(
+            cacheExtent: 0.0,
+            cacheExtentStyle: CacheExtentStyle.viewport,
             axisDirection: axisDirection,
-            controller: _controller,
-            physics: physics,
-            viewportBuilder: (BuildContext context, ViewportOffset position) {
-              return Viewport(
-                cacheExtent: 0.0,
-                cacheExtentStyle: CacheExtentStyle.viewport,
-                axisDirection: axisDirection,
-                offset: position,
-                clipBehavior: Clip.antiAlias,
-                slivers: <Widget>[
-                  _SliverFixedExtentCarousel(
-                    itemExtent: _itemExtent,
-                    minExtent: widget.shrinkExtent,
-                    delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                        return Padding(
-                          padding: effectivePadding,
-                          child: Material(
-                            clipBehavior: Clip.antiAlias,
-                            color: effectiveBackgroundColor,
-                            elevation: effectiveElevation,
-                            shape: effectiveShape,
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: <Widget>[
-                                widget.children.elementAt(index),
-                                // Material(
-                                //   color: Colors.transparent,
-                                //   child: InkWell(
-                                //     onTap: () {
-                                //       widget.onTap?.call(index);
-                                //     },
-                                //     overlayColor: widget.overlayColor ??
-                                //         WidgetStateProperty.resolveWith(
-                                //             (Set<WidgetState> states) {
-                                //           if (states
-                                //               .contains(WidgetState.pressed)) {
-                                //             return theme.colorScheme.onSurface
-                                //                 .withOpacity(0.1);
-                                //           }
-                                //           if (states
-                                //               .contains(WidgetState.hovered)) {
-                                //             return theme.colorScheme.onSurface
-                                //                 .withOpacity(0.08);
-                                //           }
-                                //           if (states
-                                //               .contains(WidgetState.focused)) {
-                                //             return theme.colorScheme.onSurface
-                                //                 .withOpacity(0.1);
-                                //           }
-                                //           return null;
-                                //         }),
-                                //   ),
-                                // ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                      childCount: widget.children.length,
-                    ),
-                  ),
-                ],
-              );
-            },
+            offset: position,
+            clipBehavior: Clip.antiAlias,
+            slivers: <Widget>[
+              _SliverFixedExtentCarousel(
+                itemExtent: _itemExtent,
+                minExtent: widget.shrinkExtent,
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    return Padding(
+                      padding: effectivePadding,
+                      child: Material(
+                        clipBehavior: Clip.antiAlias,
+                        color: effectiveBackgroundColor,
+                        elevation: effectiveElevation,
+                        shape: effectiveShape,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: <Widget>[
+                            widget.children.elementAt(index),
+                            // Material(
+                            //   color: Colors.transparent,
+                            //   child: InkWell(
+                            //     onTap: () {
+                            //       widget.onTap?.call(index);
+                            //     },
+                            //     overlayColor: widget.overlayColor ??
+                            //         WidgetStateProperty.resolveWith(
+                            //             (Set<WidgetState> states) {
+                            //           if (states
+                            //               .contains(WidgetState.pressed)) {
+                            //             return theme.colorScheme.onSurface
+                            //                 .withOpacity(0.1);
+                            //           }
+                            //           if (states
+                            //               .contains(WidgetState.hovered)) {
+                            //             return theme.colorScheme.onSurface
+                            //                 .withOpacity(0.08);
+                            //           }
+                            //           if (states
+                            //               .contains(WidgetState.focused)) {
+                            //             return theme.colorScheme.onSurface
+                            //                 .withOpacity(0.1);
+                            //           }
+                            //           return null;
+                            //         }),
+                            //   ),
+                            // ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  childCount: widget.children.length,
+                ),
+              ),
+            ],
           );
-        });
+        },
+      );
+    });
   }
 }
 
@@ -343,7 +339,7 @@ class _SliverFixedExtentCarousel extends SliverMultiBoxAdaptorWidget {
   @override
   RenderSliverFixedExtentBoxAdaptor createRenderObject(BuildContext context) {
     final SliverMultiBoxAdaptorElement element =
-    context as SliverMultiBoxAdaptorElement;
+        context as SliverMultiBoxAdaptorElement;
     return _RenderSliverFixedExtentCarousel(
       childManager: element,
       minExtent: minExtent,
@@ -352,8 +348,8 @@ class _SliverFixedExtentCarousel extends SliverMultiBoxAdaptorWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext context,
-      _RenderSliverFixedExtentCarousel renderObject) {
+  void updateRenderObject(
+      BuildContext context, _RenderSliverFixedExtentCarousel renderObject) {
     renderObject.maxExtent = itemExtent;
     renderObject.minExtent = itemExtent;
   }
@@ -365,8 +361,7 @@ class _RenderSliverFixedExtentCarousel
     required super.childManager,
     required double maxExtent,
     required double minExtent,
-  })
-      : _maxExtent = maxExtent,
+  })  : _maxExtent = maxExtent,
         _minExtent = minExtent;
 
   double get maxExtent => _maxExtent;
@@ -392,10 +387,10 @@ class _RenderSliverFixedExtentCarousel
   }
 
   // This implements the [itemExtentBuilder] callback.
-  double _buildItemExtent(int index,
-      SliverLayoutDimensions currentLayoutDimensions) {
+  double _buildItemExtent(
+      int index, SliverLayoutDimensions currentLayoutDimensions) {
     final int firstVisibleIndex =
-    (constraints.scrollOffset / maxExtent).floor();
+        (constraints.scrollOffset / maxExtent).floor();
 
     // Calculate how many items have been completely scroll off screen.
     final int offscreenItems = (constraints.scrollOffset / maxExtent).floor();
@@ -411,7 +406,7 @@ class _RenderSliverFixedExtentCarousel
     // space is larger than `minExtent`, the extent for last item should be at
     // least the remaining extent to ensure a smooth size transition.
     final double effectiveMinExtent =
-    math.max(constraints.remainingPaintExtent % maxExtent, minExtent);
+        math.max(constraints.remainingPaintExtent % maxExtent, minExtent);
 
     // Two special cases are the first and last visible items. Other items' extent
     // should all return `maxExtent`.
@@ -446,21 +441,24 @@ class _RenderSliverFixedExtentCarousel
 
   /// The layout offset for the child with the given index.
   @override
-  double indexToLayoutOffset(@Deprecated(
-      'The itemExtent is already available within the scope of this function. '
-          'This feature was deprecated after v3.20.0-7.0.pre.') double itemExtent,
-      int index,) {
+  double indexToLayoutOffset(
+    @Deprecated(
+        'The itemExtent is already available within the scope of this function. '
+        'This feature was deprecated after v3.20.0-7.0.pre.')
+    double itemExtent,
+    int index,
+  ) {
     final int firstVisibleIndex =
-    (constraints.scrollOffset / maxExtent).floor();
+        (constraints.scrollOffset / maxExtent).floor();
 
     // If there is not enough space to place the last visible item but the remaining
     // space is larger than `minExtent`, the extent for last item should be at
     // least the remaining extent to make sure a smooth size transition.
     final double effectiveMinExtent =
-    math.max(constraints.remainingPaintExtent % maxExtent, minExtent);
+        math.max(constraints.remainingPaintExtent % maxExtent, minExtent);
     if (index == firstVisibleIndex) {
       final double firstVisibleItemExtent =
-      _buildItemExtent(index, _currentLayoutDimensions);
+          _buildItemExtent(index, _currentLayoutDimensions);
 
       // If the first item is squished to be less than `effectievMinExtent`,
       // then it should stop changinng its size and should start to scroll off screen.
@@ -474,21 +472,27 @@ class _RenderSliverFixedExtentCarousel
 
   /// The minimum child index that is visible at the given scroll offset.
   @override
-  int getMinChildIndexForScrollOffset(double scrollOffset,
-      @Deprecated(
-          'The itemExtent is already available within the scope of this function. '
-              'This feature was deprecated after v3.20.0-7.0.pre.') double itemExtent,) {
+  int getMinChildIndexForScrollOffset(
+    double scrollOffset,
+    @Deprecated(
+        'The itemExtent is already available within the scope of this function. '
+        'This feature was deprecated after v3.20.0-7.0.pre.')
+    double itemExtent,
+  ) {
     final int firstVisibleIndex =
-    (constraints.scrollOffset / maxExtent).floor();
+        (constraints.scrollOffset / maxExtent).floor();
     return math.max(firstVisibleIndex, 0);
   }
 
   /// The maximum child index that is visible at the given scroll offset.
   @override
-  int getMaxChildIndexForScrollOffset(double scrollOffset,
-      @Deprecated(
-          'The itemExtent is already available within the scope of this function. '
-              'This feature was deprecated after v3.20.0-7.0.pre.') double itemExtent,) {
+  int getMaxChildIndexForScrollOffset(
+    double scrollOffset,
+    @Deprecated(
+        'The itemExtent is already available within the scope of this function. '
+        'This feature was deprecated after v3.20.0-7.0.pre.')
+    double itemExtent,
+  ) {
     if (maxExtent > 0.0) {
       final double actual = scrollOffset / maxExtent - 1;
       final int round = actual.round();
@@ -526,9 +530,11 @@ class CarouselScrollPhysics extends ScrollPhysics {
     return CarouselScrollPhysics(parent: buildParent(ancestor));
   }
 
-  double _getTargetPixels(_CarouselPosition position,
-      Tolerance tolerance,
-      double velocity,) {
+  double _getTargetPixels(
+    _CarouselPosition position,
+    Tolerance tolerance,
+    double velocity,
+  ) {
     double fraction;
     fraction = position.itemExtent! / position.viewportDimension;
 
@@ -551,12 +557,14 @@ class CarouselScrollPhysics extends ScrollPhysics {
   }
 
   @override
-  Simulation? createBallisticSimulation(ScrollMetrics position,
-      double velocity,) {
+  Simulation? createBallisticSimulation(
+    ScrollMetrics position,
+    double velocity,
+  ) {
     assert(
-    position is _CarouselPosition,
-    'CarouselScrollPhysics can only be used with Scrollables that uses '
-        'the CarouselController',
+      position is _CarouselPosition,
+      'CarouselScrollPhysics can only be used with Scrollables that uses '
+      'the CarouselController',
     );
 
     final _CarouselPosition metrics = position as _CarouselPosition;
@@ -634,8 +642,7 @@ class _CarouselPosition extends ScrollPositionWithSingleContext
     this.initialItem = 0,
     required this.itemExtent,
     super.oldPosition,
-  })
-      : _itemToShowOnStartup = initialItem.toDouble(),
+  })  : _itemToShowOnStartup = initialItem.toDouble(),
         super(initialPixels: null);
 
   final int initialItem;
@@ -671,7 +678,7 @@ class _CarouselPosition extends ScrollPositionWithSingleContext
   @override
   bool applyViewportDimension(double viewportDimension) {
     final double? oldViewportDimensions =
-    hasViewportDimension ? this.viewportDimension : null;
+        hasViewportDimension ? this.viewportDimension : null;
     if (viewportDimension == oldViewportDimensions) {
       return true;
     }
