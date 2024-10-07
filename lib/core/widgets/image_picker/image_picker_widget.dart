@@ -23,8 +23,6 @@ class ImagePickerWidget extends StatelessWidget {
   // limiting the number of selection for images
   final int multipleLimit;
 
-  final int _imageQuality = 75;
-
   const ImagePickerWidget(
     this.displayText, {
     super.key,
@@ -55,7 +53,6 @@ class ImagePickerWidget extends StatelessWidget {
     final ImagePicker picker = ImagePicker();
     final List<XFile> images = await picker.pickMultiImage(
       limit: multipleLimit,
-      imageQuality: _imageQuality,
     );
 
     if (images.isEmpty) return;
@@ -68,7 +65,6 @@ class ImagePickerWidget extends StatelessWidget {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: _imageQuality,
     );
 
     if (image == null) return;
@@ -83,7 +79,6 @@ class ImagePickerWidget extends StatelessWidget {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(
       source: ImageSource.camera,
-      imageQuality: _imageQuality,
     );
 
     if (image == null) return;
