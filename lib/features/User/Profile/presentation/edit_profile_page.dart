@@ -1,8 +1,12 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/core/helpers/display.dart';
+import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/widgets/image_picker/image_picker_widget.dart';
@@ -12,11 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../core/data/storage.dart';
-import '../../../../core/helpers/display.dart';
-import '../../../../core/helpers/enum.dart';
-import '../../../../core/helpers/media_type.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String bio;

@@ -1,6 +1,5 @@
+import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/features/User/data/graphql_queries/query_constants.dart';
-
-import '../../../../core/helpers/display.dart';
 
 class CompleteUserProfileVariables {
   final String id;

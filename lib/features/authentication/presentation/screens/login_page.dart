@@ -1,4 +1,5 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
@@ -7,8 +8,6 @@ import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../../core/data/auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({

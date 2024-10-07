@@ -1,8 +1,7 @@
 import 'package:doko_react/core/provider/user_provider.dart';
+import 'package:doko_react/features/User/widgets/profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../widgets/profile_widget.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({

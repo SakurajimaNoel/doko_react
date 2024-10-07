@@ -1,9 +1,8 @@
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/widgets/heading/settings_heading.dart';
+import 'package:doko_react/features/application/settings/widgets/accent_widget.dart';
 import 'package:doko_react/features/application/settings/widgets/theme_widget.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../core/helpers/constants.dart';
-import 'accent_widget.dart';
 
 class ThemeSettings extends StatelessWidget {
   const ThemeSettings({

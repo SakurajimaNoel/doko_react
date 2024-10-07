@@ -1,16 +1,15 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
+import 'package:doko_react/core/widgets/loader/loader_button.dart';
+import 'package:doko_react/features/User/data/model/friend_model.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
+import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:doko_react/features/User/widgets/friends/friend_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../core/helpers/constants.dart';
-import '../../../../core/helpers/enum.dart';
-import '../../../../core/widgets/loader/loader_button.dart';
-import '../../data/model/friend_modal.dart';
-import '../../data/services/user_graphql_service.dart';
 
 class FriendContainerProfileWidget extends StatefulWidget {
   final ProfileFriendInfo friendInfo;

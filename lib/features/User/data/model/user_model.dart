@@ -1,6 +1,6 @@
 import 'package:doko_react/features/User/data/model/post_model.dart';
 
-import 'friend_modal.dart';
+import 'friend_model.dart';
 import 'model.dart';
 
 // basic user info

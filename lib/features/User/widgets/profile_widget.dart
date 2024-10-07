@@ -1,22 +1,21 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
+import 'package:doko_react/core/widgets/loader/loader.dart';
+import 'package:doko_react/features/User/data/graphql_queries/friend_relation.dart';
 import 'package:doko_react/features/User/data/graphql_queries/query_constants.dart';
-import 'package:doko_react/features/User/data/model/friend_modal.dart';
+import 'package:doko_react/features/User/data/model/friend_model.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
+import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:doko_react/features/User/widgets/friends/friend_container_profile_widget.dart';
 import 'package:doko_react/features/User/widgets/posts/post_container_profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
-import '../../../core/configs/router/router_constants.dart';
-import '../../../core/data/auth.dart';
-import '../../../core/helpers/enum.dart';
-import '../../../core/widgets/loader/loader.dart';
-import '../data/graphql_queries/friend_relation.dart';
-import '../data/services/user_graphql_service.dart';
 
 class ProfileWidget extends StatefulWidget {
   final String userId;
@@ -239,117 +238,121 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     return DefaultTabController(
       length: 2,
-      child: NestedScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              floating: false,
-              pinned: true,
-              expandedHeight: height,
-              title: Text(user.username),
-              actions: _appBarActions(),
-              flexibleSpace: FlexibleSpaceBar(
-                background: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    user.profilePicture.isNotEmpty
-                        ? CachedNetworkImage(
-                            memCacheHeight: Constants.profileCacheHeight,
-                            cacheKey: user.profilePicture,
-                            imageUrl: user.signedProfilePicture,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(),
+      child: Scaffold(
+        body: NestedScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return [
+              SliverAppBar(
+                forceElevated: innerBoxIsScrolled,
+                floating: false,
+                pinned: true,
+                expandedHeight: height,
+                title: Text(user.username),
+                actions: _appBarActions(),
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      user.profilePicture.isNotEmpty
+                          ? CachedNetworkImage(
+                              memCacheHeight: Constants.profileCacheHeight,
+                              cacheKey: user.profilePicture,
+                              imageUrl: user.signedProfilePicture,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                              height: height,
+                            )
+                          : Container(
+                              color: currTheme.onSecondary,
+                              child: Icon(
+                                Icons.person,
+                                size: height,
+                              ),
                             ),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
-                            height: height,
-                          )
-                        : Container(
-                            color: currTheme.onSecondary,
-                            child: Icon(
-                              Icons.person,
-                              size: height,
-                            ),
+                      Container(
+                        padding: const EdgeInsets.only(
+                          bottom: Constants.padding,
+                          left: Constants.padding,
+                        ),
+                        alignment: Alignment.bottomLeft,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              currTheme.surface.withOpacity(0.5),
+                              currTheme.surface.withOpacity(0.25),
+                              currTheme.surface.withOpacity(0.25),
+                              currTheme.surface.withOpacity(0.5),
+                            ],
                           ),
-                    Container(
-                      padding: const EdgeInsets.only(
-                        bottom: Constants.padding,
-                        left: Constants.padding,
-                      ),
-                      alignment: Alignment.bottomLeft,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            currTheme.surface.withOpacity(0.5),
-                            currTheme.surface.withOpacity(0.25),
-                            currTheme.surface.withOpacity(0.25),
-                            currTheme.surface.withOpacity(0.5),
-                          ],
                         ),
-                      ),
-                      child: Text(
-                        user.name,
-                        style: TextStyle(
-                          color: currTheme.onSurface,
-                          fontSize: Constants.heading2,
-                          fontWeight: FontWeight.w600,
+                        child: Text(
+                          user.name,
+                          style: TextStyle(
+                            color: currTheme.onSurface,
+                            fontSize: Constants.heading2,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(Constants.padding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (user.bio.isNotEmpty) ...[
-                      Text(user.bio),
-                      const SizedBox(
-                        height: 16,
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(Constants.padding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (user.bio.isNotEmpty) ...[
+                        Text(user.bio),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                      ],
+                      _userProfileAction(),
+                    ],
+                  ),
+                ),
+              ),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _SliverAppBarDelegate(
+                  const TabBar(
+                    tabs: [
+                      Tab(
+                        text: "Posts",
+                      ),
+                      Tab(
+                        text: "Friends",
                       ),
                     ],
-                    _userProfileAction(),
-                  ],
+                  ),
                 ),
+              )
+            ];
+          },
+          body: TabBarView(
+            children: [
+              PostContainerProfileWidget(
+                postInfo: user.postsInfo,
+                user: user,
+                key: ValueKey("${user.username} posts"),
               ),
-            ),
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _SliverAppBarDelegate(
-                const TabBar(
-                  tabs: [
-                    Tab(
-                      text: "Posts",
-                    ),
-                    Tab(
-                      text: "Friends",
-                    ),
-                  ],
-                ),
+              FriendContainerProfileWidget(
+                friendInfo: user.friendsInfo,
+                user: user,
+                key: ValueKey("${user.username} friends"),
               ),
-            )
-          ];
-        },
-        body: TabBarView(
-          children: [
-            PostContainerProfileWidget(
-              postInfo: user.postsInfo,
-              user: user,
-              key: ValueKey(user.profilePicture),
-            ),
-            FriendContainerProfileWidget(
-              friendInfo: user.friendsInfo,
-              user: user,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

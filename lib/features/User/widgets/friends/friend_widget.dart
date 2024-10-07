@@ -1,14 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doko_react/features/User/data/model/friend_modal.dart';
+import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/core/helpers/enum.dart';
+import 'package:doko_react/core/provider/user_provider.dart';
+import 'package:doko_react/features/User/data/graphql_queries/friend_relation.dart';
+import 'package:doko_react/features/User/data/graphql_queries/query_constants.dart';
+import 'package:doko_react/features/User/data/model/friend_model.dart';
+import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../core/helpers/constants.dart';
-import '../../../../core/helpers/enum.dart';
-import '../../../../core/provider/user_provider.dart';
-import '../../data/graphql_queries/friend_relation.dart';
-import '../../data/graphql_queries/query_constants.dart';
-import '../../data/services/user_graphql_service.dart';
 
 class FriendWidget extends StatelessWidget {
   final FriendUserModel friend;

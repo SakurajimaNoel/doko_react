@@ -3,11 +3,10 @@ import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
+import 'package:doko_react/features/User/data/model/friend_model.dart';
+import 'package:doko_react/features/User/data/model/post_model.dart';
+import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-
-import '../model/friend_modal.dart';
-import '../model/post_model.dart';
-import '../model/user_model.dart';
 
 class UserResponse {
   final ResponseStatus status;

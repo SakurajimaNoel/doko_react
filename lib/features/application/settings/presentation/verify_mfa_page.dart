@@ -1,16 +1,15 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
+import 'package:doko_react/core/widgets/error/error_text.dart';
+import 'package:doko_react/core/widgets/heading/settings_heading.dart';
 import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../core/data/auth.dart';
-import '../../../../core/helpers/input.dart';
-import '../../../../core/widgets/error/error_text.dart';
-import '../../../../core/widgets/heading/settings_heading.dart';
 
 class VerifyMfaPage extends StatefulWidget {
   const VerifyMfaPage({

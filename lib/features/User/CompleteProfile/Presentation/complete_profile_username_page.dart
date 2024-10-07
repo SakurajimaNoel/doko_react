@@ -1,16 +1,15 @@
+import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/data/auth.dart';
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/debounce.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/input.dart';
-import 'package:doko_react/core/widgets/general/bullet_list.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
+import 'package:doko_react/core/widgets/general/bullet_list.dart';
 import 'package:doko_react/core/widgets/heading/settings_heading.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../../core/configs/router/router_constants.dart';
-import '../../../../core/data/auth.dart';
-import '../../../../core/helpers/constants.dart';
 
 class CompleteProfileUsernamePage extends StatefulWidget {
   const CompleteProfileUsernamePage({

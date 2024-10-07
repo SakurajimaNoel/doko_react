@@ -2,8 +2,11 @@ import 'dart:io';
 
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/video.dart';
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
+import 'package:doko_react/core/provider/user_provider.dart';
+import 'package:doko_react/core/widgets/general/bullet_list.dart';
 import 'package:doko_react/core/widgets/general/custom_carousel_view.dart';
 import 'package:doko_react/core/widgets/heading/settings_heading.dart';
 import 'package:doko_react/core/widgets/image_picker/image_picker_widget.dart';
@@ -12,10 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../core/helpers/constants.dart';
-import '../../../../core/provider/user_provider.dart';
-import '../../../../core/widgets/general/bullet_list.dart';
 
 class CreatePostPage extends StatelessWidget {
   const CreatePostPage({super.key});

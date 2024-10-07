@@ -1,5 +1,5 @@
-import '../../../../core/data/storage.dart';
-import '../../../../core/helpers/enum.dart';
+import 'package:doko_react/core/data/storage.dart';
+import 'package:doko_react/core/helpers/enum.dart';
 
 class NodeInfo {
   String? endCursor;

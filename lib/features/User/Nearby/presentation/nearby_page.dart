@@ -1,6 +1,5 @@
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../core/helpers/constants.dart';
 
 class NearbyPage extends StatefulWidget {
   const NearbyPage({

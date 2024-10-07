@@ -4,10 +4,9 @@ import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/widgets/loader/loader_button.dart';
+import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../data/services/user_graphql_service.dart';
 
 class CreatePostPublishPage extends StatefulWidget {
   final List<PostContent> postContent;

@@ -4,6 +4,7 @@ import 'package:doko_react/core/widgets/error/error.dart';
 import 'package:doko_react/core/widgets/loader/loader.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
+import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/create_post_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/create_post_publish_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/pending_request_page.dart';
@@ -11,6 +12,7 @@ import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/User/Nearby/presentation/nearby_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/edit_profile_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/profile_page.dart';
+import 'package:doko_react/features/User/Profile/presentation/user_profile_page.dart';
 import 'package:doko_react/features/User/user_layout.dart';
 import 'package:doko_react/features/application/settings/presentation/change_password_page.dart';
 import 'package:doko_react/features/application/settings/presentation/mfa_setup_page.dart';
@@ -23,9 +25,6 @@ import 'package:doko_react/features/authentication/presentation/screens/password
 import 'package:doko_react/features/authentication/presentation/screens/signup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
-import '../../../features/User/Profile/presentation/user_profile_page.dart';
 
 class AppRouterConfig {
   static GoRouter loadingConfig() {

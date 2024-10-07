@@ -2,12 +2,15 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:doko_react/aws/amplifyconfiguration.dart';
+import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/configs/router/app_router_config.dart';
 import 'package:doko_react/core/data/auth.dart';
+import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
 import 'package:doko_react/core/provider/theme_provider.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/theme/theme_data.dart';
+import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -16,10 +19,6 @@ import 'package:image_picker_platform_interface/image_picker_platform_interface.
 import 'package:media_kit/media_kit.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'core/configs/graphql/graphql_config.dart';
-import 'core/helpers/enum.dart';
-import 'features/User/data/services/user_graphql_service.dart';
 
 void main() async {
   try {

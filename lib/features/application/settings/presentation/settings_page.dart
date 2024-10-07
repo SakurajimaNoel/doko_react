@@ -1,9 +1,8 @@
+import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/core/widgets/heading/settings_heading.dart';
+import 'package:doko_react/features/application/settings/widgets/theme_settings.dart';
+import 'package:doko_react/features/application/settings/widgets/user_settings.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../core/helpers/constants.dart';
-import '../../../../core/widgets/heading/settings_heading.dart';
-import '../widgets/theme_settings.dart';
-import '../widgets/user_settings.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});

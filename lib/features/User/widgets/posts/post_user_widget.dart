@@ -1,10 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../../core/helpers/constants.dart';
-import '../../data/model/user_model.dart';
 
 class PostUserWidget extends StatelessWidget {
   final UserModel user;

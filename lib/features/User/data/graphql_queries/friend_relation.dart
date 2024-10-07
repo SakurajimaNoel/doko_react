@@ -1,5 +1,5 @@
 import 'package:doko_react/features/User/data/graphql_queries/query_constants.dart';
-import 'package:doko_react/features/User/data/model/friend_modal.dart';
+import 'package:doko_react/features/User/data/model/friend_model.dart';
 
 enum FriendRelationStatus {
   friends,

@@ -1,12 +1,11 @@
+import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/data/auth.dart';
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/input.dart';
+import 'package:doko_react/core/widgets/heading/settings_heading.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../../core/configs/router/router_constants.dart';
-import '../../../../core/data/auth.dart';
-import '../../../../core/helpers/constants.dart';
-import '../../../../core/widgets/heading/settings_heading.dart';
 
 class CompleteProfileInfoPage extends StatefulWidget {
   final String username;
