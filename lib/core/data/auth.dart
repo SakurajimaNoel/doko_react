@@ -278,6 +278,7 @@ class AuthenticationActions {
     try {
       final cognitoPlugin = auth.getPlugin(AmplifyAuthCognito.pluginKey);
       final result = await cognitoPlugin.fetchAuthSession();
+
       String token = (result.userPoolTokensResult.value.accessToken.raw);
 
       // Clipboard.setData(ClipboardData(text: token)).then((value) {});
