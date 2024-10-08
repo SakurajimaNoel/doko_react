@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -23,6 +24,8 @@ class VerifyMfaPage extends StatefulWidget {
 }
 
 class _VerifyMfaPage extends State<VerifyMfaPage> {
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
+
   final _formKey = GlobalKey<FormState>();
   String _confirmString = "";
   bool _loading = false;
@@ -47,8 +50,7 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
       _errorMessage = "";
     });
 
-    var confirmStatus =
-        await AuthenticationActions.verifyMfaSetup(_confirmString);
+    var confirmStatus = await auth.verifyMfaSetup(_confirmString);
 
     if (confirmStatus.status == AuthStatus.error) {
       setState(() {

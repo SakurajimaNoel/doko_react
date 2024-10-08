@@ -481,7 +481,10 @@ class UserGraphqlService {
     required List<String> content,
   }) async {
     try {
-      var userIdResult = await AuthenticationActions.getUserId();
+      final AuthenticationActions auth =
+          AuthenticationActions(auth: Amplify.Auth);
+
+      var userIdResult = await auth.getUserId();
       if (userIdResult.status == AuthStatus.error) {
         throw Exception(userIdResult.message);
       }

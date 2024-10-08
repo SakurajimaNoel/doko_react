@@ -26,11 +26,16 @@ class AuthenticationToken {
 }
 
 class AuthenticationActions {
-  static Future<AuthenticationResult> signInUser(
-      String email, String password) async {
+  final AuthCategory auth;
+
+  // send auth = Amplify.Auth;
+  AuthenticationActions({
+    required this.auth,
+  });
+
+  Future<AuthenticationResult> signInUser(String email, String password) async {
     try {
-      final result =
-          await Amplify.Auth.signIn(username: email, password: password);
+      final result = await auth.signIn(username: email, password: password);
 
       return _handleSignInResult(
         result,
@@ -50,10 +55,9 @@ class AuthenticationActions {
     }
   }
 
-  static Future<AuthenticationResult> confirmSignInUser(
-      String confirmString) async {
+  Future<AuthenticationResult> confirmSignInUser(String confirmString) async {
     try {
-      await Amplify.Auth.confirmSignIn(confirmationValue: confirmString);
+      await auth.confirmSignIn(confirmationValue: confirmString);
 
       return AuthenticationResult(
         status: AuthStatus.done,
@@ -72,8 +76,8 @@ class AuthenticationActions {
     }
   }
 
-  static Future<void> signOutUser() async {
-    final result = await Amplify.Auth.signOut();
+  Future<void> signOutUser() async {
+    final result = await auth.signOut();
 
     if (result is CognitoCompleteSignOut) {
       safePrint("user signed out");
@@ -82,10 +86,9 @@ class AuthenticationActions {
     }
   }
 
-  static Future<AuthenticationResult> signUpUser(
-      String email, String password) async {
+  Future<AuthenticationResult> signUpUser(String email, String password) async {
     try {
-      await Amplify.Auth.signUp(username: email, password: password);
+      await auth.signUp(username: email, password: password);
 
       return AuthenticationResult(
         status: AuthStatus.done,
@@ -104,9 +107,9 @@ class AuthenticationActions {
     }
   }
 
-  static Future<AuthenticationResult> resetPassword(String email) async {
+  Future<AuthenticationResult> resetPassword(String email) async {
     try {
-      await Amplify.Auth.resetPassword(username: email);
+      await auth.resetPassword(username: email);
 
       return AuthenticationResult(
         status: AuthStatus.done,
@@ -125,10 +128,10 @@ class AuthenticationActions {
     }
   }
 
-  static Future<AuthenticationResult> confirmResetPassword(
+  Future<AuthenticationResult> confirmResetPassword(
       String email, String code, String password) async {
     try {
-      await Amplify.Auth.confirmResetPassword(
+      await auth.confirmResetPassword(
           username: email, confirmationCode: code, newPassword: password);
 
       return AuthenticationResult(
@@ -148,7 +151,7 @@ class AuthenticationActions {
     }
   }
 
-  static AuthenticationResult _handleSignInResult(
+  AuthenticationResult _handleSignInResult(
       SignInResult result, String username) {
     switch (result.nextStep.signInStep) {
       case AuthSignInStep.confirmSignInWithTotpMfaCode:
@@ -161,7 +164,7 @@ class AuthenticationActions {
         );
       case AuthSignInStep.confirmSignUp:
         // handle sending user confirm mail
-        Amplify.Auth.resendSignUpCode(username: username);
+        auth.resendSignUpCode(username: username);
         return AuthenticationResult(
           status: AuthStatus.error,
           message: "Your account is not verified. Please verify it to proceed.",
@@ -173,9 +176,9 @@ class AuthenticationActions {
     }
   }
 
-  static Future<AuthenticationResult> getEmail() async {
+  Future<AuthenticationResult> getEmail() async {
     try {
-      final userAttributes = await Amplify.Auth.fetchUserAttributes();
+      final userAttributes = await auth.fetchUserAttributes();
       var email = userAttributes.firstWhere(
         (attribute) =>
             attribute.userAttributeKey == CognitoUserAttributeKey.email,
@@ -203,7 +206,7 @@ class AuthenticationActions {
     }
   }
 
-  static Future<AuthenticationResult> setupMfa() async {
+  Future<AuthenticationResult> setupMfa() async {
     try {
       var emailResult = await getEmail();
       if (emailResult.status == AuthStatus.error) {
@@ -212,7 +215,7 @@ class AuthenticationActions {
 
       String email = emailResult.message!;
 
-      final totpSetupDetails = await Amplify.Auth.setUpTotp();
+      final totpSetupDetails = await auth.setUpTotp();
       final setupUri = totpSetupDetails.getSetupUri(
         appName: 'Doki',
         accountName: email,
@@ -237,11 +240,10 @@ class AuthenticationActions {
     }
   }
 
-  static Future<AuthenticationResult> verifyMfaSetup(String code) async {
+  Future<AuthenticationResult> verifyMfaSetup(String code) async {
     try {
-      await Amplify.Auth.verifyTotpSetup(code);
-      final cognitoPlugin =
-          Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
+      await auth.verifyTotpSetup(code);
+      final cognitoPlugin = auth.getPlugin(AmplifyAuthCognito.pluginKey);
 
       await cognitoPlugin.updateMfaPreference(
         totp: MfaPreference.preferred,
@@ -264,18 +266,17 @@ class AuthenticationActions {
     }
   }
 
-  static Future<void> removeMFA() async {
-    final cognitoPlugin = Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
+  Future<void> removeMFA() async {
+    final cognitoPlugin = auth.getPlugin(AmplifyAuthCognito.pluginKey);
 
     await cognitoPlugin.updateMfaPreference(
       totp: MfaPreference.disabled,
     );
   }
 
-  static Future<AuthenticationToken> getAccessToken() async {
+  Future<AuthenticationToken> getAccessToken() async {
     try {
-      final cognitoPlugin =
-          Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
+      final cognitoPlugin = auth.getPlugin(AmplifyAuthCognito.pluginKey);
       final result = await cognitoPlugin.fetchAuthSession();
       String token = (result.userPoolTokensResult.value.accessToken.raw);
 
@@ -298,10 +299,10 @@ class AuthenticationActions {
     }
   }
 
-  static Future<AuthenticationResult> updatePassword(
+  Future<AuthenticationResult> updatePassword(
       String oldPassword, String newPassword) async {
     try {
-      await Amplify.Auth.updatePassword(
+      await auth.updatePassword(
         oldPassword: oldPassword,
         newPassword: newPassword,
       );
@@ -323,9 +324,9 @@ class AuthenticationActions {
     }
   }
 
-  static Future<AuthenticationResult> getUserId() async {
+  Future<AuthenticationResult> getUserId() async {
     try {
-      final user = await Amplify.Auth.getCurrentUser();
+      final user = await auth.getCurrentUser();
       return AuthenticationResult(
         status: AuthStatus.done,
         message: user.userId,

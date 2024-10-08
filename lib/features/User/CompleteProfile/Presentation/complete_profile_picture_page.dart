@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -37,6 +38,8 @@ class CompleteProfilePicturePage extends StatefulWidget {
 
 class _CompleteProfilePicturePageState
     extends State<CompleteProfilePicturePage> {
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
+
   final UserGraphqlService _graphqlService = UserGraphqlService();
   late final UserProvider _userProvider;
   late final String _username;
@@ -78,7 +81,7 @@ class _CompleteProfilePicturePageState
       _errorMessage = "";
     });
 
-    var idResult = await AuthenticationActions.getUserId();
+    var idResult = await auth.getUserId();
     if (idResult.status == AuthStatus.error) {
       setState(() {
         _completing = false;
@@ -87,7 +90,7 @@ class _CompleteProfilePicturePageState
       return;
     }
 
-    var emailResult = await AuthenticationActions.getEmail();
+    var emailResult = await auth.getEmail();
     if (emailResult.status == AuthStatus.error) {
       setState(() {
         _completing = false;
@@ -158,7 +161,7 @@ class _CompleteProfilePicturePageState
         actions: [
           TextButton(
             onPressed: () {
-              AuthenticationActions.signOutUser();
+              auth.signOutUser();
             },
             child: Text(
               "Sign out",

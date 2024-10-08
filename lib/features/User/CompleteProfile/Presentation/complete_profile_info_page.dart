@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -21,6 +22,8 @@ class CompleteProfileInfoPage extends StatefulWidget {
 }
 
 class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
+
   static const int _years13 = 4748;
   late final String _username;
   String _name = "";
@@ -77,7 +80,7 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
         actions: [
           TextButton(
             onPressed: () {
-              AuthenticationActions.signOutUser();
+              auth.signOutUser();
             },
             child: Text(
               "Sign out",

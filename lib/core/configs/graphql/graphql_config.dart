@@ -1,13 +1,16 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/secret/secrets.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:hive/hive.dart';
 
 class GraphqlConfig {
+  static AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
+
   static final _httpLink = HttpLink(Secrets.endpoint);
 
   static final _authLink = AuthLink(getToken: () async {
-    var result = await AuthenticationActions.getAccessToken();
+    var result = await auth.getAccessToken();
     if (result.status != AuthStatus.done) {
       return "";
     }
@@ -34,7 +37,7 @@ class GraphqlConfig {
   Future<GraphQLClient> clientToQuery() async {
     if (_client == null) {
       Link link = _authLink.concat(_httpLink);
-      var userStatus = await AuthenticationActions.getUserId();
+      var userStatus = await auth.getUserId();
       String userId = "";
 
       if (userStatus.status == AuthStatus.done) {

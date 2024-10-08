@@ -21,6 +21,8 @@ class MfaSetupPage extends StatefulWidget {
 }
 
 class _MfaSetupPageState extends State<MfaSetupPage> {
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
+
   String _errorMessage = "";
   bool _loading = true;
   String _key = "";
@@ -45,7 +47,7 @@ class _MfaSetupPageState extends State<MfaSetupPage> {
   }
 
   void _setupMFA() async {
-    var setupMfaResult = await AuthenticationActions.setupMfa();
+    var setupMfaResult = await auth.setupMfa();
 
     setState(() {
       _loading = false;

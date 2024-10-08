@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -19,6 +20,8 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
+
   final _formKey = GlobalKey<FormState>();
   String _email = "";
   String _password = "";
@@ -37,8 +40,7 @@ class _SignupPageState extends State<SignupPage> {
       _errorMessage = "";
     });
 
-    var signupStatus =
-        await AuthenticationActions.signUpUser(_email, _password);
+    var signupStatus = await auth.signUpUser(_email, _password);
 
     if (signupStatus.status == AuthStatus.error) {
       setState(() {

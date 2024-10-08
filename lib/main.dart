@@ -79,6 +79,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late final AuthenticationProvider _authProvider;
   late final UserProvider _userProvider;
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
 
   @override
   void initState() {
@@ -137,7 +138,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _getCompleteUser() async {
-    var result = await AuthenticationActions.getUserId();
+    var result = await auth.getUserId();
     if (result.status == AuthStatus.error) {
       _userProvider.apiError();
       return;

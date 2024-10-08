@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/input.dart';
@@ -16,6 +17,7 @@ class ChangePasswordPage extends StatefulWidget {
 }
 
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
   final _formKey = GlobalKey<FormState>();
 
   bool _loading = false;
@@ -35,8 +37,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       _errorMessage = "";
     });
 
-    var updateStatus =
-        await AuthenticationActions.updatePassword(_password, _newPassword);
+    var updateStatus = await auth.updatePassword(_password, _newPassword);
 
     if (updateStatus.status == AuthStatus.error) {
       setState(() {

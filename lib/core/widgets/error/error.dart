@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
@@ -6,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Error extends StatelessWidget {
-  const Error({
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
+
+  Error({
     super.key,
   });
 
@@ -29,7 +32,7 @@ class Error extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  AuthenticationActions.signOutUser();
+                  auth.signOutUser();
                 },
                 child: const Text("Sign Out"),
               ),

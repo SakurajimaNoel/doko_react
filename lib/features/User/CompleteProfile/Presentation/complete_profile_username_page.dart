@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -23,6 +24,8 @@ class CompleteProfileUsernamePage extends StatefulWidget {
 
 class _CompleteProfileUsernamePageState
     extends State<CompleteProfileUsernamePage> {
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
+
   final UserGraphqlService _graphqlService = UserGraphqlService();
   final _formKey = GlobalKey<FormState>();
   final Debounce _usernameDebounce = Debounce(const Duration(
@@ -72,7 +75,7 @@ class _CompleteProfileUsernamePageState
         actions: [
           TextButton(
             onPressed: () {
-              AuthenticationActions.signOutUser();
+              auth.signOutUser();
             },
             child: Text(
               "Sign out",

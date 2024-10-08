@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -18,6 +19,8 @@ class PasswordResetPage extends StatefulWidget {
 }
 
 class _PasswordResetPageState extends State<PasswordResetPage> {
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
+
   final _formKey = GlobalKey<FormState>();
   String _email = "";
   bool _loading = false;
@@ -35,7 +38,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
       _errorMessage = "";
     });
 
-    var resetStatus = await AuthenticationActions.resetPassword(_email);
+    var resetStatus = await auth.resetPassword(_email);
     if (resetStatus.status == AuthStatus.error) {
       setState(() {
         _loading = false;

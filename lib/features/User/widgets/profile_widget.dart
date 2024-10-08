@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
@@ -30,6 +31,8 @@ class ProfileWidget extends StatefulWidget {
 }
 
 class _ProfileWidgetState extends State<ProfileWidget> {
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
+
   late final bool _self;
   late final String _userId;
   late final UserProvider _userProvider;
@@ -98,7 +101,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       ),
       TextButton(
         onPressed: () {
-          AuthenticationActions.signOutUser();
+          auth.signOutUser();
         },
         child: Text(
           "Sign out",
@@ -197,7 +200,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             ),
             TextButton(
               onPressed: () {
-                AuthenticationActions.signOutUser();
+                auth.signOutUser();
               },
               child: Text(
                 "Sign out",

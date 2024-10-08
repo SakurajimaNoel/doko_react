@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -18,6 +19,8 @@ class UserSettings extends StatefulWidget {
 }
 
 class _UserSettingsState extends State<UserSettings> {
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
+
   bool _removing = false;
   late final AuthenticationProvider _authenticationProvider;
 
@@ -32,7 +35,7 @@ class _UserSettingsState extends State<UserSettings> {
       _removing = true;
     });
 
-    await AuthenticationActions.removeMFA();
+    await auth.removeMFA();
 
     setState(() {
       _removing = false;

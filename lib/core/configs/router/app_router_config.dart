@@ -47,7 +47,7 @@ class AppRouterConfig {
         GoRoute(
           path: "/error",
           name: "error",
-          builder: (context, state) => const Error(),
+          builder: (context, state) => Error(),
         ),
       ],
     );
