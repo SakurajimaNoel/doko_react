@@ -423,13 +423,6 @@ class UserGraphqlService {
         throw Exception(result.exception);
       }
 
-      // int relationCreated =
-      //     result.data?["updateUsers"]["info"]["relationshipsCreated"];
-      //
-      // if (relationCreated != 1) {
-      //   return ResponseStatus.error;
-      // }
-
       return ResponseStatus.success;
     } catch (e) {
       safePrint(e.toString());
@@ -476,13 +469,6 @@ class UserGraphqlService {
         throw Exception(result.exception);
       }
 
-      // int relationDeleted =
-      //     result.data?["updateUsers"]["info"]["relationshipsDeleted"];
-      //
-      // if (relationDeleted != 1) {
-      //   return ResponseStatus.error;
-      // }
-
       return ResponseStatus.success;
     } catch (e) {
       safePrint(e.toString());
@@ -517,16 +503,6 @@ class UserGraphqlService {
       if (result.hasException) {
         throw Exception(result.exception);
       }
-
-      // Map<String, dynamic>? res = result.data?["createPosts"]["info"];
-      //
-      // if (res == null) {
-      //   // something went wrong or getting wrong response from api
-      // }
-
-      // int nodesCreated = res?["nodesCreated"] ?? 0;
-      // int relationshipCreated = res?["relationshipCreated"] ?? 0;
-      // check if both are 1
 
       return ResponseStatus.success;
     } catch (e) {

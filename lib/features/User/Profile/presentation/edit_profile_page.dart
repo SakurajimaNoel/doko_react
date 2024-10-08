@@ -60,6 +60,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _bioController.dispose();
+
+    super.dispose();
+  }
+
   Future<void> _updateUserProfile() async {
     bool validate = _formKey.currentState?.validate() ?? false;
     if (!validate) {

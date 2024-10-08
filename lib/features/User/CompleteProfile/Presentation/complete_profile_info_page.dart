@@ -60,6 +60,14 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
   }
 
   @override
+  void dispose() {
+    _usernameController.dispose();
+    _dobController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var currTheme = Theme.of(context).colorScheme;
 
