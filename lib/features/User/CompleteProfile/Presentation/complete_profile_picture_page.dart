@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -41,7 +42,9 @@ class _CompleteProfilePicturePageState
   final StorageActions storage = StorageActions(storage: Amplify.Storage);
   final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
 
-  final UserGraphqlService _graphqlService = UserGraphqlService();
+  final UserGraphqlService _graphqlService = UserGraphqlService(
+    client: GraphqlConfig.getGraphQLClient(),
+  );
   late final UserProvider _userProvider;
   late final String _username;
   late final String _name;

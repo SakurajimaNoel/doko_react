@@ -1,4 +1,5 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -26,7 +27,9 @@ class _CompleteProfileUsernamePageState
     extends State<CompleteProfileUsernamePage> {
   final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
 
-  final UserGraphqlService _graphqlService = UserGraphqlService();
+  final UserGraphqlService _graphqlService = UserGraphqlService(
+    client: GraphqlConfig.getGraphQLClient(),
+  );
   final _formKey = GlobalKey<FormState>();
   final Debounce _usernameDebounce = Debounce(const Duration(
     milliseconds: 500,

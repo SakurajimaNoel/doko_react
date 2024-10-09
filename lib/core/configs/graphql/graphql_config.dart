@@ -21,6 +21,36 @@ class GraphqlConfig {
   static GraphQLClient? _client;
   static Box? _userBox;
 
+  static Future<void> initGraphQLClient() async {
+    Link link = _authLink.concat(_httpLink);
+    var userStatus = await auth.getUserId();
+    String userId = "";
+
+    if (userStatus.status == AuthStatus.done) {
+      userId = userStatus.message!;
+    }
+
+    final boxName = "graphql_cache_$userId";
+    final userBox = await Hive.openBox<Map<dynamic, dynamic>?>(boxName);
+    _userBox = userBox;
+    final store = HiveStore(userBox);
+
+    _client = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(store: store),
+      defaultPolicies: DefaultPolicies(
+        query: Policies(
+          fetch: FetchPolicy.cacheAndNetwork,
+        ),
+        mutate: Policies(
+          fetch: FetchPolicy.noCache,
+        ),
+      ),
+    );
+
+    safePrint("graphql client initialized");
+  }
+
   static Future<void> clearCache() async {
     if (_client != null) {
       _client = null;
@@ -34,34 +64,11 @@ class GraphqlConfig {
     }
   }
 
-  Future<GraphQLClient> clientToQuery() async {
+  static GraphQLClient getGraphQLClient() {
     if (_client == null) {
-      Link link = _authLink.concat(_httpLink);
-      var userStatus = await auth.getUserId();
-      String userId = "";
-
-      if (userStatus.status == AuthStatus.done) {
-        userId = userStatus.message!;
-      }
-
-      final boxName = "graphql_cache_$userId";
-      final userBox = await Hive.openBox<Map<dynamic, dynamic>?>(boxName);
-      _userBox = userBox;
-      final store = HiveStore(userBox);
-
-      _client = GraphQLClient(
-        link: link,
-        cache: GraphQLCache(store: store),
-        defaultPolicies: DefaultPolicies(
-          query: Policies(
-            fetch: FetchPolicy.cacheAndNetwork,
-          ),
-          mutate: Policies(
-            fetch: FetchPolicy.noCache,
-          ),
-        ),
-      );
+      throw ("GraphQL client is not initialized. Ensure you call initGraphQLClient after authentication.");
     }
+
     return _client!;
   }
 }

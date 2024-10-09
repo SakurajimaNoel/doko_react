@@ -1,3 +1,4 @@
+import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
@@ -22,7 +23,9 @@ class PendingIncomingRequests extends StatefulWidget {
 
 class PendingIncomingRequestsState extends State<PendingIncomingRequests>
     with AutomaticKeepAliveClientMixin {
-  final UserGraphqlService _userGraphqlService = UserGraphqlService();
+  final UserGraphqlService _userGraphqlService = UserGraphqlService(
+    client: GraphqlConfig.getGraphQLClient(),
+  );
 
   late final UserProvider _userProvider;
 

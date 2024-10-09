@@ -1,3 +1,4 @@
+import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/widgets/loader/loader_button.dart';
@@ -27,7 +28,9 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
   late final ProfilePostInfo _postInfo;
   late final UserModel _user;
 
-  final UserGraphqlService _userGraphqlService = UserGraphqlService();
+  final UserGraphqlService _userGraphqlService = UserGraphqlService(
+    client: GraphqlConfig.getGraphQLClient(),
+  );
 
   bool _loading = false;
 

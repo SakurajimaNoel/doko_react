@@ -1,4 +1,5 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -25,7 +26,9 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
   final StorageActions storage = StorageActions(storage: Amplify.Storage);
   late final List<PostContent> _postContent;
 
-  final UserGraphqlService _userGraphqlService = UserGraphqlService();
+  final UserGraphqlService _userGraphqlService = UserGraphqlService(
+    client: GraphqlConfig.getGraphQLClient(),
+  );
 
   bool _uploading = false;
   String _caption = "";

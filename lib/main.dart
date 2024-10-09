@@ -145,7 +145,9 @@ class _MyAppState extends State<MyApp> {
     }
 
     String userId = result.message!;
-    final UserGraphqlService graphqlService = UserGraphqlService();
+    final UserGraphqlService graphqlService = UserGraphqlService(
+      client: GraphqlConfig.getGraphQLClient(),
+    );
     var userDetails = await graphqlService.getUser(userId);
 
     if (userDetails.status == ResponseStatus.error) {
@@ -166,6 +168,9 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _changeAuthStatus(AuthenticationStatus status) async {
     if (status == AuthenticationStatus.signedIn) {
+      // wait for graphql client to be initialized
+      await GraphqlConfig.initGraphQLClient();
+
       _fetchMfaStatus();
       _getCompleteUser();
       _authProvider.setAuthStatus(status);

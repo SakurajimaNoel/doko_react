@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
@@ -37,7 +38,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late final String _currentUserBio;
   late final UserProvider _userProvider;
 
-  final UserGraphqlService _userGraphqlService = UserGraphqlService();
+  final UserGraphqlService _userGraphqlService = UserGraphqlService(
+    client: GraphqlConfig.getGraphQLClient(),
+  );
 
   late TextEditingController _nameController;
   late TextEditingController _bioController;

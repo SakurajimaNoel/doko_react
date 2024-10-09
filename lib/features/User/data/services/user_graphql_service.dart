@@ -1,5 +1,4 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
@@ -59,17 +58,13 @@ class PostResponse {
 }
 
 class UserGraphqlService {
-  static GraphqlConfig config = GraphqlConfig();
+  late final GraphQLClient _client;
 
-  Future<GraphQLClient> _getGraphqlClient() async {
-    return await config.clientToQuery();
-  }
+  UserGraphqlService({required GraphQLClient client}) : _client = client;
 
   Future<UserResponse> getUser(String id) async {
     try {
-      var client = await _getGraphqlClient();
-
-      QueryResult result = await client.query(
+      QueryResult result = await _client.query(
         QueryOptions(
           document: gql(UserQueries.getUser()),
           variables: UserQueries.getUserVariables(id),
@@ -103,8 +98,7 @@ class UserGraphqlService {
 
   Future<UsernameResponse> checkUsername(String username) async {
     try {
-      var client = await _getGraphqlClient();
-      QueryResult result = await client.query(
+      QueryResult result = await _client.query(
         QueryOptions(
           document: gql(UserQueries.checkUsername()),
           variables: UserQueries.checkUsernameVariables(username),
@@ -140,8 +134,7 @@ class UserGraphqlService {
   Future<UserResponse> completeUserProfile(
       CompleteUserProfileVariables userDetails) async {
     try {
-      var client = await _getGraphqlClient();
-      QueryResult result = await client.mutate(
+      QueryResult result = await _client.mutate(
         MutationOptions(
           document: gql(UserQueries.completeUserProfile()),
           variables: UserQueries.completeUserProfileVariables(userDetails),
@@ -173,8 +166,7 @@ class UserGraphqlService {
     required String currentUserId,
   }) async {
     try {
-      var client = await _getGraphqlClient();
-      QueryResult result = await client.query(
+      QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
           document: gql(UserQueries.getCompleteUser()),
@@ -217,8 +209,7 @@ class UserGraphqlService {
     required String currentUserId,
   }) async {
     try {
-      var client = await _getGraphqlClient();
-      QueryResult result = await client.query(
+      QueryResult result = await _client.query(
         QueryOptions(
           document: gql(UserQueries.getFriendsByUserId()),
           variables: UserQueries.getFriendsByUserIdVariables(
@@ -259,8 +250,7 @@ class UserGraphqlService {
 
   Future<PostResponse> getPostsByUserId(String id, String cursor) async {
     try {
-      var client = await _getGraphqlClient();
-      QueryResult result = await client.query(
+      QueryResult result = await _client.query(
         QueryOptions(
           document: gql(UserQueries.getUserPostsByUserId()),
           variables: UserQueries.getUserPostsByUserIdVariables(id, cursor),
@@ -298,8 +288,7 @@ class UserGraphqlService {
   Future<FriendResponse> getPendingOutgoingFriendsByUserId(
       String id, String? cursor) async {
     try {
-      var client = await _getGraphqlClient();
-      QueryResult result = await client.query(
+      QueryResult result = await _client.query(
         QueryOptions(
           document: gql(UserQueries.getPendingOutgoingFriendsByUserId(cursor)),
           variables: UserQueries.getPendingOutgoingFriendsByUserIdVariables(
@@ -338,8 +327,7 @@ class UserGraphqlService {
   Future<FriendResponse> getPendingIncomingFriendsByUserId(
       String id, String? cursor) async {
     try {
-      var client = await _getGraphqlClient();
-      QueryResult result = await client.query(
+      QueryResult result = await _client.query(
         QueryOptions(
           document: gql(UserQueries.getPendingIncomingFriendsByUserId(cursor)),
           variables: UserQueries.getPendingIncomingFriendsByUserIdVariables(
@@ -378,8 +366,7 @@ class UserGraphqlService {
   Future<UserResponse> updateUserProfile(
       String id, String name, String bio, String profilePicture) async {
     try {
-      var client = await _getGraphqlClient();
-      QueryResult result = await client.mutate(
+      QueryResult result = await _client.mutate(
         MutationOptions(
           document: gql(UserQueries.updateUserProfile()),
           variables: UserQueries.updateUserProfileVariables(
@@ -410,8 +397,7 @@ class UserGraphqlService {
   Future<ResponseStatus> userSendFriendRequest(
       String requestedBy, String requestedTo) async {
     try {
-      var client = await _getGraphqlClient();
-      QueryResult result = await client.mutate(
+      QueryResult result = await _client.mutate(
         MutationOptions(
           document: gql(UserQueries.userSendFriendRequest()),
           variables: UserQueries.userSendFriendRequestVariables(
@@ -433,8 +419,7 @@ class UserGraphqlService {
   Future<ResponseStatus> userAcceptFriendRequest(
       String requestedBy, String requestedTo) async {
     try {
-      var client = await _getGraphqlClient();
-      QueryResult result = await client.mutate(
+      QueryResult result = await _client.mutate(
         MutationOptions(
           document: gql(UserQueries.userAcceptFriendRequest()),
           variables: UserQueries.userAcceptFriendRequestVariables(
@@ -456,8 +441,7 @@ class UserGraphqlService {
   Future<ResponseStatus> userRemoveFriendRelation(
       String requestedBy, String requestedTo) async {
     try {
-      var client = await _getGraphqlClient();
-      QueryResult result = await client.mutate(
+      QueryResult result = await _client.mutate(
         MutationOptions(
           document: gql(UserQueries.userRemoveFriendRelation()),
           variables: UserQueries.userRemoveFriendRelationVariables(
@@ -490,9 +474,8 @@ class UserGraphqlService {
       }
 
       String userId = userIdResult.message!;
-      var client = await _getGraphqlClient();
 
-      QueryResult result = await client.mutate(
+      QueryResult result = await _client.mutate(
         MutationOptions(
           document: gql(UserQueries.userCreatePost()),
           variables: UserQueries.userCreatePostVariables(

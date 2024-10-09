@@ -1,3 +1,4 @@
+import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
@@ -33,7 +34,9 @@ class _FriendContainerProfileWidgetState
   late final UserModel _user;
   late final UserProvider _userProvider;
 
-  final UserGraphqlService _userGraphqlService = UserGraphqlService();
+  final UserGraphqlService _userGraphqlService = UserGraphqlService(
+    client: GraphqlConfig.getGraphQLClient(),
+  );
 
   bool _loading = false;
 

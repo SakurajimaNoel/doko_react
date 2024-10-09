@@ -1,5 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -37,7 +38,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   late final String _userId;
   late final UserProvider _userProvider;
 
-  final UserGraphqlService _userGraphqlService = UserGraphqlService();
+  final UserGraphqlService _userGraphqlService = UserGraphqlService(
+    client: GraphqlConfig.getGraphQLClient(),
+  );
 
   bool _loading = true;
   CompleteUserModel? _user;
@@ -407,7 +410,9 @@ class _UserProfileActionState extends State<_UserProfileAction> {
 
   late final UserProvider _userProvider;
 
-  final UserGraphqlService _userGraphqlService = UserGraphqlService();
+  final UserGraphqlService _userGraphqlService = UserGraphqlService(
+    client: GraphqlConfig.getGraphQLClient(),
+  );
   bool _updating = false;
 
   @override
