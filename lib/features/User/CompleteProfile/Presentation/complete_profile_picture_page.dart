@@ -38,6 +38,7 @@ class CompleteProfilePicturePage extends StatefulWidget {
 
 class _CompleteProfilePicturePageState
     extends State<CompleteProfilePicturePage> {
+  final StorageActions storage = StorageActions(storage: Amplify.Storage);
   final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
 
   final UserGraphqlService _graphqlService = UserGraphqlService();
@@ -112,8 +113,8 @@ class _CompleteProfilePicturePageState
     String imageString = DisplayText.generateRandomString();
     String bucketPath = "$id/profile/$imageString$imageExtension";
 
-    var pictureResult = await StorageActions.uploadFile(
-        File(_profilePicture!.path), bucketPath);
+    var pictureResult =
+        await storage.uploadFile(File(_profilePicture!.path), bucketPath);
     if (pictureResult.status == ResponseStatus.error) {
       setState(() {
         _completing = false;
@@ -138,7 +139,7 @@ class _CompleteProfilePicturePageState
         _errorMessage = "Oops! Somethings went wrong.";
       });
 
-      StorageActions.deleteFile(bucketPath);
+      storage.deleteFile(bucketPath);
       return;
     }
 

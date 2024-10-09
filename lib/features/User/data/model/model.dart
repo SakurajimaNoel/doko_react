@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 
@@ -24,12 +25,15 @@ class NodeInfo {
 }
 
 class StorageUtils {
+  static final StorageActions storage =
+      StorageActions(storage: Amplify.Storage);
+
   static Future<List<String>> generatePreSignedURLs(
       List<String> content) async {
     List<String> signedContent = List.filled(content.length, "");
     for (int i = 0; i < content.length; i++) {
       String path = content[i];
-      var result = await StorageActions.getDownloadUrl(path);
+      var result = await storage.getDownloadUrl(path);
       if (result.status == ResponseStatus.success) {
         signedContent[i] = result.value;
       }
@@ -38,7 +42,7 @@ class StorageUtils {
   }
 
   static Future<String> generatePreSignedURL(String path) async {
-    var result = await StorageActions.getDownloadUrl(path);
+    var result = await storage.getDownloadUrl(path);
     return result.value;
   }
 }

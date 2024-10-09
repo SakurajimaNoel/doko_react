@@ -16,18 +16,27 @@ class StorageResult {
 }
 
 class StorageActions {
-  static Future<StorageResult> getDownloadUrl(String path) async {
+  final StorageCategory storage;
+
+  // send storage = Amplify.Storage
+  StorageActions({
+    required this.storage,
+  });
+
+  Future<StorageResult> getDownloadUrl(String path) async {
     try {
-      final result = await Amplify.Storage.getUrl(
-        path: StoragePath.fromString(path),
-        options: const StorageGetUrlOptions(
-          pluginOptions: S3GetUrlPluginOptions(
-            expiresIn: Duration(
-              minutes: 60,
+      final result = await storage
+          .getUrl(
+            path: StoragePath.fromString(path),
+            options: const StorageGetUrlOptions(
+              pluginOptions: S3GetUrlPluginOptions(
+                expiresIn: Duration(
+                  minutes: 60,
+                ),
+              ),
             ),
-          ),
-        ),
-      ).result;
+          )
+          .result;
       String url = result.url.toString();
 
       return StorageResult(
@@ -49,12 +58,14 @@ class StorageActions {
     }
   }
 
-  static Future<StorageResult> uploadFile(File file, String path) async {
+  Future<StorageResult> uploadFile(File file, String path) async {
     try {
-      final result = await Amplify.Storage.uploadFile(
-        localFile: AWSFilePlatform.fromFile(file),
-        path: StoragePath.fromString(path),
-      ).result;
+      final result = await storage
+          .uploadFile(
+            localFile: AWSFilePlatform.fromFile(file),
+            path: StoragePath.fromString(path),
+          )
+          .result;
       return StorageResult(
         status: ResponseStatus.success,
         value: result.uploadedItem.path,
@@ -73,11 +84,13 @@ class StorageActions {
     }
   }
 
-  static Future<StorageResult> deleteFile(String path) async {
+  Future<StorageResult> deleteFile(String path) async {
     try {
-      final result = await Amplify.Storage.remove(
-        path: StoragePath.fromString(path),
-      ).result;
+      final result = await storage
+          .remove(
+            path: StoragePath.fromString(path),
+          )
+          .result;
 
       return StorageResult(
         status: ResponseStatus.success,

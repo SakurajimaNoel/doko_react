@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -21,6 +22,7 @@ class CreatePostPublishPage extends StatefulWidget {
 }
 
 class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
+  final StorageActions storage = StorageActions(storage: Amplify.Storage);
   late final List<PostContent> _postContent;
 
   final UserGraphqlService _userGraphqlService = UserGraphqlService();
@@ -54,7 +56,7 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
 
       // clean up
       for (final path in postContentPath) {
-        StorageActions.deleteFile(path);
+        storage.deleteFile(path);
       }
 
       return;
@@ -89,7 +91,7 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
       if (item.type == MediaTypeValue.thumbnail ||
           item.type == MediaTypeValue.unknown) continue;
 
-      fileUploadFuture.add(StorageActions.uploadFile(item.file!, item.path));
+      fileUploadFuture.add(storage.uploadFile(item.file!, item.path));
     }
 
     List<StorageResult> results = await Future.wait(fileUploadFuture);

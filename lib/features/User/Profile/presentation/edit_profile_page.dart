@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -31,6 +32,8 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+  final StorageActions storage = StorageActions(storage: Amplify.Storage);
+
   late final String _currentUserBio;
   late final UserProvider _userProvider;
 
@@ -110,12 +113,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
         return;
       }
 
-      StorageActions.deleteFile(_userProvider.profilePicture);
+      storage.deleteFile(_userProvider.profilePicture);
     }
 
     // when profile picture is removed
     if (_removeProfile) {
-      StorageActions.deleteFile(_userProvider.profilePicture);
+      storage.deleteFile(_userProvider.profilePicture);
       bucketPath = "";
     }
 
@@ -144,7 +147,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<bool> _handleImage(String path) async {
     var pictureResult =
-        await StorageActions.uploadFile(File(_profilePicture!.path), path);
+        await storage.uploadFile(File(_profilePicture!.path), path);
     if (pictureResult.status == ResponseStatus.error) {
       return false;
     }
