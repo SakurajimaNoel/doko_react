@@ -126,6 +126,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
         ),
         fullscreen: const MaterialVideoControlsThemeData(),
         child: Video(
+          resumeUponEnteringForegroundMode: true,
           controller: controller,
           fit: BoxFit.contain,
           aspectRatio: _ratio,
