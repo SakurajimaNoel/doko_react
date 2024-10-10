@@ -9,6 +9,7 @@ import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
 import 'package:doko_react/core/provider/theme_provider.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
+import 'package:doko_react/core/provider/video_provider.dart';
 import 'package:doko_react/core/theme/theme_data.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,9 @@ void main() async {
           ),
           ChangeNotifierProvider(
             create: (context) => UserProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => VideoProvider(),
           ),
         ],
         child: const MyApp(),
