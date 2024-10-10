@@ -126,6 +126,7 @@ class _PostContent extends StatelessWidget {
     return VideoPlayer(
       path: item.signedURL,
       autoplay: false,
+      key: Key(item.key),
     );
   }
 

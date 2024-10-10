@@ -269,34 +269,6 @@ class _CustomCarouselViewState extends State<CustomCarouselView> {
                           fit: StackFit.expand,
                           children: <Widget>[
                             widget.children.elementAt(index),
-                            // Material(
-                            //   color: Colors.transparent,
-                            //   child: InkWell(
-                            //     onTap: () {
-                            //       widget.onTap?.call(index);
-                            //     },
-                            //     overlayColor: widget.overlayColor ??
-                            //         WidgetStateProperty.resolveWith(
-                            //             (Set<WidgetState> states) {
-                            //           if (states
-                            //               .contains(WidgetState.pressed)) {
-                            //             return theme.colorScheme.onSurface
-                            //                 .withOpacity(0.1);
-                            //           }
-                            //           if (states
-                            //               .contains(WidgetState.hovered)) {
-                            //             return theme.colorScheme.onSurface
-                            //                 .withOpacity(0.08);
-                            //           }
-                            //           if (states
-                            //               .contains(WidgetState.focused)) {
-                            //             return theme.colorScheme.onSurface
-                            //                 .withOpacity(0.1);
-                            //           }
-                            //           return null;
-                            //         }),
-                            //   ),
-                            // ),
                           ],
                         ),
                       ),

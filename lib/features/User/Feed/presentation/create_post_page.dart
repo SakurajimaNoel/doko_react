@@ -256,7 +256,10 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
         case MediaTypeValue.video:
           mediaWidgets.add(
             _postItemWrapper(
-              item: VideoPlayer(path: item.file!.path),
+              item: VideoPlayer(
+                path: item.file!.path,
+                key: Key(item.path),
+              ),
               index: index,
             ),
           );
