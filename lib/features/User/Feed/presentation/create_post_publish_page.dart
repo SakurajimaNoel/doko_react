@@ -1,6 +1,7 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/data/cache.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
@@ -95,6 +96,7 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
           item.type == MediaTypeValue.unknown) continue;
 
       fileUploadFuture.add(storage.uploadFile(item.file!, item.path));
+      Cache.addFileToCache(item.file!.path, item.path);
     }
 
     List<StorageResult> results = await Future.wait(fileUploadFuture);
