@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/data/video.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   void initState() {
     super.initState();
+    safePrint("init");
 
     _path = widget.path;
 
@@ -48,6 +50,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   void dispose() {
+    safePrint("dispose video player");
     player.dispose();
     super.dispose();
   }
@@ -88,45 +91,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   Widget build(BuildContext context) {
     var currTheme = Theme.of(context).colorScheme;
+    Color primary = currTheme.primary;
 
     return MaterialVideoControlsTheme(
       normal: MaterialVideoControlsThemeData(
-        buttonBarButtonColor: currTheme.primary,
-        automaticallyImplySkipNextButton: false,
-        automaticallyImplySkipPreviousButton: false,
-        primaryButtonBar: [
-          const MaterialPlayOrPauseButton(
-            iconSize: 24,
-          ),
-        ],
-        bottomButtonBar: [
-          const MaterialPositionIndicator(
-            style: TextStyle(
-              fontSize: 0,
-            ),
-          ),
-          const Spacer(),
-          IconButton(
-            onPressed: () {
-              if (player.state.volume == 0) {
-                // TODO: handle current video volume
-                player.setVolume(50);
-              } else {
-                player.setVolume(0);
-              }
-            },
-            icon: StreamBuilder(
-              stream: player.stream.volume,
-              builder: (context, volume) {
-                return Icon(
-                  volume.data == 0 ? Icons.volume_off : Icons.volume_up,
-                  size: 16,
-                  color: currTheme.primary,
-                );
-              },
-            ),
-          )
-        ],
         seekBarPositionColor: currTheme.primary,
         seekBarThumbColor: currTheme.primary,
         seekBarColor: currTheme.onPrimary,
@@ -138,7 +106,59 @@ class _VideoPlayerState extends State<VideoPlayer> {
         controller: controller,
         fit: BoxFit.contain,
         aspectRatio: _ratio,
-        controls: MaterialVideoControls,
+        controls: (VideoState state) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              MaterialPlayOrPauseButton(
+                iconColor: primary,
+                iconSize: Constants.width,
+              ),
+              const Spacer(),
+              Stack(
+                alignment: AlignmentDirectional.bottomEnd,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 8,
+                        ),
+                        child: MaterialPositionIndicator(
+                          style: TextStyle(
+                            fontSize: Constants.smallFontSize,
+                            color: primary,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          if (player.state.volume == 0) {
+                            player.setVolume(50);
+                          } else {
+                            player.setVolume(0);
+                          }
+                        },
+                        icon: StreamBuilder(
+                          stream: state.widget.controller.player.stream.volume,
+                          builder: (context, volume) => Icon(
+                            volume.data == 0
+                                ? Icons.volume_off
+                                : Icons.volume_up,
+                            size: Constants.width,
+                            color: primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const MaterialSeekBar(),
+                ],
+              ),
+            ],
+          );
+        },
         key: Key(_path),
       ),
     );

@@ -191,26 +191,33 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
     return SizedBox(
       width: width,
       child: Stack(
+        alignment: AlignmentDirectional.topEnd,
         children: [
           item,
-          IconButton.filledTonal(
-            color: currTheme.onError,
-            style: IconButton.styleFrom(
-              backgroundColor: currTheme.error,
+          Padding(
+            padding: const EdgeInsets.only(
+              right: Constants.padding * 0.5,
+              top: Constants.padding * 0.5,
             ),
-            onPressed: () async {
-              var type = _content[index].type;
-              if (type == MediaTypeValue.thumbnail ||
-                  type == MediaTypeValue.unknown) {
-                await VideoActions.cancelCurrentlyActiveVideoCompression();
-              }
+            child: IconButton.filledTonal(
+              color: currTheme.onError,
+              style: IconButton.styleFrom(
+                backgroundColor: currTheme.error,
+              ),
+              onPressed: () async {
+                var type = _content[index].type;
+                if (type == MediaTypeValue.thumbnail ||
+                    type == MediaTypeValue.unknown) {
+                  await VideoActions.cancelCurrentlyActiveVideoCompression();
+                }
 
-              setState(() {
-                _content.removeAt(index);
-              });
-            },
-            icon: const Icon(
-              Icons.delete,
+                setState(() {
+                  _content.removeAt(index);
+                });
+              },
+              icon: const Icon(
+                Icons.delete,
+              ),
             ),
           )
         ],
