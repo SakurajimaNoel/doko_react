@@ -69,72 +69,70 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
           right: Constants.gap,
           top: Constants.gap * 10,
         ),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const Heading(
-                "Password Reset",
-                size: Constants.heading2,
-              ),
-              const SizedBox(
-                height: Constants.gap * 1.5,
-              ),
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      enabled: !_loading,
-                      onSaved: (value) {
-                        if (value == null || value.isEmpty) {
-                          return;
-                        }
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const Heading(
+              "Password Reset",
+              size: Constants.heading2,
+            ),
+            const SizedBox(
+              height: Constants.gap * 1.5,
+            ),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    enabled: !_loading,
+                    onSaved: (value) {
+                      if (value == null || value.isEmpty) {
+                        return;
+                      }
 
-                        _email = value;
-                      },
-                      validator: (value) {
-                        InputStatus status = ValidateInput.validateEmail(value);
+                      _email = value;
+                    },
+                    validator: (value) {
+                      InputStatus status = ValidateInput.validateEmail(value);
 
-                        if (!status.isValid) {
-                          return status.message;
-                        }
+                      if (!status.isValid) {
+                        return status.message;
+                      }
 
-                        return null;
-                      },
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Email",
-                        hintText: "Email...",
+                      return null;
+                    },
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: "Email",
+                      hintText: "Email...",
+                    ),
+                  ),
+                  const SizedBox(
+                    height: Constants.gap * 1.5,
+                  ),
+                  FilledButton(
+                    onPressed: _loading ? null : _submit,
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(
+                        Constants.buttonWidth,
+                        Constants.buttonHeight,
                       ),
                     ),
+                    child: _loading
+                        ? const LoaderButton()
+                        : const Text("Continue"),
+                  ),
+                  if (_errorMessage.isNotEmpty) ...[
                     const SizedBox(
-                      height: Constants.gap * 1.5,
+                      height: Constants.gap * 0.75,
                     ),
-                    FilledButton(
-                      onPressed: _loading ? null : _submit,
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(
-                          Constants.buttonWidth,
-                          Constants.buttonHeight,
-                        ),
-                      ),
-                      child: _loading
-                          ? const LoaderButton()
-                          : const Text("Continue"),
-                    ),
-                    if (_errorMessage.isNotEmpty) ...[
-                      const SizedBox(
-                        height: Constants.gap * 0.75,
-                      ),
-                      ErrorText(_errorMessage),
-                    ],
+                    ErrorText(_errorMessage),
                   ],
-                ),
-              )
-            ],
-          ),
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );

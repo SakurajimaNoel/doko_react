@@ -20,7 +20,6 @@ class Heading extends StatelessWidget {
           fontSize: size ?? Constants.heading1,
           fontWeight: FontWeight.w500,
         ),
-        textAlign: TextAlign.center,
       ),
     );
   }

@@ -86,135 +86,143 @@ class _PasswordResetConfirmPage extends State<PasswordResetConfirmPage> {
       appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(Constants.padding),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Heading(
-                "Password Reset",
-                size: Constants.heading2,
-              ),
-              const SizedBox(
-                height: Constants.gap * 1.5,
-              ),
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      enabled: !_loading,
-                      keyboardType: TextInputType.number,
-                      maxLength: 6,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(6),
-                      ],
-                      onSaved: (value) {
-                        if (value == null || value.isEmpty) {
-                          return;
-                        }
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Heading(
+                  "Password Reset",
+                  size: Constants.heading2,
+                ),
+                const SizedBox(
+                  height: Constants.gap * 0.5,
+                ),
+                const Text(
+                  "We've sent a password reset code to your email. Please check your inbox (and spam folder) for the message.",
+                ),
+                const SizedBox(
+                  height: Constants.gap * 1.5,
+                ),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        enabled: !_loading,
+                        keyboardType: TextInputType.number,
+                        maxLength: 6,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(6),
+                        ],
+                        onSaved: (value) {
+                          if (value == null || value.isEmpty) {
+                            return;
+                          }
 
-                        _code = value;
-                      },
-                      validator: (value) {
-                        InputStatus status =
-                            ValidateInput.validateConfirmCode(value);
-                        if (!status.isValid) {
-                          return status.message;
-                        }
+                          _code = value;
+                        },
+                        validator: (value) {
+                          InputStatus status =
+                              ValidateInput.validateConfirmCode(value);
+                          if (!status.isValid) {
+                            return status.message;
+                          }
 
-                        return null;
-                      },
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Code",
-                        hintText: "Code...",
-                        counterText: '',
-                      ),
-                    ),
-                    const SizedBox(
-                      height: Constants.gap * 1.5,
-                    ),
-                    TextFormField(
-                      enabled: !_loading,
-                      obscureText: true,
-                      onChanged: (value) {
-                        _password = value;
-                      },
-                      onSaved: (value) {
-                        if (value == null || value.isEmpty) {
-                          return;
-                        }
-
-                        _password = value;
-                      },
-                      validator: (value) {
-                        InputStatus status =
-                            ValidateInput.validatePassword(value);
-
-                        if (!status.isValid) {
-                          return status.message;
-                        }
-
-                        return null;
-                      },
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "New Password",
-                        hintText: "New Password...",
-                      ),
-                    ),
-                    const SizedBox(
-                      height: Constants.gap * 1.5,
-                    ),
-                    TextFormField(
-                      enabled: !_loading,
-                      obscureText: true,
-                      validator: (value) {
-                        InputStatus status =
-                            ValidateInput.validateConfirmPassword(
-                                _password, value);
-
-                        if (!status.isValid) {
-                          return status.message;
-                        }
-
-                        return null;
-                      },
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Confirm Password",
-                        hintText: "Confirm Password...",
-                      ),
-                    ),
-                    const SizedBox(
-                      height: Constants.gap * 1.5,
-                    ),
-                    FilledButton(
-                      onPressed: _loading ? null : _submit,
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(
-                          Constants.buttonWidth,
-                          Constants.buttonHeight,
+                          return null;
+                        },
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: "Code",
+                          hintText: "Code...",
+                          counterText: '',
                         ),
                       ),
-                      child:
-                          _loading ? const LoaderButton() : const Text("Reset"),
-                    ),
-                    if (_errorMessage.isNotEmpty) ...[
                       const SizedBox(
-                        height: Constants.gap * 0.75,
+                        height: Constants.gap * 1.5,
                       ),
-                      ErrorText(_errorMessage),
+                      TextFormField(
+                        enabled: !_loading,
+                        obscureText: true,
+                        onChanged: (value) {
+                          _password = value;
+                        },
+                        onSaved: (value) {
+                          if (value == null || value.isEmpty) {
+                            return;
+                          }
+
+                          _password = value;
+                        },
+                        validator: (value) {
+                          InputStatus status =
+                              ValidateInput.validatePassword(value);
+
+                          if (!status.isValid) {
+                            return status.message;
+                          }
+
+                          return null;
+                        },
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: "New Password",
+                          hintText: "New Password...",
+                        ),
+                      ),
+                      const SizedBox(
+                        height: Constants.gap * 1.5,
+                      ),
+                      TextFormField(
+                        enabled: !_loading,
+                        obscureText: true,
+                        validator: (value) {
+                          InputStatus status =
+                              ValidateInput.validateConfirmPassword(
+                                  _password, value);
+
+                          if (!status.isValid) {
+                            return status.message;
+                          }
+
+                          return null;
+                        },
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: "Confirm Password",
+                          hintText: "Confirm Password...",
+                        ),
+                      ),
+                      const SizedBox(
+                        height: Constants.gap * 1.5,
+                      ),
+                      if (_errorMessage.isNotEmpty) ...[
+                        const SizedBox(
+                          height: Constants.gap * 0.75,
+                        ),
+                        ErrorText(_errorMessage),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              )
-            ],
-          ),
+              ],
+            ),
+            FilledButton(
+              onPressed: _loading ? null : _submit,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(
+                  Constants.buttonWidth,
+                  Constants.buttonHeight,
+                ),
+              ),
+              child: _loading ? const LoaderButton() : const Text("Reset"),
+            ),
+          ],
         ),
       ),
     );

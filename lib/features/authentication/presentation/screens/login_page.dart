@@ -66,129 +66,127 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(Constants.padding),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(),
-              const Heading("Login"),
-              const SizedBox(
-                height: Constants.gap * 1.5,
-              ),
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      enabled: !_loading,
-                      validator: (value) {
-                        InputStatus status = ValidateInput.validateEmail(value);
-                        if (!status.isValid) {
-                          return status.message;
-                        }
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Spacer(),
+            const Heading("Login"),
+            const SizedBox(
+              height: Constants.gap * 1.5,
+            ),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    enabled: !_loading,
+                    validator: (value) {
+                      InputStatus status = ValidateInput.validateEmail(value);
+                      if (!status.isValid) {
+                        return status.message;
+                      }
 
-                        return null;
-                      },
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Email",
-                        hintText: "Email...",
-                      ),
-                      onSaved: (value) {
-                        if (value == null || value.isEmpty) return;
-                        _email = value;
-                      },
+                      return null;
+                    },
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: "Email",
+                      hintText: "Email...",
                     ),
-                    const SizedBox(
-                      height: Constants.gap * 1.5,
-                    ),
-                    TextFormField(
-                      enabled: !_loading,
-                      obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Password can't be empty";
-                        }
-                        return null;
-                      },
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Password",
-                        hintText: "Password...",
-                      ),
-                      onSaved: (value) {
-                        if (value == null || value.isEmpty) {
-                          return;
-                        }
-
-                        _password = value;
-                      },
-                    ),
-                    const SizedBox(
-                      height: Constants.gap * 1.5,
-                    ),
-                    FilledButton(
-                      onPressed: _loading ? null : _submit,
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(
-                          Constants.buttonWidth,
-                          Constants.buttonHeight,
-                        ),
-                      ),
-                      child:
-                          _loading ? const LoaderButton() : const Text("Login"),
-                    ),
-                    if (_errorMessage.isNotEmpty) ...[
-                      const SizedBox(
-                        height: Constants.gap * 0.75,
-                      ),
-                      ErrorText(_errorMessage),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: Constants.gap * 0.75,
-              ),
-              TextButton(
-                onPressed: _loading
-                    ? null
-                    : () {
-                        context.goNamed(RouterConstants.passwordReset);
-                      },
-                style: TextButton.styleFrom(
-                  foregroundColor: currTheme.secondary,
-                ),
-                child: const Text("Forgot Password?"),
-              ),
-              const Spacer(),
-              RichText(
-                text: TextSpan(
-                  text: "Don't have the account? ",
-                  style: TextStyle(
-                    color: currTheme.onSurface,
+                    onSaved: (value) {
+                      if (value == null || value.isEmpty) return;
+                      _email = value;
+                    },
                   ),
-                  children: [
-                    TextSpan(
-                      text: "Sign Up.",
-                      style: TextStyle(
-                        color: currTheme.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = _loading
-                            ? null
-                            : () async {
-                                context.goNamed(RouterConstants.signUp);
-                              },
+                  const SizedBox(
+                    height: Constants.gap * 1.5,
+                  ),
+                  TextFormField(
+                    enabled: !_loading,
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Password can't be empty";
+                      }
+                      return null;
+                    },
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: "Password",
+                      hintText: "Password...",
                     ),
+                    onSaved: (value) {
+                      if (value == null || value.isEmpty) {
+                        return;
+                      }
+
+                      _password = value;
+                    },
+                  ),
+                  const SizedBox(
+                    height: Constants.gap * 1.5,
+                  ),
+                  FilledButton(
+                    onPressed: _loading ? null : _submit,
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(
+                        Constants.buttonWidth,
+                        Constants.buttonHeight,
+                      ),
+                    ),
+                    child:
+                        _loading ? const LoaderButton() : const Text("Login"),
+                  ),
+                  if (_errorMessage.isNotEmpty) ...[
+                    const SizedBox(
+                      height: Constants.gap * 0.75,
+                    ),
+                    ErrorText(_errorMessage),
                   ],
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(
+              height: Constants.gap * 0.75,
+            ),
+            TextButton(
+              onPressed: _loading
+                  ? null
+                  : () {
+                      context.goNamed(RouterConstants.passwordReset);
+                    },
+              style: TextButton.styleFrom(
+                foregroundColor: currTheme.secondary,
+              ),
+              child: const Text("Forgot Password?"),
+            ),
+            const Spacer(),
+            RichText(
+              text: TextSpan(
+                text: "Don't have the account? ",
+                style: TextStyle(
+                  color: currTheme.onSurface,
+                ),
+                children: [
+                  TextSpan(
+                    text: "Sign Up.",
+                    style: TextStyle(
+                      color: currTheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = _loading
+                          ? null
+                          : () async {
+                              context.goNamed(RouterConstants.signUp);
+                            },
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

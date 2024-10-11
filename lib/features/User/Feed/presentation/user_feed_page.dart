@@ -33,15 +33,13 @@ class _UserFeedPageState extends State<UserFeedPage> {
           ),
         ],
       ),
-      body: const SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(Constants.padding),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text("user feed!"),
-            ],
-          ),
+      body: const Padding(
+        padding: EdgeInsets.all(Constants.padding),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text("user feed!"),
+          ],
         ),
       ),
     );

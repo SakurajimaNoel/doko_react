@@ -57,87 +57,82 @@ class _ConfirmMfaPageState extends State<ConfirmMfaPage> {
           top: Constants.appBarHeight,
           bottom: Constants.gap,
         ),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  const Heading(
-                    "Multi-factor authentication",
-                    size: Constants.heading3,
-                  ),
-                  const SizedBox(
-                    height: Constants.gap * 1.5,
-                  ),
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          keyboardType: TextInputType.number,
-                          enabled: !_loading,
-                          maxLength: 6,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(6),
-                          ],
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "Code",
-                            hintText: "Code...",
-                          ),
-                          onSaved: (value) {
-                            if (value == null || value.isEmpty) {
-                              return;
-                            }
-                            _confirmString = value;
-                          },
-                          validator: (value) {
-                            InputStatus status =
-                                ValidateInput.validateConfirmCode(value);
-                            if (!status.isValid) {
-                              return status.message;
-                            }
-
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: Constants.gap * 1.5),
-                        if (_errorMessage.isNotEmpty) ...[
-                          const SizedBox(
-                            height: Constants.gap * 0.75,
-                          ),
-                          ErrorText(_errorMessage),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              children: [
+                const Heading(
+                  "Multi-factor authentication",
+                  size: Constants.heading3,
+                ),
+                const SizedBox(
+                  height: Constants.gap * 1.5,
+                ),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        keyboardType: TextInputType.number,
+                        enabled: !_loading,
+                        maxLength: 6,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(6),
                         ],
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: "Code",
+                          hintText: "Code...",
+                        ),
+                        onSaved: (value) {
+                          if (value == null || value.isEmpty) {
+                            return;
+                          }
+                          _confirmString = value;
+                        },
+                        validator: (value) {
+                          InputStatus status =
+                              ValidateInput.validateConfirmCode(value);
+                          if (!status.isValid) {
+                            return status.message;
+                          }
+
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: Constants.gap * 1.5),
+                      if (_errorMessage.isNotEmpty) ...[
                         const SizedBox(
-                          height: Constants.gap * 0,
+                          height: Constants.gap * 0.75,
                         ),
-                        const Text(
-                          "* Check your authenticator app for the code to verify your identity.",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: Constants.smallFontSize - 1,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
+                        ErrorText(_errorMessage),
                       ],
-                    ),
-                  ),
-                ],
-              ),
-              FilledButton(
-                onPressed: _loading ? null : _submit,
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size(
-                    Constants.buttonWidth,
-                    Constants.buttonHeight,
+                      const Text(
+                        "* Check your authenticator app for the code to verify your identity.",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontSize: Constants.smallFontSize - 1,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: _loading ? const LoaderButton() : const Text("Continue"),
+              ],
+            ),
+            FilledButton(
+              onPressed: _loading ? null : _submit,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(
+                  Constants.buttonWidth,
+                  Constants.buttonHeight,
+                ),
               ),
-            ],
-          ),
+              child: _loading ? const LoaderButton() : const Text("Continue"),
+            ),
+          ],
         ),
       ),
     );
