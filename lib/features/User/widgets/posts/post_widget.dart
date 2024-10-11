@@ -21,10 +21,7 @@ class PostWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.sizeOf(context).width;
-
-    var contentWidth =
-        width - (Constants.actionWidth + Constants.actionEdgeGap);
-    var height = contentWidth * (1 / Constants.postContainer);
+    var height = width * (1 / Constants.postContainer);
 
     return Container(
       margin: const EdgeInsets.only(bottom: Constants.gap * 1.5),
@@ -54,27 +51,13 @@ class PostWidget extends StatelessWidget {
             const SizedBox(
               height: Constants.gap * 0.5,
             ),
-            Row(
-              children: [
-                SizedBox(
-                  // content carousel
-                  height: height,
-                  width: contentWidth,
-                  child: _PostContent(
-                    content: post.content,
-                  ),
-                ),
-                SizedBox(
-                  // post action
-                  height: height,
-                  width: Constants.actionWidth,
-                  child: const _PostAction(),
-                ),
-                const SizedBox(
-                  // gap from edge
-                  width: Constants.actionEdgeGap,
-                ),
-              ],
+            SizedBox(
+              // content carousel
+              height: height,
+              width: width,
+              child: _PostContent(
+                content: post.content,
+              ),
             ),
           ],
           const SizedBox(
@@ -90,10 +73,7 @@ class PostWidget extends StatelessWidget {
           const SizedBox(
             height: Constants.gap * 0.5,
           ),
-          if (post.content.isEmpty)
-            const _PostAction(
-              row: true,
-            ),
+          const _PostAction(),
         ],
       ),
     );
@@ -125,7 +105,6 @@ class _PostContent extends StatelessWidget {
   Widget _handleVideoContent(Content item) {
     return VideoPlayer(
       path: item.signedURL,
-      autoplay: false,
       key: Key(item.key),
     );
   }
@@ -140,19 +119,16 @@ class _PostContent extends StatelessWidget {
   Widget build(BuildContext context) {
     var width = MediaQuery.sizeOf(context).width;
 
-    var contentWidth =
-        width - (Constants.actionWidth + Constants.actionEdgeGap);
-
     return CustomCarouselView(
-      itemExtent: contentWidth,
-      shrinkExtent: contentWidth * 0.5,
+      itemExtent: width,
+      shrinkExtent: width * 0.5,
       itemSnapping: true,
       padding: const EdgeInsets.symmetric(
-        horizontal: Constants.padding * 0.5,
+        horizontal: Constants.padding * 0.25,
       ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
-          Radius.circular(Constants.radius * 0.5),
+          Radius.circular(Constants.radius * 0.25),
         ),
       ),
       children: content.map(
@@ -230,47 +206,37 @@ class _PostCaptionState extends State<_PostCaption> {
 
 // post actions
 class _PostAction extends StatelessWidget {
-  final bool row;
-
-  const _PostAction({
-    this.row = false,
-  });
-
-  Widget _actionAlignment(List<Widget> actionChildren) {
-    if (row) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        textDirection: TextDirection.rtl,
-        children: actionChildren,
-      );
-    }
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: actionChildren,
-    );
-  }
+  const _PostAction();
 
   @override
   Widget build(BuildContext context) {
     List<Widget> actionChildren = [
       IconButton(
         onPressed: () {},
-        icon: const Icon(Icons.share),
+        icon: const Icon(Icons.thumb_up_alt_outlined),
         iconSize: Constants.width * 1.25,
+      ),
+      const SizedBox(
+        width: Constants.gap * 0.25,
       ),
       IconButton(
         onPressed: () {},
         icon: const Icon(Icons.insert_comment_outlined),
         iconSize: Constants.width * 1.25,
       ),
+      const SizedBox(
+        width: Constants.gap * 0.25,
+      ),
       IconButton(
         onPressed: () {},
-        icon: const Icon(Icons.thumb_up_alt_outlined),
+        icon: const Icon(Icons.share),
         iconSize: Constants.width * 1.25,
       ),
     ];
 
-    return _actionAlignment(actionChildren);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: actionChildren,
+    );
   }
 }
