@@ -56,13 +56,13 @@ class _SignupPageState extends State<SignupPage> {
 
   void _handleSuccess() {
     String message =
-        "Account created successfully. Please verify your email to log in.";
+        "Almost there! Just one more step: verify your email address to activate your account. Look for the verification email in your inbox.";
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         duration: const Duration(
-          milliseconds: 500,
+          milliseconds: 750,
         ),
       ),
     );
@@ -174,6 +174,15 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                   ),
                   const SizedBox(
+                    height: Constants.gap * 0.5,
+                  ),
+                  if (_errorMessage.isNotEmpty) ...[
+                    const SizedBox(
+                      height: Constants.gap * 0.75,
+                    ),
+                    ErrorText(_errorMessage),
+                  ],
+                  const SizedBox(
                     height: Constants.gap * 1.5,
                   ),
                   FilledButton(
@@ -187,12 +196,17 @@ class _SignupPageState extends State<SignupPage> {
                     child:
                         _loading ? const LoaderButton() : const Text("Sign Up"),
                   ),
-                  if (_errorMessage.isNotEmpty) ...[
-                    const SizedBox(
-                      height: Constants.gap * 0.75,
+                  const SizedBox(
+                    height: Constants.gap,
+                  ),
+                  const Text(
+                    "Once you've created your account, please check your inbox for a verification email.",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: Constants.smallFontSize,
+                      fontStyle: FontStyle.italic,
                     ),
-                    ErrorText(_errorMessage),
-                  ],
+                  ),
                 ],
               ),
             ),

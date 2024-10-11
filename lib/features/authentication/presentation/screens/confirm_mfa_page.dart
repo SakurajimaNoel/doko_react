@@ -51,76 +51,64 @@ class _ConfirmMfaPageState extends State<ConfirmMfaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.only(
-          left: Constants.gap,
-          right: Constants.gap,
-          top: Constants.appBarHeight,
-          bottom: Constants.gap,
-        ),
+        padding: const EdgeInsets.all(Constants.padding),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Column(
-              children: [
-                const Heading(
-                  "Multi-factor authentication",
-                  size: Constants.heading3,
-                ),
-                const SizedBox(
-                  height: Constants.gap * 1.5,
-                ),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        keyboardType: TextInputType.number,
-                        enabled: !_loading,
-                        maxLength: 6,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(6),
-                        ],
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: "Code",
-                          hintText: "Code...",
-                        ),
-                        onSaved: (value) {
-                          if (value == null || value.isEmpty) {
-                            return;
-                          }
-                          _confirmString = value;
-                        },
-                        validator: (value) {
-                          InputStatus status =
-                              ValidateInput.validateConfirmCode(value);
-                          if (!status.isValid) {
-                            return status.message;
-                          }
-
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: Constants.gap * 1.5),
-                      if (_errorMessage.isNotEmpty) ...[
-                        const SizedBox(
-                          height: Constants.gap * 0.75,
-                        ),
-                        ErrorText(_errorMessage),
-                      ],
-                      const Text(
-                        "* Check your authenticator app for the code to verify your identity.",
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          fontSize: Constants.smallFontSize - 1,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
+            const Heading(
+              "Multi-factor authentication",
+              size: Constants.heading3,
+            ),
+            const SizedBox(
+              height: Constants.gap * 1.5,
+            ),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    enabled: !_loading,
+                    maxLength: 6,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(6),
                     ],
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: "Code",
+                      hintText: "Code...",
+                    ),
+                    onSaved: (value) {
+                      if (value == null || value.isEmpty) {
+                        return;
+                      }
+                      _confirmString = value;
+                    },
+                    validator: (value) {
+                      InputStatus status =
+                          ValidateInput.validateConfirmCode(value);
+                      if (!status.isValid) {
+                        return status.message;
+                      }
+
+                      return null;
+                    },
                   ),
-                ),
-              ],
+                  const SizedBox(
+                    height: Constants.gap * 0.5,
+                  ),
+                  if (_errorMessage.isNotEmpty) ...[
+                    const SizedBox(
+                      height: Constants.gap * 0.75,
+                    ),
+                    ErrorText(_errorMessage),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: Constants.gap * 1.5,
             ),
             FilledButton(
               onPressed: _loading ? null : _submit,
@@ -131,6 +119,17 @@ class _ConfirmMfaPageState extends State<ConfirmMfaPage> {
                 ),
               ),
               child: _loading ? const LoaderButton() : const Text("Continue"),
+            ),
+            const SizedBox(
+              height: Constants.gap,
+            ),
+            const Text(
+              "Check your authenticator app for the code to verify your identity.",
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                fontSize: Constants.smallFontSize,
+                fontStyle: FontStyle.italic,
+              ),
             ),
           ],
         ),

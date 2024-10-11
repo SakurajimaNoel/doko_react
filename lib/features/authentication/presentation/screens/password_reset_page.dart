@@ -66,19 +66,13 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
       body: Padding(
         padding: const EdgeInsets.all(Constants.padding),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Column(
               children: [
                 const Heading(
                   "Password Reset",
                   size: Constants.heading2,
-                ),
-                const SizedBox(
-                  height: Constants.gap * 0.5,
-                ),
-                const Text(
-                  "Enter your email address below. We'll send you a verification code.",
                 ),
                 const SizedBox(
                   height: Constants.gap * 1.5,
@@ -114,7 +108,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                         ),
                       ),
                       const SizedBox(
-                        height: Constants.gap * 1.5,
+                        height: Constants.gap * 0.5,
                       ),
                       if (_errorMessage.isNotEmpty) ...[
                         const SizedBox(
@@ -127,6 +121,9 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                 ),
               ],
             ),
+            const SizedBox(
+              height: Constants.gap * 1.5,
+            ),
             FilledButton(
               onPressed: _loading ? null : _submit,
               style: FilledButton.styleFrom(
@@ -136,6 +133,17 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                 ),
               ),
               child: _loading ? const LoaderButton() : const Text("Continue"),
+            ),
+            const SizedBox(
+              height: Constants.gap,
+            ),
+            const Text(
+              "We'll send you a verification code to your email to reset your password.",
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                fontSize: Constants.smallFontSize,
+                fontStyle: FontStyle.italic,
+              ),
             ),
           ],
         ),
