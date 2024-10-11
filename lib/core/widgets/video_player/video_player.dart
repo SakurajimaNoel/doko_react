@@ -11,12 +11,10 @@ import 'package:visibility_detector/visibility_detector.dart';
 
 class VideoPlayer extends StatefulWidget {
   final String path;
-  final bool autoplay;
 
   const VideoPlayer({
     required super.key,
     required this.path,
-    this.autoplay = false,
   });
 
   @override
@@ -47,7 +45,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
     player
         .open(
       Media(_path),
-      play: widget.autoplay,
     )
         .then((_) {
       _handleRatio();
