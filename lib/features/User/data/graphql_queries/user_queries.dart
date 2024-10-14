@@ -128,6 +128,7 @@ class UserQueries {
               endCursor
               hasNextPage
             }
+            totalCount            
           }
           friendsConnection(first: \$friendsConnectionFirst2, sort: \$friendsConnectionSort2, where: \$friendsConnectionWhere2) {
             edges {
@@ -148,6 +149,7 @@ class UserQueries {
               endCursor
               hasNextPage
             }
+            totalCount
           }
           friends(where: \$friendsWhere2) {
             friendsConnection(where: \$friendsConnectionWhere4) {
@@ -211,7 +213,36 @@ class UserQueries {
   }
 
   // get user accepted friends by user id
-  static String getFriendsByUserId() {
+  static String getFriendsByUserId(String? cursor) {
+    if (cursor == null || cursor.isEmpty) {
+      return """
+      query Query(\$where: UserWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
+        users(where: \$where) {
+          friendsConnection(first: \$first, sort: \$sort, where: \$friendsConnectionWhere2) {
+            edges {
+              node {
+                id
+                name
+                username
+                profilePicture
+                friendsConnection(where: \$friendsConnectionWhere3) {
+                  edges {
+                    requestedBy
+                    status
+                  }
+                }
+              }
+            }
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+          }
+        }
+      }
+      """;
+    }
+
     return """
         query Query(\$where: UserWhere, \$after: String, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
           users(where: \$where) {
@@ -241,8 +272,34 @@ class UserQueries {
   }
 
   static Map<String, dynamic> getFriendsByUserIdVariables(
-      String id, String cursor,
+      String id, String? cursor,
       {required String currentUserId}) {
+    if (cursor == null || cursor.isEmpty) {
+      return {
+        "where": {
+          "id": id,
+        },
+        "first": QueryConstants.friendLimit,
+        "sort": const [
+          {
+            "edge": {
+              "addedOn": "DESC",
+            }
+          }
+        ],
+        "friendsConnectionWhere2": const {
+          "edge": {
+            "status": FriendStatus.accepted,
+          }
+        },
+        "friendsConnectionWhere3": {
+          "node": {
+            "id": currentUserId,
+          }
+        }
+      };
+    }
+
     return {
       "where": {
         "id": id,

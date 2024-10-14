@@ -41,6 +41,8 @@ class CompleteUserModel extends UserModel {
   final DateTime createdOn;
   final ProfilePostInfo postsInfo;
   final ProfileFriendInfo friendsInfo;
+  int postsCount;
+  int friendsCount;
 
   CompleteUserModel({
     required this.friendRelationDetail,
@@ -54,6 +56,8 @@ class CompleteUserModel extends UserModel {
     required super.profilePicture,
     required super.id,
     required super.signedProfilePicture,
+    required this.friendsCount,
+    required this.postsCount,
   });
 
   CompleteUserModel.fromUserModel({
@@ -64,6 +68,8 @@ class CompleteUserModel extends UserModel {
     required this.postsInfo,
     required this.createdOn,
     required this.dob,
+    required this.postsCount,
+    required this.friendsCount,
   }) : super(
           name: user.name,
           username: user.username,
@@ -107,6 +113,8 @@ class CompleteUserModel extends UserModel {
       createdOn: DateTime.parse(map["createdOn"]),
       postsInfo: results[1] as ProfilePostInfo,
       friendsInfo: results[2] as ProfileFriendInfo,
+      friendsCount: map["friendsConnection"]["totalCount"],
+      postsCount: map["postsConnection"]["totalCount"],
     );
   }
 }

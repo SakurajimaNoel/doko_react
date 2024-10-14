@@ -205,13 +205,13 @@ class UserGraphqlService {
 
   Future<FriendResponse> getFriendsByUserId(
     String id,
-    String cursor, {
+    String? cursor, {
     required String currentUserId,
   }) async {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
-          document: gql(UserQueries.getFriendsByUserId()),
+          document: gql(UserQueries.getFriendsByUserId(cursor)),
           variables: UserQueries.getFriendsByUserIdVariables(
             id,
             cursor,
