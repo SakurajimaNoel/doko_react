@@ -145,7 +145,7 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
       );
     }
 
-    return ListView.builder(
+    return SliverList.builder(
       itemCount: _posts.length + 1,
       itemBuilder: (BuildContext context, int index) =>
           _buildItem(context, index),

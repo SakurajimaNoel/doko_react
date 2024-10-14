@@ -27,7 +27,7 @@ class PostWidget extends StatelessWidget {
     var height = width * (1 / Constants.postContainer);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: Constants.gap * 2.5),
+      margin: const EdgeInsets.symmetric(vertical: Constants.gap * 1.25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
