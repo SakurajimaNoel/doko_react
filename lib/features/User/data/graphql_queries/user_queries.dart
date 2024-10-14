@@ -704,4 +704,79 @@ class UserQueries {
       ],
     };
   }
+
+  // post action like
+  static String userAddLikePost() {
+    return """
+    mutation Mutation(\$where: PostWhere, \$connect: PostConnectInput, \$update: PostUpdateInput) {
+      updatePosts(where: \$where, connect: \$connect, update: \$update) {
+        info {
+          relationshipsCreated
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> userAddLikePostVariables({
+    required String postId,
+    required String userId,
+  }) {
+    return {
+      "where": {
+        "id": postId,
+      },
+      "connect": {
+        "likedBy": [
+          {
+            "where": {
+              "node": {
+                "id": userId,
+              }
+            }
+          }
+        ]
+      },
+      "update": {
+        "likes_INCREMENT": 1,
+      }
+    };
+  }
+
+  static String userRemoveLikePost() {
+    return """
+    mutation Mutation(\$where: PostWhere, \$update: PostUpdateInput, \$disconnect: PostDisconnectInput) {
+      updatePosts(where: \$where, update: \$update, disconnect: \$disconnect) {
+        info {
+          relationshipsDeleted
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> userRemoveLikePostVariables({
+    required String postId,
+    required String userId,
+  }) {
+    return {
+      "where": {
+        "id": postId,
+      },
+      "disconnect": {
+        "likedBy": [
+          {
+            "where": {
+              "node": {
+                "id": userId,
+              }
+            }
+          }
+        ]
+      },
+      "update": {
+        "likes_DECREMENT": 1,
+      }
+    };
+  }
 }
