@@ -126,6 +126,20 @@ class DisplayText {
     }
   }
 
+  static String displayNumericValue(int likes) {
+    if (likes < 1000) {
+      return likes.toString();
+    } else if (likes < 10000) {
+      return "${(likes / 1000).toStringAsFixed(0)},${likes % 1000}";
+    } else if (likes < 1000000) {
+      return '${(likes / 1000).toStringAsFixed(likes % 1000 == 0 ? 0 : 1)}k';
+    } else if (likes < 1000000000) {
+      return '${(likes / 1000000).toStringAsFixed(likes % 1000000 == 0 ? 0 : 1)}M';
+    } else {
+      return '${(likes / 1000000000).toStringAsFixed(likes % 1000000000 == 0 ? 0 : 1)}B';
+    }
+  }
+
   static String generateRandomString() {
     return UUID.getUUID();
   }

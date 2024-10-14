@@ -45,13 +45,29 @@ class ProfilePostModel {
   final String caption;
   final DateTime createdOn;
   final List<Content> content;
+  int likes;
+  bool userLike;
+  int comments;
 
-  const ProfilePostModel({
+  ProfilePostModel({
     required this.caption,
     required this.createdOn,
     required this.id,
     required this.content,
+    required this.likes,
+    required this.userLike,
+    required this.comments,
   });
+
+  void updateUserLike(bool like) {
+    userLike = like;
+
+    if (like) {
+      likes++;
+    } else {
+      likes--;
+    }
+  }
 
   static Future<ProfilePostModel> createModel({required Map map}) async {
     List<Future<Content>> contentFuture = (map["content"] as List)
@@ -61,12 +77,16 @@ class ProfilePostModel {
         .toList();
 
     List<Content> content = await Future.wait(contentFuture);
+    bool userLike = (map["likedBy"] as List).length == 1;
 
     return ProfilePostModel(
       caption: map["caption"],
       createdOn: DateTime.parse(map["createdOn"]),
       id: map["id"],
       content: content,
+      likes: map["likedByConnection"]["totalCount"],
+      userLike: userLike,
+      comments: map["commentsConnection"]["totalCount"],
     );
   }
 }
@@ -105,12 +125,15 @@ class ProfilePostInfo {
 class PostModel extends ProfilePostModel {
   final UserModel createdBy;
 
-  const PostModel({
+  PostModel({
     required this.createdBy,
     required super.caption,
     required super.createdOn,
     required super.id,
     required super.content,
+    required super.likes,
+    required super.userLike,
+    required super.comments,
   });
 
   PostModel.fromProfilePost({
@@ -121,6 +144,9 @@ class PostModel extends ProfilePostModel {
           createdOn: post.createdOn,
           id: post.id,
           content: post.content,
+          likes: post.likes,
+          userLike: post.userLike,
+          comments: post.comments,
         );
 
   static Future<PostModel> createModel({required Map map}) async {
@@ -140,6 +166,7 @@ class PostModel extends ProfilePostModel {
 
     UserModel createdBy = results[0] as UserModel;
     List<Content> content = results.sublist(1).cast<Content>();
+    bool userLike = (map["likedBy"] as List).length == 1;
 
     return PostModel(
       caption: map["caption"],
@@ -147,6 +174,9 @@ class PostModel extends ProfilePostModel {
       id: map["id"],
       createdBy: createdBy,
       content: content,
+      likes: map["likedByConnection"]["totalCount"],
+      userLike: userLike,
+      comments: map["commentsConnection"]["totalCount"],
     );
   }
 }

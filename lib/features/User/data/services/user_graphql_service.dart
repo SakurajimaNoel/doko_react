@@ -250,10 +250,21 @@ class UserGraphqlService {
 
   Future<PostResponse> getPostsByUserId(String id, String cursor) async {
     try {
+      final AuthenticationActions auth =
+          AuthenticationActions(auth: Amplify.Auth);
+
+      var userIdResult = await auth.getUserId();
+      if (userIdResult.status == AuthStatus.error) {
+        throw Exception(userIdResult.message);
+      }
+
+      String userId = userIdResult.message!;
+
       QueryResult result = await _client.query(
         QueryOptions(
           document: gql(UserQueries.getUserPostsByUserId()),
-          variables: UserQueries.getUserPostsByUserIdVariables(id, cursor),
+          variables:
+              UserQueries.getUserPostsByUserIdVariables(id, cursor, userId),
         ),
       );
 
@@ -485,6 +496,58 @@ class UserGraphqlService {
           ),
         ),
       );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      return ResponseStatus.success;
+    } catch (e) {
+      safePrint(e.toString());
+      return ResponseStatus.error;
+    }
+  }
+
+  Future<ResponseStatus> userLikePostAction({
+    required String postId,
+    bool addLike = true,
+  }) async {
+    try {
+      final AuthenticationActions auth =
+          AuthenticationActions(auth: Amplify.Auth);
+
+      var userIdResult = await auth.getUserId();
+      if (userIdResult.status == AuthStatus.error) {
+        throw Exception(userIdResult.message);
+      }
+
+      String userId = userIdResult.message!;
+
+      Future<QueryResult<Object?>> futureMutation;
+
+      if (addLike) {
+        futureMutation = _client.mutate(
+          MutationOptions(
+            document: gql(UserQueries.userAddLikePost()),
+            variables: UserQueries.userAddLikePostVariables(
+              postId: postId,
+              userId: userId,
+            ),
+          ),
+        );
+      } else {
+        futureMutation = _client.mutate(
+          MutationOptions(
+            document: gql(UserQueries.userRemoveLikePost()),
+            variables: UserQueries.userRemoveLikePostVariables(
+              postId: postId,
+              userId: userId,
+            ),
+          ),
+        );
+      }
+
+      QueryResult result = await futureMutation;
 
       if (result.hasException) {
         throw Exception(result.exception);

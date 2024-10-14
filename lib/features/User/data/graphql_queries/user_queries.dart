@@ -96,7 +96,7 @@ class UserQueries {
   // get complete user
   static String getCompleteUser() {
     return """
-      query Query(\$where: UserWhere, \$first: Int, \$sort: [UserPostsConnectionSort!], \$friendsConnectionFirst2: Int, \$friendsConnectionSort2: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$friendsWhere2: UserWhere, \$friendsConnectionWhere4: UserFriendsConnectionWhere) {
+      query Query(\$where: UserWhere, \$first: Int, \$sort: [UserPostsConnectionSort!], \$friendsConnectionFirst2: Int, \$friendsConnectionSort2: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$friendsWhere2: UserWhere, \$friendsConnectionWhere4: UserFriendsConnectionWhere, \$likedByWhere2: UserWhere) {
         users(where: \$where) {
           username
           profilePicture
@@ -112,6 +112,16 @@ class UserQueries {
                 id
                 createdOn
                 caption
+                likes
+                likedBy(where: \$likedByWhere2) {
+                  id
+                }
+                commentsConnection {
+                  totalCount
+                }
+                likedByConnection {
+                  totalCount
+                }
               }
             }
             pageInfo {
@@ -194,6 +204,9 @@ class UserQueries {
           "id": id,
         }
       },
+      "likedByWhere2": {
+        "id": currentUserId,
+      },
     };
   }
 
@@ -259,7 +272,7 @@ class UserQueries {
   // get user posts by user id
   static String getUserPostsByUserId() {
     return """
-        query Users(\$where: UserWhere, \$after: String, \$sort: [UserPostsConnectionSort!], \$first: Int) {
+        query Users(\$where: UserWhere, \$after: String, \$sort: [UserPostsConnectionSort!], \$first: Int, \$likedByWhere2: UserWhere) {
           users(where: \$where) {
             postsConnection(after: \$after, sort: \$sort, first: \$first) {
               edges {
@@ -268,6 +281,15 @@ class UserQueries {
                   caption
                   id
                   createdOn
+                  likedBy(where: \$likedByWhere2) {
+                    id
+                  }
+                  commentsConnection {
+                    totalCount
+                  }
+                  likedByConnection {
+                    totalCount
+                  }
                 }
               }
               pageInfo {
@@ -281,7 +303,7 @@ class UserQueries {
   }
 
   static Map<String, dynamic> getUserPostsByUserIdVariables(
-      String id, String cursor) {
+      String id, String cursor, String userId) {
     return {
       "where": {
         "id": id,
@@ -294,7 +316,10 @@ class UserQueries {
             "createdOn": "DESC",
           }
         }
-      ]
+      ],
+      "likedByWhere2": {
+        "id": userId,
+      },
     };
   }
 
@@ -708,8 +733,8 @@ class UserQueries {
   // post action like
   static String userAddLikePost() {
     return """
-    mutation Mutation(\$where: PostWhere, \$connect: PostConnectInput, \$update: PostUpdateInput) {
-      updatePosts(where: \$where, connect: \$connect, update: \$update) {
+    mutation Mutation(\$where: PostWhere, \$connect: PostConnectInput) {
+      updatePosts(where: \$where, connect: \$connect) {
         info {
           relationshipsCreated
         }
@@ -737,16 +762,13 @@ class UserQueries {
           }
         ]
       },
-      "update": {
-        "likes_INCREMENT": 1,
-      }
     };
   }
 
   static String userRemoveLikePost() {
     return """
-    mutation Mutation(\$where: PostWhere, \$update: PostUpdateInput, \$disconnect: PostDisconnectInput) {
-      updatePosts(where: \$where, update: \$update, disconnect: \$disconnect) {
+    mutation Mutation(\$where: PostWhere, \$disconnect: PostDisconnectInput) {
+      updatePosts(where: \$where, disconnect: \$disconnect) {
         info {
           relationshipsDeleted
         }
@@ -774,9 +796,6 @@ class UserQueries {
           }
         ]
       },
-      "update": {
-        "likes_DECREMENT": 1,
-      }
     };
   }
 }

@@ -1,11 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
+import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/widgets/general/custom_carousel_view.dart';
 import 'package:doko_react/core/widgets/video_player/video_player.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
+import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:doko_react/features/User/widgets/posts/post_user_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +27,7 @@ class PostWidget extends StatelessWidget {
     var height = width * (1 / Constants.postContainer);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: Constants.gap * 1.5),
+      margin: const EdgeInsets.only(bottom: Constants.gap * 2.5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -67,13 +70,21 @@ class PostWidget extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: Constants.padding,
+              vertical: Constants.padding * 0.5,
             ),
             child: _PostCaption(caption: post.caption),
           ),
           const SizedBox(
             height: Constants.gap * 0.5,
           ),
-          const _PostAction(),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Constants.padding,
+            ),
+            child: _PostAction(
+              postModel: post,
+            ),
+          ),
         ],
       ),
     );
@@ -205,33 +216,90 @@ class _PostCaptionState extends State<_PostCaption> {
 }
 
 // post actions
-class _PostAction extends StatelessWidget {
-  const _PostAction();
+class _PostAction extends StatefulWidget {
+  final PostModel postModel;
+
+  const _PostAction({
+    required this.postModel,
+  });
+
+  @override
+  State<_PostAction> createState() => _PostActionState();
+}
+
+class _PostActionState extends State<_PostAction> {
+  final UserGraphqlService _userGraphqlService = UserGraphqlService(
+    client: GraphqlConfig.getGraphQLClient(),
+  );
+
+  late final PostModel _post;
+  bool _updating = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _post = widget.postModel;
+  }
+
+  Future<void> handleLike() async {
+    setState(() {
+      _updating = true;
+      _post.updateUserLike(!_post.userLike);
+    });
+
+    var likeResponse = await _userGraphqlService.userLikePostAction(
+      postId: _post.id,
+      addLike: _post.userLike,
+    );
+
+    setState(() {
+      _updating = false;
+    });
+
+    if (likeResponse == ResponseStatus.error) {
+      setState(() {
+        _post.updateUserLike(!_post.userLike);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    var currTheme = Theme.of(context).colorScheme;
+
     List<Widget> actionChildren = [
-      IconButton(
-        onPressed: () {},
-        icon: const Icon(Icons.thumb_up_alt_outlined),
-        iconSize: Constants.width * 1.25,
+      GestureDetector(
+        onTap: _updating ? null : handleLike,
+        child: _post.userLike
+            ? Icon(
+                Icons.thumb_up,
+                color: currTheme.primary,
+              )
+            : const Icon(Icons.thumb_up_outlined),
       ),
       const SizedBox(
-        width: Constants.gap * 0.25,
+        width: Constants.gap * 0.5,
       ),
-      IconButton(
-        onPressed: () {},
-        icon: const Icon(Icons.insert_comment_outlined),
-        iconSize: Constants.width * 1.25,
+      Text(DisplayText.displayNumericValue(_post.likes)),
+      const SizedBox(
+        width: Constants.gap * 1.5,
+      ),
+      GestureDetector(
+        onTap: () {},
+        child: const Icon(Icons.insert_comment_outlined),
       ),
       const SizedBox(
-        width: Constants.gap * 0.25,
+        width: Constants.gap * 0.5,
       ),
-      IconButton(
-        onPressed: () {},
-        icon: const Icon(Icons.share),
-        iconSize: Constants.width * 1.25,
+      Text(DisplayText.displayNumericValue(_post.comments)),
+      const SizedBox(
+        width: Constants.gap * 1.5,
       ),
+      GestureDetector(
+        onTap: () {},
+        child: const Icon(Icons.share),
+      )
     ];
 
     return Row(
