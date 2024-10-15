@@ -4,6 +4,7 @@ import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
@@ -13,7 +14,6 @@ import 'package:doko_react/features/User/data/graphql_queries/query_constants.da
 import 'package:doko_react/features/User/data/model/friend_model.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
-import 'package:doko_react/features/User/widgets/friends/friend_container_profile_widget.dart';
 import 'package:doko_react/features/User/widgets/posts/post_container_profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -219,6 +219,56 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     );
   }
 
+  Widget _userProfileInfo() {
+    var currTheme = Theme.of(context).colorScheme;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Material(
+          shape: Border(
+            bottom: BorderSide(
+              color: currTheme.primary,
+              width: Constants.sliverBorder * 3,
+            ),
+          ),
+          child: Container(
+            height: double.infinity,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_view_month,
+                  color: currTheme.primary,
+                ),
+                const SizedBox(
+                  width: Constants.gap * 0.5,
+                ),
+                Text(
+                  "Posts: ${DisplayText.displayNumericValue(_user!.postsCount)}",
+                  style: TextStyle(
+                    color: currTheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        TextButton.icon(
+          style: TextButton.styleFrom(
+            iconColor: currTheme.secondary,
+            foregroundColor: currTheme.secondary,
+          ),
+          onPressed: () {
+            context.pushNamed(RouterConstants.pendingRequests);
+          },
+          icon: const Icon(Icons.group),
+          label: Text(
+              "Friends: ${DisplayText.displayNumericValue(_user!.friendsCount)}"),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var currTheme = Theme.of(context).colorScheme;
@@ -242,123 +292,118 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       user.name = userProvider.name;
     }
 
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        body: NestedScrollView(
+    return Scaffold(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await _fetchCompleteUser();
+        },
+        child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return [
-              SliverAppBar(
-                forceElevated: innerBoxIsScrolled,
-                floating: false,
-                pinned: true,
-                expandedHeight: height,
-                title: Text(user.username),
-                actions: _appBarActions(),
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      user.profilePicture.isNotEmpty
-                          ? CachedNetworkImage(
-                              memCacheHeight: Constants.profileCacheHeight,
-                              cacheKey: user.profilePicture,
-                              imageUrl: user.signedProfilePicture,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
-                              height: height,
-                            )
-                          : Container(
-                              color: currTheme.onSecondary,
-                              child: Icon(
-                                Icons.person,
-                                size: height,
-                              ),
+          slivers: [
+            SliverAppBar(
+              floating: false,
+              pinned: true,
+              expandedHeight: height,
+              title: Text(user.username),
+              actions: _appBarActions(),
+              flexibleSpace: FlexibleSpaceBar(
+                background: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    user.profilePicture.isNotEmpty
+                        ? CachedNetworkImage(
+                            memCacheHeight: Constants.profileCacheHeight,
+                            cacheKey: user.profilePicture,
+                            imageUrl: user.signedProfilePicture,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(),
                             ),
-                      Container(
-                        padding: const EdgeInsets.only(
-                          bottom: Constants.padding,
-                          left: Constants.padding,
-                        ),
-                        alignment: Alignment.bottomLeft,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              currTheme.surface.withOpacity(0.5),
-                              currTheme.surface.withOpacity(0.25),
-                              currTheme.surface.withOpacity(0.25),
-                              currTheme.surface.withOpacity(0.5),
-                            ],
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                            height: height,
+                          )
+                        : Container(
+                            color: currTheme.onSecondary,
+                            child: Icon(
+                              Icons.person,
+                              size: height,
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          user.name,
-                          style: TextStyle(
-                            color: currTheme.onSurface,
-                            fontSize: Constants.heading2,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(Constants.padding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (user.bio.isNotEmpty) ...[
-                        Text(user.bio),
-                        const SizedBox(
-                          height: 16,
-                        ),
-                      ],
-                      _userProfileAction(),
-                    ],
-                  ),
-                ),
-              ),
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _SliverAppBarDelegate(
-                  const TabBar(
-                    tabs: [
-                      Tab(
-                        text: "Posts",
+                    Container(
+                      padding: const EdgeInsets.only(
+                        bottom: Constants.padding,
+                        left: Constants.padding,
                       ),
-                      Tab(
-                        text: "Friends",
+                      alignment: Alignment.bottomLeft,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            currTheme.surface.withOpacity(0.5),
+                            currTheme.surface.withOpacity(0.25),
+                            currTheme.surface.withOpacity(0.25),
+                            currTheme.surface.withOpacity(0.5),
+                          ],
+                        ),
+                      ),
+                      child: Text(
+                        user.name,
+                        style: TextStyle(
+                          color: currTheme.onSurface,
+                          fontSize: Constants.heading2,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(Constants.padding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (user.bio.isNotEmpty) ...[
+                      Text(user.bio),
+                      const SizedBox(
+                        height: 16,
                       ),
                     ],
-                  ),
+                    _userProfileAction(),
+                  ],
                 ),
-              )
-            ];
-          },
-          body: TabBarView(
-            children: [
-              PostContainerProfileWidget(
-                postInfo: user.postsInfo,
-                user: user,
-                key: ValueKey("${user.username} posts"),
               ),
-              FriendContainerProfileWidget(
-                friendInfo: user.friendsInfo,
-                user: user,
-                key: ValueKey("${user.username} friends"),
+            ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SliverAppBarDelegate(
+                _userProfileInfo(),
               ),
-            ],
-          ),
+            ),
+            PostContainerProfileWidget(
+              postInfo: user.postsInfo,
+              user: user,
+              key: ValueKey("${user.username} posts"),
+            ),
+          ],
+          // body: TabBarView(
+          //   children: [
+          //     PostContainerProfileWidget(
+          //       postInfo: user.postsInfo,
+          //       user: user,
+          //       key: ValueKey("${user.username} posts"),
+          //     ),
+          //     FriendContainerProfileWidget(
+          //       friendInfo: user.friendsInfo,
+          //       user: user,
+          //       key: ValueKey("${user.username} friends"),
+          //     ),
+          //   ],
+          // ),
         ),
       ),
     );
@@ -366,22 +411,27 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 }
 
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar _tabBar;
+  final Widget _widget;
 
-  _SliverAppBarDelegate(this._tabBar);
-
-  @override
-  double get minExtent => _tabBar.preferredSize.height;
+  _SliverAppBarDelegate(this._widget);
 
   @override
-  double get maxExtent => _tabBar.preferredSize.height;
+  double get minExtent => Constants.sliverPersistentHeaderHeight;
+
+  @override
+  double get maxExtent => Constants.sliverPersistentHeaderHeight;
 
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: _tabBar,
+    return Material(
+      shape: Border(
+        bottom: BorderSide(
+          color: Theme.of(context).colorScheme.outlineVariant,
+          width: Constants.sliverBorder,
+        ),
+      ),
+      child: _widget,
     );
   }
 
