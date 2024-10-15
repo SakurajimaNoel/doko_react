@@ -43,4 +43,8 @@ class Constants {
   static const double actionEdgeGap = _root * 0.125;
   static const int postLimit = 10;
   static const int postCaptionDisplayLimit = 125;
+
+  // profile
+  static const double sliverPersistentHeaderHeight = 50;
+  static const double sliverBorder = 1.5;
 }

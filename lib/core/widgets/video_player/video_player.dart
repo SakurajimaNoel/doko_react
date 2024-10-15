@@ -118,11 +118,13 @@ class _VideoPlayerState extends State<VideoPlayer> {
           seekBarPositionColor: currTheme.primary,
           seekBarThumbColor: currTheme.primary,
           seekBarColor: currTheme.onPrimary,
+          seekBarBufferColor: currTheme.onSecondaryContainer.withOpacity(0.25),
           seekBarThumbSize: 0,
           seekBarHeight: seekBarHeight,
         ),
         fullscreen: const MaterialVideoControlsThemeData(),
         child: Video(
+          fill: currTheme.surfaceContainer,
           resumeUponEnteringForegroundMode: true,
           controller: controller,
           fit: BoxFit.contain,
