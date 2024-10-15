@@ -42,6 +42,8 @@ class StorageUtils {
   }
 
   static Future<String> generatePreSignedURL(String path) async {
+    if (path.isEmpty) return "";
+
     var result = await storage.getDownloadUrl(path);
     return result.value;
   }
