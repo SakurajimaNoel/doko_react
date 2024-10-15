@@ -264,6 +264,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               pathParameters: {
                 "userId": _userId,
               },
+              extra: {
+                "name": _user!.name,
+              },
             );
           },
           icon: const Icon(Icons.group),
@@ -395,20 +398,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               key: ValueKey("${user.username} posts"),
             ),
           ],
-          // body: TabBarView(
-          //   children: [
-          //     PostContainerProfileWidget(
-          //       postInfo: user.postsInfo,
-          //       user: user,
-          //       key: ValueKey("${user.username} posts"),
-          //     ),
-          //     FriendContainerProfileWidget(
-          //       friendInfo: user.friendsInfo,
-          //       user: user,
-          //       key: ValueKey("${user.username} friends"),
-          //     ),
-          //   ],
-          // ),
         ),
       ),
     );

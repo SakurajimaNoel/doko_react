@@ -5,7 +5,6 @@ import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:doko_react/features/User/data/model/friend_model.dart';
-import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:doko_react/features/User/widgets/friends/friend_widget.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +13,14 @@ import 'package:provider/provider.dart';
 
 class FriendContainerProfileWidget extends StatefulWidget {
   final ProfileFriendInfo friendInfo;
-  final UserModel user;
+  final String userId;
+  final String name;
 
   const FriendContainerProfileWidget({
     super.key,
     required this.friendInfo,
-    required this.user,
+    required this.userId,
+    required this.name,
   });
 
   @override
@@ -31,7 +32,8 @@ class _FriendContainerProfileWidgetState
     extends State<FriendContainerProfileWidget>
     with AutomaticKeepAliveClientMixin {
   late final ProfileFriendInfo _friendInfo;
-  late final UserModel _user;
+  late final String name;
+  late final String userId;
   late final UserProvider _userProvider;
 
   final UserGraphqlService _userGraphqlService = UserGraphqlService(
@@ -48,7 +50,8 @@ class _FriendContainerProfileWidgetState
     super.initState();
 
     _friendInfo = widget.friendInfo;
-    _user = widget.user;
+    name = widget.name;
+    userId = widget.userId;
 
     _userProvider = context.read<UserProvider>();
 
@@ -57,7 +60,7 @@ class _FriendContainerProfileWidgetState
 
   Future<void> _fetchMoreFriends() async {
     // only call this function when has next page
-    String id = _user.id;
+    String id = userId;
     String cursor = _friendInfo.info.endCursor!;
 
     var friendResponse = await _userGraphqlService.getFriendsByUserId(
@@ -102,14 +105,14 @@ class _FriendContainerProfileWidgetState
     if (index >= _friends.length) {
       // fetch more friends if available
       if (!_friendInfo.info.hasNextPage) {
-        // no more posts available
+        // no more friends available
         return Padding(
-          padding: const EdgeInsets.only(
-            bottom: Constants.padding,
+          padding: const EdgeInsets.symmetric(
+            vertical: Constants.padding * 2,
           ),
           child: Center(
             child: Text(
-              "${_user.name} has no more friends.",
+              "$name has no more friends.",
               style: const TextStyle(
                 fontWeight: FontWeight.w500,
               ),
@@ -154,7 +157,7 @@ class _FriendContainerProfileWidgetState
         ),
         child: Center(
           child: Text(
-            "${_user.name} has no friends.",
+            "$name has no friends.",
             style: const TextStyle(
               fontWeight: FontWeight.w500,
             ),
@@ -163,8 +166,8 @@ class _FriendContainerProfileWidgetState
       );
     }
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: Constants.padding,
+      padding: const EdgeInsets.all(
+        Constants.padding,
       ),
       child: ListView.builder(
         itemCount: _friends.length + 1,

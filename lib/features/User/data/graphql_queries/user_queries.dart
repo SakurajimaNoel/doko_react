@@ -216,7 +216,7 @@ class UserQueries {
   static String getFriendsByUserId(String? cursor) {
     if (cursor == null || cursor.isEmpty) {
       return """
-      query Query(\$where: UserWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
+       query Query(\$where: UserWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
         users(where: \$where) {
           friendsConnection(first: \$first, sort: \$sort, where: \$friendsConnectionWhere2) {
             edges {
@@ -280,14 +280,14 @@ class UserQueries {
           "id": id,
         },
         "first": QueryConstants.friendLimit,
-        "sort": const [
+        "sort": [
           {
             "edge": {
               "addedOn": "DESC",
             }
-          }
+          },
         ],
-        "friendsConnectionWhere2": const {
+        "friendsConnectionWhere2": {
           "edge": {
             "status": FriendStatus.accepted,
           }

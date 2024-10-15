@@ -3,6 +3,7 @@ import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
 import 'package:doko_react/features/User/data/model/friend_model.dart';
+import 'package:doko_react/features/User/data/model/model.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -227,8 +228,15 @@ class UserGraphqlService {
       List? res = result.data?["users"];
 
       if (res == null || res.isEmpty) {
-        return const FriendResponse(
+        return FriendResponse(
           status: ResponseStatus.success,
+          friendInfo: ProfileFriendInfo(
+            friends: [],
+            info: NodeInfo(
+              endCursor: null,
+              hasNextPage: false,
+            ),
+          ),
         );
       }
 
