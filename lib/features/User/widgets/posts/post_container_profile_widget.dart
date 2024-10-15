@@ -34,7 +34,6 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
 
   bool _loading = false;
 
-  // String _errorMessage = "";
   late List<ProfilePostModel> _posts;
 
   @override
@@ -57,9 +56,6 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
     _loading = false;
 
     if (postResponse.status == ResponseStatus.error) {
-      // setState(() {
-      //   _errorMessage = "Error fetching user posts.";
-      // });
       String message = "Error fetching more user posts";
       _handleError(message);
       return;
@@ -95,8 +91,8 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
       if (!_postInfo.info.hasNextPage) {
         // no more posts available
         return Padding(
-          padding: const EdgeInsets.only(
-            bottom: Constants.padding,
+          padding: const EdgeInsets.symmetric(
+            vertical: Constants.padding * 2,
           ),
           child: Center(
             child: Text(
@@ -130,10 +126,7 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
     super.build(context);
 
     if (_posts.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.only(
-          bottom: Constants.padding,
-        ),
+      return SliverFillRemaining(
         child: Center(
           child: Text(
             "${_user.name} has not uploaded any posts.",

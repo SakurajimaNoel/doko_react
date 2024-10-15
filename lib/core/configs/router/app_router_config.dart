@@ -7,6 +7,7 @@ import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_p
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/User/Nearby/presentation/nearby_page.dart';
+import 'package:doko_react/features/User/Profile/presentation/friends/friends_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/friends/pending_request_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/post/create_post_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/post/create_post_publish_page.dart';
@@ -157,7 +158,7 @@ class AppRouterConfig {
 
     return GoRouter(
       navigatorKey: homeRouterRootNavigatorKey,
-      initialLocation: "/profile",
+      initialLocation: "/user-feed",
       routes: [
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
@@ -273,8 +274,20 @@ class AppRouterConfig {
                             name: RouterConstants.profileFriends,
                             path: "friends",
                             builder: (context, state) {
+                              var extra = state.extra ??
+                                  {
+                                    "name": "user",
+                                  };
+
+                              final Map<String, dynamic> data =
+                                  extra as Map<String, dynamic>;
+
+                              String name = data["name"];
                               String userId = state.pathParameters["userId"]!;
-                              return UserProfilePage(userId: userId);
+                              return FriendsPage(
+                                userId: userId,
+                                name: name,
+                              );
                             },
                           ),
                         ]),
