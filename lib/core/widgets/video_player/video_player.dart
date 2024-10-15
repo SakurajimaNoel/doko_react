@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:doko_react/core/data/video.dart';
 import 'package:doko_react/core/helpers/constants.dart';
-import 'package:doko_react/core/provider/video_provider.dart';
+import 'package:doko_react/core/provider/user_preferences_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -24,7 +24,7 @@ class VideoPlayer extends StatefulWidget {
 class _VideoPlayerState extends State<VideoPlayer> {
   late final String _path;
   late final Key _key;
-  late final VideoProvider _videoProvider;
+  late final UserPreferencesProvider _userPreferencesProvider;
 
   double _ratio = Constants.landscape;
   Timer? timer; // to get current video aspect ratio
@@ -40,7 +40,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
     _path = widget.path;
     _key = widget.key!;
 
-    _videoProvider = context.read<VideoProvider>();
+    _userPreferencesProvider = context.read<UserPreferencesProvider>();
 
     player
         .open(
@@ -101,7 +101,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
       onVisibilityChanged: (VisibilityInfo visibilityInfo) {
         var visiblePercentage = visibilityInfo.visibleFraction * 100;
 
-        if (_videoProvider.mute) {
+        if (_userPreferencesProvider.mute) {
           player.setVolume(0);
         } else {
           player.setVolume(100);
@@ -157,7 +157,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
                         ),
                         IconButton(
                           onPressed: () {
-                            _videoProvider.toggleAudio();
+                            _userPreferencesProvider.toggleAudio();
 
                             if (player.state.volume == 0) {
                               player.setVolume(100);

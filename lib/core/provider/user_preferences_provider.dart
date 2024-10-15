@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class VideoProvider extends ChangeNotifier {
+class UserPreferencesProvider extends ChangeNotifier {
   bool _isMuted = true;
 
   bool get mute => _isMuted;
