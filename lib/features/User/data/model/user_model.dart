@@ -40,7 +40,6 @@ class CompleteUserModel extends UserModel {
   final DateTime dob;
   final DateTime createdOn;
   final ProfilePostInfo postsInfo;
-  final ProfileFriendInfo friendsInfo;
   int postsCount;
   int friendsCount;
 
@@ -49,7 +48,6 @@ class CompleteUserModel extends UserModel {
     required this.bio,
     required this.dob,
     required this.postsInfo,
-    required this.friendsInfo,
     required this.createdOn,
     required super.name,
     required super.username,
@@ -64,7 +62,6 @@ class CompleteUserModel extends UserModel {
     required UserModel user,
     required this.friendRelationDetail,
     required this.bio,
-    required this.friendsInfo,
     required this.postsInfo,
     required this.createdOn,
     required this.dob,
@@ -87,14 +84,9 @@ class CompleteUserModel extends UserModel {
       map: map["postsConnection"],
     );
 
-    // user friends
-    Future<ProfileFriendInfo> futureFriendInfo =
-        ProfileFriendInfo.createModel(map: map["friendsConnection"]);
-
     final results = await Future.wait([
       futureUser,
       futurePostInfo,
-      futureFriendInfo,
     ]);
 
     List friendConnection = map["friends"] as List;
@@ -112,7 +104,6 @@ class CompleteUserModel extends UserModel {
       dob: DateTime.parse(map["dob"]),
       createdOn: DateTime.parse(map["createdOn"]),
       postsInfo: results[1] as ProfilePostInfo,
-      friendsInfo: results[2] as ProfileFriendInfo,
       friendsCount: map["friendsConnection"]["totalCount"],
       postsCount: map["postsConnection"]["totalCount"],
     );

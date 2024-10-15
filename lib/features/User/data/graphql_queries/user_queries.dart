@@ -96,7 +96,7 @@ class UserQueries {
   // get complete user
   static String getCompleteUser() {
     return """
-      query Query(\$where: UserWhere, \$first: Int, \$sort: [UserPostsConnectionSort!], \$friendsConnectionFirst2: Int, \$friendsConnectionSort2: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$friendsWhere2: UserWhere, \$friendsConnectionWhere4: UserFriendsConnectionWhere, \$likedByWhere2: UserWhere) {
+      query Query(\$where: UserWhere, \$first: Int, \$sort: [UserPostsConnectionSort!], \$friendsWhere2: UserWhere, \$friendsConnectionWhere4: UserFriendsConnectionWhere, \$likedByWhere2: UserWhere) {
         users(where: \$where) {
           username
           profilePicture
@@ -128,27 +128,9 @@ class UserQueries {
               endCursor
               hasNextPage
             }
-            totalCount            
+            totalCount
           }
-          friendsConnection(first: \$friendsConnectionFirst2, sort: \$friendsConnectionSort2, where: \$friendsConnectionWhere2) {
-            edges {
-              node {
-                id
-                name
-                username
-                profilePicture
-                friendsConnection(where: \$friendsConnectionWhere3) {
-                  edges {
-                    requestedBy
-                    status
-                  }
-                }
-              }
-            }
-            pageInfo {
-              endCursor
-              hasNextPage
-            }
+          friendsConnection {
             totalCount
           }
           friends(where: \$friendsWhere2) {
@@ -180,24 +162,6 @@ class UserQueries {
           }
         }
       ],
-      "friendsConnectionFirst2": QueryConstants.friendLimit,
-      "friendsConnectionSort2": const [
-        {
-          "edge": {
-            "addedOn": "DESC",
-          }
-        }
-      ],
-      "friendsConnectionWhere2": const {
-        "edge": {
-          "status": "ACCEPTED",
-        }
-      },
-      "friendsConnectionWhere3": {
-        "node": {
-          "id": currentUserId,
-        }
-      },
       "friendsWhere2": {
         "id": currentUserId,
       },
