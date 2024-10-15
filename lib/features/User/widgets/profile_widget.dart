@@ -232,7 +232,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               width: Constants.sliverBorder * 3,
             ),
           ),
-          child: Container(
+          child: SizedBox(
             height: double.infinity,
             child: Row(
               children: [
@@ -259,7 +259,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             foregroundColor: currTheme.secondary,
           ),
           onPressed: () {
-            context.pushNamed(RouterConstants.pendingRequests);
+            context.pushNamed(
+              RouterConstants.profileFriends,
+              pathParameters: {
+                "userId": _userId,
+              },
+            );
           },
           icon: const Icon(Icons.group),
           label: Text(

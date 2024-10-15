@@ -5,14 +5,14 @@ import 'package:doko_react/core/widgets/loader/loader.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
-import 'package:doko_react/features/User/Feed/presentation/create_post_page.dart';
-import 'package:doko_react/features/User/Feed/presentation/create_post_publish_page.dart';
-import 'package:doko_react/features/User/Feed/presentation/pending_request_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/User/Nearby/presentation/nearby_page.dart';
-import 'package:doko_react/features/User/Profile/presentation/edit_profile_page.dart';
-import 'package:doko_react/features/User/Profile/presentation/profile_page.dart';
-import 'package:doko_react/features/User/Profile/presentation/user_profile_page.dart';
+import 'package:doko_react/features/User/Profile/presentation/friends/pending_request_page.dart';
+import 'package:doko_react/features/User/Profile/presentation/post/create_post_page.dart';
+import 'package:doko_react/features/User/Profile/presentation/post/create_post_publish_page.dart';
+import 'package:doko_react/features/User/Profile/presentation/profile/edit_profile_page.dart';
+import 'package:doko_react/features/User/Profile/presentation/profile/profile_page.dart';
+import 'package:doko_react/features/User/Profile/presentation/profile/user_profile_page.dart';
 import 'package:doko_react/features/User/user_layout.dart';
 import 'package:doko_react/features/application/settings/presentation/change_password_page.dart';
 import 'package:doko_react/features/application/settings/presentation/mfa_setup_page.dart';
@@ -157,7 +157,7 @@ class AppRouterConfig {
 
     return GoRouter(
       navigatorKey: homeRouterRootNavigatorKey,
-      initialLocation: "/user-feed",
+      initialLocation: "/profile",
       routes: [
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
@@ -171,35 +171,6 @@ class AppRouterConfig {
                   name: RouterConstants.userFeed,
                   path: "/user-feed",
                   builder: (context, state) => const UserFeedPage(),
-                  routes: [
-                    GoRoute(
-                      name: RouterConstants.pendingRequests,
-                      path: "pending-requests",
-                      builder: (context, state) => const PendingRequestPage(),
-                    ),
-                    GoRoute(
-                      parentNavigatorKey: homeRouterRootNavigatorKey,
-                      name: RouterConstants.createPost,
-                      path: "create-post",
-                      builder: (context, state) => const CreatePostPage(),
-                      routes: [
-                        GoRoute(
-                            parentNavigatorKey: homeRouterRootNavigatorKey,
-                            name: RouterConstants.postPublish,
-                            path: "publish",
-                            builder: (context, state) {
-                              final Map<String, dynamic> data =
-                                  state.extra as Map<String, dynamic>;
-                              final List<PostContent> postContent =
-                                  data["postContent"];
-
-                              return CreatePostPublishPage(
-                                postContent: postContent,
-                              );
-                            }),
-                      ],
-                    ),
-                  ],
                 ),
               ],
             ),
@@ -219,6 +190,34 @@ class AppRouterConfig {
                   path: "/profile",
                   builder: (context, state) => const ProfilePage(),
                   routes: [
+                    GoRoute(
+                      name: RouterConstants.pendingRequests,
+                      path: "pending-requests",
+                      builder: (context, state) => const PendingRequestPage(),
+                    ),
+                    GoRoute(
+                      parentNavigatorKey: homeRouterRootNavigatorKey,
+                      name: RouterConstants.createPost,
+                      path: "create-post",
+                      builder: (context, state) => const CreatePostPage(),
+                      routes: [
+                        GoRoute(
+                          parentNavigatorKey: homeRouterRootNavigatorKey,
+                          name: RouterConstants.postPublish,
+                          path: "publish",
+                          builder: (context, state) {
+                            final Map<String, dynamic> data =
+                                state.extra as Map<String, dynamic>;
+                            final List<PostContent> postContent =
+                                data["postContent"];
+
+                            return CreatePostPublishPage(
+                              postContent: postContent,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                     GoRoute(
                       parentNavigatorKey: homeRouterRootNavigatorKey,
                       name: RouterConstants.settings,
@@ -263,13 +262,22 @@ class AppRouterConfig {
                       },
                     ),
                     GoRoute(
-                      name: RouterConstants.userProfile,
-                      path: ":userId",
-                      builder: (context, state) {
-                        String userId = state.pathParameters["userId"]!;
-                        return UserProfilePage(userId: userId);
-                      },
-                    ),
+                        name: RouterConstants.userProfile,
+                        path: ":userId",
+                        builder: (context, state) {
+                          String userId = state.pathParameters["userId"]!;
+                          return UserProfilePage(userId: userId);
+                        },
+                        routes: [
+                          GoRoute(
+                            name: RouterConstants.profileFriends,
+                            path: "friends",
+                            builder: (context, state) {
+                              String userId = state.pathParameters["userId"]!;
+                              return UserProfilePage(userId: userId);
+                            },
+                          ),
+                        ]),
                   ],
                 ),
               ],

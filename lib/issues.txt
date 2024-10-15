@@ -1,1 +1,2 @@
 profile page hande post and friend tab to have different scroller
+handle -1 like case
