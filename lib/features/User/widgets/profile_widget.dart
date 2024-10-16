@@ -300,10 +300,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       user.name = userProvider.name;
     }
 
-    var caption = user.postsInfo.posts.isNotEmpty
-        ? user.postsInfo.posts[0].createdOn.toString()
-        : "user";
-
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
@@ -399,9 +395,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             PostContainerProfileWidget(
               postInfo: user.postsInfo,
               user: user,
-              key: ValueKey(
-                "${user.username} $caption posts",
-              ),
+              key: ObjectKey(user.postsInfo),
             ),
           ],
         ),
