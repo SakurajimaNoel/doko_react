@@ -118,7 +118,6 @@ class _UserLayoutState extends State<UserLayout> {
         selectedIndex: widget.navigationShell.currentIndex,
         destinations: getDestinations(),
         onDestinationSelected: _onDestinationSelected,
-        // labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
       ),
     );
   }

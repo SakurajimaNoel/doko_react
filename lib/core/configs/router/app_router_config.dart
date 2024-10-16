@@ -1,5 +1,6 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
+import 'package:doko_react/core/provider/user_preferences_provider.dart';
 import 'package:doko_react/core/widgets/error/error.dart';
 import 'package:doko_react/core/widgets/loader/loader.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
@@ -26,6 +27,7 @@ import 'package:doko_react/features/authentication/presentation/screens/password
 import 'package:doko_react/features/authentication/presentation/screens/signup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class AppRouterConfig {
   static GoRouter loadingConfig() {
@@ -189,7 +191,15 @@ class AppRouterConfig {
                 GoRoute(
                   name: RouterConstants.profile,
                   path: "/profile",
-                  builder: (context, state) => const ProfilePage(),
+                  builder: (context, state) {
+                    final needsRefresh = context.select(
+                        (UserPreferencesProvider preferences) =>
+                            preferences.profileRefresh);
+
+                    return ProfilePage(
+                      key: ObjectKey(needsRefresh),
+                    );
+                  },
                   routes: [
                     GoRoute(
                       name: RouterConstants.pendingRequests,

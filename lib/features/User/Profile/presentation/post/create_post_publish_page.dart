@@ -6,10 +6,12 @@ import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
+import 'package:doko_react/core/provider/user_preferences_provider.dart';
 import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class CreatePostPublishPage extends StatefulWidget {
   final List<PostContent> postContent;
@@ -26,6 +28,8 @@ class CreatePostPublishPage extends StatefulWidget {
 class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
   final StorageActions storage = StorageActions(storage: Amplify.Storage);
   late final List<PostContent> _postContent;
+
+  late final UserPreferencesProvider userPreferencesProvider;
 
   final UserGraphqlService _userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
@@ -65,6 +69,8 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
 
       return;
     }
+
+    userPreferencesProvider.needsProfileRefresh();
 
     // navigate to user feed
     String message = "Successfully created new post.";
@@ -126,6 +132,7 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
     super.initState();
 
     _postContent = widget.postContent;
+    userPreferencesProvider = context.read<UserPreferencesProvider>();
   }
 
   @override
