@@ -109,8 +109,13 @@ class _PostContainerProfileWidgetState
         _loading = true;
         _fetchMorePosts();
       }
-      return const Center(
-        child: LoaderButton(),
+      return Container(
+        margin: const EdgeInsets.symmetric(
+          vertical: Constants.padding,
+        ),
+        child: const Center(
+          child: LoaderButton(),
+        ),
       );
     }
 
