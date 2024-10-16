@@ -89,7 +89,8 @@ class _UserAction extends StatefulWidget {
   State<_UserAction> createState() => _UserActionState();
 }
 
-class _UserActionState extends State<_UserAction> {
+class _UserActionState extends State<_UserAction>
+    with AutomaticKeepAliveClientMixin {
   late FriendRelationStatus _status;
   late FriendUserModel _friend;
 
@@ -228,6 +229,8 @@ class _UserActionState extends State<_UserAction> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     var currScheme = Theme.of(context).colorScheme;
 
     if (_self) {
@@ -334,4 +337,7 @@ class _UserActionState extends State<_UserAction> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

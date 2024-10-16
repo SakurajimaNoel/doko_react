@@ -227,7 +227,8 @@ class _PostAction extends StatefulWidget {
   State<_PostAction> createState() => _PostActionState();
 }
 
-class _PostActionState extends State<_PostAction> {
+class _PostActionState extends State<_PostAction>
+    with AutomaticKeepAliveClientMixin {
   final UserGraphqlService _userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
   );
@@ -266,6 +267,8 @@ class _PostActionState extends State<_PostAction> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     var currTheme = Theme.of(context).colorScheme;
 
     List<Widget> actionChildren = [
@@ -307,4 +310,7 @@ class _PostActionState extends State<_PostAction> {
       children: actionChildren,
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
