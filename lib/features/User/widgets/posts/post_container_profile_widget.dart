@@ -13,7 +13,7 @@ class PostContainerProfileWidget extends StatefulWidget {
   final UserModel user;
 
   const PostContainerProfileWidget({
-    required super.key,
+    super.key,
     required this.postInfo,
     required this.user,
   });
@@ -23,8 +23,8 @@ class PostContainerProfileWidget extends StatefulWidget {
       _PostContainerProfileWidgetState();
 }
 
-class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
-    with AutomaticKeepAliveClientMixin {
+class _PostContainerProfileWidgetState
+    extends State<PostContainerProfileWidget> {
   late final ProfilePostInfo _postInfo;
   late final UserModel _user;
 
@@ -123,8 +123,6 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     if (_posts.isEmpty) {
       return SliverFillRemaining(
         child: Center(
@@ -144,7 +142,4 @@ class _PostContainerProfileWidgetState extends State<PostContainerProfileWidget>
           _buildItem(context, index),
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

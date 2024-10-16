@@ -29,8 +29,7 @@ class FriendContainerProfileWidget extends StatefulWidget {
 }
 
 class _FriendContainerProfileWidgetState
-    extends State<FriendContainerProfileWidget>
-    with AutomaticKeepAliveClientMixin {
+    extends State<FriendContainerProfileWidget> {
   late final ProfileFriendInfo _friendInfo;
   late final String name;
   late final String userId;
@@ -148,8 +147,6 @@ class _FriendContainerProfileWidgetState
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     if (_friends.isEmpty) {
       return Padding(
         padding: const EdgeInsets.only(
@@ -176,7 +173,4 @@ class _FriendContainerProfileWidgetState
       ),
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
