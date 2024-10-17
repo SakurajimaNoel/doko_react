@@ -1,5 +1,5 @@
-import 'package:doko_react/features/User/Feed/widgets/pending_incoming_requests.dart';
-import 'package:doko_react/features/User/Feed/widgets/pending_outgoing_requets.dart';
+import 'package:doko_react/features/User/Profile/widgets/friends/pending_incoming_requests.dart';
+import 'package:doko_react/features/User/Profile/widgets/friends/pending_outgoing_requets.dart';
 import 'package:flutter/material.dart';
 
 class PendingRequestPage extends StatelessWidget {

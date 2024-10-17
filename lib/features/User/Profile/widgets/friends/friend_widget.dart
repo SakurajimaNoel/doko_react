@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
+import 'package:doko_react/features/User/Profile/widgets/user/user_widget.dart';
 import 'package:doko_react/features/User/data/graphql_queries/friend_relation.dart';
 import 'package:doko_react/features/User/data/graphql_queries/query_constants.dart';
 import 'package:doko_react/features/User/data/model/friend_model.dart';
@@ -28,47 +28,7 @@ class FriendWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              friend.profilePicture.isEmpty
-                  ? const CircleAvatar(
-                      child: Icon(Icons.person),
-                    )
-                  : CircleAvatar(
-                      child: ClipOval(
-                        child: CachedNetworkImage(
-                          cacheKey: friend.profilePicture,
-                          imageUrl: friend.signedProfilePicture,
-                          placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                          fit: BoxFit.cover,
-                          width: 40,
-                          height: 40,
-                          memCacheHeight: Constants.thumbnailCacheHeight,
-                        ),
-                      ),
-                    ),
-              const SizedBox(
-                width: Constants.gap,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(friend.name),
-                  Text(
-                    "@${friend.username}",
-                    style: const TextStyle(
-                      fontSize: Constants.smallFontSize,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          UserWidget(user: friend),
           _UserAction(
             friend: friend,
           ),

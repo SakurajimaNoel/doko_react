@@ -6,22 +6,22 @@ import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loader/loader.dart';
 import 'package:doko_react/core/widgets/loader/loader_button.dart';
+import 'package:doko_react/features/User/Profile/widgets/friends/friend_widget.dart';
 import 'package:doko_react/features/User/data/model/friend_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
-import 'package:doko_react/features/User/widgets/friends/friend_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class PendingIncomingRequests extends StatefulWidget {
-  const PendingIncomingRequests({super.key});
+class PendingOutgoingRequests extends StatefulWidget {
+  const PendingOutgoingRequests({super.key});
 
   @override
-  State<PendingIncomingRequests> createState() =>
-      PendingIncomingRequestsState();
+  State<PendingOutgoingRequests> createState() =>
+      PendingOutgoingRequestsState();
 }
 
-class PendingIncomingRequestsState extends State<PendingIncomingRequests>
+class PendingOutgoingRequestsState extends State<PendingOutgoingRequests>
     with AutomaticKeepAliveClientMixin {
   final UserGraphqlService _userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
@@ -42,7 +42,7 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
 
   Future<void> _getIncomingRequest() async {
     var friendResponse = await _userGraphqlService
-        .getPendingIncomingFriendsByUserId(_userProvider.id, null);
+        .getPendingOutgoingFriendsByUserId(_userProvider.id, null);
 
     setState(() {
       _loading = false;
@@ -59,7 +59,7 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
     });
   }
 
-  Future<void> _fetchMoreIncomingRequest() async {
+  Future<void> _fetchMoreOutgoingRequest() async {
     if (_friendInfo == null) return;
 
     // only call this function if have next page
@@ -67,12 +67,12 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
     String cursor = _friendInfo!.info.endCursor!;
 
     var friendResponse =
-        await _userGraphqlService.getPendingIncomingFriendsByUserId(id, cursor);
+        await _userGraphqlService.getPendingOutgoingFriendsByUserId(id, cursor);
 
     _loading = false;
 
     if (friendResponse.status == ResponseStatus.error) {
-      String message = "Error fetching more user incoming requests";
+      String message = "Error fetching more user outgoing requests";
       _handleError(message);
       return;
     }
@@ -112,7 +112,7 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
           ),
           child: Center(
             child: Text(
-              "You have no more pending incoming requests.",
+              "You have no more pending outgoing requests.",
               style: TextStyle(
                 fontWeight: FontWeight.w500,
               ),
@@ -123,7 +123,7 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
 
       if (!_loading) {
         _loading = true;
-        _fetchMoreIncomingRequest();
+        _fetchMoreOutgoingRequest();
       }
       return const Center(
         child: LoaderButton(),
@@ -158,7 +158,7 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
 
     if (friends == null || friends.isEmpty) {
       return const Heading(
-        "No pending incoming request",
+        "No pending outgoing request",
         size: Constants.fontSize,
       );
     }

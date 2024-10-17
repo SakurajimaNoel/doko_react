@@ -7,9 +7,9 @@ import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/widgets/general/custom_carousel_view.dart';
 import 'package:doko_react/core/widgets/video_player/video_player.dart';
+import 'package:doko_react/features/User/Profile/widgets/user/user_widget.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
-import 'package:doko_react/features/User/widgets/posts/post_user_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -38,7 +38,7 @@ class PostWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                PostUserWidget(
+                UserWidget(
                   user: post.createdBy,
                 ),
                 Text(

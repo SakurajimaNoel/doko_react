@@ -2,10 +2,10 @@ import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/loader/loader.dart';
+import 'package:doko_react/features/User/Profile/widgets/friends/friend_container_profile_widget.dart';
 import 'package:doko_react/features/User/data/model/friend_model.dart';
 import 'package:doko_react/features/User/data/model/model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
-import 'package:doko_react/features/User/widgets/friends/friend_container_profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

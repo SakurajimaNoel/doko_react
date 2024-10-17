@@ -5,10 +5,10 @@ import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class PostUserWidget extends StatelessWidget {
+class UserWidget extends StatelessWidget {
   final UserModel user;
 
-  const PostUserWidget({
+  const UserWidget({
     super.key,
     required this.user,
   });
