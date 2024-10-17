@@ -100,6 +100,11 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  void _handleCancelAction(int index) {
+    _friendInfo?.friends.removeAt(index);
+    setState(() {});
+  }
+
   Widget _buildItem(
       BuildContext context, int index, List<FriendUserModel> friends) {
     if (index >= friends.length) {
@@ -131,6 +136,10 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
     }
 
     var friend = friends[index];
+    void cancelCallback() {
+      _handleCancelAction(index);
+    }
+
     return GestureDetector(
       onTap: () {
         context.pushNamed(
@@ -143,6 +152,8 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
       child: FriendWidget(
         friend: friend,
         widgetLocation: FriendWidgetLocation.incoming,
+        key: ValueKey(friend.id),
+        cancelReqAction: cancelCallback,
       ),
     );
   }

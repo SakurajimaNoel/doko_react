@@ -162,6 +162,7 @@ class _FriendContainerProfileWidgetState
             ? FriendWidgetLocation.myFriends
             : FriendWidgetLocation.friends,
         removeFriendAction: removeCallback,
+        key: ValueKey(friend.id),
       ),
     );
   }

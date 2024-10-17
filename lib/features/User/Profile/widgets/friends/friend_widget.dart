@@ -21,16 +21,23 @@ class FriendWidget extends StatelessWidget {
   final FriendUserModel friend;
   final FriendWidgetLocation widgetLocation;
   final VoidCallback? removeFriendAction;
+  final VoidCallback? cancelReqAction;
 
   const FriendWidget({
     super.key,
     required this.friend,
     this.removeFriendAction,
     required this.widgetLocation,
-  }) : assert(
+    this.cancelReqAction,
+  })  : assert(
             widgetLocation != FriendWidgetLocation.myFriends ||
                 removeFriendAction != null,
-            "required removeFriendAction to handle user unfriend action");
+            "required removeFriendAction to handle user unfriend action"),
+        assert(
+            (widgetLocation != FriendWidgetLocation.incoming &&
+                    widgetLocation != FriendWidgetLocation.outgoing) ||
+                cancelReqAction != null,
+            "required cancelReqAction to handle user cancel their request.");
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +53,7 @@ class FriendWidget extends StatelessWidget {
           _UserAction(
             friend: friend,
             removeFriendAction: removeFriendAction,
+            cancelReqAction: cancelReqAction,
           ),
         ],
       ),
@@ -56,10 +64,12 @@ class FriendWidget extends StatelessWidget {
 class _UserAction extends StatefulWidget {
   final FriendUserModel friend;
   final VoidCallback? removeFriendAction;
+  final VoidCallback? cancelReqAction;
 
   const _UserAction({
     required this.friend,
     this.removeFriendAction,
+    this.cancelReqAction,
   });
 
   @override
@@ -162,9 +172,8 @@ class _UserActionState extends State<_UserAction>
     // success
     _friend.friendRelationDetail = null;
     // success action
-    if (currentStatus == FriendRelationStatus.friends) {
-      if (widget.removeFriendAction != null) widget.removeFriendAction!();
-    }
+    if (widget.removeFriendAction != null) widget.removeFriendAction!();
+    if (widget.cancelReqAction != null) widget.cancelReqAction!();
   }
 
   Future<void> _handleAccept() async {
@@ -195,6 +204,10 @@ class _UserActionState extends State<_UserAction>
 
     // success
     _friend.friendRelationDetail!.updateStatus(FriendStatus.accepted);
+    // success action
+    if (widget.cancelReqAction != null) {
+      widget.cancelReqAction!(); // reusing same callback as cancelReqAction
+    }
   }
 
   void _handleError(String message) {
