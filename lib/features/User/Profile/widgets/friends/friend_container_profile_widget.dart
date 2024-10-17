@@ -34,6 +34,7 @@ class _FriendContainerProfileWidgetState
   late final String name;
   late final String userId;
   late final UserProvider _userProvider;
+  late final bool self;
 
   final UserGraphqlService _userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
@@ -53,6 +54,8 @@ class _FriendContainerProfileWidgetState
     userId = widget.userId;
 
     _userProvider = context.read<UserProvider>();
+
+    self = _userProvider.id == userId;
 
     _friends = _friendInfo.friends;
   }
@@ -100,6 +103,11 @@ class _FriendContainerProfileWidgetState
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  void _handleUnfriendAction(int index) {
+    _friends.removeAt(index);
+    setState(() {});
+  }
+
   Widget _buildItem(BuildContext context, int index) {
     if (index >= _friends.length) {
       // fetch more friends if available
@@ -135,6 +143,10 @@ class _FriendContainerProfileWidgetState
     }
 
     var friend = _friends[index];
+    void removeCallback() {
+      _handleUnfriendAction(index);
+    }
+
     return GestureDetector(
       onTap: () {
         context.pushNamed(
@@ -146,6 +158,10 @@ class _FriendContainerProfileWidgetState
       },
       child: FriendWidget(
         friend: friend,
+        widgetLocation: self
+            ? FriendWidgetLocation.myFriends
+            : FriendWidgetLocation.friends,
+        removeFriendAction: removeCallback,
       ),
     );
   }

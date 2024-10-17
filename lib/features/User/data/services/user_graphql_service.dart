@@ -67,6 +67,7 @@ class UserGraphqlService {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
           document: gql(UserQueries.getUser()),
           variables: UserQueries.getUserVariables(id),
         ),
@@ -101,6 +102,7 @@ class UserGraphqlService {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
           document: gql(UserQueries.checkUsername()),
           variables: UserQueries.checkUsernameVariables(username),
         ),
@@ -212,6 +214,7 @@ class UserGraphqlService {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
           document: gql(UserQueries.getFriendsByUserId(cursor)),
           variables: UserQueries.getFriendsByUserIdVariables(
             id,
@@ -309,6 +312,7 @@ class UserGraphqlService {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
           document: gql(UserQueries.getPendingOutgoingFriendsByUserId(cursor)),
           variables: UserQueries.getPendingOutgoingFriendsByUserIdVariables(
               id, cursor),
@@ -348,6 +352,7 @@ class UserGraphqlService {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
           document: gql(UserQueries.getPendingIncomingFriendsByUserId(cursor)),
           variables: UserQueries.getPendingIncomingFriendsByUserIdVariables(
               id, cursor),

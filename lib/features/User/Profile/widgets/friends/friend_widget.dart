@@ -10,13 +10,27 @@ import 'package:doko_react/features/User/data/services/user_graphql_service.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+enum FriendWidgetLocation {
+  incoming, // my incoming friends
+  outgoing, // my outgoing friends
+  myFriends, // my friends
+  friends, // user friends
+}
+
 class FriendWidget extends StatelessWidget {
   final FriendUserModel friend;
+  final FriendWidgetLocation widgetLocation;
+  final VoidCallback? removeFriendAction;
 
   const FriendWidget({
     super.key,
     required this.friend,
-  });
+    this.removeFriendAction,
+    required this.widgetLocation,
+  }) : assert(
+            widgetLocation != FriendWidgetLocation.myFriends ||
+                removeFriendAction != null,
+            "required removeFriendAction to handle user unfriend action");
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +45,7 @@ class FriendWidget extends StatelessWidget {
           UserWidget(user: friend),
           _UserAction(
             friend: friend,
+            removeFriendAction: removeFriendAction,
           ),
         ],
       ),
@@ -40,9 +55,11 @@ class FriendWidget extends StatelessWidget {
 
 class _UserAction extends StatefulWidget {
   final FriendUserModel friend;
+  final VoidCallback? removeFriendAction;
 
   const _UserAction({
     required this.friend,
+    this.removeFriendAction,
   });
 
   @override
@@ -144,6 +161,10 @@ class _UserActionState extends State<_UserAction>
 
     // success
     _friend.friendRelationDetail = null;
+    // success action
+    if (currentStatus == FriendRelationStatus.friends) {
+      if (widget.removeFriendAction != null) widget.removeFriendAction!();
+    }
   }
 
   Future<void> _handleAccept() async {
@@ -280,6 +301,7 @@ class _UserActionState extends State<_UserAction>
       );
     }
 
+    // friends
     return IconButton(
       onPressed: _updating
           ? null

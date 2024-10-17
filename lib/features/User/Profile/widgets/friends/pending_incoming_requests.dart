@@ -142,6 +142,7 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
       },
       child: FriendWidget(
         friend: friend,
+        widgetLocation: FriendWidgetLocation.incoming,
       ),
     );
   }
