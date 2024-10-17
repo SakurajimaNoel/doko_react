@@ -96,7 +96,7 @@ class UserQueries {
   // get complete user
   static String getCompleteUser() {
     return """
-      query Query(\$where: UserWhere, \$first: Int, \$sort: [UserPostsConnectionSort!], \$friendsWhere2: UserWhere, \$friendsConnectionWhere4: UserFriendsConnectionWhere, \$likedByWhere2: UserWhere) {
+      query Query(\$where: UserWhere, \$first: Int, \$sort: [UserPostsConnectionSort!], \$friendsWhere2: UserWhere, \$friendsConnectionWhere4: UserFriendsConnectionWhere, \$likedByWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
         users(where: \$where) {
           username
           profilePicture
@@ -130,7 +130,7 @@ class UserQueries {
             }
             totalCount
           }
-          friendsConnection {
+          friendsConnection(where: \$friendsConnectionWhere2) {
             totalCount
           }
           friends(where: \$friendsWhere2) {
@@ -143,7 +143,7 @@ class UserQueries {
           }
         }
       }
-        """;
+      """;
   }
 
   static Map<String, dynamic> getCompleteUserVariables(
@@ -172,6 +172,11 @@ class UserQueries {
       },
       "likedByWhere2": {
         "id": currentUserId,
+      },
+      "friendsConnectionWhere2": {
+        "edge": {
+          "status": FriendStatus.accepted,
+        }
       },
     };
   }
