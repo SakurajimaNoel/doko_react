@@ -85,6 +85,10 @@ class _PostContainerProfileWidgetState
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  void _updatePostLike(bool like, int index) {
+    _posts[index].updateUserLike(like);
+  }
+
   Widget _buildItem(BuildContext context, int index) {
     if (index >= _posts.length) {
       // fetch more posts if available
@@ -121,8 +125,14 @@ class _PostContainerProfileWidgetState
 
     PostModel postItem =
         PostModel.fromProfilePost(post: _posts[index], createdBy: _user);
+
+    void likeCallback(bool like) {
+      _updatePostLike(like, index);
+    }
+
     return PostWidget(
       post: postItem,
+      handlePostLike: likeCallback,
     );
   }
 

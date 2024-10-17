@@ -15,10 +15,12 @@ import 'package:flutter/material.dart';
 
 class PostWidget extends StatelessWidget {
   final PostModel post;
+  final ValueChanged<bool> handlePostLike;
 
   const PostWidget({
     super.key,
     required this.post,
+    required this.handlePostLike,
   });
 
   @override
@@ -83,6 +85,7 @@ class PostWidget extends StatelessWidget {
             ),
             child: _PostAction(
               postModel: post,
+              likeAction: handlePostLike,
             ),
           ),
         ],
@@ -218,17 +221,18 @@ class _PostCaptionState extends State<_PostCaption> {
 // post actions
 class _PostAction extends StatefulWidget {
   final PostModel postModel;
+  final ValueChanged<bool> likeAction;
 
   const _PostAction({
     required this.postModel,
+    required this.likeAction,
   });
 
   @override
   State<_PostAction> createState() => _PostActionState();
 }
 
-class _PostActionState extends State<_PostAction>
-    with AutomaticKeepAliveClientMixin {
+class _PostActionState extends State<_PostAction> {
   final UserGraphqlService _userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
   );
@@ -244,9 +248,11 @@ class _PostActionState extends State<_PostAction>
   }
 
   Future<void> handleLike() async {
+    bool likeStatus = _post.userLike;
+
     setState(() {
       _updating = true;
-      _post.updateUserLike(!_post.userLike);
+      _post.updateUserLike(!likeStatus); // for widget state
     });
 
     var likeResponse = await _userGraphqlService.userLikePostAction(
@@ -260,15 +266,15 @@ class _PostActionState extends State<_PostAction>
 
     if (likeResponse == ResponseStatus.error) {
       setState(() {
-        _post.updateUserLike(!_post.userLike);
+        _post.updateUserLike(likeStatus);
       });
     }
+
+    widget.likeAction(!likeStatus);
   }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     var currTheme = Theme.of(context).colorScheme;
 
     List<Widget> actionChildren = [
@@ -310,7 +316,4 @@ class _PostActionState extends State<_PostAction>
       children: actionChildren,
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
