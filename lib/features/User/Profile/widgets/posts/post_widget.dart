@@ -14,6 +14,7 @@ import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PostWidget extends StatelessWidget {
   final PostModel post;
@@ -29,6 +30,11 @@ class PostWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var width = MediaQuery.sizeOf(context).width;
     var height = width * (1 / Constants.postContainer);
+
+    var currTheme = Theme.of(context).colorScheme;
+
+    final custom.CarouselController carouselController =
+        custom.CarouselController();
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: Constants.gap * 1.25),
@@ -67,6 +73,22 @@ class PostWidget extends StatelessWidget {
                 id: post.id,
               ),
             ),
+            if (post.content.length > 1) ...[
+              const SizedBox(
+                height: Constants.gap,
+              ),
+              Center(
+                child: AnimatedSmoothIndicator(
+                  activeIndex: 0,
+                  count: post.content.length,
+                  effect: ScrollingDotsEffect(
+                      activeDotColor: currTheme.primary,
+                      dotWidth: Constants.carouselDots,
+                      dotHeight: Constants.carouselDots,
+                      activeDotScale: Constants.carouselActiveDotScale),
+                ),
+              ),
+            ]
           ],
           const SizedBox(
             height: Constants.gap * 0.5,
