@@ -35,6 +35,8 @@ dependencies:
   flutter_cache_manager: ^3.4.1
   image_picker_android: ^0.8.12+15
   visibility_detector: ^0.4.0+2
+  path_provider: ^2.1.4
+  image_cropper: ^8.0.2
 
 dev_dependencies:
   flutter_test:
