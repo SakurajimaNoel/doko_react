@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
+import 'package:doko_react/core/data/image_cropper.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
@@ -17,6 +18,7 @@ import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -173,11 +175,49 @@ class _EditProfilePageState extends State<EditProfilePage> {
     });
   }
 
-  void onSelection(List<XFile> image) {
+  void onSelection(List<XFile> image) async {
     if (_updating) return;
+    var currScheme = Theme.of(context).colorScheme;
+
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: image[0].path,
+      uiSettings: [
+        AndroidUiSettings(
+          initAspectRatio: CropAspectRatioProfile(),
+          toolbarTitle: 'Post Media Content',
+          toolbarColor: currScheme.surface,
+          toolbarWidgetColor: currScheme.onSurface,
+          statusBarColor: currScheme.surface,
+          backgroundColor: currScheme.surface,
+          dimmedLayerColor: currScheme.surface.withOpacity(0.75),
+          cropFrameColor: currScheme.onSurface,
+          cropGridColor: currScheme.onSurface,
+          cropFrameStrokeWidth: 6,
+          cropGridStrokeWidth: 6,
+          aspectRatioPresets: [
+            CropAspectRatioProfile(),
+          ],
+          lockAspectRatio: true,
+          hideBottomControls: false,
+        ),
+        IOSUiSettings(
+          title: 'Post Media Content',
+          minimumAspectRatio: Constants.profile,
+          aspectRatioLockEnabled: true,
+          aspectRatioPresets: [
+            CropAspectRatioProfile(),
+          ],
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+
+    if (croppedFile == null) return;
 
     setState(() {
-      _profilePicture = image[0];
+      _profilePicture = XFile(croppedFile.path);
       _removeProfile = false;
     });
   }
