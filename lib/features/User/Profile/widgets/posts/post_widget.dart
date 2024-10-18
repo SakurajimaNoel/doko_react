@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -5,7 +6,8 @@ import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
-import 'package:doko_react/core/widgets/general/custom_carousel_view.dart';
+import 'package:doko_react/core/widgets/general/custom_carousel_view.dart'
+    as custom;
 import 'package:doko_react/core/widgets/video_player/video_player.dart';
 import 'package:doko_react/features/User/Profile/widgets/user/user_widget.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
@@ -62,6 +64,7 @@ class PostWidget extends StatelessWidget {
               width: width,
               child: _PostContent(
                 content: post.content,
+                id: post.id,
               ),
             ),
           ],
@@ -95,12 +98,22 @@ class PostWidget extends StatelessWidget {
 }
 
 // post content carousel view
-class _PostContent extends StatelessWidget {
+class _PostContent extends StatefulWidget {
   final List<Content> content;
+  final String id;
 
   const _PostContent({
     required this.content,
+    required this.id,
   });
+
+  @override
+  State<_PostContent> createState() => _PostContentState();
+}
+
+class _PostContentState extends State<_PostContent> {
+  final custom.CarouselController carouselController =
+      custom.CarouselController();
 
   Widget _handleImageContent(Content item) {
     return CachedNetworkImage(
@@ -130,10 +143,20 @@ class _PostContent extends StatelessWidget {
   }
 
   @override
+  void dispose() {
+    safePrint("widget disposed");
+    safePrint(carouselController);
+
+    carouselController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var width = MediaQuery.sizeOf(context).width;
 
-    return CustomCarouselView(
+    return custom.CustomCarouselView(
+      controller: carouselController,
       itemExtent: width,
       shrinkExtent: width * 0.5,
       itemSnapping: true,
@@ -145,7 +168,7 @@ class _PostContent extends StatelessWidget {
           Radius.circular(Constants.radius * 0.25),
         ),
       ),
-      children: content.map(
+      children: widget.content.map(
         (item) {
           switch (item.mediaType) {
             case MediaTypeValue.image:

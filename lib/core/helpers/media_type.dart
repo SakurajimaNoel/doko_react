@@ -12,13 +12,20 @@ class PostContent {
   final File? file;
   final String path;
 
+  final File? originalImage;
+
   PostContent({
     required this.type,
-    required this.file,
+    this.file,
+    this.originalImage,
     required this.path,
-  }) : assert(
+  })  : assert(
           type == MediaTypeValue.unknown || file != null,
           "File cannot be null for MediaTypeValue: $type.",
+        ),
+        assert(
+          type != MediaTypeValue.image || originalImage != null,
+          "Require original image file after cropping",
         );
 }
 

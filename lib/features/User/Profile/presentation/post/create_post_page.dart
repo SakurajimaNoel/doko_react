@@ -13,6 +13,7 @@ import 'package:doko_react/core/widgets/image_picker/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/video_player/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +24,8 @@ class CreatePostPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<String> postContentInfo = [
       "You can add up to ${Constants.postLimit} media items per post.",
-      "Keep your videos under ${Constants.videoDuration.inSeconds} seconds. Longer videos will be automatically trimmed."
+      "Keep your videos under ${Constants.videoDuration.inSeconds} seconds. Longer videos will be automatically trimmed.",
+      "GIFs are typically designed to loop seamlessly, so cropping them might disrupt their intended animation.",
     ];
 
     return Scaffold(
@@ -102,7 +104,6 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
     if (thumbnail == null) {
       tempContent = PostContent(
         type: MediaTypeValue.unknown,
-        file: null,
         path: "",
       );
     } else {
@@ -154,13 +155,21 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
       return;
     }
 
-    setState(() {
-      _content.add(PostContent(
-        type: type,
-        file: file,
-        path: _generateAWSPath(item.path),
-      ));
-    });
+    if (type == MediaTypeValue.image) {
+      setState(() {
+        _content.add(PostContent(
+          type: type,
+          file: file,
+          path: _generateAWSPath(item.path),
+          originalImage: file,
+        ));
+      });
+      return;
+    }
+
+    String message =
+        "It seems like we don't support that file type. Please try uploading an image or video instead.";
+    _showMessage(message);
   }
 
   void onSelection(List<XFile> selectedFiles) {
@@ -184,14 +193,18 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
     );
   }
 
-  Widget _postItemWrapper({required Widget item, required int index}) {
+  Widget _postItemWrapper({
+    required Widget item,
+    required int index,
+    bool image = false,
+    required String path,
+  }) {
     var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
-    var currTheme = Theme.of(context).colorScheme;
+    var currScheme = Theme.of(context).colorScheme;
 
     return SizedBox(
       width: width,
       child: Stack(
-        alignment: AlignmentDirectional.topEnd,
         children: [
           item,
           Padding(
@@ -199,25 +212,87 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
               right: Constants.padding * 0.5,
               top: Constants.padding * 0.5,
             ),
-            child: IconButton.filledTonal(
-              color: currTheme.onError,
-              style: IconButton.styleFrom(
-                backgroundColor: currTheme.error,
-              ),
-              onPressed: () async {
-                var type = _content[index].type;
-                if (type == MediaTypeValue.thumbnail ||
-                    type == MediaTypeValue.unknown) {
-                  await VideoActions.cancelCurrentlyActiveVideoCompression();
-                }
+            child: Row(
+              mainAxisAlignment: image
+                  ? MainAxisAlignment.spaceBetween
+                  : MainAxisAlignment.end,
+              children: [
+                if (image)
+                  IconButton.filledTonal(
+                    onPressed: () async {
+                      CroppedFile? croppedFile = await ImageCropper().cropImage(
+                        sourcePath: path,
+                        uiSettings: [
+                          AndroidUiSettings(
+                            initAspectRatio: CropAspectRatioPreset.square,
+                            toolbarTitle: 'Post Media Content',
+                            toolbarColor: currScheme.surface,
+                            toolbarWidgetColor: currScheme.onSurface,
+                            statusBarColor: currScheme.surface,
+                            backgroundColor: currScheme.surface,
+                            dimmedLayerColor:
+                                currScheme.surface.withOpacity(0.75),
+                            cropFrameColor: currScheme.onSurface,
+                            cropGridColor: currScheme.onSurface,
+                            cropFrameStrokeWidth: 6,
+                            cropGridStrokeWidth: 6,
+                            aspectRatioPresets: [
+                              CropAspectRatioPreset.square,
+                            ],
+                            lockAspectRatio: true,
+                            hideBottomControls: false,
+                          ),
+                          IOSUiSettings(
+                            title: 'Post Media Content',
+                            minimumAspectRatio: Constants.postContainer,
+                            aspectRatioLockEnabled: true,
+                            aspectRatioPresets: [
+                              CropAspectRatioPreset.square,
+                            ],
+                          ),
+                          WebUiSettings(
+                            context: context,
+                          ),
+                        ],
+                      );
 
-                setState(() {
-                  _content.removeAt(index);
-                });
-              },
-              icon: const Icon(
-                Icons.delete,
-              ),
+                      if (croppedFile == null) return;
+
+                      setState(() {
+                        _content[index] = PostContent(
+                          type: MediaTypeValue.image,
+                          file: File(croppedFile.path),
+                          path: _generateAWSPath(croppedFile.path),
+                          originalImage: File(path),
+                        );
+                      });
+                    },
+                    icon: const Icon(
+                      Icons.crop,
+                    ),
+                  ),
+                IconButton.filledTonal(
+                  color: currScheme.onError,
+                  style: IconButton.styleFrom(
+                    backgroundColor: currScheme.error,
+                  ),
+                  onPressed: () async {
+                    var type = _content[index].type;
+                    if (type == MediaTypeValue.thumbnail ||
+                        type == MediaTypeValue.unknown) {
+                      await VideoActions
+                          .cancelCurrentlyActiveVideoCompression();
+                    }
+
+                    setState(() {
+                      _content.removeAt(index);
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.delete,
+                  ),
+                ),
+              ],
             ),
           )
         ],
@@ -250,8 +325,11 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
                 height: height,
               ),
               index: index,
+              image: true,
+              path: item.originalImage!.path,
             ),
           );
+
           break;
         case MediaTypeValue.video:
           mediaWidgets.add(
@@ -261,12 +339,14 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
                 key: Key(item.path),
               ),
               index: index,
+              path: item.file!.path,
             ),
           );
           break;
         case MediaTypeValue.thumbnail:
           mediaWidgets.add(
             _postItemWrapper(
+              path: item.file!.path,
               item: Stack(
                 children: [
                   Center(
@@ -376,6 +456,8 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
             onPressed: _compressingVideo
                 ? null
                 : () {
+                    if (!mounted) return;
+
                     Map<String, dynamic> data = {
                       "postContent": _content,
                     };
