@@ -23,8 +23,8 @@ class Constants {
 
   static const double appBarHeight = kToolbarHeight;
   static const double expandedAppBarHeight = _root * 22.5;
-  static const int profileWidth = 10;
-  static const int profileHeight = 9;
+  static const int profileWidth = 1;
+  static const int profileHeight = 1;
   static const double profile = (profileWidth / profileHeight);
 
   // images

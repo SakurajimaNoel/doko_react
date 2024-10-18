@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/data/auth.dart';
+import 'package:doko_react/core/data/image_cropper.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
@@ -17,6 +17,7 @@ import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -64,9 +65,48 @@ class _CompleteProfilePicturePageState
     _dob = DateTime.parse(widget.dob);
   }
 
-  void onSelection(List<XFile> image) {
+  void onSelection(List<XFile> image) async {
+    var currScheme = Theme.of(context).colorScheme;
+
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: image[0].path,
+      uiSettings: [
+        AndroidUiSettings(
+          initAspectRatio: CropAspectRatioProfile(),
+          toolbarTitle: 'Post Media Content',
+          toolbarColor: currScheme.surface,
+          toolbarWidgetColor: currScheme.onSurface,
+          statusBarColor: currScheme.surface,
+          backgroundColor: currScheme.surface,
+          dimmedLayerColor: currScheme.surface.withOpacity(0.75),
+          cropFrameColor: currScheme.onSurface,
+          cropGridColor: currScheme.onSurface,
+          cropFrameStrokeWidth: 6,
+          cropGridStrokeWidth: 6,
+          aspectRatioPresets: [
+            CropAspectRatioProfile(),
+          ],
+          lockAspectRatio: true,
+          hideBottomControls: false,
+        ),
+        IOSUiSettings(
+          title: 'Post Media Content',
+          minimumAspectRatio: Constants.profile,
+          aspectRatioLockEnabled: true,
+          aspectRatioPresets: [
+            CropAspectRatioProfile(),
+          ],
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+
+    if (croppedFile == null) return;
+
     setState(() {
-      _profilePicture = image[0];
+      _profilePicture = XFile(croppedFile.path);
     });
   }
 
@@ -154,10 +194,10 @@ class _CompleteProfilePicturePageState
   @override
   Widget build(BuildContext context) {
     var currTheme = Theme.of(context).colorScheme;
-    final double radius = min(
-      MediaQuery.sizeOf(context).width / 2 - Constants.padding,
-      Constants.radius * 10,
-    );
+
+    var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
+    var height = width * (1 / Constants.profile);
+    double opacity = _profilePicture != null ? 0.25 : 0.5;
 
     return Scaffold(
       appBar: AppBar(
@@ -179,71 +219,92 @@ class _CompleteProfilePicturePageState
       body: Padding(
         padding: const EdgeInsets.all(Constants.padding),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const SettingsHeading("Profile Information"),
-            const Text(
-                "Almost there! Select an image to add as your profile picture."),
-            const SizedBox(
-              height: Constants.gap * 0.5,
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SettingsHeading("Profile Information"),
+                const Text(
+                    "Almost there! Select an image to add as your profile picture."),
+                const SizedBox(
+                  height: Constants.gap,
+                ),
+                SizedBox(
+                  height: height,
+                  width: width,
+                  child: Stack(
+                    fit: StackFit.expand,
                     children: [
                       _profilePicture == null
-                          ? CircleAvatar(
-                              radius: radius,
-                              backgroundColor: currTheme.secondaryContainer,
-                              child: Icon(
-                                Icons.account_circle_outlined,
-                                color: currTheme.onSecondaryContainer,
-                                size: radius * 2,
+                          ? Container(
+                              color: currTheme.onSecondary,
+                              child: const Icon(
+                                Icons.person,
+                                size: Constants.height * 15,
                               ),
                             )
-                          : CircleAvatar(
-                              radius: radius,
-                              backgroundImage: FileImage(
-                                File(_profilePicture!.path),
-                              ),
+                          : Image.file(
+                              File(_profilePicture!.path),
+                              fit: BoxFit.cover,
+                              cacheHeight: Constants.editProfileCachedHeight,
                             ),
+                      Container(
+                        padding: const EdgeInsets.only(
+                          bottom: Constants.padding,
+                          left: Constants.padding,
+                          right: Constants.padding,
+                        ),
+                        alignment: Alignment.bottomLeft,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              currTheme.surface.withOpacity(opacity),
+                              currTheme.surface.withOpacity(opacity),
+                            ],
+                          ),
+                        ),
+                        child: ImagePickerWidget(
+                          "",
+                          onSelection: onSelection,
+                          icon: const Icon(Icons.photo_camera),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    if (_errorMessage.isNotEmpty) ...[
+                      ErrorText(_errorMessage),
                       const SizedBox(
                         height: Constants.gap * 0.5,
                       ),
-                      ImagePickerWidget(
-                        _profilePicture == null ? "Select" : "Change",
-                        onSelection: onSelection,
-                      ),
                     ],
-                  ),
-                  Column(
-                    children: [
-                      if (_errorMessage.isNotEmpty) ...[
-                        ErrorText(_errorMessage),
-                        const SizedBox(
-                          height: Constants.gap * 0.5,
+                    FilledButton(
+                      onPressed: _completing || _profilePicture == null
+                          ? null
+                          : _completeProfile,
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(
+                          Constants.buttonWidth,
+                          Constants.buttonHeight,
                         ),
-                      ],
-                      FilledButton(
-                        onPressed: _completing || _profilePicture == null
-                            ? null
-                            : _completeProfile,
-                        style: FilledButton.styleFrom(
-                          minimumSize: const Size(
-                            Constants.buttonWidth,
-                            Constants.buttonHeight,
-                          ),
-                        ),
-                        child: _completing
-                            ? const LoaderButton()
-                            : const Text("Complete"),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                      child: _completing
+                          ? const LoaderButton()
+                          : const Text("Complete"),
+                    ),
+                  ],
+                ),
+              ],
             )
           ],
         ),
