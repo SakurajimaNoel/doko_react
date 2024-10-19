@@ -89,7 +89,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
       final timer = this.timer;
       if (timer != null) timer.cancel();
-    } on Exception catch (e) {
+    } on Exception {
       final timer = this.timer;
       if (timer != null) timer.cancel();
     }
@@ -118,7 +118,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
           } else {
             player.pause();
           }
-        } on Exception catch (e) {
+        } on Exception {
           // ignore exception
         }
       },
