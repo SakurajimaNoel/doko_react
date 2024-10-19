@@ -1,4 +1,3 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/helpers/constants.dart';
@@ -6,8 +5,6 @@ import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
-import 'package:doko_react/core/widgets/general/custom_carousel_view.dart'
-    as custom;
 import 'package:doko_react/core/widgets/video_player/video_player.dart';
 import 'package:doko_react/features/User/Profile/widgets/user/user_widget.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
@@ -19,23 +16,17 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 class PostWidget extends StatelessWidget {
   final PostModel post;
   final ValueChanged<bool> handlePostLike;
+  final ValueChanged<int> handlePostDisplayItem;
 
   const PostWidget({
     super.key,
     required this.post,
     required this.handlePostLike,
+    required this.handlePostDisplayItem,
   });
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.sizeOf(context).width;
-    var height = width * (1 / Constants.postContainer);
-
-    var currTheme = Theme.of(context).colorScheme;
-
-    final custom.CarouselController carouselController =
-        custom.CarouselController();
-
     return Container(
       margin: const EdgeInsets.symmetric(vertical: Constants.gap * 1.25),
       child: Column(
@@ -64,31 +55,12 @@ class PostWidget extends StatelessWidget {
             const SizedBox(
               height: Constants.gap * 0.5,
             ),
-            SizedBox(
-              // content carousel
-              height: height,
-              width: width,
-              child: _PostContent(
-                content: post.content,
-                id: post.id,
-              ),
+            _PostContent(
+              content: post.content,
+              initialItem: post.initialItem,
+              id: post.id,
+              currentItemAction: handlePostDisplayItem,
             ),
-            if (post.content.length > 1) ...[
-              const SizedBox(
-                height: Constants.gap,
-              ),
-              Center(
-                child: AnimatedSmoothIndicator(
-                  activeIndex: 0,
-                  count: post.content.length,
-                  effect: ScrollingDotsEffect(
-                      activeDotColor: currTheme.primary,
-                      dotWidth: Constants.carouselDots,
-                      dotHeight: Constants.carouselDots,
-                      activeDotScale: Constants.carouselActiveDotScale),
-                ),
-              ),
-            ]
           ],
           const SizedBox(
             height: Constants.gap * 0.5,
@@ -123,10 +95,14 @@ class PostWidget extends StatelessWidget {
 class _PostContent extends StatefulWidget {
   final List<Content> content;
   final String id;
+  final ValueChanged<int> currentItemAction;
+  final int initialItem;
 
   const _PostContent({
     required this.content,
     required this.id,
+    required this.currentItemAction,
+    required this.initialItem,
   });
 
   @override
@@ -134,8 +110,18 @@ class _PostContent extends StatefulWidget {
 }
 
 class _PostContentState extends State<_PostContent> {
-  final custom.CarouselController carouselController =
-      custom.CarouselController();
+  late final PageController controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = PageController(
+      viewportFraction: 1,
+      keepPage: true,
+      initialPage: widget.initialItem,
+    );
+  }
 
   Widget _handleImageContent(Content item) {
     return CachedNetworkImage(
@@ -165,43 +151,78 @@ class _PostContentState extends State<_PostContent> {
   }
 
   @override
-  void dispose() {
-    safePrint("widget disposed");
-    safePrint(carouselController);
+  void deactivate() {
+    int currentPage = controller.hasClients ? controller.page?.toInt() ?? 0 : 0;
+    widget.currentItemAction(currentPage);
 
-    carouselController.dispose();
+    super.deactivate();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.sizeOf(context).width;
+    var currTheme = Theme.of(context).colorScheme;
 
-    return custom.CustomCarouselView(
-      controller: carouselController,
-      itemExtent: width,
-      shrinkExtent: width * 0.5,
-      itemSnapping: true,
-      padding: const EdgeInsets.symmetric(
-        horizontal: Constants.padding * 0.25,
+    var width = MediaQuery.sizeOf(context).width;
+    var height = width * (1 / Constants.postContainer);
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: height,
+            child: PageView.builder(
+              controller: controller,
+              itemCount: widget.content.length,
+              itemBuilder: (context, index) {
+                var postItem = widget.content[index];
+                Widget postItemWidget;
+
+                switch (postItem.mediaType) {
+                  case MediaTypeValue.image:
+                    postItemWidget = _handleImageContent(postItem);
+                  case MediaTypeValue.video:
+                    postItemWidget = _handleVideoContent(postItem);
+                  default:
+                    postItemWidget = _handleUnknownContent(postItem);
+                }
+
+                return Container(
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.circular(Constants.radius * 0.25),
+                  ),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: Constants.padding * 0.25,
+                  ),
+                  child: postItemWidget,
+                );
+              },
+            ),
+          ),
+          if (widget.content.length > 1) ...[
+            const SizedBox(
+              height: Constants.gap * 0.5,
+            ),
+            SmoothPageIndicator(
+              controller: controller,
+              count: widget.content.length,
+              effect: ScrollingDotsEffect(
+                activeDotColor: currTheme.primary,
+                dotWidth: Constants.carouselDots,
+                dotHeight: Constants.carouselDots,
+                activeDotScale: Constants.carouselActiveDotScale,
+              ),
+            ),
+          ],
+        ],
       ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(Constants.radius * 0.25),
-        ),
-      ),
-      children: widget.content.map(
-        (item) {
-          switch (item.mediaType) {
-            case MediaTypeValue.image:
-              return _handleImageContent(item);
-            case MediaTypeValue.video:
-              return _handleVideoContent(item);
-            default:
-              return _handleUnknownContent(item);
-          }
-        },
-      ).toList(),
     );
   }
 }

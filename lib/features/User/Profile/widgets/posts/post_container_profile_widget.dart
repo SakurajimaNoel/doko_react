@@ -89,6 +89,10 @@ class _PostContainerProfileWidgetState
     _posts[index].updateUserLike(like);
   }
 
+  void _postCurrentDisplayItem(int index, int item) {
+    _posts[index].updatePostInitialItem(item);
+  }
+
   Widget _buildItem(BuildContext context, int index) {
     if (index >= _posts.length) {
       // fetch more posts if available
@@ -130,9 +134,14 @@ class _PostContainerProfileWidgetState
       _updatePostLike(like, index);
     }
 
+    void currentItemCallback(int item) {
+      _postCurrentDisplayItem(index, item);
+    }
+
     return PostWidget(
       post: postItem,
       handlePostLike: likeCallback,
+      handlePostDisplayItem: currentItemCallback,
     );
   }
 

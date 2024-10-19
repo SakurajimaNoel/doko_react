@@ -48,6 +48,7 @@ class ProfilePostModel {
   int likes;
   bool userLike;
   int comments;
+  int initialItem = 0;
 
   ProfilePostModel({
     required this.caption,
@@ -57,6 +58,7 @@ class ProfilePostModel {
     required this.likes,
     required this.userLike,
     required this.comments,
+    this.initialItem = 0,
   });
 
   void updateUserLike(bool like) {
@@ -67,6 +69,10 @@ class ProfilePostModel {
     } else {
       likes--;
     }
+  }
+
+  void updatePostInitialItem(int item) {
+    initialItem = item;
   }
 
   static Future<ProfilePostModel> createModel({required Map map}) async {
@@ -147,6 +153,7 @@ class PostModel extends ProfilePostModel {
           likes: post.likes,
           userLike: post.userLike,
           comments: post.comments,
+          initialItem: post.initialItem,
         );
 
   static Future<PostModel> createModel({required Map map}) async {
