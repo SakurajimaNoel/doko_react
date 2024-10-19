@@ -7,7 +7,8 @@ import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/general/bullet_list.dart';
-import 'package:doko_react/core/widgets/general/custom_carousel_view.dart';
+import 'package:doko_react/core/widgets/general/custom_carousel_view.dart'
+    as custom;
 import 'package:doko_react/core/widgets/heading/settings_heading.dart';
 import 'package:doko_react/core/widgets/image_picker/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/video_player/video_player.dart';
@@ -16,6 +17,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class CreatePostPage extends StatelessWidget {
   const CreatePostPage({super.key});
@@ -66,6 +68,9 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
 
   final List<PostContent> _content = [];
   bool _compressingVideo = false;
+
+  final custom.CarouselController carouselController =
+      custom.CarouselController();
 
   @override
   void initState() {
@@ -420,7 +425,8 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
               ),
               SizedBox(
                 height: height,
-                child: CustomCarouselView(
+                child: custom.CustomCarouselView(
+                  controller: carouselController,
                   itemExtent: width,
                   shrinkExtent: width * 0.5,
                   itemSnapping: true,
@@ -445,6 +451,13 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
                   ],
                 ),
               ),
+              if (_content.isNotEmpty)
+                _PostContentIndicator(
+                  length: _content.length != 10
+                      ? _content.length + 1
+                      : _content.length,
+                  controller: carouselController,
+                ),
               const SizedBox(
                 height: Constants.gap,
               ),
@@ -477,6 +490,72 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PostContentIndicator extends StatefulWidget {
+  final int length;
+  final ScrollController controller;
+
+  const _PostContentIndicator({
+    required this.length,
+    required this.controller,
+  });
+
+  @override
+  State<_PostContentIndicator> createState() => _PostContentIndicatorState();
+}
+
+class _PostContentIndicatorState extends State<_PostContentIndicator> {
+  int activeItem = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.controller.addListener(() {
+      int active = getActiveItem();
+      if (active != activeItem) {
+        setState(() {
+          activeItem = active;
+        });
+      }
+    });
+  }
+
+  int getActiveItem() {
+    double offset =
+        widget.controller.hasClients ? widget.controller.offset : -1;
+    var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
+
+    int item = (offset / width).round();
+
+    return item;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var currTheme = Theme.of(context).colorScheme;
+
+    return Column(
+      children: [
+        const SizedBox(
+          height: Constants.gap * 0.5,
+        ),
+        Center(
+          child: AnimatedSmoothIndicator(
+            activeIndex: activeItem,
+            count: widget.length,
+            effect: ScrollingDotsEffect(
+              activeDotColor: currTheme.primary,
+              dotWidth: Constants.carouselDots,
+              dotHeight: Constants.carouselDots,
+              activeDotScale: Constants.carouselActiveDotScale,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

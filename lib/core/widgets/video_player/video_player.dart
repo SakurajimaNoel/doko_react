@@ -58,36 +58,41 @@ class _VideoPlayerState extends State<VideoPlayer> {
   }
 
   void _handleRatio() {
-    var width = player.state.width;
-    var height = player.state.height;
+    try {
+      var width = player.state.width;
+      var height = player.state.height;
 
-    if (width == null || height == null) {
-      this.timer ??= Timer.periodic(
-          const Duration(
-            milliseconds: 250,
-          ), (t) {
-        _handleRatio();
-      });
-      return;
-    }
-
-    if (VideoActions.getVideoOrientation(width, height) ==
-        VideoOrientation.landscape) {
-      if (_ratio != Constants.landscape) {
-        setState(() {
-          _ratio = Constants.landscape;
+      if (width == null || height == null) {
+        this.timer ??= Timer.periodic(
+            const Duration(
+              milliseconds: 250,
+            ), (t) {
+          _handleRatio();
         });
+        return;
       }
-    } else {
-      if (_ratio != Constants.portrait) {
-        setState(() {
-          _ratio = Constants.portrait;
-        });
-      }
-    }
 
-    final timer = this.timer;
-    if (timer != null) timer.cancel();
+      if (VideoActions.getVideoOrientation(width, height) ==
+          VideoOrientation.landscape) {
+        if (_ratio != Constants.landscape) {
+          setState(() {
+            _ratio = Constants.landscape;
+          });
+        }
+      } else {
+        if (_ratio != Constants.portrait) {
+          setState(() {
+            _ratio = Constants.portrait;
+          });
+        }
+      }
+
+      final timer = this.timer;
+      if (timer != null) timer.cancel();
+    } on Exception catch (e) {
+      final timer = this.timer;
+      if (timer != null) timer.cancel();
+    }
   }
 
   @override
@@ -101,16 +106,20 @@ class _VideoPlayerState extends State<VideoPlayer> {
       onVisibilityChanged: (VisibilityInfo visibilityInfo) {
         var visiblePercentage = visibilityInfo.visibleFraction * 100;
 
-        if (_userPreferencesProvider.mute) {
-          player.setVolume(0);
-        } else {
-          player.setVolume(100);
-        }
+        try {
+          if (_userPreferencesProvider.mute) {
+            player.setVolume(0);
+          } else {
+            player.setVolume(100);
+          }
 
-        if (visiblePercentage >= 75) {
-          player.play();
-        } else {
-          player.pause();
+          if (visiblePercentage >= 75) {
+            player.play();
+          } else {
+            player.pause();
+          }
+        } on Exception catch (e) {
+          // ignore exception
         }
       },
       child: MaterialVideoControlsTheme(
