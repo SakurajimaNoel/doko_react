@@ -46,7 +46,7 @@ class Constants {
   static const int postLimit = 10;
   static const int postCaptionDisplayLimit = 125;
   static const double carouselDots = 6;
-  static const double carouselActiveDotScale = 1.2;
+  static const double carouselActiveDotScale = 1.5;
 
   // profile
   static const double sliverPersistentHeaderHeight = 50;

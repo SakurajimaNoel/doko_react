@@ -13,6 +13,7 @@ import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PostWidget extends StatelessWidget {
   final PostModel post;
@@ -112,6 +113,7 @@ class _PostContent extends StatefulWidget {
 
 class _PostContentState extends State<_PostContent> {
   late final custom.CarouselController carouselController;
+  late int activeItem;
 
   @override
   void initState() {
@@ -120,6 +122,7 @@ class _PostContentState extends State<_PostContent> {
     carouselController = custom.CarouselController(
       initialItem: widget.initialItem,
     );
+    activeItem = widget.initialItem;
   }
 
   Widget _handleImageContent(Content item) {
@@ -149,86 +152,34 @@ class _PostContentState extends State<_PostContent> {
     );
   }
 
-  @override
-  void deactivate() {
+  int getActiveItem() {
     double offset =
         carouselController.hasClients ? carouselController.offset : -1;
     var width = MediaQuery.sizeOf(context).width - Constants.padding * 0.5;
 
     int item = (offset / width).round();
-    widget.currentItemAction(item);
+
+    return item;
+  }
+
+  @override
+  void deactivate() {
+    widget.currentItemAction(getActiveItem());
 
     super.deactivate();
   }
 
   @override
   void dispose() {
-    // controller.dispose();
+    carouselController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var currTheme = Theme.of(context).colorScheme;
-
     var width = MediaQuery.sizeOf(context).width;
     var height = width * (1 / Constants.postContainer);
 
-    // return SingleChildScrollView(
-    //   child: Column(
-    //     crossAxisAlignment: CrossAxisAlignment.center,
-    //     children: [
-    //       SizedBox(
-    //         height: height,
-    //         child: PageView.builder(
-    //           controller: controller,
-    //           itemCount: widget.content.length,
-    //           itemBuilder: (context, index) {
-    //             var postItem = widget.content[index];
-    //             Widget postItemWidget;
-    //
-    //             switch (postItem.mediaType) {
-    //               case MediaTypeValue.image:
-    //                 postItemWidget = _handleImageContent(postItem);
-    //               case MediaTypeValue.video:
-    //                 postItemWidget = _handleVideoContent(postItem);
-    //               default:
-    //                 postItemWidget = _handleUnknownContent(postItem);
-    //             }
-    //
-    //             return Container(
-    //               decoration: BoxDecoration(
-    //                 borderRadius:
-    //                     BorderRadius.circular(Constants.radius * 0.25),
-    //               ),
-    //               margin: const EdgeInsets.symmetric(
-    //                 horizontal: Constants.padding * 0.25,
-    //               ),
-    //               child: postItemWidget,
-    //             );
-    //           },
-    //         ),
-    //       ),
-    //       if (widget.content.length > 1) ...[
-    //         const SizedBox(
-    //           height: Constants.gap * 0.5,
-    //         ),
-    //         SmoothPageIndicator(
-    //           controller: controller,
-    //           count: widget.content.length,
-    //           effect: ScrollingDotsEffect(
-    //             activeDotColor: currTheme.primary,
-    //             dotWidth: Constants.carouselDots,
-    //             dotHeight: Constants.carouselDots,
-    //             activeDotScale: Constants.carouselActiveDotScale,
-    //           ),
-    //         ),
-    //       ],
-    //     ],
-    //   ),
-    // );
-
-    // trial
     return Column(
       children: [
         SizedBox(
@@ -258,6 +209,73 @@ class _PostContentState extends State<_PostContent> {
                 }
               },
             ).toList(),
+          ),
+        ),
+        if (widget.content.length > 1)
+          _PostContentIndicator(
+            length: widget.content.length,
+            activeItem: activeItem,
+            controller: carouselController,
+            getCurrentActive: getActiveItem,
+          ),
+      ],
+    );
+  }
+}
+
+class _PostContentIndicator extends StatefulWidget {
+  final int length;
+  final int activeItem;
+  final ScrollController controller;
+  final ValueGetter<int> getCurrentActive;
+
+  const _PostContentIndicator({
+    required this.length,
+    required this.activeItem,
+    required this.controller,
+    required this.getCurrentActive,
+  });
+
+  @override
+  State<_PostContentIndicator> createState() => _PostContentIndicatorState();
+}
+
+class _PostContentIndicatorState extends State<_PostContentIndicator> {
+  late int activeItem;
+
+  @override
+  void initState() {
+    super.initState();
+
+    activeItem = widget.activeItem;
+
+    widget.controller.addListener(() {
+      int active = widget.getCurrentActive();
+      if (active != activeItem) {
+        setState(() {
+          activeItem = active;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var currTheme = Theme.of(context).colorScheme;
+
+    return Column(
+      children: [
+        const SizedBox(
+          height: Constants.gap * 0.5,
+        ),
+        AnimatedSmoothIndicator(
+          activeIndex: activeItem,
+          count: widget.length,
+          effect: ScrollingDotsEffect(
+            activeDotColor: currTheme.primary,
+            dotWidth: Constants.carouselDots,
+            dotHeight: Constants.carouselDots,
+            activeDotScale: Constants.carouselActiveDotScale,
           ),
         ),
       ],
