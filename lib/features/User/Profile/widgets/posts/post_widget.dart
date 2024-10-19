@@ -5,13 +5,14 @@ import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
+import 'package:doko_react/core/widgets/general/custom_carousel_view.dart'
+    as custom;
 import 'package:doko_react/core/widgets/video_player/video_player.dart';
 import 'package:doko_react/features/User/Profile/widgets/user/user_widget.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PostWidget extends StatelessWidget {
   final PostModel post;
@@ -110,16 +111,14 @@ class _PostContent extends StatefulWidget {
 }
 
 class _PostContentState extends State<_PostContent> {
-  late final PageController controller;
+  late final custom.CarouselController carouselController;
 
   @override
   void initState() {
     super.initState();
 
-    controller = PageController(
-      viewportFraction: 1,
-      keepPage: true,
-      initialPage: widget.initialItem,
+    carouselController = custom.CarouselController(
+      initialItem: widget.initialItem,
     );
   }
 
@@ -152,15 +151,19 @@ class _PostContentState extends State<_PostContent> {
 
   @override
   void deactivate() {
-    int currentPage = controller.hasClients ? controller.page?.toInt() ?? 0 : 0;
-    widget.currentItemAction(currentPage);
+    double offset =
+        carouselController.hasClients ? carouselController.offset : -1;
+    var width = MediaQuery.sizeOf(context).width - Constants.padding * 0.5;
+
+    int item = (offset / width).round();
+    widget.currentItemAction(item);
 
     super.deactivate();
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    // controller.dispose();
     super.dispose();
   }
 
@@ -171,58 +174,93 @@ class _PostContentState extends State<_PostContent> {
     var width = MediaQuery.sizeOf(context).width;
     var height = width * (1 / Constants.postContainer);
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: height,
-            child: PageView.builder(
-              controller: controller,
-              itemCount: widget.content.length,
-              itemBuilder: (context, index) {
-                var postItem = widget.content[index];
-                Widget postItemWidget;
+    // return SingleChildScrollView(
+    //   child: Column(
+    //     crossAxisAlignment: CrossAxisAlignment.center,
+    //     children: [
+    //       SizedBox(
+    //         height: height,
+    //         child: PageView.builder(
+    //           controller: controller,
+    //           itemCount: widget.content.length,
+    //           itemBuilder: (context, index) {
+    //             var postItem = widget.content[index];
+    //             Widget postItemWidget;
+    //
+    //             switch (postItem.mediaType) {
+    //               case MediaTypeValue.image:
+    //                 postItemWidget = _handleImageContent(postItem);
+    //               case MediaTypeValue.video:
+    //                 postItemWidget = _handleVideoContent(postItem);
+    //               default:
+    //                 postItemWidget = _handleUnknownContent(postItem);
+    //             }
+    //
+    //             return Container(
+    //               decoration: BoxDecoration(
+    //                 borderRadius:
+    //                     BorderRadius.circular(Constants.radius * 0.25),
+    //               ),
+    //               margin: const EdgeInsets.symmetric(
+    //                 horizontal: Constants.padding * 0.25,
+    //               ),
+    //               child: postItemWidget,
+    //             );
+    //           },
+    //         ),
+    //       ),
+    //       if (widget.content.length > 1) ...[
+    //         const SizedBox(
+    //           height: Constants.gap * 0.5,
+    //         ),
+    //         SmoothPageIndicator(
+    //           controller: controller,
+    //           count: widget.content.length,
+    //           effect: ScrollingDotsEffect(
+    //             activeDotColor: currTheme.primary,
+    //             dotWidth: Constants.carouselDots,
+    //             dotHeight: Constants.carouselDots,
+    //             activeDotScale: Constants.carouselActiveDotScale,
+    //           ),
+    //         ),
+    //       ],
+    //     ],
+    //   ),
+    // );
 
-                switch (postItem.mediaType) {
-                  case MediaTypeValue.image:
-                    postItemWidget = _handleImageContent(postItem);
-                  case MediaTypeValue.video:
-                    postItemWidget = _handleVideoContent(postItem);
-                  default:
-                    postItemWidget = _handleUnknownContent(postItem);
-                }
-
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius:
-                        BorderRadius.circular(Constants.radius * 0.25),
-                  ),
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: Constants.padding * 0.25,
-                  ),
-                  child: postItemWidget,
-                );
-              },
+    // trial
+    return Column(
+      children: [
+        SizedBox(
+          height: height,
+          child: custom.CustomCarouselView(
+            controller: carouselController,
+            itemExtent: width,
+            shrinkExtent: width * 0.5,
+            itemSnapping: true,
+            padding: const EdgeInsets.symmetric(
+              horizontal: Constants.padding * 0.25,
             ),
-          ),
-          if (widget.content.length > 1) ...[
-            const SizedBox(
-              height: Constants.gap * 0.5,
-            ),
-            SmoothPageIndicator(
-              controller: controller,
-              count: widget.content.length,
-              effect: ScrollingDotsEffect(
-                activeDotColor: currTheme.primary,
-                dotWidth: Constants.carouselDots,
-                dotHeight: Constants.carouselDots,
-                activeDotScale: Constants.carouselActiveDotScale,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(Constants.radius * 0.25),
               ),
             ),
-          ],
-        ],
-      ),
+            children: widget.content.map(
+              (item) {
+                switch (item.mediaType) {
+                  case MediaTypeValue.image:
+                    return _handleImageContent(item);
+                  case MediaTypeValue.video:
+                    return _handleVideoContent(item);
+                  default:
+                    return _handleUnknownContent(item);
+                }
+              },
+            ).toList(),
+          ),
+        ),
+      ],
     );
   }
 }
