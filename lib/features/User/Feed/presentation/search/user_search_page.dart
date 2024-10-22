@@ -3,6 +3,7 @@ import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/debounce.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
+import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:doko_react/features/User/Profile/widgets/friends/friend_widget.dart';
 import 'package:doko_react/features/User/data/model/friend_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
@@ -31,6 +32,7 @@ class _UserSearchPageState extends State<UserSearchPage> {
 
   // when null than there is no search query and if empty than there is query but no result for that query
   List<FriendUserModel>? searchResult;
+  bool searching = false;
 
   @override
   void initState() {
@@ -51,23 +53,29 @@ class _UserSearchPageState extends State<UserSearchPage> {
   }
 
   Future<void> searchUser(String query) async {
+    setState(() {
+      searching = true;
+    });
     String userId = userProvider.id;
 
     SearchResponse searchResponse =
         await userGraphqlService.searchUserByUsernameOrName(userId, query);
 
+    setState(() {
+      searching = false;
+      searchResult = searchResponse.friends;
+    });
+
     if (searchResponse.status == ResponseStatus.error) {
       showMessage(Constants.errorMessage);
       return;
     }
-
-    setState(() {
-      searchResult = searchResponse.friends;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    var currScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -91,22 +99,34 @@ class _UserSearchPageState extends State<UserSearchPage> {
                     width: Constants.gap,
                   ),
                   Expanded(
-                    child: TextField(
-                      onChanged: (String value) {
-                        if (value.isEmpty) {
-                          setState(() {
-                            searchResult = null;
-                          });
-                          searchDebounce.dispose();
-                          return;
-                        }
+                    child: Stack(
+                      alignment: AlignmentDirectional.centerEnd,
+                      children: [
+                        TextField(
+                          onChanged: (String value) {
+                            if (value.isEmpty) {
+                              setState(() {
+                                searchResult = null;
+                              });
+                              searchDebounce.dispose();
+                              return;
+                            }
 
-                        searchDebounce(() => searchUser(value));
-                      },
-                      decoration: const InputDecoration(
-                        labelText: "Search",
-                        hintText: "Search user by username or name.",
-                      ),
+                            searchDebounce(() => searchUser(value));
+                          },
+                          decoration: const InputDecoration(
+                            labelText: "Search",
+                            hintText: "Search user by username or name.",
+                          ),
+                        ),
+                        if (searching)
+                          const LoaderButton()
+                        else if (searchResult != null)
+                          Icon(
+                            Icons.check,
+                            color: currScheme.primary,
+                          ),
+                      ],
                     ),
                   )
                 ],
@@ -130,6 +150,7 @@ class _UserSearchPageState extends State<UserSearchPage> {
                               return FriendWidget(
                                 friend: searchResult![index],
                                 widgetLocation: FriendWidgetLocation.search,
+                                key: ObjectKey(searchResult![index]),
                               );
                             },
                           ),
