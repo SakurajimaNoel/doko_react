@@ -76,7 +76,11 @@ class ProfilePostModel {
   }
 
   static Future<ProfilePostModel> createModel({required Map map}) async {
-    List<Future<Content>> contentFuture = (map["content"] as List)
+    List mapContent = [];
+    if (map["content"] != null) {
+      mapContent = map["content"] as List;
+    }
+    List<Future<Content>> contentFuture = (mapContent)
         .map((element) => Content.createContentObject(
               element.toString(),
             ))
@@ -160,7 +164,11 @@ class PostModel extends ProfilePostModel {
     Future<UserModel> createdByFuture =
         UserModel.createModel(map: map["createdBy"]);
 
-    List<Future<Content>> postContentFuture = (map["content"] as List)
+    List mapContent = [];
+    if (map["content"] != null) {
+      mapContent = map["content"] as List;
+    }
+    List<Future<Content>> postContentFuture = (mapContent)
         .map((element) => Content.createContentObject(
               element.toString(),
             ))

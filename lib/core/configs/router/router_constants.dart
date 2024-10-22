@@ -16,6 +16,7 @@ class RouterConstants {
   static const String createPost = "create-post";
   static const String postPublish = "publish";
   static const String profileFriends = "profile-friends";
+  static const String userSearch = "user-search";
 
   // settings page
   static const String settings = "settings";

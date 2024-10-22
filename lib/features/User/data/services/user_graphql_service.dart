@@ -58,6 +58,16 @@ class PostResponse {
   });
 }
 
+class SearchResponse {
+  final ResponseStatus status;
+  final List<FriendUserModel> friends;
+
+  const SearchResponse({
+    required this.status,
+    this.friends = const [],
+  });
+}
+
 class UserGraphqlService {
   late final GraphQLClient _client;
 
@@ -570,6 +580,50 @@ class UserGraphqlService {
     } catch (e) {
       safePrint(e.toString());
       return ResponseStatus.error;
+    }
+  }
+
+  Future<SearchResponse> searchUserByUsernameOrName(
+      String id, String query) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(UserQueries.searchUserByUsernameOrName()),
+          variables: UserQueries.searchUserByUsernameOrNameVariables(id, query),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      List? res = result.data?["users"];
+
+      if (res == null || res.isEmpty) {
+        return const SearchResponse(
+          status: ResponseStatus.success,
+        );
+      }
+
+      List<Future<FriendUserModel>> futureFriendsModel =
+          (res).map((user) async {
+        FriendUserModel friend =
+            await FriendUserModel.createModel(userMap: user);
+        return friend;
+      }).toList();
+
+      List<FriendUserModel> friends = await Future.wait(futureFriendsModel);
+
+      return SearchResponse(
+        status: ResponseStatus.success,
+        friends: friends,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return const SearchResponse(
+        status: ResponseStatus.error,
+      );
     }
   }
 }

@@ -6,6 +6,7 @@ import 'package:doko_react/core/widgets/loader/loader.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
+import 'package:doko_react/features/User/Feed/presentation/search/user_search_page.dart';
 import 'package:doko_react/features/User/Feed/presentation/user_feed_page.dart';
 import 'package:doko_react/features/User/Nearby/presentation/nearby_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/friends/friends_page.dart';
@@ -174,6 +175,13 @@ class AppRouterConfig {
                   name: RouterConstants.userFeed,
                   path: "/user-feed",
                   builder: (context, state) => const UserFeedPage(),
+                  routes: [
+                    GoRoute(
+                      name: RouterConstants.userSearch,
+                      path: "search",
+                      builder: (context, state) => const UserSearchPage(),
+                    )
+                  ],
                 ),
               ],
             ),

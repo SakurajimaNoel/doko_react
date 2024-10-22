@@ -21,12 +21,12 @@ class UserModel {
 
   static Future<UserModel> createModel({required Map map}) async {
     String signedProfilePicture =
-        await StorageUtils.generatePreSignedURL(map["profilePicture"]);
+        await StorageUtils.generatePreSignedURL(map["profilePicture"] ?? "");
 
     return UserModel(
       name: map["name"],
       username: map["username"],
-      profilePicture: map["profilePicture"],
+      profilePicture: map["profilePicture"] ?? "",
       id: map["id"],
       signedProfilePicture: signedProfilePicture,
     );

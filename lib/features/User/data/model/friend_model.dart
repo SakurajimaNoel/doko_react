@@ -47,8 +47,7 @@ class FriendUserModel extends UserModel {
           signedProfilePicture: user.signedProfilePicture,
         );
 
-  static Future<FriendUserModel> createModel({required Map map}) async {
-    Map userMap = map["node"];
+  static Future<FriendUserModel> createModel({required Map userMap}) async {
     UserModel user = await UserModel.createModel(map: userMap);
 
     List friendConnection = userMap["friendsConnection"]["edges"];
@@ -83,7 +82,8 @@ class ProfileFriendInfo {
   static Future<ProfileFriendInfo> createModel({required Map map}) async {
     List<Future<FriendUserModel>> futureFriendsModel =
         (map["edges"] as List).map((user) async {
-      FriendUserModel friend = await FriendUserModel.createModel(map: user);
+      FriendUserModel friend =
+          await FriendUserModel.createModel(userMap: user["node"]);
       return friend;
     }).toList();
 

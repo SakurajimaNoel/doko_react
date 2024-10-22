@@ -15,6 +15,7 @@ enum FriendWidgetLocation {
   outgoing, // my outgoing friends
   myFriends, // my friends
   friends, // user friends
+  search, // general user search
 }
 
 class FriendWidget extends StatelessWidget {
@@ -143,7 +144,7 @@ class _UserActionState extends State<_UserAction>
       case FriendRelationStatus.incomingReq:
         errorMessage = "can't remove ${_friend.name}'s friend request.";
       default:
-        errorMessage = "Oops! Something went wrong.";
+        errorMessage = Constants.errorMessage;
     }
 
     setState(() {
