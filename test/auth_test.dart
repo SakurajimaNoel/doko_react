@@ -1,6 +1,7 @@
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/data/auth.dart';
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -152,7 +153,7 @@ void main() {
 
         // assert
         expect(result.status, AuthStatus.error);
-        expect(result.message, "Oops! Something went wrong.");
+        expect(result.message, Constants.errorMessage);
       });
     });
 
@@ -199,7 +200,7 @@ void main() {
         final result = await auth.confirmSignInUser(code);
 
         expect(result.status, AuthStatus.error);
-        expect(result.message, "Oops! Something went wrong.");
+        expect(result.message, Constants.errorMessage);
       });
     });
 
@@ -240,7 +241,7 @@ void main() {
         final result = await auth.signUpUser(email, password);
 
         expect(result.status, AuthStatus.error);
-        expect(result.message, "Oops! Something went wrong.");
+        expect(result.message, Constants.errorMessage);
       });
     });
 
@@ -281,7 +282,7 @@ void main() {
         final result = await auth.resetPassword(email);
 
         expect(result.status, AuthStatus.error);
-        expect(result.message, "Oops! Something went wrong.");
+        expect(result.message, Constants.errorMessage);
       });
     });
 
@@ -328,7 +329,7 @@ void main() {
         final result = await auth.confirmResetPassword(email, code, password);
 
         expect(result.status, AuthStatus.error);
-        expect(result.message, "Oops! Something went wrong.");
+        expect(result.message, Constants.errorMessage);
       });
     });
 
@@ -370,7 +371,7 @@ void main() {
         final result = await auth.getEmail();
 
         expect(result.status, AuthStatus.error);
-        expect(result.message, "Oops! Something went wrong.");
+        expect(result.message, Constants.errorMessage);
       });
     });
 
@@ -444,7 +445,7 @@ void main() {
         final result = await auth.setupMfa();
 
         expect(result.status, AuthStatus.error);
-        expect(result.message, "Oops! Something went wrong.");
+        expect(result.message, Constants.errorMessage);
       });
     });
 
@@ -492,7 +493,7 @@ void main() {
         final result = await auth.verifyMfaSetup(code);
 
         expect(result.status, AuthStatus.error);
-        expect(result.message, "Oops! Something went wrong.");
+        expect(result.message, Constants.errorMessage);
       });
     });
 
@@ -545,7 +546,7 @@ void main() {
         final result = await auth.getAccessToken();
 
         expect(result.status, AuthStatus.error);
-        expect(result.value, "Oops! Something went wrong.");
+        expect(result.value, Constants.errorMessage);
       });
     });
 
@@ -587,7 +588,7 @@ void main() {
         final result = await auth.updatePassword(password, password);
 
         expect(result.status, AuthStatus.error);
-        expect(result.message, "Oops! Something went wrong.");
+        expect(result.message, Constants.errorMessage);
       });
     });
 
@@ -630,7 +631,7 @@ void main() {
         final result = await auth.getUserId();
 
         expect(result.status, AuthStatus.error);
-        expect(result.message, "Oops! Something went wrong.");
+        expect(result.message, Constants.errorMessage);
       });
     });
   });

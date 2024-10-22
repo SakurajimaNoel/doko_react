@@ -135,7 +135,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
           children: const [
             ErrorText(
-              "Oops! Something went wrong.",
+              Constants.errorMessage,
               fontSize: Constants.fontSize,
             ),
             SizedBox(
@@ -511,7 +511,7 @@ class _UserProfileActionState extends State<_UserProfileAction> {
       case FriendRelationStatus.incomingReq:
         errorMessage = "can't remove ${_user.name}'s friend request.";
       default:
-        errorMessage = "Oops! Something went wrong.";
+        errorMessage = Constants.errorMessage;
     }
 
     setState(() {

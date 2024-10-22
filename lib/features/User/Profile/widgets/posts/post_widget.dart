@@ -148,7 +148,7 @@ class _PostContentState extends State<_PostContent> {
 
   Widget _handleUnknownContent(Content item) {
     return const Center(
-      child: ErrorText("Oops! Something went wrong."),
+      child: ErrorText(Constants.errorMessage),
     );
   }
 
