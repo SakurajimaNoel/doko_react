@@ -104,6 +104,8 @@ class _FriendContainerProfileWidgetState
   }
 
   void _handleUnfriendAction(int index) {
+    if (!self) return;
+
     _friends.removeAt(index);
     setState(() {});
   }
@@ -184,6 +186,7 @@ class _FriendContainerProfileWidgetState
         ),
       );
     }
+
     return Padding(
       padding: const EdgeInsets.all(
         Constants.padding,

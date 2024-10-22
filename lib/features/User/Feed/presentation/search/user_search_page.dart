@@ -61,9 +61,11 @@ class _UserSearchPageState extends State<UserSearchPage> {
     SearchResponse searchResponse =
         await userGraphqlService.searchUserByUsernameOrName(userId, query);
 
+    if (searching == false) return;
+
     setState(() {
       searching = false;
-      searchResult = searchResponse.friends;
+      searchResult = searchResponse.users;
     });
 
     if (searchResponse.status == ResponseStatus.error) {
@@ -107,6 +109,7 @@ class _UserSearchPageState extends State<UserSearchPage> {
                             if (value.isEmpty) {
                               setState(() {
                                 searchResult = null;
+                                searching = false;
                               });
                               searchDebounce.dispose();
                               return;

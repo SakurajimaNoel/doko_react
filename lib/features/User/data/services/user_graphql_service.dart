@@ -60,11 +60,11 @@ class PostResponse {
 
 class SearchResponse {
   final ResponseStatus status;
-  final List<FriendUserModel> friends;
+  final List<FriendUserModel> users;
 
   const SearchResponse({
     required this.status,
-    this.friends = const [],
+    this.users = const [],
   });
 }
 
@@ -617,7 +617,54 @@ class UserGraphqlService {
 
       return SearchResponse(
         status: ResponseStatus.success,
-        friends: friends,
+        users: friends,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return const SearchResponse(
+        status: ResponseStatus.error,
+      );
+    }
+  }
+
+  Future<SearchResponse> searchUserFriendsByUsernameOrName(
+      String userId, String myId, String query) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(UserQueries.searchUserFriendsByUsernameOrName()),
+          variables: UserQueries.searchUserFriendsByUsernameOrNameVariables(
+              userId, myId, query),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      List? res = result.data?["users"];
+
+      if (res == null || res.isEmpty) {
+        return const SearchResponse(
+          status: ResponseStatus.success,
+        );
+      }
+
+      var friends = res[0]["friendsConnection"]["edges"] as List;
+
+      List<Future<FriendUserModel>> futureFriendsModel =
+          (friends).map((user) async {
+        FriendUserModel friend =
+            await FriendUserModel.createModel(userMap: user["node"]);
+        return friend;
+      }).toList();
+
+      List<FriendUserModel> users = await Future.wait(futureFriendsModel);
+
+      return SearchResponse(
+        status: ResponseStatus.success,
+        users: users,
       );
     } catch (e) {
       safePrint(e.toString());
