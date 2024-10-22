@@ -824,4 +824,57 @@ class UserQueries {
       },
     };
   }
+
+  // search user based on username or name
+  static String searchUserByUsernameOrName() {
+    return '''
+    query Users(\$options: UserOptions, \$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+      users(options: \$options, where: \$where) {
+        id
+        name
+        username
+        profilePicture
+        friendsConnection(where: \$friendsConnectionWhere2) {
+          edges {
+            requestedBy
+            status
+          }
+        }
+      }
+    }
+    ''';
+  }
+
+  static Map<String, dynamic> searchUserByUsernameOrNameVariables(
+      String id, String query) {
+    return {
+      "options": {
+        "limit": 20,
+      },
+      "where": {
+        "AND": [
+          {
+            "OR": [
+              {
+                "name_CONTAINS": query,
+              },
+              {
+                "username_CONTAINS": query,
+              }
+            ],
+          },
+          {
+            "NOT": {
+              "id": id,
+            }
+          }
+        ],
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          "id": id,
+        }
+      }
+    };
+  }
 }
