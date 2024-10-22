@@ -849,7 +849,7 @@ class UserQueries {
       String id, String query) {
     return {
       "options": {
-        "limit": 20,
+        "limit": QueryConstants.generalSearchLimit,
       },
       "where": {
         "AND": [
@@ -875,6 +875,62 @@ class UserQueries {
           "id": id,
         }
       }
+    };
+  }
+
+  // search user friends based on username or name
+  static String searchUserFriendsByUsernameOrName() {
+    return '''
+    query Users(\$where: UserWhere, \$first: Int, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
+      users(where: \$where) {
+        friendsConnection(first: \$first, where: \$friendsConnectionWhere2) {
+          edges {
+            node {
+              id
+              name
+              profilePicture
+              username
+              friendsConnection(where: \$friendsConnectionWhere3) {
+                edges {
+                  requestedBy
+                  status
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    ''';
+  }
+
+  static Map<String, dynamic> searchUserFriendsByUsernameOrNameVariables(
+      String userId, String myId, String query) {
+    return {
+      "where": {
+        "id": userId,
+      },
+      "first": QueryConstants.friendSearchLimit,
+      "friendsConnectionWhere2": {
+        "edge": {
+          "status": FriendStatus.accepted,
+        },
+        "node": {
+          "OR": [
+            {
+              "name_CONTAINS": query,
+            },
+            {
+              "username_CONTAINS": query,
+            },
+          ],
+        }
+      },
+      "friendsConnectionWhere3": {
+        "node": {
+          "id": myId,
+        }
+      },
     };
   }
 }
