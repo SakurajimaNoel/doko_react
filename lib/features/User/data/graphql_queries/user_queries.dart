@@ -852,21 +852,12 @@ class UserQueries {
         "limit": QueryConstants.generalSearchLimit,
       },
       "where": {
-        "AND": [
+        "OR": [
           {
-            "OR": [
-              {
-                "name_CONTAINS": query,
-              },
-              {
-                "username_CONTAINS": query,
-              }
-            ],
+            "name_CONTAINS": query,
           },
           {
-            "NOT": {
-              "id": id,
-            }
+            "username_CONTAINS": query,
           }
         ],
       },
