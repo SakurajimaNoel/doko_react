@@ -933,4 +933,42 @@ class UserQueries {
       },
     };
   }
+
+  // search user friends by username
+  static String searchUserFriendsByUsername() {
+    return '''
+    query Users(\$where: UserWhere, \$first: Int, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+      users(where: \$where) {
+        friendsConnection(first: \$first, where: \$friendsConnectionWhere2) {
+          edges {
+            node {
+              id
+              name
+              profilePicture
+              username
+            }
+          }
+        }
+      }
+    }
+    ''';
+  }
+
+  static Map<String, dynamic> searchUserFriendsByUsernameVariables(
+      String id, String query) {
+    return {
+      "where": {
+        "id": id,
+      },
+      "first": QueryConstants.friendSearchCommentLimit,
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_CONTAINS": query,
+        },
+        "edge": {
+          "status": FriendStatus.accepted,
+        }
+      }
+    };
+  }
 }
