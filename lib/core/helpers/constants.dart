@@ -25,8 +25,8 @@ class Constants {
 
   static const double appBarHeight = kToolbarHeight;
   static const double expandedAppBarHeight = _root * 22.5;
-  static const int profileWidth = 1;
-  static const int profileHeight = 1;
+  static const double profileWidth = 1;
+  static const double profileHeight = 1;
   static const double profile = (profileWidth / profileHeight);
 
   // images
@@ -41,8 +41,10 @@ class Constants {
   static const double portrait = 9 / 16;
 
   // post
-  static const double postContainer =
-      1 / 1; // for height use 1/postContainer and for width use postContainer
+  static const double postWidth = 1;
+  static const double postHeight = 1;
+  static const double postContainer = (postWidth /
+      postHeight); // for height use 1/postContainer and for width use postContainer
   static const double actionWidth = _root * 2.5;
   static const double actionEdgeGap = _root * 0.125;
   static const int postLimit = 10;

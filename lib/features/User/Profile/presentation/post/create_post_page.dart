@@ -201,7 +201,7 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
   Widget _postItemWrapper({
     required Widget item,
     required int index,
-    bool image = false,
+    bool animated = false,
     required String path,
   }) {
     var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
@@ -218,18 +218,21 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
               top: Constants.padding * 0.5,
             ),
             child: Row(
-              mainAxisAlignment: image
+              mainAxisAlignment: !animated
                   ? MainAxisAlignment.spaceBetween
                   : MainAxisAlignment.end,
               children: [
-                if (image)
+                if (!animated)
                   IconButton.filledTonal(
                     onPressed: () async {
                       CroppedFile? croppedFile = await ImageCropper().cropImage(
+                        aspectRatio: const CropAspectRatio(
+                          ratioX: Constants.postWidth,
+                          ratioY: Constants.postHeight,
+                        ),
                         sourcePath: path,
                         uiSettings: [
                           AndroidUiSettings(
-                            initAspectRatio: CropAspectRatioPreset.square,
                             toolbarTitle: 'Post Media Content',
                             toolbarColor: currScheme.surface,
                             toolbarWidgetColor: currScheme.onSurface,
@@ -241,19 +244,9 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
                             cropGridColor: currScheme.onSurface,
                             cropFrameStrokeWidth: 6,
                             cropGridStrokeWidth: 6,
-                            aspectRatioPresets: [
-                              CropAspectRatioPreset.square,
-                            ],
-                            lockAspectRatio: true,
-                            hideBottomControls: false,
                           ),
                           IOSUiSettings(
                             title: 'Post Media Content',
-                            minimumAspectRatio: Constants.postContainer,
-                            aspectRatioLockEnabled: true,
-                            aspectRatioPresets: [
-                              CropAspectRatioPreset.square,
-                            ],
                           ),
                           WebUiSettings(
                             context: context,
@@ -320,6 +313,11 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
 
       switch (type) {
         case MediaTypeValue.image:
+          var extension = MediaType.getExtensionFromFileName(
+            item.originalImage!.path,
+            withDot: false,
+          );
+
           mediaWidgets.add(
             _postItemWrapper(
               item: Image.file(
@@ -330,8 +328,8 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
                 height: height,
               ),
               index: index,
-              image: true,
               path: item.originalImage!.path,
+              animated: extension == "gif",
             ),
           );
 
@@ -345,6 +343,7 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
               ),
               index: index,
               path: item.file!.path,
+              animated: true,
             ),
           );
           break;
@@ -379,6 +378,7 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
                 ],
               ),
               index: index,
+              animated: true,
             ),
           );
         default:

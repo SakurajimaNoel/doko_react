@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/data/auth.dart';
-import 'package:doko_react/core/data/image_cropper.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
@@ -66,13 +65,26 @@ class _CompleteProfilePicturePageState
   }
 
   void onSelection(List<XFile> image) async {
+    String? extension =
+        MediaType.getExtensionFromFileName(image[0].path, withDot: false);
+
+    if (extension == "gif") {
+      setState(() {
+        _profilePicture = XFile(image[0].path);
+      });
+      return;
+    }
+
     var currScheme = Theme.of(context).colorScheme;
 
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: image[0].path,
+      aspectRatio: const CropAspectRatio(
+        ratioX: Constants.profileWidth,
+        ratioY: Constants.profileHeight,
+      ),
       uiSettings: [
         AndroidUiSettings(
-          initAspectRatio: CropAspectRatioProfile(),
           toolbarTitle: 'Profile Picture',
           toolbarColor: currScheme.surface,
           toolbarWidgetColor: currScheme.onSurface,
@@ -83,19 +95,9 @@ class _CompleteProfilePicturePageState
           cropGridColor: currScheme.onSurface,
           cropFrameStrokeWidth: 6,
           cropGridStrokeWidth: 6,
-          aspectRatioPresets: [
-            CropAspectRatioProfile(),
-          ],
-          lockAspectRatio: true,
-          hideBottomControls: false,
         ),
         IOSUiSettings(
           title: 'Profile Picture',
-          minimumAspectRatio: Constants.profile,
-          aspectRatioLockEnabled: true,
-          aspectRatioPresets: [
-            CropAspectRatioProfile(),
-          ],
         ),
         WebUiSettings(
           context: context,
