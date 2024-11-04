@@ -184,7 +184,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       uiSettings: [
         AndroidUiSettings(
           initAspectRatio: CropAspectRatioProfile(),
-          toolbarTitle: 'Post Media Content',
+          toolbarTitle: 'Profile Picture',
           toolbarColor: currScheme.surface,
           toolbarWidgetColor: currScheme.onSurface,
           statusBarColor: currScheme.surface,
@@ -201,7 +201,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           hideBottomControls: false,
         ),
         IOSUiSettings(
-          title: 'Post Media Content',
+          title: 'Profile Picture',
           minimumAspectRatio: Constants.profile,
           aspectRatioLockEnabled: true,
           aspectRatioPresets: [

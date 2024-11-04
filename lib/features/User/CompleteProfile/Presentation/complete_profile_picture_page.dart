@@ -73,7 +73,7 @@ class _CompleteProfilePicturePageState
       uiSettings: [
         AndroidUiSettings(
           initAspectRatio: CropAspectRatioProfile(),
-          toolbarTitle: 'Post Media Content',
+          toolbarTitle: 'Profile Picture',
           toolbarColor: currScheme.surface,
           toolbarWidgetColor: currScheme.onSurface,
           statusBarColor: currScheme.surface,
@@ -90,7 +90,7 @@ class _CompleteProfilePicturePageState
           hideBottomControls: false,
         ),
         IOSUiSettings(
-          title: 'Post Media Content',
+          title: 'Profile Picture',
           minimumAspectRatio: Constants.profile,
           aspectRatioLockEnabled: true,
           aspectRatioPresets: [
