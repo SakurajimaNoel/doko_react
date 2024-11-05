@@ -15,38 +15,38 @@ class UserWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _UserProfileImage(
-          user: user,
-        ),
-        const SizedBox(
-          width: Constants.gap,
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(user.name),
-            GestureDetector(
-              onTap: () {
-                context.pushNamed(
-                  RouterConstants.userProfile,
-                  pathParameters: {
-                    "userId": user.id,
-                  },
-                );
-              },
-              child: Text(
+    return GestureDetector(
+      onTap: () {
+        context.pushNamed(
+          RouterConstants.userProfile,
+          pathParameters: {
+            "userId": user.id,
+          },
+        );
+      },
+      child: Row(
+        children: [
+          _UserProfileImage(
+            user: user,
+          ),
+          const SizedBox(
+            width: Constants.gap,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(user.name),
+              Text(
                 "@${user.username}",
                 style: const TextStyle(
                   fontSize: Constants.smallFontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
