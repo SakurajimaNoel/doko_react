@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
+import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
@@ -13,81 +14,145 @@ import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class PostWidget extends StatelessWidget {
+enum PostLocation {
+  feed,
+  page,
+}
+
+class PostWidget extends StatefulWidget {
   final PostModel post;
   final ValueChanged<bool> handlePostLike;
   final ValueChanged<int> handlePostDisplayItem;
+  final PostLocation location;
 
   const PostWidget({
     super.key,
     required this.post,
     required this.handlePostLike,
     required this.handlePostDisplayItem,
+    this.location = PostLocation.feed,
   });
 
   @override
+  State<PostWidget> createState() => _PostWidgetState();
+}
+
+class _PostWidgetState extends State<PostWidget> {
+  bool longpress = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: Constants.gap * 1.25),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            // post metadata
-            padding: const EdgeInsets.symmetric(horizontal: Constants.padding),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                UserWidget(
-                  user: post.createdBy,
-                ),
-                Text(
-                  DisplayText.displayDateDiff(post.createdOn),
-                  style: const TextStyle(
-                    fontSize: Constants.smallFontSize,
+    final currTheme = Theme.of(context).colorScheme;
+    final isPage = widget.location == PostLocation.page;
+
+    return GestureDetector(
+      onLongPress: () {
+        setState(() {
+          longpress = true;
+        });
+      },
+      onLongPressCancel: () {
+        setState(() {
+          longpress = false;
+        });
+      },
+      onLongPressEnd: (details) {
+        setState(() {
+          longpress = false;
+        });
+      },
+      onTap: () async {
+        if (isPage) return;
+
+        setState(() {
+          longpress = true;
+        });
+        await context.pushNamed(
+          RouterConstants.userPost,
+          pathParameters: {
+            "postId": "rohan",
+          },
+          extra: {"post": widget.post},
+        );
+
+        setState(() {
+          longpress = false;
+        });
+      },
+      child: Container(
+        color: !isPage
+            ? longpress
+                ? currTheme.surfaceContainer
+                : currTheme.surface
+            : Colors.transparent,
+        padding: const EdgeInsets.symmetric(
+          vertical: Constants.gap * 0.5,
+        ),
+        margin: EdgeInsets.symmetric(
+          vertical: isPage ? 0 : Constants.gap * 1.25,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              // post metadata
+              padding:
+                  const EdgeInsets.symmetric(horizontal: Constants.padding),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  UserWidget(
+                    user: widget.post.createdBy,
                   ),
+                  Text(
+                    DisplayText.displayDateDiff(widget.post.createdOn),
+                    style: const TextStyle(
+                      fontSize: Constants.smallFontSize,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (widget.post.content.isNotEmpty) ...[
+              const SizedBox(
+                height: Constants.gap * 0.5,
+              ),
+              GestureDetector(
+                onTap: () {},
+                child: _PostContent(
+                  content: widget.post.content,
+                  initialItem: widget.post.initialItem,
+                  id: widget.post.id,
+                  currentItemAction: widget.handlePostDisplayItem,
                 ),
-              ],
+              ),
+            ],
+            // caption
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: Constants.padding,
+                vertical: Constants.padding,
+              ),
+              child: _PostCaption(caption: widget.post.caption),
             ),
-          ),
-          if (post.content.isNotEmpty) ...[
             const SizedBox(
-              height: Constants.gap * 0.5,
+              height: Constants.gap * 0.125,
             ),
-            _PostContent(
-              content: post.content,
-              initialItem: post.initialItem,
-              id: post.id,
-              currentItemAction: handlePostDisplayItem,
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: Constants.padding,
+              ),
+              child: _PostAction(
+                postModel: widget.post,
+                likeAction: widget.handlePostLike,
+              ),
             ),
           ],
-          const SizedBox(
-            height: Constants.gap * 0.5,
-          ),
-          // caption
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: Constants.padding,
-              vertical: Constants.padding * 0.5,
-            ),
-            child: _PostCaption(caption: post.caption),
-          ),
-          const SizedBox(
-            height: Constants.gap * 0.5,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: Constants.padding,
-            ),
-            child: _PostAction(
-              postModel: post,
-              likeAction: handlePostLike,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -13,9 +13,11 @@ import 'package:doko_react/features/User/Profile/presentation/friends/friends_pa
 import 'package:doko_react/features/User/Profile/presentation/friends/pending_request_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/post/create_post_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/post/create_post_publish_page.dart';
+import 'package:doko_react/features/User/Profile/presentation/post/post_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/profile/edit_profile_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/profile/profile_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/profile/user_profile_page.dart';
+import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/user_layout.dart';
 import 'package:doko_react/features/application/settings/presentation/change_password_page.dart';
 import 'package:doko_react/features/application/settings/presentation/mfa_setup_page.dart';
@@ -161,7 +163,7 @@ class AppRouterConfig {
 
     return GoRouter(
       navigatorKey: homeRouterRootNavigatorKey,
-      initialLocation: "/user-feed",
+      initialLocation: "/profile",
       routes: [
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
@@ -209,6 +211,20 @@ class AppRouterConfig {
                     );
                   },
                   routes: [
+                    GoRoute(
+                      parentNavigatorKey: homeRouterRootNavigatorKey,
+                      name: RouterConstants.userPost,
+                      path: "post/:postId",
+                      builder: (context, state) {
+                        final Map<String, dynamic> data =
+                            state.extra as Map<String, dynamic>;
+                        final PostModel post = data["post"];
+
+                        return PostPage(
+                          post: post,
+                        );
+                      },
+                    ),
                     GoRoute(
                       name: RouterConstants.pendingRequests,
                       path: "pending-requests",
