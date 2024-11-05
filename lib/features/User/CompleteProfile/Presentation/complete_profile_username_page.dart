@@ -41,7 +41,7 @@ class _CompleteProfileUsernamePageState
   bool _usernameAvailable = false;
 
   final List<String> usernamePattern = [
-    "Be between 3 and 20 characters long.",
+    "Be between 3 and ${Constants.usernameLimit} characters long.",
     "Start with a letter (a-z or A-Z).",
     "Contain only letters, numbers, underscores ( _ ), periods ( . ), and hyphens ( - ).",
   ];

@@ -1,3 +1,5 @@
+import 'package:doko_react/core/helpers/constants.dart';
+
 class InputStatus {
   final bool isValid;
   final String? message;
@@ -106,7 +108,9 @@ class ValidateInput {
   }
 
   static InputStatus validateUsername(String? username) {
-    final RegExp usernameRegex = RegExp(r"^[a-zA-Z][a-zA-Z0-9_.-]{2,19}$");
+    final RegExp usernameRegex = RegExp(r"^[a-zA-Z][a-zA-Z0-9_.-]{2," +
+        (Constants.usernameLimit - 1).toString() +
+        r"}$");
 
     if (username == null || username.isEmpty) {
       return InputStatus(

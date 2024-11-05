@@ -122,7 +122,7 @@ class _CommentInputState extends State<CommentInput> {
         color: currTheme.surfaceContainerLow,
         border: Border(
           top: BorderSide(
-            width: 1,
+            width: 1.5,
             color: currTheme.outline,
           ),
         ),

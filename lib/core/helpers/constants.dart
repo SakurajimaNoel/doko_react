@@ -4,6 +4,7 @@ class Constants {
   static const double _root = 16;
 
   static const String errorMessage = "Oops! Something went wrong.";
+  static const usernameLimit = 20;
 
   static const double padding = _root;
   static const double gap = _root;
