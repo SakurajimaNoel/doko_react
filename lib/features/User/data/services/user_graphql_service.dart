@@ -68,6 +68,16 @@ class SearchResponse {
   });
 }
 
+class IndividualPostResponse {
+  final ResponseStatus status;
+  final PostModel? postInfo;
+
+  const IndividualPostResponse({
+    required this.status,
+    this.postInfo,
+  });
+}
+
 class UserGraphqlService {
   late final GraphQLClient _client;
 
@@ -669,6 +679,44 @@ class UserGraphqlService {
     } catch (e) {
       safePrint(e.toString());
       return const SearchResponse(
+        status: ResponseStatus.error,
+      );
+    }
+  }
+
+  Future<IndividualPostResponse> getPostsById(
+      String postId, String userId) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          document: gql(UserQueries.getPostById()),
+          variables: UserQueries.getPostByIdVariables(postId, userId),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      List? res = result.data?["posts"];
+
+      if (res == null || res.isEmpty) {
+        return const IndividualPostResponse(
+          status: ResponseStatus.success,
+        );
+      }
+
+      PostModel info = await PostModel.createModel(
+        map: res[0],
+      );
+
+      return IndividualPostResponse(
+        status: ResponseStatus.success,
+        postInfo: info,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return const IndividualPostResponse(
         status: ResponseStatus.error,
       );
     }

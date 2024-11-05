@@ -163,7 +163,7 @@ class AppRouterConfig {
 
     return GoRouter(
       navigatorKey: homeRouterRootNavigatorKey,
-      initialLocation: "/profile",
+      initialLocation: "/user-feed",
       routes: [
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
@@ -216,12 +216,16 @@ class AppRouterConfig {
                       name: RouterConstants.userPost,
                       path: "post/:postId",
                       builder: (context, state) {
-                        final Map<String, dynamic> data =
-                            state.extra as Map<String, dynamic>;
-                        final PostModel post = data["post"];
+                        Map<String, dynamic>? data;
+                        if (state.extra != null) {
+                          data = state.extra as Map<String, dynamic>;
+                        }
 
+                        final PostModel? post = data?["post"];
+                        String postId = state.pathParameters["postId"]!;
                         return PostPage(
                           post: post,
+                          postId: postId,
                         );
                       },
                     ),
@@ -297,14 +301,16 @@ class AppRouterConfig {
                       },
                     ),
                     GoRoute(
+                        parentNavigatorKey: homeRouterRootNavigatorKey,
                         name: RouterConstants.userProfile,
-                        path: ":userId",
+                        path: "user/:userId",
                         builder: (context, state) {
                           String userId = state.pathParameters["userId"]!;
                           return UserProfilePage(userId: userId);
                         },
                         routes: [
                           GoRoute(
+                            parentNavigatorKey: homeRouterRootNavigatorKey,
                             name: RouterConstants.profileFriends,
                             path: "friends",
                             builder: (context, state) {

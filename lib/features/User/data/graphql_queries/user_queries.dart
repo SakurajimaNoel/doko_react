@@ -962,4 +962,45 @@ class UserQueries {
       }
     };
   }
+
+  // post by id
+  static String getPostById() {
+    return """
+      query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere) {
+        posts(where: \$where) {
+          caption
+          id
+          content
+          createdOn
+          createdBy {
+            id
+            name
+            profilePicture
+            username
+          }
+          likedBy(where: \$likedByWhere2) {
+            id
+          }
+          commentsConnection {
+            totalCount
+          }
+          likedByConnection {
+            totalCount
+          }
+        }
+      }
+    """;
+  }
+
+  static Map<String, dynamic> getPostByIdVariables(
+      String postId, String userId) {
+    return {
+      "where": {
+        "id": postId,
+      },
+      "likedByWhere2": {
+        "id": userId,
+      }
+    };
+  }
 }
