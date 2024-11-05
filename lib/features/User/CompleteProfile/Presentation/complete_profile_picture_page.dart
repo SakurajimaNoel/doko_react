@@ -68,7 +68,8 @@ class _CompleteProfilePicturePageState
     String? extension =
         MediaType.getExtensionFromFileName(image[0].path, withDot: false);
 
-    if (extension == "gif") {
+    if (extension == "gif" ||
+        (extension == "webp" && await MediaType.isAnimated(image[0].path))) {
       setState(() {
         _profilePicture = XFile(image[0].path);
       });

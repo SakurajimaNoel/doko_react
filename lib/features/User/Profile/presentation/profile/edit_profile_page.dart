@@ -179,8 +179,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     String? extension =
         MediaType.getExtensionFromFileName(image[0].path, withDot: false);
 
-    if (extension == "gif") {
-      safePrint("gif selected");
+    if (extension == "gif" ||
+        (extension == "webp" && await MediaType.isAnimated(image[0].path))) {
       setState(() {
         _profilePicture = XFile(image[0].path);
         _removeProfile = false;

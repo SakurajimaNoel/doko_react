@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:image/image.dart' as img;
+
 enum MediaTypeValue {
   image,
   video,
@@ -151,7 +153,7 @@ class MediaType {
     final int lastDot = fileName.lastIndexOf('.', fileName.length - 1);
     if (lastDot == -1) return null;
 
-    final String extension = fileName.substring(lastDot + 1);
+    final String extension = fileName.substring(lastDot + 1).toLowerCase();
 
     if (withDot) {
       return ".$extension";
@@ -172,5 +174,14 @@ class MediaType {
     }
 
     return MediaTypeValue.unknown;
+  }
+
+  static Future<bool> isAnimated(String path) async {
+    final imageBytes = await File(path).readAsBytes();
+    final image = img.WebPDecoder().decode(imageBytes);
+
+    if (image != null) return image.numFrames > 1;
+
+    return false;
   }
 }
