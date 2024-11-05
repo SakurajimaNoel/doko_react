@@ -74,6 +74,7 @@ class _CommentInputState extends State<CommentInput> {
       return;
     }
 
+    if (!mounted) return;
     var currScheme = Theme.of(context).colorScheme;
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: image.path,

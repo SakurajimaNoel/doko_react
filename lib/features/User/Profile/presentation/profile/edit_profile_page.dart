@@ -188,6 +188,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       return;
     }
 
+    if (!mounted) return;
     var currScheme = Theme.of(context).colorScheme;
 
     CroppedFile? croppedFile = await ImageCropper().cropImage(

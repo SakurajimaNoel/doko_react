@@ -76,6 +76,7 @@ class _CompleteProfilePicturePageState
       return;
     }
 
+    if (!mounted) return;
     var currScheme = Theme.of(context).colorScheme;
 
     CroppedFile? croppedFile = await ImageCropper().cropImage(
