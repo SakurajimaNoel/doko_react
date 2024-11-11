@@ -949,7 +949,7 @@ class UserQueries {
     };
   }
 
-  // search user friends by username
+  // search user friends by username for comment mention
   static String searchUserFriendsByUsername() {
     return '''
     query Users(\$where: UserWhere, \$first: Int, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
@@ -970,7 +970,9 @@ class UserQueries {
   }
 
   static Map<String, dynamic> searchUserFriendsByUsernameVariables(
-      String username, String query) {
+    String username, {
+    required String query,
+  }) {
     return {
       "where": {
         "username": username,

@@ -1,4 +1,3 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
@@ -66,9 +65,6 @@ class _PostPageState extends State<PostPage> {
     setState(() {
       post = response.postInfo;
     });
-
-    safePrint("printing user id");
-    safePrint(post?.createdBy.id);
   }
 
   Future<void> fetchPostCommentsById() async {}

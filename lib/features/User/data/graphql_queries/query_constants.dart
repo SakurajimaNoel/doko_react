@@ -3,7 +3,7 @@ class QueryConstants {
   static const int friendLimit = 10;
   static const int generalSearchLimit = 10;
   static const int friendSearchLimit = 10;
-  static const int friendSearchCommentLimit = 5;
+  static const int friendSearchCommentLimit = 6;
 }
 
 class FriendStatus {

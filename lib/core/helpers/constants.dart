@@ -61,4 +61,6 @@ class Constants {
   static const double commentWidth = 2;
   static const double commentHeight = 1;
   static const double commentContainer = (commentWidth / commentHeight);
+  static const String zeroWidthSpace = "\u200B";
+  static const double commentOverlayHeight = _root * 5;
 }

@@ -77,6 +77,16 @@ class IndividualPostResponse {
   });
 }
 
+class CommentUserSearchResponse {
+  final ResponseStatus status;
+  final List<UserModel> users;
+
+  const CommentUserSearchResponse({
+    required this.status,
+    this.users = const [],
+  });
+}
+
 class UserGraphqlService {
   late final GraphQLClient _client;
 
@@ -608,7 +618,6 @@ class UserGraphqlService {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
-          fetchPolicy: FetchPolicy.networkOnly,
           document: gql(UserQueries.searchUserByUsernameOrName()),
           variables: UserQueries.searchUserByUsernameOrNameVariables(
             query,
@@ -698,6 +707,54 @@ class UserGraphqlService {
     } catch (e) {
       safePrint(e.toString());
       return const SearchResponse(
+        status: ResponseStatus.error,
+      );
+    }
+  }
+
+  Future<CommentUserSearchResponse> searchUserFriendsByUsername(
+    String username, {
+    required String query,
+  }) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          document: gql(UserQueries.searchUserFriendsByUsername()),
+          variables: UserQueries.searchUserFriendsByUsernameVariables(
+            username,
+            query: query,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      List? res = result.data?["users"];
+
+      if (res == null || res.isEmpty) {
+        return const CommentUserSearchResponse(
+          status: ResponseStatus.success,
+        );
+      }
+
+      var friends = res[0]["friendsConnection"]["edges"] as List;
+
+      List<Future<UserModel>> futureFriendsModel = (friends).map((user) async {
+        UserModel friend = await UserModel.createModel(map: user["node"]);
+        return friend;
+      }).toList();
+
+      List<UserModel> users = await Future.wait(futureFriendsModel);
+
+      return CommentUserSearchResponse(
+        status: ResponseStatus.success,
+        users: users,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return const CommentUserSearchResponse(
         status: ResponseStatus.error,
       );
     }
