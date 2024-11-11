@@ -13,14 +13,12 @@ import 'package:provider/provider.dart';
 
 class FriendContainerProfileWidget extends StatefulWidget {
   final ProfileFriendInfo friendInfo;
-  final String userId;
-  final String name;
+  final String username;
 
   const FriendContainerProfileWidget({
     super.key,
     required this.friendInfo,
-    required this.userId,
-    required this.name,
+    required this.username,
   });
 
   @override
@@ -31,8 +29,8 @@ class FriendContainerProfileWidget extends StatefulWidget {
 class _FriendContainerProfileWidgetState
     extends State<FriendContainerProfileWidget> {
   late final ProfileFriendInfo _friendInfo;
-  late final String name;
-  late final String userId;
+
+  late final String username;
   late final UserProvider _userProvider;
   late final bool self;
 
@@ -50,25 +48,24 @@ class _FriendContainerProfileWidgetState
     super.initState();
 
     _friendInfo = widget.friendInfo;
-    name = widget.name;
-    userId = widget.userId;
+
+    username = widget.username;
 
     _userProvider = context.read<UserProvider>();
 
-    self = _userProvider.id == userId;
+    self = _userProvider.username == username;
 
     _friends = _friendInfo.friends;
   }
 
   Future<void> _fetchMoreFriends() async {
     // only call this function when has next page
-    String id = userId;
     String cursor = _friendInfo.info.endCursor!;
 
-    var friendResponse = await _userGraphqlService.getFriendsByUserId(
-      id,
-      cursor,
-      currentUserId: _userProvider.id,
+    var friendResponse = await _userGraphqlService.getFriendsByUsername(
+      username,
+      cursor: cursor,
+      currentUsername: _userProvider.username,
     );
 
     _loading = false;
@@ -121,7 +118,7 @@ class _FriendContainerProfileWidgetState
           ),
           child: Center(
             child: Text(
-              "$name has no more friends.",
+              "@$username has no more friends.",
               style: const TextStyle(
                 fontWeight: FontWeight.w500,
               ),
@@ -178,7 +175,7 @@ class _FriendContainerProfileWidgetState
         ),
         child: Center(
           child: Text(
-            "$name has no friends.",
+            "@$username has no friends.",
             style: const TextStyle(
               fontWeight: FontWeight.w500,
             ),

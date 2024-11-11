@@ -7,6 +7,7 @@ import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/provider/user_preferences_provider.dart';
+import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
   late final List<PostContent> _postContent;
 
   late final UserPreferencesProvider userPreferencesProvider;
+  late final UserProvider userProvider;
 
   final UserGraphqlService _userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
@@ -37,6 +39,15 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
 
   bool _uploading = false;
   String _caption = "";
+
+  @override
+  void initState() {
+    super.initState();
+
+    _postContent = widget.postContent;
+    userPreferencesProvider = context.read<UserPreferencesProvider>();
+    userProvider = context.read<UserProvider>();
+  }
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -51,7 +62,10 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
 
   Future<void> _updateGraph(List<String> postContentPath) async {
     var result = await _userGraphqlService.userCreatePost(
-        caption: _caption, content: postContentPath);
+      caption: _caption,
+      content: postContentPath,
+      username: userProvider.username,
+    );
 
     setState(() {
       _uploading = false;
@@ -125,14 +139,6 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
 
     // update graph
     _updateGraph(postContentPath);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _postContent = widget.postContent;
-    userPreferencesProvider = context.read<UserPreferencesProvider>();
   }
 
   @override

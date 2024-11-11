@@ -303,10 +303,10 @@ class AppRouterConfig {
                     GoRoute(
                         parentNavigatorKey: homeRouterRootNavigatorKey,
                         name: RouterConstants.userProfile,
-                        path: "user/:userId",
+                        path: "user/:username",
                         builder: (context, state) {
-                          String userId = state.pathParameters["userId"]!;
-                          return UserProfilePage(userId: userId);
+                          String username = state.pathParameters["username"]!;
+                          return UserProfilePage(username: username);
                         },
                         routes: [
                           GoRoute(
@@ -314,19 +314,10 @@ class AppRouterConfig {
                             name: RouterConstants.profileFriends,
                             path: "friends",
                             builder: (context, state) {
-                              var extra = state.extra ??
-                                  {
-                                    "name": "user",
-                                  };
-
-                              final Map<String, dynamic> data =
-                                  extra as Map<String, dynamic>;
-
-                              String name = data["name"];
-                              String userId = state.pathParameters["userId"]!;
+                              String username =
+                                  state.pathParameters["username"]!;
                               return FriendsPage(
-                                userId: userId,
-                                name: name,
+                                username: username,
                               );
                             },
                           ),

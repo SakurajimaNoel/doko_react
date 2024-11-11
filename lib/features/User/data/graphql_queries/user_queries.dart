@@ -34,10 +34,10 @@ class UserQueries {
         """;
   }
 
-  static Map<String, dynamic> getUserVariables(String id) {
+  static Map<String, dynamic> getUserVariables(String userId) {
     return {
       "where": {
-        "id": id,
+        "id": userId,
       }
     };
   }
@@ -147,12 +147,12 @@ class UserQueries {
   }
 
   static Map<String, dynamic> getCompleteUserVariables(
-    String id, {
-    required String currentUserId,
+    String username, {
+    required String currentUsername,
   }) {
     return {
       "where": {
-        "id": id,
+        "username": username,
       },
       "first": QueryConstants.postLimit,
       "sort": const [
@@ -163,15 +163,15 @@ class UserQueries {
         }
       ],
       "friendsWhere2": {
-        "id": currentUserId,
+        "username": currentUsername,
       },
       "friendsConnectionWhere4": {
         "node": {
-          "id": id,
+          "username": username,
         }
       },
       "likedByWhere2": {
-        "id": currentUserId,
+        "username": currentUsername,
       },
       "friendsConnectionWhere2": {
         "edge": {
@@ -182,7 +182,7 @@ class UserQueries {
   }
 
   // get user accepted friends by user id
-  static String getFriendsByUserId(String? cursor) {
+  static String getFriendsByUsername(String? cursor) {
     if (cursor == null || cursor.isEmpty) {
       return """
        query Query(\$where: UserWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
@@ -240,13 +240,15 @@ class UserQueries {
         """;
   }
 
-  static Map<String, dynamic> getFriendsByUserIdVariables(
-      String id, String? cursor,
-      {required String currentUserId}) {
+  static Map<String, dynamic> getFriendsByUsernameVariables(
+    String username, {
+    String? cursor,
+    required String currentUsername,
+  }) {
     if (cursor == null || cursor.isEmpty) {
       return {
         "where": {
-          "id": id,
+          "username": username,
         },
         "first": QueryConstants.friendLimit,
         "sort": [
@@ -263,7 +265,7 @@ class UserQueries {
         },
         "friendsConnectionWhere3": {
           "node": {
-            "id": currentUserId,
+            "username": currentUsername,
           }
         }
       };
@@ -271,7 +273,7 @@ class UserQueries {
 
     return {
       "where": {
-        "id": id,
+        "username": username,
       },
       "after": cursor,
       "first": QueryConstants.friendLimit,
@@ -289,14 +291,14 @@ class UserQueries {
       },
       "friendsConnectionWhere3": {
         "node": {
-          "id": currentUserId,
+          "username": currentUsername,
         }
       }
     };
   }
 
   // get user posts by user id
-  static String getUserPostsByUserId() {
+  static String getUserPostsByUsername() {
     return """
         query Users(\$where: UserWhere, \$after: String, \$sort: [UserPostsConnectionSort!], \$first: Int, \$likedByWhere2: UserWhere) {
           users(where: \$where) {
@@ -328,11 +330,14 @@ class UserQueries {
         """;
   }
 
-  static Map<String, dynamic> getUserPostsByUserIdVariables(
-      String id, String cursor, String userId) {
+  static Map<String, dynamic> getUserPostsByUsernameVariables(
+    String username, {
+    required String cursor,
+    required String currentUsername,
+  }) {
     return {
       "where": {
-        "id": id,
+        "username": username,
       },
       "after": cursor,
       "first": QueryConstants.postLimit,
@@ -344,13 +349,13 @@ class UserQueries {
         }
       ],
       "likedByWhere2": {
-        "id": userId,
+        "username": currentUsername,
       },
     };
   }
 
 // get user pending friends outgoing
-  static String getPendingOutgoingFriendsByUserId(String? cursor) {
+  static String getPendingOutgoingFriendsByUsername(String? cursor) {
     if (cursor == null || cursor.isEmpty) {
       return """
     query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
@@ -408,17 +413,19 @@ class UserQueries {
     """;
   }
 
-  static Map<String, dynamic> getPendingOutgoingFriendsByUserIdVariables(
-      String id, String? cursor) {
+  static Map<String, dynamic> getPendingOutgoingFriendsByUsernameVariables(
+    String username, {
+    String? cursor,
+  }) {
     if (cursor == null || cursor.isEmpty) {
       return {
         "where": {
-          "id": id,
+          "username": username,
         },
         "friendsConnectionWhere2": {
           "edge": {
             "status": FriendStatus.pending,
-            "requestedBy": id,
+            "requestedBy": username,
           }
         },
         "first": QueryConstants.friendLimit,
@@ -431,7 +438,7 @@ class UserQueries {
         ],
         "friendsConnectionWhere3": {
           "node": {
-            "id": id,
+            "username": username,
           }
         },
       };
@@ -439,12 +446,12 @@ class UserQueries {
 
     return {
       "where": {
-        "id": id,
+        "username": username,
       },
       "friendsConnectionWhere2": {
         "edge": {
           "status": FriendStatus.pending,
-          "requestedBy": id,
+          "requestedBy": username,
         }
       },
       "first": QueryConstants.friendLimit,
@@ -458,14 +465,14 @@ class UserQueries {
       ],
       "friendsConnectionWhere3": {
         "node": {
-          "id": id,
+          "username": username,
         }
       },
     };
   }
 
   // get user pending friends incoming
-  static String getPendingIncomingFriendsByUserId(String? cursor) {
+  static String getPendingIncomingFriendsByUsername(String? cursor) {
     if (cursor == null || cursor.isEmpty) {
       return """
       query Query(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
@@ -523,18 +530,20 @@ class UserQueries {
      """;
   }
 
-  static Map<String, dynamic> getPendingIncomingFriendsByUserIdVariables(
-      String id, String? cursor) {
+  static Map<String, dynamic> getPendingIncomingFriendsByUsernameVariables(
+    String username, {
+    String? cursor,
+  }) {
     if (cursor == null || cursor.isEmpty) {
       return {
         "where": {
-          "id": id,
+          "username": username,
         },
         "friendsConnectionWhere2": {
           "edge": {
             "status": FriendStatus.pending,
             "NOT": {
-              "requestedBy": id,
+              "requestedBy": username,
             }
           }
         },
@@ -551,13 +560,13 @@ class UserQueries {
 
     return {
       "where": {
-        "id": id,
+        "username": username,
       },
       "friendsConnectionWhere2": {
         "edge": {
           "status": FriendStatus.pending,
           "NOT": {
-            "requestedBy": id,
+            "requestedBy": username,
           }
         }
       },
@@ -572,7 +581,7 @@ class UserQueries {
       ],
       "friendsConnectionWhere3": {
         "node": {
-          "id": id,
+          "username": username,
         }
       }
     };
@@ -594,11 +603,15 @@ class UserQueries {
     """;
   }
 
-  static Map<String, dynamic> updateUserProfileVariables(
-      String id, String name, String bio, String profilePicture) {
+  static Map<String, dynamic> updateUserProfileVariables({
+    required String username,
+    required String name,
+    required String bio,
+    required String profilePicture,
+  }) {
     return {
       "where": {
-        "id": id,
+        "username": username,
       },
       "update": {
         "name": name,
@@ -622,22 +635,24 @@ class UserQueries {
     """;
   }
 
-  static Map<String, dynamic> userSendFriendRequestVariables(
-      String requestedBy, String requestedTo) {
+  static Map<String, dynamic> userSendFriendRequestVariables({
+    required String requestedByUsername,
+    required String requestedToUsername,
+  }) {
     return {
       "where": {
-        "id": requestedBy,
+        "username": requestedByUsername,
       },
       "connect": {
         "friends": [
           {
             "where": {
               "node": {
-                "id": requestedTo,
+                "username": requestedToUsername,
               },
             },
             "edge": {
-              "requestedBy": requestedBy,
+              "requestedBy": requestedByUsername,
               "status": "PENDING",
             }
           }
@@ -659,18 +674,20 @@ class UserQueries {
     """;
   }
 
-  static Map<String, dynamic> userAcceptFriendRequestVariables(
-      String requestedBy, String requestedTo) {
+  static Map<String, dynamic> userAcceptFriendRequestVariables({
+    required String requestedByUsername,
+    required String requestedToUsername,
+  }) {
     return {
       "where": {
-        "id": requestedBy,
+        "username": requestedByUsername,
       },
       "update": {
         "friends": [
           {
             "where": {
               "node": {
-                "id": requestedTo,
+                "username": requestedToUsername,
               },
             },
             "update": {
@@ -697,18 +714,20 @@ class UserQueries {
   """;
   }
 
-  static Map<String, dynamic> userRemoveFriendRelationVariables(
-      String requestedBy, String requestedTo) {
+  static Map<String, dynamic> userRemoveFriendRelationVariables({
+    required String requestedByUsername,
+    required String requestedToUsername,
+  }) {
     return {
       "where": {
-        "id": requestedBy,
+        "username": requestedByUsername,
       },
       "disconnect": {
         "friends": [
           {
             "where": {
               "node": {
-                "id": requestedTo,
+                "username": requestedToUsername,
               }
             }
           }
@@ -732,7 +751,7 @@ class UserQueries {
   }
 
   static Map<String, dynamic> userCreatePostVariables({
-    required String userId,
+    required String username,
     required String caption,
     required List<String> content,
   }) {
@@ -745,7 +764,7 @@ class UserQueries {
             "connect": {
               "where": {
                 "node": {
-                  "id": userId,
+                  "username": username,
                 }
               }
             }
@@ -769,9 +788,9 @@ class UserQueries {
     """;
   }
 
-  static Map<String, dynamic> userAddLikePostVariables({
-    required String postId,
-    required String userId,
+  static Map<String, dynamic> userAddLikePostVariables(
+    String postId, {
+    required String username,
   }) {
     return {
       "where": {
@@ -782,7 +801,7 @@ class UserQueries {
           {
             "where": {
               "node": {
-                "id": userId,
+                "username": username,
               }
             }
           }
@@ -803,9 +822,9 @@ class UserQueries {
     """;
   }
 
-  static Map<String, dynamic> userRemoveLikePostVariables({
-    required String postId,
-    required String userId,
+  static Map<String, dynamic> userRemoveLikePostVariables(
+    String postId, {
+    required String username,
   }) {
     return {
       "where": {
@@ -816,7 +835,7 @@ class UserQueries {
           {
             "where": {
               "node": {
-                "id": userId,
+                "username": username,
               }
             }
           }
@@ -846,7 +865,9 @@ class UserQueries {
   }
 
   static Map<String, dynamic> searchUserByUsernameOrNameVariables(
-      String id, String query) {
+    String query, {
+    required String username,
+  }) {
     return {
       "options": {
         "limit": QueryConstants.generalSearchLimit,
@@ -863,7 +884,7 @@ class UserQueries {
       },
       "friendsConnectionWhere2": {
         "node": {
-          "id": id,
+          "username": username,
         }
       }
     };
@@ -896,10 +917,13 @@ class UserQueries {
   }
 
   static Map<String, dynamic> searchUserFriendsByUsernameOrNameVariables(
-      String userId, String myId, String query) {
+    String username, {
+    required String currentUsername,
+    required String query,
+  }) {
     return {
       "where": {
-        "id": userId,
+        "username": username,
       },
       "first": QueryConstants.friendSearchLimit,
       "friendsConnectionWhere2": {
@@ -919,7 +943,7 @@ class UserQueries {
       },
       "friendsConnectionWhere3": {
         "node": {
-          "id": myId,
+          "username": currentUsername,
         }
       },
     };
@@ -946,10 +970,10 @@ class UserQueries {
   }
 
   static Map<String, dynamic> searchUserFriendsByUsernameVariables(
-      String id, String query) {
+      String username, String query) {
     return {
       "where": {
-        "id": id,
+        "username": username,
       },
       "first": QueryConstants.friendSearchCommentLimit,
       "friendsConnectionWhere2": {
@@ -993,13 +1017,15 @@ class UserQueries {
   }
 
   static Map<String, dynamic> getPostByIdVariables(
-      String postId, String userId) {
+    String postId, {
+    required String username,
+  }) {
     return {
       "where": {
         "id": postId,
       },
       "likedByWhere2": {
-        "id": userId,
+        "username": username,
       }
     };
   }

@@ -10,10 +10,10 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var userId = context.select((UserProvider user) => user.id);
+    var username = context.select((UserProvider user) => user.username);
 
     return ProfileWidget(
-      userId: userId,
+      username: username,
     );
   }
 }

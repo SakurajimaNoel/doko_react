@@ -14,13 +14,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class FriendsPage extends StatefulWidget {
-  final String userId;
-  final String name;
+  final String username;
 
   const FriendsPage({
     super.key,
-    required this.userId,
-    required this.name,
+    required this.username,
   });
 
   @override
@@ -28,8 +26,7 @@ class FriendsPage extends StatefulWidget {
 }
 
 class _FriendsPageState extends State<FriendsPage> {
-  late final String userId;
-  late final String name;
+  late final String username;
   late final bool self;
 
   final UserGraphqlService _userGraphqlService = UserGraphqlService(
@@ -61,19 +58,17 @@ class _FriendsPageState extends State<FriendsPage> {
   void initState() {
     super.initState();
 
-    name = widget.name;
-    userId = widget.userId;
+    username = widget.username;
 
     _userProvider = context.read<UserProvider>();
     _getUserFriends();
-    self = _userProvider.id == userId;
+    self = _userProvider.username == username;
   }
 
   Future<void> _getUserFriends() async {
-    var friendResponse = await _userGraphqlService.getFriendsByUserId(
-      userId,
-      null,
-      currentUserId: _userProvider.id,
+    var friendResponse = await _userGraphqlService.getFriendsByUsername(
+      username,
+      currentUsername: _userProvider.username,
     );
 
     setState(() {
@@ -81,7 +76,7 @@ class _FriendsPageState extends State<FriendsPage> {
     });
 
     if (friendResponse.status == ResponseStatus.error) {
-      String message = "can't fetch $name friends.";
+      String message = "can't fetch @$username friends.";
       _handleError(message);
       return;
     }
@@ -106,10 +101,14 @@ class _FriendsPageState extends State<FriendsPage> {
     setState(() {
       searching = true;
     });
-    String myId = _userProvider.id;
+    String currentUsername = _userProvider.username;
 
-    SearchResponse searchResponse = await _userGraphqlService
-        .searchUserFriendsByUsernameOrName(userId, myId, query);
+    SearchResponse searchResponse =
+        await _userGraphqlService.searchUserFriendsByUsernameOrName(
+      username,
+      currentUsername: currentUsername,
+      query: query,
+    );
 
     if (searching == false) return;
 
@@ -188,8 +187,7 @@ class _FriendsPageState extends State<FriendsPage> {
             child: searchResult == null
                 ? FriendContainerProfileWidget(
                     friendInfo: _friendInfo,
-                    userId: userId,
-                    name: name,
+                    username: username,
                   )
                 : searchResult!.isEmpty
                     ? const Center(
@@ -224,7 +222,7 @@ class _FriendsPageState extends State<FriendsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("$name friends"),
+        title: Text("$username friends"),
       ),
       body: widget,
     );

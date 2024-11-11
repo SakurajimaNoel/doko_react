@@ -56,10 +56,13 @@ class _UserSearchPageState extends State<UserSearchPage> {
     setState(() {
       searching = true;
     });
-    String userId = userProvider.id;
+    String username = userProvider.username;
 
     SearchResponse searchResponse =
-        await userGraphqlService.searchUserByUsernameOrName(userId, query);
+        await userGraphqlService.searchUserByUsernameOrName(
+      query,
+      username: username,
+    );
 
     if (searching == false) return;
 

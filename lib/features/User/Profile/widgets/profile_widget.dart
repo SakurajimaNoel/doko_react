@@ -20,11 +20,11 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class ProfileWidget extends StatefulWidget {
-  final String userId;
+  final String username;
 
   const ProfileWidget({
     super.key,
-    required this.userId,
+    required this.username,
   });
 
   @override
@@ -35,7 +35,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
 
   late final bool _self;
-  late final String _userId;
+  late final String _username;
   late final UserProvider _userProvider;
 
   final UserGraphqlService _userGraphqlService = UserGraphqlService(
@@ -51,18 +51,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     _userProvider = context.read<UserProvider>();
 
-    _userId = widget.userId;
-    _self = _userProvider.id == _userId;
+    _username = widget.username;
+    _self = _userProvider.username == _username;
 
     _fetchCompleteUser();
   }
 
   Future<void> _fetchCompleteUser() async {
-    if (_userId.isEmpty) return;
+    if (_username.isEmpty) return;
 
     var completeUser = await _userGraphqlService.getCompleteUser(
-      _userId,
-      currentUserId: _userProvider.id,
+      _username,
+      currentUsername: _userProvider.username,
     );
 
     if (_loading) {
@@ -178,7 +178,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     }
 
     var status = FriendRelation.getFriendRelationStatus(
-        _user!.friendRelationDetail, _userProvider.id);
+      _user!.friendRelationDetail,
+      currentUsername: _userProvider.username,
+    );
 
     return _UserProfileAction(
       status: status,
@@ -262,10 +264,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             context.pushNamed(
               RouterConstants.profileFriends,
               pathParameters: {
-                "userId": _userId,
-              },
-              extra: {
-                "name": _user!.name,
+                "username": _username,
               },
             );
           },
@@ -475,11 +474,13 @@ class _UserProfileActionState extends State<_UserProfileAction> {
       _updating = true;
     });
 
-    String requestedBy = _userProvider.id;
-    String requestedTo = _user.id;
+    String requestedByUsername = _userProvider.username;
+    String requestedToUsername = _user.username;
 
     var addResponse = await _userGraphqlService.userSendFriendRequest(
-        requestedBy, requestedTo);
+      requestedByUsername: requestedByUsername,
+      requestedToUsername: requestedToUsername,
+    );
     setState(() {
       _updating = false;
     });
@@ -495,7 +496,7 @@ class _UserProfileActionState extends State<_UserProfileAction> {
 
     // success
     _user.friendRelationDetail = FriendConnectionDetail(
-      requestedBy: requestedBy,
+      requestedByUsername: requestedByUsername,
       status: FriendStatus.pending,
     );
   }
@@ -519,12 +520,16 @@ class _UserProfileActionState extends State<_UserProfileAction> {
       _updating = true;
     });
 
-    String requestedBy = _user.friendRelationDetail!.requestedBy;
-    String requestedTo =
-        requestedBy == _userProvider.id ? _user.id : _userProvider.id;
+    String requestedByUsername =
+        _user.friendRelationDetail!.requestedByUsername;
+    String requestedToUsername = requestedByUsername == _userProvider.username
+        ? _user.username
+        : _userProvider.username;
 
     var cancelResponse = await _userGraphqlService.userRemoveFriendRelation(
-        requestedBy, requestedTo);
+      requestedByUsername: requestedByUsername,
+      requestedToUsername: requestedToUsername,
+    );
     setState(() {
       _updating = false;
     });
@@ -547,12 +552,16 @@ class _UserProfileActionState extends State<_UserProfileAction> {
       _updating = true;
     });
 
-    String requestedBy = _user.friendRelationDetail!.requestedBy;
-    String requestedTo =
-        requestedBy == _userProvider.id ? _user.id : _userProvider.id;
+    String requestedByUsername =
+        _user.friendRelationDetail!.requestedByUsername;
+    String requestedToUsername = requestedByUsername == _userProvider.username
+        ? _user.username
+        : _userProvider.username;
 
     var acceptResponse = await _userGraphqlService.userAcceptFriendRequest(
-        requestedBy, requestedTo);
+      requestedByUsername: requestedByUsername,
+      requestedToUsername: requestedToUsername,
+    );
 
     setState(() {
       _updating = false;

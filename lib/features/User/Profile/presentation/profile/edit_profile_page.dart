@@ -87,7 +87,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       _errorMessage = "";
     });
 
-    String id = _userProvider.id;
+    String username = _userProvider.username;
+    String userId = _userProvider.id;
     String name = _nameController.text;
     String bio = _bioController.text;
     String bucketPath = _userProvider.profilePicture;
@@ -106,7 +107,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       }
 
       String imageString = DisplayText.generateRandomString();
-      bucketPath = "$id/profile/$imageString$imageExtension";
+      bucketPath = "$userId/profile/$imageString$imageExtension";
 
       var imageResult = await _handleImage(bucketPath);
       if (!imageResult) {
@@ -127,8 +128,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
 
     // update graph
-    var updateResult =
-        await _userGraphqlService.updateUserProfile(id, name, bio, bucketPath);
+    var updateResult = await _userGraphqlService.updateUserProfile(
+      username: username,
+      name: name,
+      bio: bio,
+      profilePicture: bucketPath,
+    );
 
     if (updateResult.status == ResponseStatus.error) {
       String message =

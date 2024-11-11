@@ -98,8 +98,10 @@ class _UserActionState extends State<_UserAction>
 
     _friend = widget.friend;
     _status = FriendRelation.getFriendRelationStatus(
-        _friend.friendRelationDetail, _userProvider.id);
-    _self = _friend.id == _userProvider.id;
+      _friend.friendRelationDetail,
+      currentUsername: _userProvider.username,
+    );
+    _self = _friend.username == _userProvider.username;
   }
 
   Future<void> _handleAdd() async {
@@ -108,11 +110,13 @@ class _UserActionState extends State<_UserAction>
       _updating = true;
     });
 
-    String requestedBy = _userProvider.id;
-    String requestedTo = _friend.id;
+    String requestedByUsername = _userProvider.username;
+    String requestedToUsername = _friend.username;
 
     var addResponse = await _userGraphqlService.userSendFriendRequest(
-        requestedBy, requestedTo);
+      requestedByUsername: requestedByUsername,
+      requestedToUsername: requestedToUsername,
+    );
     setState(() {
       _updating = false;
     });
@@ -128,7 +132,7 @@ class _UserActionState extends State<_UserAction>
 
     // success
     _friend.friendRelationDetail = FriendConnectionDetail(
-      requestedBy: requestedBy,
+      requestedByUsername: requestedByUsername,
       status: FriendStatus.pending,
     );
   }
@@ -152,12 +156,16 @@ class _UserActionState extends State<_UserAction>
       _updating = true;
     });
 
-    String requestedBy = _friend.friendRelationDetail!.requestedBy;
-    String requestedTo =
-        requestedBy == _userProvider.id ? _friend.id : _userProvider.id;
+    String requestedByUsername =
+        _friend.friendRelationDetail!.requestedByUsername;
+    String requestedToUsername = requestedByUsername == _userProvider.username
+        ? _friend.username
+        : _userProvider.username;
 
     var cancelResponse = await _userGraphqlService.userRemoveFriendRelation(
-        requestedBy, requestedTo);
+      requestedByUsername: requestedByUsername,
+      requestedToUsername: requestedToUsername,
+    );
     setState(() {
       _updating = false;
     });
@@ -183,12 +191,16 @@ class _UserActionState extends State<_UserAction>
       _updating = true;
     });
 
-    String requestedBy = _friend.friendRelationDetail!.requestedBy;
-    String requestedTo =
-        requestedBy == _userProvider.id ? _friend.id : _userProvider.id;
+    String requestedByUsername =
+        _friend.friendRelationDetail!.requestedByUsername;
+    String requestedToUsername = requestedByUsername == _userProvider.username
+        ? _friend.username
+        : _userProvider.username;
 
     var acceptResponse = await _userGraphqlService.userAcceptFriendRequest(
-        requestedBy, requestedTo);
+      requestedByUsername: requestedByUsername,
+      requestedToUsername: requestedToUsername,
+    );
 
     setState(() {
       _updating = false;

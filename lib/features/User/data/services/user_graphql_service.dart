@@ -1,5 +1,4 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
 import 'package:doko_react/features/User/data/model/friend_model.dart';
@@ -185,8 +184,8 @@ class UserGraphqlService {
   }
 
   Future<CompleteUserResponse> getCompleteUser(
-    String id, {
-    required String currentUserId,
+    String username, {
+    required String currentUsername,
   }) async {
     try {
       QueryResult result = await _client.query(
@@ -194,8 +193,8 @@ class UserGraphqlService {
           fetchPolicy: FetchPolicy.networkOnly,
           document: gql(UserQueries.getCompleteUser()),
           variables: UserQueries.getCompleteUserVariables(
-            id,
-            currentUserId: currentUserId,
+            username,
+            currentUsername: currentUsername,
           ),
         ),
       );
@@ -226,20 +225,20 @@ class UserGraphqlService {
     }
   }
 
-  Future<FriendResponse> getFriendsByUserId(
-    String id,
-    String? cursor, {
-    required String currentUserId,
+  Future<FriendResponse> getFriendsByUsername(
+    String username, {
+    String? cursor,
+    required String currentUsername,
   }) async {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(UserQueries.getFriendsByUserId(cursor)),
-          variables: UserQueries.getFriendsByUserIdVariables(
-            id,
-            cursor,
-            currentUserId: currentUserId,
+          document: gql(UserQueries.getFriendsByUsername(cursor)),
+          variables: UserQueries.getFriendsByUsernameVariables(
+            username,
+            cursor: cursor,
+            currentUsername: currentUsername,
           ),
         ),
       );
@@ -279,23 +278,20 @@ class UserGraphqlService {
     }
   }
 
-  Future<PostResponse> getPostsByUserId(String id, String cursor) async {
+  Future<PostResponse> getPostsByUsername(
+    String username, {
+    required String cursor,
+    required String currentUsername,
+  }) async {
     try {
-      final AuthenticationActions auth =
-          AuthenticationActions(auth: Amplify.Auth);
-
-      var userIdResult = await auth.getUserId();
-      if (userIdResult.status == AuthStatus.error) {
-        throw Exception(userIdResult.message);
-      }
-
-      String userId = userIdResult.message!;
-
       QueryResult result = await _client.query(
         QueryOptions(
-          document: gql(UserQueries.getUserPostsByUserId()),
-          variables:
-              UserQueries.getUserPostsByUserIdVariables(id, cursor, userId),
+          document: gql(UserQueries.getUserPostsByUsername()),
+          variables: UserQueries.getUserPostsByUsernameVariables(
+            username,
+            currentUsername: currentUsername,
+            cursor: cursor,
+          ),
         ),
       );
 
@@ -327,15 +323,20 @@ class UserGraphqlService {
     }
   }
 
-  Future<FriendResponse> getPendingOutgoingFriendsByUserId(
-      String id, String? cursor) async {
+  Future<FriendResponse> getPendingOutgoingFriendsByUsername(
+    String username, {
+    String? cursor,
+  }) async {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(UserQueries.getPendingOutgoingFriendsByUserId(cursor)),
-          variables: UserQueries.getPendingOutgoingFriendsByUserIdVariables(
-              id, cursor),
+          document:
+              gql(UserQueries.getPendingOutgoingFriendsByUsername(cursor)),
+          variables: UserQueries.getPendingOutgoingFriendsByUsernameVariables(
+            username,
+            cursor: cursor,
+          ),
         ),
       );
 
@@ -367,15 +368,20 @@ class UserGraphqlService {
     }
   }
 
-  Future<FriendResponse> getPendingIncomingFriendsByUserId(
-      String id, String? cursor) async {
+  Future<FriendResponse> getPendingIncomingFriendsByUsername(
+    String username, {
+    String? cursor,
+  }) async {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(UserQueries.getPendingIncomingFriendsByUserId(cursor)),
-          variables: UserQueries.getPendingIncomingFriendsByUserIdVariables(
-              id, cursor),
+          document:
+              gql(UserQueries.getPendingIncomingFriendsByUsername(cursor)),
+          variables: UserQueries.getPendingIncomingFriendsByUsernameVariables(
+            username,
+            cursor: cursor,
+          ),
         ),
       );
 
@@ -407,14 +413,22 @@ class UserGraphqlService {
     }
   }
 
-  Future<UserResponse> updateUserProfile(
-      String id, String name, String bio, String profilePicture) async {
+  Future<UserResponse> updateUserProfile({
+    required String username,
+    required String name,
+    required String bio,
+    required String profilePicture,
+  }) async {
     try {
       QueryResult result = await _client.mutate(
         MutationOptions(
           document: gql(UserQueries.updateUserProfile()),
           variables: UserQueries.updateUserProfileVariables(
-              id, name, bio, profilePicture),
+            username: username,
+            name: name,
+            bio: bio,
+            profilePicture: profilePicture,
+          ),
         ),
       );
 
@@ -438,14 +452,18 @@ class UserGraphqlService {
     }
   }
 
-  Future<ResponseStatus> userSendFriendRequest(
-      String requestedBy, String requestedTo) async {
+  Future<ResponseStatus> userSendFriendRequest({
+    required String requestedByUsername,
+    required String requestedToUsername,
+  }) async {
     try {
       QueryResult result = await _client.mutate(
         MutationOptions(
           document: gql(UserQueries.userSendFriendRequest()),
           variables: UserQueries.userSendFriendRequestVariables(
-              requestedBy, requestedTo),
+            requestedByUsername: requestedByUsername,
+            requestedToUsername: requestedToUsername,
+          ),
         ),
       );
 
@@ -460,14 +478,18 @@ class UserGraphqlService {
     }
   }
 
-  Future<ResponseStatus> userAcceptFriendRequest(
-      String requestedBy, String requestedTo) async {
+  Future<ResponseStatus> userAcceptFriendRequest({
+    required String requestedByUsername,
+    required String requestedToUsername,
+  }) async {
     try {
       QueryResult result = await _client.mutate(
         MutationOptions(
           document: gql(UserQueries.userAcceptFriendRequest()),
           variables: UserQueries.userAcceptFriendRequestVariables(
-              requestedBy, requestedTo),
+            requestedByUsername: requestedByUsername,
+            requestedToUsername: requestedToUsername,
+          ),
         ),
       );
 
@@ -482,14 +504,18 @@ class UserGraphqlService {
     }
   }
 
-  Future<ResponseStatus> userRemoveFriendRelation(
-      String requestedBy, String requestedTo) async {
+  Future<ResponseStatus> userRemoveFriendRelation({
+    required String requestedByUsername,
+    required String requestedToUsername,
+  }) async {
     try {
       QueryResult result = await _client.mutate(
         MutationOptions(
           document: gql(UserQueries.userRemoveFriendRelation()),
           variables: UserQueries.userRemoveFriendRelationVariables(
-              requestedBy, requestedTo),
+            requestedByUsername: requestedByUsername,
+            requestedToUsername: requestedToUsername,
+          ),
         ),
       );
 
@@ -507,23 +533,14 @@ class UserGraphqlService {
   Future<ResponseStatus> userCreatePost({
     required String caption,
     required List<String> content,
+    required String username,
   }) async {
     try {
-      final AuthenticationActions auth =
-          AuthenticationActions(auth: Amplify.Auth);
-
-      var userIdResult = await auth.getUserId();
-      if (userIdResult.status == AuthStatus.error) {
-        throw Exception(userIdResult.message);
-      }
-
-      String userId = userIdResult.message!;
-
       QueryResult result = await _client.mutate(
         MutationOptions(
           document: gql(UserQueries.userCreatePost()),
           variables: UserQueries.userCreatePostVariables(
-            userId: userId,
+            username: username,
             caption: caption,
             content: content,
           ),
@@ -541,21 +558,12 @@ class UserGraphqlService {
     }
   }
 
-  Future<ResponseStatus> userLikePostAction({
-    required String postId,
+  Future<ResponseStatus> userLikePostAction(
+    String postId, {
     bool addLike = true,
+    required String username,
   }) async {
     try {
-      final AuthenticationActions auth =
-          AuthenticationActions(auth: Amplify.Auth);
-
-      var userIdResult = await auth.getUserId();
-      if (userIdResult.status == AuthStatus.error) {
-        throw Exception(userIdResult.message);
-      }
-
-      String userId = userIdResult.message!;
-
       Future<QueryResult<Object?>> futureMutation;
 
       if (addLike) {
@@ -563,8 +571,8 @@ class UserGraphqlService {
           MutationOptions(
             document: gql(UserQueries.userAddLikePost()),
             variables: UserQueries.userAddLikePostVariables(
-              postId: postId,
-              userId: userId,
+              postId,
+              username: username,
             ),
           ),
         );
@@ -573,8 +581,8 @@ class UserGraphqlService {
           MutationOptions(
             document: gql(UserQueries.userRemoveLikePost()),
             variables: UserQueries.userRemoveLikePostVariables(
-              postId: postId,
-              userId: userId,
+              postId,
+              username: username,
             ),
           ),
         );
@@ -594,13 +602,18 @@ class UserGraphqlService {
   }
 
   Future<SearchResponse> searchUserByUsernameOrName(
-      String id, String query) async {
+    String query, {
+    required String username,
+  }) async {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
           document: gql(UserQueries.searchUserByUsernameOrName()),
-          variables: UserQueries.searchUserByUsernameOrNameVariables(id, query),
+          variables: UserQueries.searchUserByUsernameOrNameVariables(
+            query,
+            username: username,
+          ),
         ),
       );
 
@@ -638,14 +651,20 @@ class UserGraphqlService {
   }
 
   Future<SearchResponse> searchUserFriendsByUsernameOrName(
-      String userId, String myId, String query) async {
+    String username, {
+    required String currentUsername,
+    required String query,
+  }) async {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
           document: gql(UserQueries.searchUserFriendsByUsernameOrName()),
           variables: UserQueries.searchUserFriendsByUsernameOrNameVariables(
-              userId, myId, query),
+            username,
+            currentUsername: currentUsername,
+            query: query,
+          ),
         ),
       );
 
@@ -685,12 +704,17 @@ class UserGraphqlService {
   }
 
   Future<IndividualPostResponse> getPostsById(
-      String postId, String userId) async {
+    String postId, {
+    required String username,
+  }) async {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
           document: gql(UserQueries.getPostById()),
-          variables: UserQueries.getPostByIdVariables(postId, userId),
+          variables: UserQueries.getPostByIdVariables(
+            postId,
+            username: username,
+          ),
         ),
       );
 

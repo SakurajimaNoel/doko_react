@@ -10,7 +10,9 @@ enum FriendRelationStatus {
 
 class FriendRelation {
   static FriendRelationStatus getFriendRelationStatus(
-      FriendConnectionDetail? connectionDetail, String currentUserId) {
+    FriendConnectionDetail? connectionDetail, {
+    required String currentUsername,
+  }) {
     if (connectionDetail == null) {
       return FriendRelationStatus.unrelated;
     }
@@ -19,7 +21,7 @@ class FriendRelation {
       return FriendRelationStatus.friends;
     }
 
-    if (connectionDetail.requestedBy == currentUserId) {
+    if (connectionDetail.requestedByUsername == currentUsername) {
       return FriendRelationStatus.outgoingReq;
     }
 

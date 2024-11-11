@@ -42,7 +42,7 @@ class PendingOutgoingRequestsState extends State<PendingOutgoingRequests>
 
   Future<void> _getIncomingRequest() async {
     var friendResponse = await _userGraphqlService
-        .getPendingOutgoingFriendsByUserId(_userProvider.id, null);
+        .getPendingOutgoingFriendsByUsername(_userProvider.username);
 
     setState(() {
       _loading = false;
@@ -63,11 +63,14 @@ class PendingOutgoingRequestsState extends State<PendingOutgoingRequests>
     if (_friendInfo == null) return;
 
     // only call this function if have next page
-    String id = _userProvider.id;
+    String username = _userProvider.username;
     String cursor = _friendInfo!.info.endCursor!;
 
     var friendResponse =
-        await _userGraphqlService.getPendingOutgoingFriendsByUserId(id, cursor);
+        await _userGraphqlService.getPendingOutgoingFriendsByUsername(
+      username,
+      cursor: cursor,
+    );
 
     _loading = false;
 

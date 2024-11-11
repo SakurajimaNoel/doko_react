@@ -20,7 +20,7 @@ class UserWidget extends StatelessWidget {
         context.pushNamed(
           RouterConstants.userProfile,
           pathParameters: {
-            "userId": user.id,
+            "username": user.username,
           },
         );
       },

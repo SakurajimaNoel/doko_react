@@ -53,8 +53,10 @@ class _PostPageState extends State<PostPage> {
   }
 
   Future<void> fetchPostById() async {
-    var response =
-        await userGraphqlService.getPostsById(widget.postId, userProvider.id);
+    var response = await userGraphqlService.getPostsById(
+      widget.postId,
+      username: userProvider.username,
+    );
     setState(() {
       loading = false;
     });

@@ -1,12 +1,14 @@
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
+import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:doko_react/features/User/Profile/widgets/posts/post_widget.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class PostContainerProfileWidget extends StatefulWidget {
   final ProfilePostInfo postInfo;
@@ -27,6 +29,7 @@ class _PostContainerProfileWidgetState
     extends State<PostContainerProfileWidget> {
   late final ProfilePostInfo _postInfo;
   late final UserModel _user;
+  late final UserProvider userProvider;
 
   final UserGraphqlService _userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
@@ -44,14 +47,19 @@ class _PostContainerProfileWidgetState
     _user = widget.user;
 
     _posts = _postInfo.posts;
+    userProvider = context.read<UserProvider>();
   }
 
   Future<void> _fetchMorePosts() async {
     // only call this function when has next page
-    String id = _user.id;
+    String username = _user.username;
     String cursor = _postInfo.info.endCursor!;
 
-    var postResponse = await _userGraphqlService.getPostsByUserId(id, cursor);
+    var postResponse = await _userGraphqlService.getPostsByUsername(
+      username,
+      cursor: cursor,
+      currentUsername: userProvider.username,
+    );
 
     _loading = false;
 

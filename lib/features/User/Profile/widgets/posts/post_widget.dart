@@ -5,6 +5,7 @@ import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
+import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/widgets/general/custom_carousel_view.dart'
     as custom;
@@ -15,6 +16,7 @@ import 'package:doko_react/features/User/data/services/user_graphql_service.dart
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 enum PostLocation {
@@ -41,7 +43,7 @@ class PostWidget extends StatefulWidget {
 }
 
 class _PostWidgetState extends State<PostWidget> {
-  bool longpress = false;
+  bool longPress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -51,24 +53,24 @@ class _PostWidgetState extends State<PostWidget> {
     return GestureDetector(
       onLongPress: () {
         setState(() {
-          longpress = true;
+          longPress = true;
         });
       },
       onLongPressCancel: () {
         setState(() {
-          longpress = false;
+          longPress = false;
         });
       },
       onLongPressEnd: (details) {
         setState(() {
-          longpress = false;
+          longPress = false;
         });
       },
       onTap: () async {
         if (isPage) return;
 
         setState(() {
-          longpress = true;
+          longPress = true;
         });
         await context.pushNamed(
           RouterConstants.userPost,
@@ -79,12 +81,12 @@ class _PostWidgetState extends State<PostWidget> {
         );
 
         setState(() {
-          longpress = false;
+          longPress = false;
         });
       },
       child: Container(
         color: !isPage
-            ? longpress
+            ? longPress
                 ? currTheme.surfaceContainer
                 : currTheme.surface
             : Colors.transparent,
@@ -420,6 +422,8 @@ class _PostAction extends StatefulWidget {
 }
 
 class _PostActionState extends State<_PostAction> {
+  late final UserProvider userProvider;
+
   final UserGraphqlService _userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
   );
@@ -432,6 +436,7 @@ class _PostActionState extends State<_PostAction> {
     super.initState();
 
     _post = widget.postModel;
+    userProvider = context.read<UserProvider>();
   }
 
   Future<void> handleLike() async {
@@ -443,8 +448,9 @@ class _PostActionState extends State<_PostAction> {
     });
 
     var likeResponse = await _userGraphqlService.userLikePostAction(
-      postId: _post.id,
+      _post.id,
       addLike: _post.userLike,
+      username: userProvider.username,
     );
 
     setState(() {

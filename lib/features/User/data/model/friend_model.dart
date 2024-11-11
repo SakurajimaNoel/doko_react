@@ -3,7 +3,7 @@ import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'model.dart';
 
 class FriendConnectionDetail {
-  final String requestedBy;
+  final String requestedByUsername;
   String status;
 
   void updateStatus(String status) {
@@ -11,13 +11,13 @@ class FriendConnectionDetail {
   }
 
   FriendConnectionDetail({
-    required this.requestedBy,
+    required this.requestedByUsername,
     required this.status,
   });
 
   static FriendConnectionDetail createModel(Map map) {
     return FriendConnectionDetail(
-      requestedBy: map["requestedBy"],
+      requestedByUsername: map["requestedBy"],
       status: map["status"],
     );
   }
