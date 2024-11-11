@@ -1,23 +1,50 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
+import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/data/text_mention_controller.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/debounce.dart';
+import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/features/User/Profile/widgets/user/user_widget.dart';
+import 'package:doko_react/features/User/data/model/comment_model.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
+import 'package:doko_react/secret/secrets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:giphy_get/giphy_get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+class CommentMediaData {
+  final Uint8List media;
+  final String extension;
+
+  const CommentMediaData({
+    required this.media,
+    required this.extension,
+  });
+}
+
 class CommentInput extends StatefulWidget {
-  const CommentInput({super.key});
+  final String postId;
+  final String createdBy;
+  final String commentTargetId;
+  final VoidCallback successAction;
+
+  const CommentInput({
+    super.key,
+    required this.postId,
+    required this.commentTargetId,
+    required this.successAction,
+    required this.createdBy,
+  });
 
   @override
   State<CommentInput> createState() => _CommentInputState();
@@ -26,8 +53,11 @@ class CommentInput extends StatefulWidget {
 class _CommentInputState extends State<CommentInput> {
   FocusNode focusNode = FocusNode();
   bool showMore = false;
+  bool adding = false;
+  late bool isReply;
 
-  Uint8List? mediaData;
+  final StorageActions storage = StorageActions(storage: Amplify.Storage);
+  CommentMediaData? mediaData;
   String? mediaUrl;
 
   final controller = TextMentionController();
@@ -52,6 +82,8 @@ class _CommentInputState extends State<CommentInput> {
     focusNode.addListener(_onFocusChange);
     userProvider = context.read<UserProvider>();
     controller.addListener(handleTrigger);
+
+    isReply = widget.postId != widget.commentTargetId;
   }
 
   @override
@@ -105,7 +137,7 @@ class _CommentInputState extends State<CommentInput> {
       String mentionString = beforeSelectionLast
           .substring(beforeSelectionLast.lastIndexOf("@") + 1);
 
-      if (mentionString.endsWith(Constants.zeroWidthSpace)) return;
+      if (mentionString.contains(Constants.zeroWidthSpace)) return;
 
       if (!loading) {
         setState(() {
@@ -172,11 +204,19 @@ class _CommentInputState extends State<CommentInput> {
     String? extension =
         MediaType.getExtensionFromFileName(image.path, withDot: false);
 
+    if (extension == null) {
+      showMessage("Invalid image file selected.");
+      return;
+    }
+
     if (extension == "gif" ||
         (extension == "webp" && await MediaType.isAnimated(image.path))) {
       final animatedData = await image.readAsBytes();
       setState(() {
-        mediaData = animatedData;
+        mediaData = CommentMediaData(
+          media: animatedData,
+          extension: ".$extension",
+        );
       });
       return;
     }
@@ -214,7 +254,10 @@ class _CommentInputState extends State<CommentInput> {
     if (croppedFile == null) return;
     final finalMedia = await croppedFile.readAsBytes();
     setState(() {
-      mediaData = finalMedia;
+      mediaData = CommentMediaData(
+        media: finalMedia,
+        extension: extension,
+      );
     });
   }
 
@@ -261,7 +304,7 @@ class _CommentInputState extends State<CommentInput> {
       ];
     }
 
-    // for inksplash
+    // for ink splash
     final WidgetStateProperty<Color?> effectiveOverlayColor =
         WidgetStateProperty.resolveWith((Set<WidgetState> states) {
       if (states.contains(WidgetState.pressed)) {
@@ -296,7 +339,7 @@ class _CommentInputState extends State<CommentInput> {
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () {
-                      // showMessage(user.username);
+                      controller.addMention(user.username);
                     },
                     overlayColor: effectiveOverlayColor,
                   ),
@@ -307,7 +350,62 @@ class _CommentInputState extends State<CommentInput> {
         )
         .toList();
 
-    return userList + userList + userList;
+    return userList;
+  }
+
+  Future<void> handleComment() async {
+    setState(() {
+      adding = true;
+    });
+
+    String media = "";
+    bool aws = false;
+
+    if (mediaData != null) {
+      // upload to aws media
+      aws = true;
+      String imageString = DisplayText.generateRandomString();
+      String bucketPath =
+          "${widget.createdBy}/posts/${widget.postId}/comment/$imageString${mediaData!.extension}";
+      media = bucketPath;
+
+      var mediaResult = await storage.uploadBytes(mediaData!.media, bucketPath);
+      if (mediaResult.status == ResponseStatus.error) {
+        showMessage(Constants.errorMessage);
+        return;
+      }
+    } else if (mediaUrl != null) {
+      media = mediaUrl!;
+    }
+
+    var currentInput = controller.getCommentInput();
+    CommentInputModel commentInput = CommentInputModel(
+      media: media,
+      mentions: currentInput.mentions.toList(),
+      content: currentInput.content,
+      commentBy: userProvider.username,
+      commentOn: widget.commentTargetId,
+    );
+
+    var result = await userGraphqlService.addComment(commentInput);
+    setState(() {
+      adding = false;
+    });
+
+    if (!result) {
+      if (aws) {
+        storage.deleteFile(media);
+      }
+      showMessage(Constants.errorMessage);
+      return;
+    }
+
+    // todo handle adding comment to display
+    showMessage("Comment posted successfully");
+    // cleanup
+    controller.clear();
+    handleMediaRemove();
+    widget.successAction();
   }
 
   @override
@@ -388,6 +486,7 @@ class _CommentInputState extends State<CommentInput> {
                   );
                 },
                 child: TextField(
+                  enabled: !adding,
                   controller: controller,
                   focusNode: focusNode,
                   minLines: 1,
@@ -399,8 +498,17 @@ class _CommentInputState extends State<CommentInput> {
                   contentInsertionConfiguration: ContentInsertionConfiguration(
                     onContentInserted: (KeyboardInsertedContent data) async {
                       if (data.hasData) {
+                        String? extension =
+                            MediaType.getExtension(data.mimeType);
+                        if (extension == null) {
+                          showMessage(Constants.errorMessage);
+                          return;
+                        }
                         setState(() {
-                          mediaData = data.data;
+                          mediaData = CommentMediaData(
+                            media: data.data!,
+                            extension: extension,
+                          );
                         });
                       }
                     },
@@ -408,13 +516,15 @@ class _CommentInputState extends State<CommentInput> {
                 ),
               ),
             ),
-            if (showMore) ...[
+            if (showMore || adding) ...[
               const SizedBox(
                 height: 4,
               ),
               _CommentInputActions(
                 handleImageGallery: handleImageGallery,
                 handleGifSelection: handleGifSelection,
+                isReply: false,
+                handleComment: handleComment,
               ),
             ],
           ],
@@ -424,25 +534,52 @@ class _CommentInputState extends State<CommentInput> {
   }
 }
 
-class _CommentInputActions extends StatelessWidget {
+class _CommentInputActions extends StatefulWidget {
   final AsyncCallback handleImageGallery;
   final ValueSetter<String?> handleGifSelection;
+  final bool isReply;
+  final AsyncCallback handleComment;
 
   const _CommentInputActions({
     required this.handleImageGallery,
     required this.handleGifSelection,
+    required this.isReply,
+    required this.handleComment,
   });
 
   @override
+  State<_CommentInputActions> createState() => _CommentInputActionsState();
+}
+
+class _CommentInputActionsState extends State<_CommentInputActions> {
+  late final UserProvider userProvider;
+  bool adding = false;
+
+  Future<void> handleCommentAdd() async {
+    setState(() {
+      adding = true;
+    });
+    await widget.handleComment();
+    setState(() {
+      adding = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    userProvider = context.read<UserProvider>();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final UserProvider userProvider = context.read<UserProvider>();
     final currTheme = Theme.of(context).colorScheme;
 
     return Row(
       children: [
         GestureDetector(
           onTap: () {
-            handleImageGallery();
+            widget.handleImageGallery();
           },
           child: Icon(
             Icons.collections_outlined,
@@ -453,29 +590,40 @@ class _CommentInputActions extends StatelessWidget {
           width: 16,
         ),
         // TODO: handle this
-        // GestureDetector(
-        //   onTap: () async {
-        //     GiphyGif? gif = await GiphyGet.getGif(
-        //       context: context,
-        //       apiKey: Secrets.giphy,
-        //       randomID: userProvider.id,
-        //       tabColor: currTheme.primary,
-        //       debounceTimeInMilliseconds: 500,
-        //     );
-        //     if (gif == null) return;
-        //
-        //     handleGifSelection(gif.images?.downsized?.url);
-        //   },
-        //   child: Icon(
-        //     Icons.gif_box_outlined,
-        //     color: currTheme.primary,
-        //   ),
-        // ),
+        GestureDetector(
+          onTap: () async {
+            GiphyGif? gif = await GiphyGet.getGif(
+              context: context,
+              apiKey: Secrets.giphy,
+              randomID: userProvider.id,
+              tabColor: currTheme.primary,
+              debounceTimeInMilliseconds: 500,
+            );
+            if (gif == null) return;
+
+            widget.handleGifSelection(gif.images?.downsized?.url);
+          },
+          child: Icon(
+            Icons.gif_box_outlined,
+            color: currTheme.primary,
+          ),
+        ),
         const Spacer(),
         FilledButton.icon(
-          onPressed: () {},
-          icon: const Icon(Icons.add),
-          label: const Text("Add"),
+          onPressed: adding ? null : handleCommentAdd,
+          icon: adding
+              ? null
+              : widget.isReply
+                  ? const Icon(Icons.reply)
+                  : const Icon(Icons.add),
+          label: adding
+              ? Transform.scale(
+                  scale: 0.5,
+                  child: const CircularProgressIndicator(),
+                )
+              : widget.isReply
+                  ? const Text("Reply")
+                  : const Text("Add"),
           style: FilledButton.styleFrom(),
         ),
       ],
@@ -484,7 +632,7 @@ class _CommentInputActions extends StatelessWidget {
 }
 
 class _CommentInputMedia extends StatelessWidget {
-  final Uint8List? mediaData;
+  final CommentMediaData? mediaData;
   final String? mediaUrl;
   final VoidCallback handleMediaRemove;
 
@@ -508,7 +656,7 @@ class _CommentInputMedia extends StatelessWidget {
         alignment: AlignmentDirectional.topEnd,
         children: [
           mediaData != null
-              ? Image.memory(mediaData!)
+              ? Image.memory(mediaData!.media)
               : CachedNetworkImage(
                   cacheKey: mediaUrl!,
                   fit: BoxFit.cover,

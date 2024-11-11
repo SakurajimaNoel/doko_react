@@ -1,5 +1,6 @@
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/features/User/data/graphql_queries/query_constants.dart';
+import 'package:doko_react/features/User/data/model/comment_model.dart';
 
 class CompleteUserProfileVariables {
   final String id;
@@ -750,7 +751,8 @@ class UserQueries {
     """;
   }
 
-  static Map<String, dynamic> userCreatePostVariables({
+  static Map<String, dynamic> userCreatePostVariables(
+    String postId, {
     required String username,
     required String caption,
     required List<String> content,
@@ -758,6 +760,7 @@ class UserQueries {
     return {
       "input": [
         {
+          "id": postId,
           "caption": caption,
           "content": content,
           "createdBy": {
@@ -1028,6 +1031,122 @@ class UserQueries {
       },
       "likedByWhere2": {
         "username": username,
+      }
+    };
+  }
+
+  // add comment
+  static String addComment() {
+    return '''
+    mutation CreateComments(\$input: [CommentCreateInput!]!, \$where: UserWhere) {
+      createComments(input: \$input) {
+        comments {
+          id
+          media
+          mentions {
+            username
+          }
+          content
+          createdOn
+          commentBy {
+            id
+            name
+            username
+            profilePicture
+          }
+          likedByConnection {
+            totalCount
+          }
+          commentsConnection {
+            totalCount
+          }
+          likedBy(where: \$where) {
+            username
+          }
+        }
+      }
+    }
+    ''';
+  }
+
+  static Map<String, dynamic> addCommentVariables(
+      CommentInputModel commentInput) {
+    String commentOnNode = commentInput.isReply ? "Comment" : "Post";
+
+    if (commentInput.mentions.isEmpty) {
+      return {
+        "input": [
+          {
+            "media": commentInput.media,
+            "content": commentInput.content,
+            "commentBy": {
+              "connect": {
+                "where": {
+                  "node": {
+                    "username": commentInput.commentBy,
+                  },
+                },
+              }
+            },
+            "commentOn": {
+              commentOnNode: {
+                "connect": {
+                  "where": {
+                    "node": {
+                      "id": commentInput.commentOn,
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "where": {
+          "username": commentInput.commentBy,
+        }
+      };
+    }
+
+    return {
+      "input": [
+        {
+          "media": commentInput.media,
+          "content": commentInput.content,
+          "commentBy": {
+            "connect": {
+              "where": {
+                "node": {
+                  "username": commentInput.commentBy,
+                },
+              },
+            }
+          },
+          "commentOn": {
+            commentOnNode: {
+              "connect": {
+                "where": {
+                  "node": {
+                    "id": commentInput.commentOn,
+                  }
+                }
+              }
+            }
+          },
+          "mentions": {
+            "connect": [
+              {
+                "where": {
+                  "node": {
+                    "OR": commentInput.generateMentions(),
+                  }
+                }
+              }
+            ],
+          }
+        }
+      ],
+      "where": {
+        "username": commentInput.commentBy,
       }
     };
   }

@@ -1,6 +1,7 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
+import 'package:doko_react/features/User/data/model/comment_model.dart';
 import 'package:doko_react/features/User/data/model/friend_model.dart';
 import 'package:doko_react/features/User/data/model/model.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
@@ -540,7 +541,8 @@ class UserGraphqlService {
     }
   }
 
-  Future<ResponseStatus> userCreatePost({
+  Future<ResponseStatus> userCreatePost(
+    String postId, {
     required String caption,
     required List<String> content,
     required String username,
@@ -550,6 +552,7 @@ class UserGraphqlService {
         MutationOptions(
           document: gql(UserQueries.userCreatePost()),
           variables: UserQueries.userCreatePostVariables(
+            postId,
             username: username,
             caption: caption,
             content: content,
@@ -800,6 +803,27 @@ class UserGraphqlService {
       return const IndividualPostResponse(
         status: ResponseStatus.error,
       );
+    }
+  }
+
+  // todo update return type same as get comments
+  Future<bool> addComment(CommentInputModel commentInput) async {
+    try {
+      QueryResult result = await _client.mutate(
+        MutationOptions(
+          document: gql(UserQueries.addComment()),
+          variables: UserQueries.addCommentVariables(commentInput),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      return true;
+    } catch (e) {
+      safePrint(e.toString());
+      return false;
     }
   }
 }

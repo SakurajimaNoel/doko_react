@@ -66,6 +66,7 @@ class _PostContentWidget extends StatefulWidget {
 class _PostContentWidgetState extends State<_PostContentWidget> {
   late final UserProvider _userProvider;
 
+  late final String postId;
   final List<PostContent> _content = [];
   bool _compressingVideo = false;
 
@@ -76,6 +77,7 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
   void initState() {
     super.initState();
 
+    postId = DisplayText.generateRandomString();
     _userProvider = context.read<UserProvider>();
   }
 
@@ -95,7 +97,7 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
     String randomString = DisplayText.generateRandomString();
     String extension = MediaType.getExtensionFromFileName(path) ?? "";
 
-    return "$userId/posts/$randomString$extension";
+    return "$userId/posts/$postId/$randomString$extension";
   }
 
   Future<void> _handleVideo(XFile item) async {
@@ -473,6 +475,7 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
 
                     Map<String, dynamic> data = {
                       "postContent": _content,
+                      "postId": postId,
                     };
 
                     context.pushNamed(

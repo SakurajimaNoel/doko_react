@@ -16,10 +16,12 @@ import 'package:provider/provider.dart';
 
 class CreatePostPublishPage extends StatefulWidget {
   final List<PostContent> postContent;
+  final String postId;
 
   const CreatePostPublishPage({
     super.key,
     required this.postContent,
+    required this.postId,
   });
 
   @override
@@ -62,6 +64,7 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
 
   Future<void> _updateGraph(List<String> postContentPath) async {
     var result = await _userGraphqlService.userCreatePost(
+      widget.postId,
       caption: _caption,
       content: postContentPath,
       username: userProvider.username,

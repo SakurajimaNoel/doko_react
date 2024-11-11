@@ -249,9 +249,11 @@ class AppRouterConfig {
                                 state.extra as Map<String, dynamic>;
                             final List<PostContent> postContent =
                                 data["postContent"];
+                            final String postId = data["postId"];
 
                             return CreatePostPublishPage(
                               postContent: postContent,
+                              postId: postId,
                             );
                           },
                         ),

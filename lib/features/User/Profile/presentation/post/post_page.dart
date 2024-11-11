@@ -27,6 +27,7 @@ class PostPage extends StatefulWidget {
 
 class _PostPageState extends State<PostPage> {
   PostModel? post;
+  String? commentTargetId;
   late final UserProvider userProvider;
   final UserGraphqlService userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
@@ -44,6 +45,7 @@ class _PostPageState extends State<PostPage> {
     if (post == null) {
       fetchPostById();
     } else {
+      commentTargetId = post!.id;
       fetchPostCommentsById();
       setState(() {
         loading = false;
@@ -62,6 +64,7 @@ class _PostPageState extends State<PostPage> {
 
     if (response.status == ResponseStatus.error) return;
 
+    commentTargetId = response.postInfo?.id;
     setState(() {
       post = response.postInfo;
     });
@@ -98,6 +101,9 @@ class _PostPageState extends State<PostPage> {
       );
     }
 
+    bool postComment = post!.id == commentTargetId!;
+    final currTheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(post!.caption),
@@ -119,7 +125,46 @@ class _PostPageState extends State<PostPage> {
               ],
             ),
           ),
-          const CommentInput()
+          Column(
+            children: [
+              if (!postComment)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Constants.padding,
+                    vertical: Constants.padding * 0.5,
+                  ),
+                  color: currTheme.surfaceContainerHighest,
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Text("Replying to someone comment"),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            commentTargetId = post!.id;
+                          });
+                        },
+                        child: const Icon(
+                          Icons.close,
+                          size: Constants.width,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              CommentInput(
+                createdBy: post!.createdBy.id,
+                postId: post!.id,
+                commentTargetId: commentTargetId!,
+                successAction: () {
+                  setState(() {
+                    commentTargetId = post!.id;
+                  });
+                },
+              ),
+            ],
+          )
         ],
       ),
     );

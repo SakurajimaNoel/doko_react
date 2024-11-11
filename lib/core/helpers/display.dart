@@ -143,4 +143,8 @@ class DisplayText {
   static String generateRandomString() {
     return UUID.getUUID();
   }
+
+  static String getUsernameFromCommentInput(String username) {
+    return username.substring(1, username.length - 1);
+  }
 }

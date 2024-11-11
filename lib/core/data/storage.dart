@@ -4,6 +4,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:aws_common/vm.dart';
 import 'package:doko_react/core/helpers/enum.dart';
+import 'package:flutter/foundation.dart';
 
 class StorageResult {
   final ResponseStatus status;
@@ -63,6 +64,32 @@ class StorageActions {
       final result = await storage
           .uploadFile(
             localFile: AWSFilePlatform.fromFile(file),
+            path: StoragePath.fromString(path),
+          )
+          .result;
+      return StorageResult(
+        status: ResponseStatus.success,
+        value: result.uploadedItem.path,
+      );
+    } on StorageException catch (e) {
+      return StorageResult(
+        status: ResponseStatus.error,
+        value: e.message,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return const StorageResult(
+        status: ResponseStatus.error,
+        value: "Oops, Something went wrong!",
+      );
+    }
+  }
+
+  Future<StorageResult> uploadBytes(Uint8List data, String path) async {
+    try {
+      final result = await storage
+          .uploadFile(
+            localFile: AWSFile.fromData(data),
             path: StoragePath.fromString(path),
           )
           .result;

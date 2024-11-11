@@ -1,4 +1,5 @@
 import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/core/helpers/display.dart';
 import 'package:flutter/material.dart';
 
 class CommentInput {
@@ -141,7 +142,7 @@ class TextMentionController extends TextEditingController {
     List<String> comment = [];
     Set<String> uniqueMentions = {};
     List<String> tempMentions = List<String>.from(_mentions);
-
+// todo handle username regex everywhere
     final RegExp usernameRegex = RegExp(
       r"[@][\w][\w\d_.-]{2,19}[" + Constants.zeroWidthSpace + r"]",
       multiLine: true,
@@ -163,7 +164,8 @@ class TextMentionController extends TextEditingController {
       if (tempMentions.contains(mentionedString)) {
         // is username is present in mentions add 2 elements
         tempMentions.remove(mentionedString);
-        uniqueMentions.add(mentionedString);
+        uniqueMentions
+            .add(DisplayText.getUsernameFromCommentInput(mentionedString));
         comment.addAll([normalString, mentionedString]);
         continue;
       }
