@@ -1,5 +1,5 @@
 // used for comment input
-import 'package:amplify_flutter/amplify_flutter.dart';
+
 
 class CommentInputModel {
   // if no media empty string
@@ -29,14 +29,11 @@ class CommentInputModel {
   });
 
   List<Map<String, String>> generateMentions() {
-    safePrint("mention trial");
-    safePrint(mentions.length);
     var mentionMap = mentions.map((String username) {
       return {
         "username": username,
       };
     }).toList();
-    safePrint(mentionMap);
     return mentionMap;
   }
 }

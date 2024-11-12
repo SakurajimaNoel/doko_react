@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
+import 'package:doko_react/core/configs/router/router_constants.dart';
+import 'package:doko_react/core/data/extensions.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
@@ -14,6 +16,7 @@ import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -64,14 +67,11 @@ class _PostWidgetState extends State<PostWidget> {
           const SizedBox(
             height: Constants.gap * 0.5,
           ),
-          GestureDetector(
-            onTap: () {},
-            child: _PostContent(
-              content: widget.post.content,
-              initialItem: widget.post.initialItem,
-              id: widget.post.id,
-              currentItemAction: widget.handlePostDisplayItem,
-            ),
+          _PostContent(
+            content: widget.post.content,
+            initialItem: widget.post.initialItem,
+            id: widget.post.id,
+            currentItemAction: widget.handlePostDisplayItem,
           ),
         ],
         // caption
@@ -427,7 +427,17 @@ class _PostActionState extends State<_PostAction> {
         width: Constants.gap * 1.5,
       ),
       GestureDetector(
-        onTap: () {},
+        onTap: () {
+          String currentRoute = GoRouter.of(context).currentRouteName ?? "";
+          if (currentRoute == RouterConstants.userPost) return;
+
+          context.pushNamed(
+            RouterConstants.userPost,
+            pathParameters: {
+              "postId": _post.id,
+            },
+          );
+        },
         child: const Icon(Icons.insert_comment_outlined),
       ),
       const SizedBox(

@@ -162,8 +162,7 @@ class AppRouterConfig {
 
     return GoRouter(
       navigatorKey: homeRouterRootNavigatorKey,
-      // initialLocation: "/profile/post/8fc53dff-8aff-4679-9862-f53f930c8d66",
-      initialLocation: "/profile/user/rohan_verma__/friends",
+      initialLocation: "/profile/post/8fc53dff-8aff-4679-9862-f53f930c8d66",
       routes: [
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
@@ -202,6 +201,7 @@ class AppRouterConfig {
                   name: RouterConstants.profile,
                   path: "/profile",
                   builder: (context, state) {
+                    // todo: handle this in a better way
                     final needsRefresh = context.select(
                         (UserPreferencesProvider preferences) =>
                             preferences.profileRefresh);

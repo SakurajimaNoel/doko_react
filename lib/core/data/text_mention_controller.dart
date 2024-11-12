@@ -146,7 +146,6 @@ class TextMentionController extends TextEditingController {
     List<String> comment = [];
     Set<String> uniqueMentions = {};
     List<String> tempMentions = List<String>.from(_mentions);
-// todo handle username regex everywhere
     final RegExp usernameRegex = RegExp(
       r"[@]" + Constants.usernameRegex + r"[" + Constants.zeroWidthSpace + r"]",
       multiLine: true,

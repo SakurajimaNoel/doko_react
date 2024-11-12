@@ -95,63 +95,68 @@ class _PostPageState extends State<PostPage> {
       appBar: AppBar(
         title: Text(post!.caption),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.only(
-                bottom: Constants.gap,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await fetchPostById();
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.only(
+                  bottom: Constants.gap,
+                ),
+                children: [
+                  PostWidget(
+                    post: post!,
+                    handlePostLike: handlePostLike,
+                    handlePostDisplayItem: handlePostDisplayItem,
+                  ),
+                ],
               ),
+            ),
+            Column(
               children: [
-                PostWidget(
-                  post: post!,
-                  handlePostLike: handlePostLike,
-                  handlePostDisplayItem: handlePostDisplayItem,
+                if (!postComment)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: Constants.padding,
+                      vertical: Constants.padding * 0.5,
+                    ),
+                    color: currTheme.surfaceContainerHighest,
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Text("Replying to someone comment"),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              commentTargetId = post!.id;
+                            });
+                          },
+                          child: const Icon(
+                            Icons.close,
+                            size: Constants.width,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                CommentInput(
+                  createdBy: post!.createdBy.id,
+                  postId: post!.id,
+                  commentTargetId: commentTargetId!,
+                  successAction: () {
+                    setState(() {
+                      commentTargetId = post!.id;
+                    });
+                  },
                 ),
               ],
-            ),
-          ),
-          Column(
-            children: [
-              if (!postComment)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: Constants.padding,
-                    vertical: Constants.padding * 0.5,
-                  ),
-                  color: currTheme.surfaceContainerHighest,
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        child: Text("Replying to someone comment"),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            commentTargetId = post!.id;
-                          });
-                        },
-                        child: const Icon(
-                          Icons.close,
-                          size: Constants.width,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              CommentInput(
-                createdBy: post!.createdBy.id,
-                postId: post!.id,
-                commentTargetId: commentTargetId!,
-                successAction: () {
-                  setState(() {
-                    commentTargetId = post!.id;
-                  });
-                },
-              ),
-            ],
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

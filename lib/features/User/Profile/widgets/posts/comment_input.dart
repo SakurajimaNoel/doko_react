@@ -18,6 +18,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:giphy_get/giphy_get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -415,119 +416,133 @@ class _CommentInputState extends State<CommentInput> {
 
     final currTheme = Theme.of(context).colorScheme;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: currTheme.surfaceContainerLow,
-        border: Border(
-          top: BorderSide(
-            width: 1.5,
-            color: currTheme.outline,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, var result) {
+        if (didPop) return;
+
+        if (focusNode.hasFocus) {
+          FocusScope.of(context).unfocus();
+          return;
+        }
+        context.pop();
+      },
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: currTheme.surfaceContainerLow,
+          border: Border(
+            top: BorderSide(
+              width: 1.5,
+              color: currTheme.outline,
+            ),
           ),
         ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: Constants.padding * 0.125,
-          horizontal: Constants.padding,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (mediaData != null || mediaUrl != null)
-              _CommentInputMedia(
-                mediaData: mediaData,
-                mediaUrl: mediaUrl,
-                handleMediaRemove: handleMediaRemove,
-              ),
-            CompositedTransformTarget(
-              link: link,
-              child: OverlayPortal(
-                controller: overlayPortalController,
-                overlayChildBuilder: (BuildContext context) {
-                  return CompositedTransformFollower(
-                    offset: const Offset(0, -6),
-                    link: link,
-                    targetAnchor: Alignment.topCenter,
-                    followerAnchor: Alignment.bottomCenter,
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxHeight: height / 2.5,
-                          minHeight: Constants.commentOverlayHeight,
-                          minWidth: width - Constants.padding,
-                          maxWidth: width - Constants.padding,
-                        ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: currTheme.surfaceContainerLowest,
-                            borderRadius: BorderRadius.circular(3),
-                            boxShadow: [
-                              BoxShadow(
-                                offset: const Offset(0, 2),
-                                blurRadius: 16,
-                                color: currTheme.shadow,
-                              ),
-                            ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: Constants.padding * 0.125,
+            horizontal: Constants.padding,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (mediaData != null || mediaUrl != null)
+                _CommentInputMedia(
+                  mediaData: mediaData,
+                  mediaUrl: mediaUrl,
+                  handleMediaRemove: handleMediaRemove,
+                ),
+              CompositedTransformTarget(
+                link: link,
+                child: OverlayPortal(
+                  controller: overlayPortalController,
+                  overlayChildBuilder: (BuildContext context) {
+                    return CompositedTransformFollower(
+                      offset: const Offset(0, -6),
+                      link: link,
+                      targetAnchor: Alignment.topCenter,
+                      followerAnchor: Alignment.bottomCenter,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxHeight: height / 2.5,
+                            minHeight: Constants.commentOverlayHeight,
+                            minWidth: width - Constants.padding,
+                            maxWidth: width - Constants.padding,
                           ),
-                          child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding:
-                                const EdgeInsets.all(Constants.padding * 0.75),
-                            scrollDirection: Axis.vertical,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: generateOverlayContent(),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: currTheme.surfaceContainerLowest,
+                              borderRadius: BorderRadius.circular(3),
+                              boxShadow: [
+                                BoxShadow(
+                                  offset: const Offset(0, 2),
+                                  blurRadius: 16,
+                                  color: currTheme.shadow,
+                                ),
+                              ],
+                            ),
+                            child: SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.all(
+                                  Constants.padding * 0.75),
+                              scrollDirection: Axis.vertical,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: generateOverlayContent(),
+                              ),
                             ),
                           ),
                         ),
                       ),
+                    );
+                  },
+                  child: TextField(
+                    autofocus: true,
+                    enabled: !adding,
+                    controller: controller,
+                    focusNode: focusNode,
+                    minLines: 1,
+                    maxLines: 3,
+                    maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                    decoration: const InputDecoration(
+                      hintText: "Type your comment here...",
                     ),
-                  );
-                },
-                child: TextField(
-                  enabled: !adding,
-                  controller: controller,
-                  focusNode: focusNode,
-                  minLines: 1,
-                  maxLines: 3,
-                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                  decoration: const InputDecoration(
-                    hintText: "Type your comment here...",
-                  ),
-                  contentInsertionConfiguration: ContentInsertionConfiguration(
-                    onContentInserted: (KeyboardInsertedContent data) async {
-                      if (data.hasData) {
-                        String? extension =
-                            MediaType.getExtension(data.mimeType);
-                        if (extension == null) {
-                          showMessage(Constants.errorMessage);
-                          return;
+                    contentInsertionConfiguration:
+                        ContentInsertionConfiguration(
+                      onContentInserted: (KeyboardInsertedContent data) async {
+                        if (data.hasData) {
+                          String? extension =
+                              MediaType.getExtension(data.mimeType);
+                          if (extension == null) {
+                            showMessage(Constants.errorMessage);
+                            return;
+                          }
+                          setState(() {
+                            mediaData = CommentMediaData(
+                              media: data.data!,
+                              extension: extension,
+                            );
+                          });
                         }
-                        setState(() {
-                          mediaData = CommentMediaData(
-                            media: data.data!,
-                            extension: extension,
-                          );
-                        });
-                      }
-                    },
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-            if (showMore || adding) ...[
-              const SizedBox(
-                height: 4,
-              ),
-              _CommentInputActions(
-                handleImageGallery: handleImageGallery,
-                handleGifSelection: handleGifSelection,
-                isReply: false,
-                handleComment: handleComment,
-              ),
+              if (showMore || adding) ...[
+                const SizedBox(
+                  height: 4,
+                ),
+                _CommentInputActions(
+                  handleImageGallery: handleImageGallery,
+                  handleGifSelection: handleGifSelection,
+                  isReply: false,
+                  handleComment: handleComment,
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
