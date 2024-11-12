@@ -537,7 +537,7 @@ class _CommentInputState extends State<CommentInput> {
                 _CommentInputActions(
                   handleImageGallery: handleImageGallery,
                   handleGifSelection: handleGifSelection,
-                  isReply: false,
+                  isReply: isReply,
                   handleComment: handleComment,
                 ),
               ],

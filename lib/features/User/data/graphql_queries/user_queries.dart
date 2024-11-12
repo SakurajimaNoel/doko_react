@@ -995,7 +995,7 @@ class UserQueries {
   // post by id
   static String getPostById() {
     return """
-      query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere) {
+      query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$first: Int, \$sort: [PostCommentsConnectionSort!], \$likedByWhere3: UserWhere) {
         posts(where: \$where) {
           caption
           id
@@ -1010,8 +1010,38 @@ class UserQueries {
           likedBy(where: \$likedByWhere2) {
             id
           }
-          commentsConnection {
+          commentsConnection(first: \$first, sort: \$sort) {
             totalCount
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+            edges {
+              node {
+                id
+                createdOn
+                media
+                content
+                mentions {
+                  username
+                }
+                likedByConnection {
+                  totalCount
+                }
+                commentsConnection {
+                  totalCount
+                }
+                commentBy {
+                  id
+                  username
+                  name
+                  profilePicture
+                }
+                likedBy(where: \$likedByWhere3) {
+                  username
+                }
+              }
+            }
           }
           likedByConnection {
             totalCount
@@ -1031,7 +1061,14 @@ class UserQueries {
       },
       "likedByWhere2": {
         "username": username,
-      }
+      },
+      "first": QueryConstants.commentLimit,
+      "sort": [
+        {
+          "node": {"createdOn": "ASC"}
+        }
+      ],
+      "likedByWhere3": {"username": username}
     };
   }
 
@@ -1147,6 +1184,100 @@ class UserQueries {
       ],
       "where": {
         "username": commentInput.commentBy,
+      }
+    };
+  }
+
+  // get comments
+  static String getComments() {
+    return '''
+    query CommentsConnection(\$where: CommentWhere, \$first: Int, \$sort: [CommentSort], \$after: String, \$likedByWhere2: UserWhere) {
+      commentsConnection(where: \$where, first: \$first, sort: \$sort, after: \$after) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        edges {
+          node {
+            id
+            createdOn
+            media
+            content
+            mentions {
+              username
+            }
+            likedByConnection {
+              totalCount
+            }
+            commentsConnection {
+              totalCount
+            }
+            commentBy {
+              id
+              username
+              name
+              profilePicture
+            }
+            likedBy(where: \$likedByWhere2) {
+              username
+            }
+          }
+        }
+      }
+    }  
+    ''';
+  }
+
+  static Map<String, dynamic> getCommentsVariable(
+    bool post, {
+    String? cursor,
+    required String nodeId,
+    required String username,
+  }) {
+    String connectionNode = post ? "Post" : "Comment";
+
+    if (cursor == null) {
+      return {
+        "where": {
+          "commentOnConnection": {
+            connectionNode: {
+              "node": {
+                "id": nodeId,
+              }
+            }
+          }
+        },
+        "first": QueryConstants.commentLimit,
+        "sort": [
+          {
+            "createdOn": "ASC",
+          }
+        ],
+        "likedByWhere2": {
+          "username": username,
+        }
+      };
+    }
+
+    return {
+      "where": {
+        "commentOnConnection": {
+          connectionNode: {
+            "node": {
+              "id": nodeId,
+            }
+          }
+        }
+      },
+      "first": QueryConstants.commentLimit,
+      "after": cursor,
+      "sort": [
+        {
+          "createdOn": "ASC",
+        }
+      ],
+      "likedByWhere2": {
+        "username": username,
       }
     };
   }

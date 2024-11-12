@@ -1,5 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/data/storage.dart';
+import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 
 class NodeInfo {
@@ -43,6 +44,9 @@ class StorageUtils {
 
   static Future<String> generatePreSignedURL(String path) async {
     if (path.isEmpty) return "";
+
+    // if already url
+    if (DisplayText.isValidUrl(path)) return path;
 
     var result = await storage.getDownloadUrl(path);
     return result.value;

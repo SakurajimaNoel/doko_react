@@ -147,4 +147,8 @@ class DisplayText {
   static String getUsernameFromCommentInput(String username) {
     return username.substring(1, username.length - 1);
   }
+
+  static bool isValidUrl(String url) {
+    return url.startsWith("http");
+  }
 }

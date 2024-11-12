@@ -4,19 +4,33 @@ import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/widgets/loader/loader.dart';
+import 'package:doko_react/features/User/Profile/widgets/comments/comment_widget.dart';
 import 'package:doko_react/features/User/Profile/widgets/posts/comment_input.dart';
 import 'package:doko_react/features/User/Profile/widgets/posts/post_widget.dart';
+import 'package:doko_react/features/User/data/model/comment_model.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+class CommentTarget {
+  final String targetId;
+  final String targetUsername;
+
+  const CommentTarget({
+    required this.targetId,
+    required this.targetUsername,
+  });
+}
+
 class PostPage extends StatefulWidget {
+  final PostModel? post;
   final String postId;
 
   const PostPage({
     super.key,
     required this.postId,
+    this.post,
   });
 
   @override
@@ -25,13 +39,14 @@ class PostPage extends StatefulWidget {
 
 class _PostPageState extends State<PostPage> {
   PostModel? post;
-  String? commentTargetId;
+  CommentTarget? commentTarget;
   late final UserProvider userProvider;
   final UserGraphqlService userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
   );
-  bool loading = true;
+  bool loading = false;
   String error = "";
+  CommentInfo? commentInfo;
 
   @override
   void initState() {
@@ -39,23 +54,52 @@ class _PostPageState extends State<PostPage> {
 
     userProvider = context.read<UserProvider>();
 
-    fetchPostById();
+    post = widget.post;
+
+    if (post == null) {
+      fetchPostById();
+    } else {
+      setState(() {
+        commentTarget = CommentTarget(
+          targetId: post!.id,
+          targetUsername: post!.createdBy.username,
+        );
+      });
+
+      // fetch only comments
+    }
   }
 
-  Future<void> fetchPostById() async {
+  Future<void> fetchPostById({
+    bool setLoading = true,
+  }) async {
+    if (setLoading && !loading) {
+      setState(() {
+        loading = true;
+      });
+    }
+
     var response = await userGraphqlService.getPostsById(
       widget.postId,
       username: userProvider.username,
     );
-    setState(() {
-      loading = false;
-    });
+    if (setLoading && loading) {
+      setState(() {
+        loading = false;
+      });
+    }
 
     if (response.status == ResponseStatus.error) return;
 
-    commentTargetId = response.postInfo?.id;
     setState(() {
+      if (response.postInfo != null) {
+        commentTarget = CommentTarget(
+          targetId: response.postInfo!.id,
+          targetUsername: response.postInfo!.createdBy.username,
+        );
+      }
       post = response.postInfo;
+      commentInfo = response.commentInfo;
     });
   }
 
@@ -65,6 +109,47 @@ class _PostPageState extends State<PostPage> {
 
   void handlePostDisplayItem(int value) {
     post?.updatePostInitialItem(value);
+  }
+
+  Widget _buildItem(BuildContext context, int index, int itemCount) {
+    if (index == 0) {
+      return PostWidget(
+        post: post!,
+        handlePostLike: handlePostLike,
+        handlePostDisplayItem: handlePostDisplayItem,
+      );
+    }
+
+    if (index == itemCount - 1 || commentInfo == null) {
+      return const Center(
+        child: Text(
+          "No more comments",
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      );
+    }
+
+    CommentModel commentItem = commentInfo!.comments[index - 1];
+    void likeCallback(bool like) {
+      commentInfo!.comments[index - 1].updateUserLike(like);
+    }
+
+    void replyCallback() {
+      setState(() {
+        commentTarget = CommentTarget(
+          targetId: commentItem.id,
+          targetUsername: commentItem.commentBy.username,
+        );
+      });
+    }
+
+    return CommentWidget(
+      comment: commentItem,
+      handleCommentLike: likeCallback,
+      handleReply: replyCallback,
+    );
   }
 
   @override
@@ -88,8 +173,11 @@ class _PostPageState extends State<PostPage> {
       );
     }
 
-    bool postComment = post!.id == commentTargetId!;
+    bool commentReply = post!.id == commentTarget!.targetId;
     final currTheme = Theme.of(context).colorScheme;
+
+    // one for post widget and one for comment show more
+    int itemCount = commentInfo != null ? commentInfo!.comments.length + 2 : 2;
 
     return Scaffold(
       appBar: AppBar(
@@ -97,27 +185,30 @@ class _PostPageState extends State<PostPage> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await fetchPostById();
+          await fetchPostById(
+            setLoading: false,
+          );
         },
         child: Column(
           children: [
             Expanded(
-              child: ListView(
+              child: ListView.separated(
                 padding: const EdgeInsets.only(
                   bottom: Constants.gap,
                 ),
-                children: [
-                  PostWidget(
-                    post: post!,
-                    handlePostLike: handlePostLike,
-                    handlePostDisplayItem: handlePostDisplayItem,
-                  ),
-                ],
+                itemBuilder: (BuildContext context, int index) =>
+                    _buildItem(context, index, itemCount),
+                separatorBuilder: (BuildContext context, int index) {
+                  return const SizedBox(
+                    height: Constants.gap * 2,
+                  );
+                },
+                itemCount: itemCount,
               ),
             ),
             Column(
               children: [
-                if (!postComment)
+                if (!commentReply)
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: Constants.padding,
@@ -126,30 +217,38 @@ class _PostPageState extends State<PostPage> {
                     color: currTheme.surfaceContainerHighest,
                     child: Row(
                       children: [
-                        const Expanded(
-                          child: Text("Replying to someone comment"),
+                        Expanded(
+                          child: Text(
+                              "Replying to ${commentTarget!.targetUsername} comment"),
                         ),
                         GestureDetector(
                           onTap: () {
                             setState(() {
-                              commentTargetId = post!.id;
+                              commentTarget = CommentTarget(
+                                targetId: post!.id,
+                                targetUsername: post!.createdBy.username,
+                              );
                             });
                           },
                           child: const Icon(
                             Icons.close,
-                            size: Constants.width,
+                            size: Constants.width * 1.5,
                           ),
                         ),
                       ],
                     ),
                   ),
                 CommentInput(
+                  key: ObjectKey(commentTarget),
                   createdBy: post!.createdBy.id,
                   postId: post!.id,
-                  commentTargetId: commentTargetId!,
+                  commentTargetId: commentTarget!.targetId,
                   successAction: () {
                     setState(() {
-                      commentTargetId = post!.id;
+                      commentTarget = CommentTarget(
+                        targetId: post!.id,
+                        targetUsername: post!.createdBy.username,
+                      );
                     });
                   },
                 ),

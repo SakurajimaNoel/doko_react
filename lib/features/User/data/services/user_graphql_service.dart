@@ -71,10 +71,12 @@ class SearchResponse {
 class IndividualPostResponse {
   final ResponseStatus status;
   final PostModel? postInfo;
+  final CommentInfo? commentInfo;
 
   const IndividualPostResponse({
     required this.status,
     this.postInfo,
+    this.commentInfo,
   });
 }
 
@@ -793,10 +795,13 @@ class UserGraphqlService {
       PostModel info = await PostModel.createModel(
         map: res[0],
       );
+      CommentInfo commentInfo =
+          await CommentInfo.createModel(map: res[0]["commentsConnection"]);
 
       return IndividualPostResponse(
         status: ResponseStatus.success,
         postInfo: info,
+        commentInfo: commentInfo,
       );
     } catch (e) {
       safePrint(e.toString());
@@ -809,6 +814,10 @@ class UserGraphqlService {
   // todo update return type same as get comments
   Future<bool> addComment(CommentInputModel commentInput) async {
     try {
+      if (commentInput.content.isEmpty && commentInput.media.isEmpty) {
+        throw Exception("no data to create comment");
+      }
+
       QueryResult result = await _client.mutate(
         MutationOptions(
           document: gql(UserQueries.addComment()),

@@ -20,7 +20,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class PostWidget extends StatefulWidget {
+class PostWidget extends StatelessWidget {
   final PostModel post;
   final ValueChanged<bool> handlePostLike;
   final ValueChanged<int> handlePostDisplayItem;
@@ -31,13 +31,6 @@ class PostWidget extends StatefulWidget {
     required this.handlePostLike,
     required this.handlePostDisplayItem,
   });
-
-  @override
-  State<PostWidget> createState() => _PostWidgetState();
-}
-
-class _PostWidgetState extends State<PostWidget> {
-  bool longPress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -52,10 +45,10 @@ class _PostWidgetState extends State<PostWidget> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               UserWidget(
-                user: widget.post.createdBy,
+                user: post.createdBy,
               ),
               Text(
-                DisplayText.displayDateDiff(widget.post.createdOn),
+                DisplayText.displayDateDiff(post.createdOn),
                 style: const TextStyle(
                   fontSize: Constants.smallFontSize,
                 ),
@@ -63,15 +56,15 @@ class _PostWidgetState extends State<PostWidget> {
             ],
           ),
         ),
-        if (widget.post.content.isNotEmpty) ...[
+        if (post.content.isNotEmpty) ...[
           const SizedBox(
             height: Constants.gap * 0.5,
           ),
           _PostContent(
-            content: widget.post.content,
-            initialItem: widget.post.initialItem,
-            id: widget.post.id,
-            currentItemAction: widget.handlePostDisplayItem,
+            content: post.content,
+            initialItem: post.initialItem,
+            id: post.id,
+            currentItemAction: handlePostDisplayItem,
           ),
         ],
         // caption
@@ -80,7 +73,7 @@ class _PostWidgetState extends State<PostWidget> {
             horizontal: Constants.padding,
             vertical: Constants.padding,
           ),
-          child: _PostCaption(caption: widget.post.caption),
+          child: _PostCaption(caption: post.caption),
         ),
         const SizedBox(
           height: Constants.gap * 0.125,
@@ -90,8 +83,8 @@ class _PostWidgetState extends State<PostWidget> {
             horizontal: Constants.padding,
           ),
           child: _PostAction(
-            postModel: widget.post,
-            likeAction: widget.handlePostLike,
+            postModel: post,
+            likeAction: handlePostLike,
           ),
         ),
       ],
@@ -435,6 +428,9 @@ class _PostActionState extends State<_PostAction> {
             RouterConstants.userPost,
             pathParameters: {
               "postId": _post.id,
+            },
+            extra: {
+              "post": _post,
             },
           );
         },
