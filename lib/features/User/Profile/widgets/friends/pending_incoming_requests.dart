@@ -1,5 +1,4 @@
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
-import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
@@ -10,7 +9,6 @@ import 'package:doko_react/features/User/Profile/widgets/friends/friend_widget.d
 import 'package:doko_react/features/User/data/model/friend_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class PendingIncomingRequests extends StatefulWidget {
@@ -114,16 +112,11 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
       // fetch more friends if available
       if (!_friendInfo!.info.hasNextPage) {
         // no more posts available
-        return const Padding(
-          padding: EdgeInsets.only(
-            bottom: Constants.padding,
-          ),
-          child: Center(
-            child: Text(
-              "You have no more pending incoming requests.",
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
+        return const Center(
+          child: Text(
+            "You have no more pending incoming requests.",
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
             ),
           ),
         );
@@ -143,21 +136,11 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
       _handleCancelAction(index);
     }
 
-    return GestureDetector(
-      onTap: () {
-        context.pushNamed(
-          RouterConstants.userProfile,
-          pathParameters: {
-            "userId": friend.id,
-          },
-        );
-      },
-      child: FriendWidget(
-        friend: friend,
-        widgetLocation: FriendWidgetLocation.incoming,
-        key: ValueKey(friend.id),
-        cancelReqAction: cancelCallback,
-      ),
+    return FriendWidget(
+      friend: friend,
+      widgetLocation: FriendWidgetLocation.incoming,
+      key: ValueKey(friend.id),
+      cancelReqAction: cancelCallback,
     );
   }
 
@@ -178,15 +161,18 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
       );
     }
 
-    return Padding(
+    return ListView.separated(
       padding: const EdgeInsets.all(
         Constants.padding,
       ),
-      child: ListView.builder(
-        itemCount: friends.length + 1,
-        itemBuilder: (BuildContext context, int index) =>
-            _buildItem(context, index, friends),
-      ),
+      itemCount: friends.length + 1,
+      itemBuilder: (BuildContext context, int index) =>
+          _buildItem(context, index, friends),
+      separatorBuilder: (BuildContext context, int index) {
+        return const SizedBox(
+          height: Constants.gap,
+        );
+      },
     );
   }
 

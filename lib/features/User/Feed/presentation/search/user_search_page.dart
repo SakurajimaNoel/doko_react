@@ -150,13 +150,19 @@ class _UserSearchPageState extends State<UserSearchPage> {
                         ? const Center(
                             child: Text("No user found with given query"),
                           )
-                        : ListView.builder(
+                        : ListView.separated(
                             itemCount: searchResult!.length,
                             itemBuilder: (BuildContext context, int index) {
                               return FriendWidget(
                                 friend: searchResult![index],
                                 widgetLocation: FriendWidgetLocation.search,
                                 key: ObjectKey(searchResult![index]),
+                              );
+                            },
+                            separatorBuilder:
+                                (BuildContext context, int index) {
+                              return const SizedBox(
+                                height: Constants.gap,
                               );
                             },
                           ),

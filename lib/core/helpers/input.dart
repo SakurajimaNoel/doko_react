@@ -108,9 +108,7 @@ class ValidateInput {
   }
 
   static InputStatus validateUsername(String? username) {
-    final RegExp usernameRegex = RegExp(r"^[\w][\w\d_.-]{2," +
-        (Constants.usernameLimit - 1).toString() +
-        r"}$");
+    final RegExp usernameRegex = RegExp(r"^" + Constants.usernameRegex + r"$");
 
     if (username == null || username.isEmpty) {
       return InputStatus(

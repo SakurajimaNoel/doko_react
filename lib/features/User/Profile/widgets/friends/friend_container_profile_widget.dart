@@ -1,14 +1,11 @@
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
-import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
-import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:doko_react/features/User/Profile/widgets/friends/friend_widget.dart';
 import 'package:doko_react/features/User/data/model/friend_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class FriendContainerProfileWidget extends StatefulWidget {
@@ -40,7 +37,6 @@ class _FriendContainerProfileWidgetState
 
   bool _loading = false;
 
-  // String _errorMessage = "";
   late List<FriendUserModel> _friends;
 
   @override
@@ -112,16 +108,11 @@ class _FriendContainerProfileWidgetState
       // fetch more friends if available
       if (!_friendInfo.info.hasNextPage) {
         // no more friends available
-        return Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: Constants.padding * 2,
-          ),
-          child: Center(
-            child: Text(
-              "@$username has no more friends.",
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
+        return Center(
+          child: Text(
+            "@$username has no more friends.",
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
             ),
           ),
         );
@@ -131,13 +122,8 @@ class _FriendContainerProfileWidgetState
         _loading = true;
         _fetchMoreFriends();
       }
-      return Container(
-        margin: const EdgeInsets.symmetric(
-          vertical: Constants.padding,
-        ),
-        child: const Center(
-          child: LoaderButton(),
-        ),
+      return const Center(
+        child: CircularProgressIndicator(),
       );
     }
 
@@ -146,23 +132,12 @@ class _FriendContainerProfileWidgetState
       _handleUnfriendAction(index);
     }
 
-    return GestureDetector(
-      onTap: () {
-        context.pushNamed(
-          RouterConstants.userProfile,
-          pathParameters: {
-            "userId": friend.id,
-          },
-        );
-      },
-      child: FriendWidget(
-        friend: friend,
-        widgetLocation: self
-            ? FriendWidgetLocation.myFriends
-            : FriendWidgetLocation.friends,
-        removeFriendAction: removeCallback,
-        key: ValueKey(friend.id),
-      ),
+    return FriendWidget(
+      friend: friend,
+      widgetLocation:
+          self ? FriendWidgetLocation.myFriends : FriendWidgetLocation.friends,
+      removeFriendAction: removeCallback,
+      key: ValueKey(friend.id),
     );
   }
 
@@ -188,10 +163,15 @@ class _FriendContainerProfileWidgetState
       padding: const EdgeInsets.all(
         Constants.padding,
       ),
-      child: ListView.builder(
+      child: ListView.separated(
         itemCount: _friends.length + 1,
         itemBuilder: (BuildContext context, int index) =>
             _buildItem(context, index),
+        separatorBuilder: (BuildContext context, int index) {
+          return const SizedBox(
+            height: Constants.gap,
+          );
+        },
       ),
     );
   }

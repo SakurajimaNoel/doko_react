@@ -193,7 +193,7 @@ class _FriendsPageState extends State<FriendsPage> {
                     ? const Center(
                         child: Text("No user found with given query"),
                       )
-                    : ListView.builder(
+                    : ListView.separated(
                         padding: const EdgeInsets.symmetric(
                           horizontal: Constants.padding,
                         ),
@@ -212,6 +212,11 @@ class _FriendsPageState extends State<FriendsPage> {
                             key: ObjectKey(
                               searchResult![index],
                             ),
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          return const SizedBox(
+                            height: Constants.gap,
                           );
                         },
                       ),

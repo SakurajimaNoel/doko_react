@@ -179,15 +179,18 @@ class PendingOutgoingRequestsState extends State<PendingOutgoingRequests>
       );
     }
 
-    return Padding(
+    return ListView.separated(
       padding: const EdgeInsets.all(
         Constants.padding,
       ),
-      child: ListView.builder(
-        itemCount: friends.length + 1,
-        itemBuilder: (BuildContext context, int index) =>
-            _buildItem(context, index, friends),
-      ),
+      itemCount: friends.length + 1,
+      itemBuilder: (BuildContext context, int index) =>
+          _buildItem(context, index, friends),
+      separatorBuilder: (BuildContext context, int index) {
+        return const SizedBox(
+          height: Constants.gap,
+        );
+      },
     );
   }
 

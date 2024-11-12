@@ -12,12 +12,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class PostPage extends StatefulWidget {
-  final PostModel? post;
   final String postId;
 
   const PostPage({
     super.key,
-    required this.post,
     required this.postId,
   });
 
@@ -39,18 +37,9 @@ class _PostPageState extends State<PostPage> {
   void initState() {
     super.initState();
 
-    post = widget.post;
     userProvider = context.read<UserProvider>();
 
-    if (post == null) {
-      fetchPostById();
-    } else {
-      commentTargetId = post!.id;
-      fetchPostCommentsById();
-      setState(() {
-        loading = false;
-      });
-    }
+    fetchPostById();
   }
 
   Future<void> fetchPostById() async {
@@ -69,8 +58,6 @@ class _PostPageState extends State<PostPage> {
       post = response.postInfo;
     });
   }
-
-  Future<void> fetchPostCommentsById() async {}
 
   void handlePostLike(bool value) {
     post?.updateUserLike(value);
@@ -120,7 +107,6 @@ class _PostPageState extends State<PostPage> {
                   post: post!,
                   handlePostLike: handlePostLike,
                   handlePostDisplayItem: handlePostDisplayItem,
-                  location: PostLocation.page,
                 ),
               ],
             ),

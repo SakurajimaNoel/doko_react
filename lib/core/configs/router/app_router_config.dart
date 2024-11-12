@@ -17,7 +17,6 @@ import 'package:doko_react/features/User/Profile/presentation/post/post_page.dar
 import 'package:doko_react/features/User/Profile/presentation/profile/edit_profile_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/profile/profile_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/profile/user_profile_page.dart';
-import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/user_layout.dart';
 import 'package:doko_react/features/application/settings/presentation/change_password_page.dart';
 import 'package:doko_react/features/application/settings/presentation/mfa_setup_page.dart';
@@ -163,7 +162,8 @@ class AppRouterConfig {
 
     return GoRouter(
       navigatorKey: homeRouterRootNavigatorKey,
-      initialLocation: "/profile/post/8fc53dff-8aff-4679-9862-f53f930c8d66",
+      // initialLocation: "/profile/post/8fc53dff-8aff-4679-9862-f53f930c8d66",
+      initialLocation: "/profile/user/rohan_verma__/friends",
       routes: [
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
@@ -216,15 +216,8 @@ class AppRouterConfig {
                       name: RouterConstants.userPost,
                       path: "post/:postId",
                       builder: (context, state) {
-                        Map<String, dynamic>? data;
-                        if (state.extra != null) {
-                          data = state.extra as Map<String, dynamic>;
-                        }
-
-                        final PostModel? post = data?["post"];
                         String postId = state.pathParameters["postId"]!;
                         return PostPage(
-                          post: post,
                           postId: postId,
                         );
                       },
@@ -303,27 +296,27 @@ class AppRouterConfig {
                       },
                     ),
                     GoRoute(
-                        parentNavigatorKey: homeRouterRootNavigatorKey,
-                        name: RouterConstants.userProfile,
-                        path: "user/:username",
-                        builder: (context, state) {
-                          String username = state.pathParameters["username"]!;
-                          return UserProfilePage(username: username);
-                        },
-                        routes: [
-                          GoRoute(
-                            parentNavigatorKey: homeRouterRootNavigatorKey,
-                            name: RouterConstants.profileFriends,
-                            path: "friends",
-                            builder: (context, state) {
-                              String username =
-                                  state.pathParameters["username"]!;
-                              return FriendsPage(
-                                username: username,
-                              );
-                            },
-                          ),
-                        ]),
+                      parentNavigatorKey: homeRouterRootNavigatorKey,
+                      name: RouterConstants.userProfile,
+                      path: "user/:username",
+                      builder: (context, state) {
+                        String username = state.pathParameters["username"]!;
+                        return UserProfilePage(username: username);
+                      },
+                      routes: [
+                        GoRoute(
+                          parentNavigatorKey: homeRouterRootNavigatorKey,
+                          name: RouterConstants.profileFriends,
+                          path: "friends",
+                          builder: (context, state) {
+                            String username = state.pathParameters["username"]!;
+                            return FriendsPage(
+                              username: username,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ],

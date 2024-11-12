@@ -42,22 +42,17 @@ class FriendWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(
-        bottom: Constants.gap,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          UserWidget(user: friend),
-          _UserAction(
-            friend: friend,
-            removeFriendAction: removeFriendAction,
-            cancelReqAction: cancelReqAction,
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        UserWidget(user: friend),
+        _UserAction(
+          friend: friend,
+          removeFriendAction: removeFriendAction,
+          cancelReqAction: cancelReqAction,
+        ),
+      ],
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/configs/graphql/graphql_config.dart';
-import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/helpers/enum.dart';
@@ -15,27 +14,19 @@ import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
-enum PostLocation {
-  feed,
-  page,
-}
 
 class PostWidget extends StatefulWidget {
   final PostModel post;
   final ValueChanged<bool> handlePostLike;
   final ValueChanged<int> handlePostDisplayItem;
-  final PostLocation location;
 
   const PostWidget({
     super.key,
     required this.post,
     required this.handlePostLike,
     required this.handlePostDisplayItem,
-    this.location = PostLocation.feed,
   });
 
   @override
@@ -47,115 +38,63 @@ class _PostWidgetState extends State<PostWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final currTheme = Theme.of(context).colorScheme;
-    final isPage = widget.location == PostLocation.page;
-
-    return GestureDetector(
-      onLongPress: () {
-        setState(() {
-          longPress = true;
-        });
-      },
-      onLongPressCancel: () {
-        setState(() {
-          longPress = false;
-        });
-      },
-      onLongPressEnd: (details) {
-        setState(() {
-          longPress = false;
-        });
-      },
-      onTap: () async {
-        if (isPage) return;
-
-        setState(() {
-          longPress = true;
-        });
-        await context.pushNamed(
-          RouterConstants.userPost,
-          pathParameters: {
-            "postId": "rohan",
-          },
-          extra: {"post": widget.post},
-        );
-
-        setState(() {
-          longPress = false;
-        });
-      },
-      child: Container(
-        color: !isPage
-            ? longPress
-                ? currTheme.surfaceContainer
-                : currTheme.surface
-            : Colors.transparent,
-        padding: const EdgeInsets.symmetric(
-          vertical: Constants.gap * 0.5,
-        ),
-        margin: EdgeInsets.symmetric(
-          vertical: isPage ? 0 : Constants.gap * 1.25,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              // post metadata
-              padding:
-                  const EdgeInsets.symmetric(horizontal: Constants.padding),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  UserWidget(
-                    user: widget.post.createdBy,
-                  ),
-                  Text(
-                    DisplayText.displayDateDiff(widget.post.createdOn),
-                    style: const TextStyle(
-                      fontSize: Constants.smallFontSize,
-                    ),
-                  ),
-                ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          // post metadata
+          padding: const EdgeInsets.symmetric(horizontal: Constants.padding),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              UserWidget(
+                user: widget.post.createdBy,
               ),
-            ),
-            if (widget.post.content.isNotEmpty) ...[
-              const SizedBox(
-                height: Constants.gap * 0.5,
-              ),
-              GestureDetector(
-                onTap: () {},
-                child: _PostContent(
-                  content: widget.post.content,
-                  initialItem: widget.post.initialItem,
-                  id: widget.post.id,
-                  currentItemAction: widget.handlePostDisplayItem,
+              Text(
+                DisplayText.displayDateDiff(widget.post.createdOn),
+                style: const TextStyle(
+                  fontSize: Constants.smallFontSize,
                 ),
               ),
             ],
-            // caption
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: Constants.padding,
-                vertical: Constants.padding,
-              ),
-              child: _PostCaption(caption: widget.post.caption),
-            ),
-            const SizedBox(
-              height: Constants.gap * 0.125,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: Constants.padding,
-              ),
-              child: _PostAction(
-                postModel: widget.post,
-                likeAction: widget.handlePostLike,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        if (widget.post.content.isNotEmpty) ...[
+          const SizedBox(
+            height: Constants.gap * 0.5,
+          ),
+          GestureDetector(
+            onTap: () {},
+            child: _PostContent(
+              content: widget.post.content,
+              initialItem: widget.post.initialItem,
+              id: widget.post.id,
+              currentItemAction: widget.handlePostDisplayItem,
+            ),
+          ),
+        ],
+        // caption
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Constants.padding,
+            vertical: Constants.padding,
+          ),
+          child: _PostCaption(caption: widget.post.caption),
+        ),
+        const SizedBox(
+          height: Constants.gap * 0.125,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Constants.padding,
+          ),
+          child: _PostAction(
+            postModel: widget.post,
+            likeAction: widget.handlePostLike,
+          ),
+        ),
+      ],
     );
   }
 }

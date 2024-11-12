@@ -45,7 +45,7 @@ class TextMentionController extends TextEditingController {
     );
 
     final RegExp usernameRegex = RegExp(
-      r"[@][\w][\w\d_.-]{2,19}[" + Constants.zeroWidthSpace + r"]",
+      r"[@]" + Constants.usernameRegex + r"[" + Constants.zeroWidthSpace + r"]",
       multiLine: true,
       unicode: true,
     );
@@ -124,7 +124,11 @@ class TextMentionController extends TextEditingController {
 
   void createCommentInput(List<String> comment) {
     final RegExp usernameRegex = RegExp(
-      r"^[@][\w][\w\d_.-]{2,19}[" + Constants.zeroWidthSpace + r"]$",
+      r"^[@]" +
+          Constants.usernameRegex +
+          r"[" +
+          Constants.zeroWidthSpace +
+          r"]$",
       multiLine: true,
       unicode: true,
     );
@@ -144,7 +148,7 @@ class TextMentionController extends TextEditingController {
     List<String> tempMentions = List<String>.from(_mentions);
 // todo handle username regex everywhere
     final RegExp usernameRegex = RegExp(
-      r"[@][\w][\w\d_.-]{2,19}[" + Constants.zeroWidthSpace + r"]",
+      r"[@]" + Constants.usernameRegex + r"[" + Constants.zeroWidthSpace + r"]",
       multiLine: true,
       unicode: true,
     );

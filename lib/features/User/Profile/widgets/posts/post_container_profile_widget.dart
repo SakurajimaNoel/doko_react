@@ -2,7 +2,6 @@ import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
-import 'package:doko_react/core/widgets/loader/loader_button.dart';
 import 'package:doko_react/features/User/Profile/widgets/posts/post_widget.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/model/user_model.dart';
@@ -27,41 +26,41 @@ class PostContainerProfileWidget extends StatefulWidget {
 
 class _PostContainerProfileWidgetState
     extends State<PostContainerProfileWidget> {
-  late final ProfilePostInfo _postInfo;
-  late final UserModel _user;
+  late final ProfilePostInfo postInfo;
+  late final UserModel user;
   late final UserProvider userProvider;
 
-  final UserGraphqlService _userGraphqlService = UserGraphqlService(
+  final UserGraphqlService userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
   );
 
-  bool _loading = false;
+  bool loading = false;
 
-  late List<ProfilePostModel> _posts;
+  late List<ProfilePostModel> posts;
 
   @override
   void initState() {
     super.initState();
 
-    _postInfo = widget.postInfo;
-    _user = widget.user;
+    postInfo = widget.postInfo;
+    user = widget.user;
 
-    _posts = _postInfo.posts;
+    posts = postInfo.posts;
     userProvider = context.read<UserProvider>();
   }
 
   Future<void> _fetchMorePosts() async {
     // only call this function when has next page
-    String username = _user.username;
-    String cursor = _postInfo.info.endCursor!;
+    String username = user.username;
+    String cursor = postInfo.info.endCursor!;
 
-    var postResponse = await _userGraphqlService.getPostsByUsername(
+    var postResponse = await userGraphqlService.getPostsByUsername(
       username,
       cursor: cursor,
       currentUsername: userProvider.username,
     );
 
-    _loading = false;
+    loading = false;
 
     if (postResponse.status == ResponseStatus.error) {
       String message = "Error fetching more user posts";
@@ -70,15 +69,15 @@ class _PostContainerProfileWidgetState
     }
 
     if (postResponse.postInfo == null) {
-      _postInfo.info.updateInfo(null, false);
+      postInfo.info.updateInfo(null, false);
       return;
     }
 
-    _postInfo.addPosts(postResponse.postInfo!.posts);
+    postInfo.addPosts(postResponse.postInfo!.posts);
     setState(() {
-      _posts = _postInfo.posts;
+      posts = postInfo.posts;
     });
-    _postInfo.info.updateInfo(postResponse.postInfo!.info.endCursor,
+    postInfo.info.updateInfo(postResponse.postInfo!.info.endCursor,
         postResponse.postInfo!.info.hasNextPage);
   }
 
@@ -93,57 +92,40 @@ class _PostContainerProfileWidgetState
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  void _updatePostLike(bool like, int index) {
-    _posts[index].updateUserLike(like);
-  }
-
-  void _postCurrentDisplayItem(int index, int item) {
-    _posts[index].updatePostInitialItem(item);
-  }
-
   Widget _buildItem(BuildContext context, int index) {
-    if (index >= _posts.length) {
+    if (index >= posts.length) {
       // fetch more posts if available
-      if (!_postInfo.info.hasNextPage) {
+      if (!postInfo.info.hasNextPage) {
         // no more posts available
-        return Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: Constants.padding * 2,
-          ),
-          child: Center(
-            child: Text(
-              "${_user.name} has no more posts.",
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
+        return Center(
+          child: Text(
+            "${user.name} has no more posts.",
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
             ),
           ),
         );
       }
 
-      if (!_loading) {
-        _loading = true;
+      if (!loading) {
+        loading = true;
         _fetchMorePosts();
       }
-      return Container(
-        margin: const EdgeInsets.symmetric(
-          vertical: Constants.padding,
-        ),
-        child: const Center(
-          child: LoaderButton(),
-        ),
+
+      return const Center(
+        child: CircularProgressIndicator(),
       );
     }
 
     PostModel postItem =
-        PostModel.fromProfilePost(post: _posts[index], createdBy: _user);
+        PostModel.fromProfilePost(post: posts[index], createdBy: user);
 
     void likeCallback(bool like) {
-      _updatePostLike(like, index);
+      posts[index].updateUserLike(like);
     }
 
     void currentItemCallback(int item) {
-      _postCurrentDisplayItem(index, item);
+      posts[index].updatePostInitialItem(item);
     }
 
     return PostWidget(
@@ -155,11 +137,11 @@ class _PostContainerProfileWidgetState
 
   @override
   Widget build(BuildContext context) {
-    if (_posts.isEmpty) {
+    if (posts.isEmpty) {
       return SliverFillRemaining(
         child: Center(
           child: Text(
-            "${_user.name} has not uploaded any posts.",
+            "${user.name} has not uploaded any posts.",
             style: const TextStyle(
               fontWeight: FontWeight.w500,
             ),
@@ -168,10 +150,15 @@ class _PostContainerProfileWidgetState
       );
     }
 
-    return SliverList.builder(
-      itemCount: _posts.length + 1,
+    return SliverList.separated(
+      itemCount: posts.length + 1,
       itemBuilder: (BuildContext context, int index) =>
           _buildItem(context, index),
+      separatorBuilder: (BuildContext context, int index) {
+        return const SizedBox(
+          height: Constants.gap * 2.5,
+        );
+      },
     );
   }
 }

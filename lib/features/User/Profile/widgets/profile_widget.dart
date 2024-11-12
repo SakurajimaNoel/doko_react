@@ -34,40 +34,40 @@ class ProfileWidget extends StatefulWidget {
 class _ProfileWidgetState extends State<ProfileWidget> {
   final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
 
-  late final bool _self;
-  late final String _username;
-  late final UserProvider _userProvider;
+  late final bool self;
+  late final String username;
+  late final UserProvider userProvider;
 
-  final UserGraphqlService _userGraphqlService = UserGraphqlService(
+  final UserGraphqlService userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
   );
 
-  bool _loading = true;
+  bool loading = true;
   CompleteUserModel? _user;
 
   @override
   void initState() {
     super.initState();
 
-    _userProvider = context.read<UserProvider>();
+    userProvider = context.read<UserProvider>();
 
-    _username = widget.username;
-    _self = _userProvider.username == _username;
+    username = widget.username;
+    self = userProvider.username == username;
 
     _fetchCompleteUser();
   }
 
   Future<void> _fetchCompleteUser() async {
-    if (_username.isEmpty) return;
+    if (username.isEmpty) return;
 
-    var completeUser = await _userGraphqlService.getCompleteUser(
-      _username,
-      currentUsername: _userProvider.username,
+    var completeUser = await userGraphqlService.getCompleteUser(
+      username,
+      currentUsername: userProvider.username,
     );
 
-    if (_loading) {
+    if (loading) {
       setState(() {
-        _loading = false;
+        loading = false;
       });
     }
 
@@ -78,8 +78,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     var user = completeUser.user!;
 
-    if (_self) {
-      _userProvider.updateUser(updatedUser: user);
+    if (self) {
+      // update user details
+      userProvider.updateUser(updatedUser: user);
     }
     if (mounted) {
       setState(() {
@@ -88,8 +89,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     }
   }
 
-  List<Widget> _appBarActions() {
-    if (!_self) {
+  List<Widget> appBarActions() {
+    if (!self) {
       return [];
     }
     var currScheme = Theme.of(context).colorScheme;
@@ -120,7 +121,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Profile"),
-        actions: _appBarActions(),
+        actions: appBarActions(),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -155,7 +156,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   }
 
   Widget _userProfileAction() {
-    if (_self) {
+    if (self) {
       return FilledButton.tonalIcon(
         onPressed: () async {
           // go to edit page
@@ -179,7 +180,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     var status = FriendRelation.getFriendRelationStatus(
       _user!.friendRelationDetail,
-      currentUsername: _userProvider.username,
+      currentUsername: userProvider.username,
     );
 
     return _UserProfileAction(
@@ -193,9 +194,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     return Scaffold(
       appBar: AppBar(
-        title: _self ? Text(_userProvider.username) : const Text("Profile"),
+        title: self ? Text(userProvider.username) : const Text("Profile"),
         actions: [
-          if (_self) ...[
+          if (self) ...[
             IconButton(
               onPressed: () {
                 context.goNamed(RouterConstants.settings);
@@ -264,7 +265,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             context.pushNamed(
               RouterConstants.profileFriends,
               pathParameters: {
-                "username": _username,
+                "username": username,
               },
             );
           },
@@ -285,7 +286,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     var user = _user;
 
-    if (_loading) {
+    if (loading) {
       return _loader();
     }
 
@@ -293,7 +294,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       return _noUser();
     }
 
-    if (_self) {
+    if (self) {
       user.profilePicture = userProvider.profilePicture;
       user.signedProfilePicture = userProvider.signedProfilePicture;
       user.name = userProvider.name;
@@ -312,7 +313,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               pinned: true,
               expandedHeight: height,
               title: Text(user.username),
-              actions: _appBarActions(),
+              actions: appBarActions(),
               flexibleSpace: FlexibleSpaceBar(
                 background: Stack(
                   fit: StackFit.expand,
@@ -391,10 +392,20 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 _userProfileInfo(),
               ),
             ),
+            const SliverToBoxAdapter(
+              child: SizedBox(
+                height: Constants.gap * 2,
+              ),
+            ),
             PostContainerProfileWidget(
               postInfo: user.postsInfo,
               user: user,
               key: ObjectKey(user.postsInfo),
+            ),
+            const SliverToBoxAdapter(
+              child: SizedBox(
+                height: Constants.gap * 2,
+              ),
             ),
           ],
         ),
@@ -451,9 +462,9 @@ class _UserProfileActionState extends State<_UserProfileAction> {
   late FriendRelationStatus _status;
   late CompleteUserModel _user;
 
-  late final UserProvider _userProvider;
+  late final UserProvider userProvider;
 
-  final UserGraphqlService _userGraphqlService = UserGraphqlService(
+  final UserGraphqlService userGraphqlService = UserGraphqlService(
     client: GraphqlConfig.getGraphQLClient(),
   );
   bool _updating = false;
@@ -465,7 +476,7 @@ class _UserProfileActionState extends State<_UserProfileAction> {
     _status = widget.status;
     _user = widget.user;
 
-    _userProvider = context.read<UserProvider>();
+    userProvider = context.read<UserProvider>();
   }
 
   Future<void> _handleAdd() async {
@@ -474,10 +485,10 @@ class _UserProfileActionState extends State<_UserProfileAction> {
       _updating = true;
     });
 
-    String requestedByUsername = _userProvider.username;
+    String requestedByUsername = userProvider.username;
     String requestedToUsername = _user.username;
 
-    var addResponse = await _userGraphqlService.userSendFriendRequest(
+    var addResponse = await userGraphqlService.userSendFriendRequest(
       requestedByUsername: requestedByUsername,
       requestedToUsername: requestedToUsername,
     );
@@ -522,11 +533,11 @@ class _UserProfileActionState extends State<_UserProfileAction> {
 
     String requestedByUsername =
         _user.friendRelationDetail!.requestedByUsername;
-    String requestedToUsername = requestedByUsername == _userProvider.username
+    String requestedToUsername = requestedByUsername == userProvider.username
         ? _user.username
-        : _userProvider.username;
+        : userProvider.username;
 
-    var cancelResponse = await _userGraphqlService.userRemoveFriendRelation(
+    var cancelResponse = await userGraphqlService.userRemoveFriendRelation(
       requestedByUsername: requestedByUsername,
       requestedToUsername: requestedToUsername,
     );
@@ -554,11 +565,11 @@ class _UserProfileActionState extends State<_UserProfileAction> {
 
     String requestedByUsername =
         _user.friendRelationDetail!.requestedByUsername;
-    String requestedToUsername = requestedByUsername == _userProvider.username
+    String requestedToUsername = requestedByUsername == userProvider.username
         ? _user.username
-        : _userProvider.username;
+        : userProvider.username;
 
-    var acceptResponse = await _userGraphqlService.userAcceptFriendRequest(
+    var acceptResponse = await userGraphqlService.userAcceptFriendRequest(
       requestedByUsername: requestedByUsername,
       requestedToUsername: requestedToUsername,
     );
