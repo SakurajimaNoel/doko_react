@@ -2,6 +2,7 @@ import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/provider/user_preferences_provider.dart';
 import 'package:doko_react/core/widgets/error/error.dart';
+import 'package:doko_react/core/widgets/error/error_unknown_route.dart';
 import 'package:doko_react/core/widgets/loader/loader.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
@@ -36,8 +37,12 @@ class AppRouterConfig {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
   static final GoRouter router = GoRouter(
-    initialLocation:
-        "/password-reset/password-reset-confirm/rohanverma031@gmail.com",
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: "/sadf",
+    redirect: (BuildContext context, GoRouterState state) {},
+    errorBuilder: (BuildContext context, GoRouterState state) {
+      return const ErrorUnknownRoute();
+    },
     routes: [
       GoRoute(
         name: RouterConstants.login,

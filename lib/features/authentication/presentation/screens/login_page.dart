@@ -179,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                     recognizer: TapGestureRecognizer()
                       ..onTap = _loading
                           ? null
-                          : () async {
+                          : () {
                               context.pushNamed(RouterConstants.signUp);
                             },
                   ),

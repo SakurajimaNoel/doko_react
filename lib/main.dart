@@ -11,6 +11,7 @@ import 'package:doko_react/core/provider/theme_provider.dart';
 import 'package:doko_react/core/provider/user_preferences_provider.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/theme/theme_data.dart';
+import 'package:doko_react/core/widgets/error/error.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -191,6 +192,11 @@ class _MyAppState extends State<MyApp> {
         context.select((AuthenticationProvider auth) => auth.authStatus);
     final userStatus = context.select((UserProvider user) => user.status);
 
+    bool loading = authStatus == AuthenticationStatus.loading ||
+        userStatus == ProfileStatus.loading;
+    bool error = authStatus == AuthenticationStatus.error ||
+        userStatus == ProfileStatus.error;
+
     GoRouter router = AppRouterConfig.router;
 
     // if (authStatus == AuthenticationStatus.loading) {
@@ -229,6 +235,32 @@ class _MyAppState extends State<MyApp> {
             break;
           default:
             themeMode = ThemeMode.system;
+        }
+
+        if (loading) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: "Dokii",
+            themeMode: themeMode,
+            theme: GlobalThemeData.lightCustomThemeData(accent),
+            darkTheme: GlobalThemeData.darkCustomThemeData(accent),
+            home: const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
+        }
+
+        if (error) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: "Dokii",
+            themeMode: themeMode,
+            theme: GlobalThemeData.lightCustomThemeData(accent),
+            darkTheme: GlobalThemeData.darkCustomThemeData(accent),
+            home: Error(),
+          );
         }
 
         return MaterialApp.router(
