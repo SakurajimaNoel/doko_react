@@ -111,16 +111,8 @@ class _PostPageState extends State<PostPage> {
     post?.updatePostInitialItem(value);
   }
 
-  Widget _buildItem(BuildContext context, int index, int itemCount) {
-    if (index == 0) {
-      return PostWidget(
-        post: post!,
-        handlePostLike: handlePostLike,
-        handlePostDisplayItem: handlePostDisplayItem,
-      );
-    }
-
-    if (index == itemCount - 1 || commentInfo == null) {
+  Widget _buildItem(BuildContext context, int index) {
+    if (commentInfo == null) {
       return const Center(
         child: Text(
           "No more comments",
@@ -131,9 +123,9 @@ class _PostPageState extends State<PostPage> {
       );
     }
 
-    CommentModel commentItem = commentInfo!.comments[index - 1];
+    CommentModel commentItem = commentInfo!.comments[index];
     void likeCallback(bool like) {
-      commentInfo!.comments[index - 1].updateUserLike(like);
+      commentInfo!.comments[index].updateUserLike(like);
     }
 
     void replyCallback() {
@@ -177,7 +169,7 @@ class _PostPageState extends State<PostPage> {
     final currTheme = Theme.of(context).colorScheme;
 
     // one for post widget and one for comment show more
-    int itemCount = commentInfo != null ? commentInfo!.comments.length + 2 : 2;
+    int itemCount = commentInfo != null ? commentInfo!.comments.length + 1 : 1;
 
     return Scaffold(
       appBar: AppBar(
@@ -192,18 +184,26 @@ class _PostPageState extends State<PostPage> {
         child: Column(
           children: [
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.only(
-                  bottom: Constants.gap,
-                ),
-                itemBuilder: (BuildContext context, int index) =>
-                    _buildItem(context, index, itemCount),
-                separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(
-                    height: Constants.gap * 2,
-                  );
-                },
-                itemCount: itemCount,
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: PostWidget(
+                      post: post!,
+                      handlePostLike: handlePostLike,
+                      handlePostDisplayItem: handlePostDisplayItem,
+                    ),
+                  ),
+                  SliverList.separated(
+                    itemCount: itemCount,
+                    itemBuilder: (BuildContext context, int index) =>
+                        _buildItem(context, index),
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const SizedBox(
+                        height: Constants.gap * 2,
+                      );
+                    },
+                  )
+                ],
               ),
             ),
             Column(

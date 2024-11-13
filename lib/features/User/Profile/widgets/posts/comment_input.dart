@@ -386,6 +386,7 @@ class _CommentInputState extends State<CommentInput> {
       content: currentInput.content,
       commentBy: userProvider.username,
       commentOn: widget.commentTargetId,
+      isReply: isReply,
     );
 
     var result = await userGraphqlService.addComment(commentInput);

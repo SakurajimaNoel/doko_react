@@ -64,7 +64,7 @@ class CommentWidget extends StatelessWidget {
             // height: commentMediaHeight,
             child: CachedNetworkImage(
               cacheKey: comment.media,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
               imageUrl: comment.signedMedia,
               placeholder: (context, url) => const Center(
                 child: CircularProgressIndicator(),
@@ -72,6 +72,7 @@ class CommentWidget extends StatelessWidget {
               errorWidget: (context, url, error) => const Icon(Icons.error),
               filterQuality: FilterQuality.high,
               memCacheHeight: commentMediaHeight.toInt(),
+              height: commentMediaHeight,
             ),
           ),
         ],
@@ -209,7 +210,6 @@ class _CommentActions extends StatefulWidget {
   final VoidCallback handleReply;
 
   const _CommentActions({
-    super.key,
     required this.comment,
     required this.likeAction,
     required this.handleReply,

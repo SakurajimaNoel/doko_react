@@ -27,7 +27,7 @@ class CommentInputModel {
     required this.content,
     required this.commentBy,
     required this.commentOn,
-    this.isReply = false,
+    required this.isReply,
   });
 
   List<Map<String, String>> generateMentions() {
