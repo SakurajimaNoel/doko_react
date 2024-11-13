@@ -56,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _handleMfa() {
-    context.goNamed(RouterConstants.mfa);
+    context.pushNamed(RouterConstants.mfa);
   }
 
   @override
@@ -155,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: _loading
                   ? null
                   : () {
-                      context.goNamed(RouterConstants.passwordReset);
+                      context.pushNamed(RouterConstants.passwordReset);
                     },
               style: TextButton.styleFrom(
                 foregroundColor: currTheme.secondary,
@@ -180,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                       ..onTap = _loading
                           ? null
                           : () async {
-                              context.goNamed(RouterConstants.signUp);
+                              context.pushNamed(RouterConstants.signUp);
                             },
                   ),
                 ],

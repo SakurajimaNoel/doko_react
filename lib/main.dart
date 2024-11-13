@@ -191,30 +191,30 @@ class _MyAppState extends State<MyApp> {
         context.select((AuthenticationProvider auth) => auth.authStatus);
     final userStatus = context.select((UserProvider user) => user.status);
 
-    GoRouter router;
+    GoRouter router = AppRouterConfig.router;
 
-    if (authStatus == AuthenticationStatus.loading) {
-      router = AppRouterConfig.loadingConfig();
-    } else if (authStatus == AuthenticationStatus.signedOut) {
-      router = AppRouterConfig.authConfig();
-    } else if (authStatus == AuthenticationStatus.signedIn) {
-      switch (userStatus) {
-        case ProfileStatus.loading:
-          router = AppRouterConfig.loadingConfig();
-          break;
-        case ProfileStatus.incomplete:
-          router = AppRouterConfig.completeProfile();
-          break;
-        case ProfileStatus.complete:
-          router = AppRouterConfig.homeConfig();
-          break;
-        default:
-          router = AppRouterConfig.errorConfig();
-          break;
-      }
-    } else {
-      router = AppRouterConfig.errorConfig();
-    }
+    // if (authStatus == AuthenticationStatus.loading) {
+    //   router = AppRouterConfig.loadingConfig();
+    // } else if (authStatus == AuthenticationStatus.signedOut) {
+    //   router = AppRouterConfig.authConfig();
+    // } else if (authStatus == AuthenticationStatus.signedIn) {
+    //   switch (userStatus) {
+    //     case ProfileStatus.loading:
+    //       router = AppRouterConfig.loadingConfig();
+    //       break;
+    //     case ProfileStatus.incomplete:
+    //       router = AppRouterConfig.completeProfile();
+    //       break;
+    //     case ProfileStatus.complete:
+    //       router = AppRouterConfig.homeConfig();
+    //       break;
+    //     default:
+    //       router = AppRouterConfig.errorConfig();
+    //       break;
+    //   }
+    // } else {
+    //   router = AppRouterConfig.errorConfig();
+    // }
 
     return Consumer<ThemeProvider>(
       builder: (context, theme, child) {

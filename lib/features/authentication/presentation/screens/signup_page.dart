@@ -68,6 +68,7 @@ class _SignupPageState extends State<SignupPage> {
     );
     _formKey.currentState?.reset();
 
+    // redirecting to home page
     context.goNamed(RouterConstants.login);
   }
 
@@ -212,25 +213,26 @@ class _SignupPageState extends State<SignupPage> {
             ),
             const Spacer(),
             RichText(
-                text: TextSpan(
-              text: "Already have the account? ",
-              style: TextStyle(
-                color: currTheme.onSurface,
+              text: TextSpan(
+                text: "Already have the account? ",
+                style: TextStyle(
+                  color: currTheme.onSurface,
+                ),
+                children: [
+                  TextSpan(
+                    text: "Login.",
+                    style: TextStyle(
+                      color: currTheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        context.goNamed(RouterConstants.login);
+                      },
+                  )
+                ],
               ),
-              children: [
-                TextSpan(
-                  text: "Login.",
-                  style: TextStyle(
-                    color: currTheme.primary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      context.goNamed(RouterConstants.login);
-                    },
-                )
-              ],
-            )),
+            ),
           ],
         ),
       ),

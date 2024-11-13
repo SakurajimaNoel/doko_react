@@ -33,6 +33,58 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class AppRouterConfig {
+  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
+  static final GoRouter router = GoRouter(
+    initialLocation:
+        "/password-reset/password-reset-confirm/rohanverma031@gmail.com",
+    routes: [
+      GoRoute(
+        name: RouterConstants.login,
+        path: "/login",
+        builder: (context, state) {
+          return const LoginPage();
+        },
+        routes: [
+          GoRoute(
+            name: RouterConstants.mfa,
+            path: "mfa",
+            builder: (context, state) {
+              return const ConfirmMfaPage();
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        name: RouterConstants.signUp,
+        path: "/sign-up",
+        builder: (context, state) {
+          return const SignupPage();
+        },
+      ),
+      GoRoute(
+        name: RouterConstants.passwordReset,
+        path: "/password-reset",
+        builder: (context, state) {
+          return const PasswordResetPage();
+        },
+        routes: [
+          GoRoute(
+            name: RouterConstants.passwordResetConfirm,
+            path: "password-reset-confirm/:email",
+            builder: (context, state) {
+              final emailValue = state.pathParameters["email"]!;
+              return PasswordResetConfirmPage(
+                email: emailValue,
+              );
+            },
+          ),
+        ],
+      ),
+    ],
+  );
+
+  // previous router
   static GoRouter loadingConfig() {
     return GoRouter(
       initialLocation: "/",

@@ -75,9 +75,7 @@ class _PasswordResetConfirmPage extends State<PasswordResetConfirmPage> {
       ),
     );
 
-    Timer(const Duration(milliseconds: 500), () {
-      context.goNamed(RouterConstants.login);
-    });
+    context.goNamed(RouterConstants.login);
   }
 
   @override
