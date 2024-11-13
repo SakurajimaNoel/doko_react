@@ -85,9 +85,7 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: const Duration(
-          milliseconds: 750,
-        ),
+        duration: Constants.snackBarDuration,
       ),
     );
   }

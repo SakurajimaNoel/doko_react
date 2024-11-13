@@ -49,9 +49,7 @@ class _UserSettingsState extends State<UserSettings> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: const Duration(
-          milliseconds: 300,
-        ),
+        duration: Constants.snackBarDuration,
       ),
     );
   }

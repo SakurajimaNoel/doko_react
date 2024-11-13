@@ -69,9 +69,7 @@ class _PasswordResetConfirmPage extends State<PasswordResetConfirmPage> {
       const SnackBar(
         content: Text(
             'Password reset successful. You can now login using new password.'),
-        duration: Duration(
-          milliseconds: 500,
-        ),
+        duration: Constants.snackBarDuration,
       ),
     );
 

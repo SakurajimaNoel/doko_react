@@ -61,9 +61,7 @@ class _SignupPageState extends State<SignupPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: const Duration(
-          milliseconds: 750,
-        ),
+        duration: Constants.snackBarDuration,
       ),
     );
     _formKey.currentState?.reset();

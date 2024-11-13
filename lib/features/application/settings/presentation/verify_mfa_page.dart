@@ -68,19 +68,15 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Successfully added MFA to this account!'),
-        duration: Duration(
-          milliseconds: 500,
-        ),
+        duration: Constants.snackBarDuration,
       ),
     );
 
     _authProvider.setMFAStatus(AuthenticationMFAStatus.setUpped);
 
-    Timer(const Duration(milliseconds: 500), () {
-      context.goNamed(
-        RouterConstants.settings,
-      );
-    });
+    context.goNamed(
+      RouterConstants.settings,
+    );
   }
 
   @override

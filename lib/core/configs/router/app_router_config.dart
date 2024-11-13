@@ -153,7 +153,7 @@ class AppRouterConfig {
       ),
       // complete profile routes
       StatefulShellRoute.indexedStack(
-        parentNavigatorKey: _rootNavigatorKey,
+        // parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state, navigationShell) {
           return UserLayout(navigationShell);
         },

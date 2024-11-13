@@ -55,9 +55,7 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: const Duration(
-          milliseconds: 1500,
-        ),
+        duration: Constants.snackBarDuration,
       ),
     );
   }

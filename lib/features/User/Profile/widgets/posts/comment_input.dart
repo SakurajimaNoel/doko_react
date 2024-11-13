@@ -101,9 +101,7 @@ class _CommentInputState extends State<CommentInput> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: const Duration(
-          milliseconds: 750,
-        ),
+        duration: Constants.snackBarDuration,
       ),
     );
   }

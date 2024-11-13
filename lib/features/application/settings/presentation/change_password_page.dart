@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
+import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
@@ -54,13 +55,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Your password has been successfully updated.'),
-        duration: Duration(milliseconds: 500),
+        duration: Constants.snackBarDuration,
       ),
     );
 
-    Timer(const Duration(milliseconds: 500), () {
-      context.goNamed(RouterConstants.settings);
-    });
+    context.goNamed(RouterConstants.settings);
   }
 
   @override

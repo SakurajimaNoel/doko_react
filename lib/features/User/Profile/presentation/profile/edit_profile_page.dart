@@ -168,15 +168,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Successfully updated user profile'),
-        duration: Duration(
-          milliseconds: 500,
-        ),
+        duration: Constants.snackBarDuration,
       ),
     );
 
-    Timer(const Duration(milliseconds: 500), () {
-      context.pop(_bioController.text);
-    });
+    context.pop(_bioController.text);
   }
 
   void onSelection(List<XFile> image) async {

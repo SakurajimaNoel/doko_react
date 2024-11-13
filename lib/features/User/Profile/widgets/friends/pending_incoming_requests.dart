@@ -93,9 +93,7 @@ class PendingIncomingRequestsState extends State<PendingIncomingRequests>
   void _handleError(String message) {
     var snackBar = SnackBar(
       content: Text(message),
-      duration: const Duration(
-        milliseconds: 1500,
-      ),
+      duration: Constants.snackBarDuration,
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);

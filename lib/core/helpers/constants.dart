@@ -8,6 +8,9 @@ class Constants {
       r"[\w][\w\d_.-]{2," + (usernameLimit - 1).toString() + r"}";
 
   static const String errorMessage = "Oops! Something went wrong.";
+  static const Duration snackBarDuration = Duration(
+    milliseconds: 1500,
+  );
 
   static const double padding = _root;
   static const double gap = _root;
