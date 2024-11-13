@@ -43,7 +43,7 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
 
     if (_date == null) return;
 
-    context.goNamed(
+    context.pushNamed(
       RouterConstants.completeProfilePicture,
       pathParameters: {
         "username": _username,

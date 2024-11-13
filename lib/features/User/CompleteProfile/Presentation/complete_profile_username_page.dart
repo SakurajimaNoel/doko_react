@@ -172,7 +172,7 @@ class _CompleteProfileUsernamePageState
                       onPressed: !_usernameAvailable
                           ? null
                           : () {
-                              context.goNamed(
+                              context.pushNamed(
                                 RouterConstants.completeProfileInfo,
                                 pathParameters: {
                                   "username": _username,

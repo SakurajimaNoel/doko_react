@@ -2,7 +2,6 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/secret/secrets.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:hive/hive.dart';
 
 class GraphqlConfig {
   static AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
@@ -19,25 +18,13 @@ class GraphqlConfig {
   });
 
   static GraphQLClient? _client;
-  static Box? _userBox;
 
-  static Future<void> initGraphQLClient() async {
+  static void initGraphQLClient() {
     Link link = _authLink.concat(_httpLink);
-    var userStatus = await auth.getUserId();
-    String userId = "";
-
-    if (userStatus.status == AuthStatus.done) {
-      userId = userStatus.message!;
-    }
-
-    final boxName = "graphql_cache_$userId";
-    final userBox = await Hive.openBox<Map<dynamic, dynamic>?>(boxName);
-    _userBox = userBox;
-    final store = HiveStore(userBox);
 
     _client = GraphQLClient(
       link: link,
-      cache: GraphQLCache(store: store),
+      cache: GraphQLCache(store: HiveStore()),
       defaultPolicies: DefaultPolicies(
         query: Policies(
           fetch: FetchPolicy.cacheAndNetwork,
@@ -49,19 +36,6 @@ class GraphqlConfig {
     );
 
     safePrint("graphql client initialized");
-  }
-
-  static Future<void> clearCache() async {
-    if (_client != null) {
-      _client = null;
-
-      if (_userBox != null && _userBox!.isOpen) {
-        await _userBox!.clear();
-        await _userBox!.close();
-        // await Hive.deleteBoxFromDisk(_userBox!.name);
-        _userBox = null;
-      }
-    }
   }
 
   static GraphQLClient getGraphQLClient() {

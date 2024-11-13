@@ -1,9 +1,9 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
+import 'package:doko_react/core/provider/authentication_provider.dart';
 import 'package:doko_react/core/provider/user_preferences_provider.dart';
-import 'package:doko_react/core/widgets/error/error.dart';
+import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error/error_unknown_route.dart';
-import 'package:doko_react/core/widgets/loader/loader.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
@@ -35,18 +35,48 @@ import 'package:provider/provider.dart';
 
 class AppRouterConfig {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+  static final _sectionNavigatorKey = GlobalKey<NavigatorState>();
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: "/sadf",
-    redirect: (BuildContext context, GoRouterState state) {},
+    initialLocation: "/",
+    redirect: (BuildContext context, GoRouterState state) {
+      var userProvider = context.read<UserProvider>();
+      var authProvider = context.read<AuthenticationProvider>();
+
+      bool isUserAuthenticated =
+          authProvider.authStatus == AuthenticationStatus.signedIn;
+      bool isUserProfileComplete =
+          userProvider.status == ProfileStatus.complete;
+
+      bool onAuthPages = state.uri.toString().startsWith("/auth");
+
+      if (isUserAuthenticated) {
+        // handle if user is logged in
+        if (onAuthPages) {
+          if (isUserProfileComplete) {
+            // user profile is completed
+            return "/";
+          }
+          return "/complete-profile-username";
+        }
+      } else {
+        // handle if user is not logged in
+        if (!onAuthPages) {
+          return "/auth/login";
+        }
+      }
+
+      return null;
+    },
     errorBuilder: (BuildContext context, GoRouterState state) {
       return const ErrorUnknownRoute();
     },
     routes: [
+      // auth routes
       GoRoute(
         name: RouterConstants.login,
-        path: "/login",
+        path: "/auth/login",
         builder: (context, state) {
           return const LoginPage();
         },
@@ -62,14 +92,14 @@ class AppRouterConfig {
       ),
       GoRoute(
         name: RouterConstants.signUp,
-        path: "/sign-up",
+        path: "/auth/sign-up",
         builder: (context, state) {
           return const SignupPage();
         },
       ),
       GoRoute(
         name: RouterConstants.passwordReset,
-        path: "/password-reset",
+        path: "/auth/password-reset",
         builder: (context, state) {
           return const PasswordResetPage();
         },
@@ -86,310 +116,208 @@ class AppRouterConfig {
           ),
         ],
       ),
+      // incomplete-profile routes
+      GoRoute(
+        name: RouterConstants.completeProfileUsername,
+        path: "/complete-profile-username",
+        builder: (context, state) => const CompleteProfileUsernamePage(),
+        routes: [
+          GoRoute(
+            name: RouterConstants.completeProfileInfo,
+            path: "complete-profile-info/:username",
+            builder: (context, state) {
+              final usernameValue = state.pathParameters["username"]!;
+              return CompleteProfileInfoPage(
+                username: usernameValue,
+              );
+            },
+            routes: [
+              GoRoute(
+                name: RouterConstants.completeProfilePicture,
+                path: "complete-profile-picture/:name/:dob",
+                builder: (context, state) {
+                  final usernameValue = state.pathParameters["username"]!;
+                  final nameValue = state.pathParameters["name"]!;
+                  final dobValue = state.pathParameters["dob"]!;
+
+                  return CompleteProfilePicturePage(
+                    username: usernameValue,
+                    name: nameValue,
+                    dob: dobValue,
+                  );
+                },
+              )
+            ],
+          )
+        ],
+      ),
+      // complete profile routes
+      StatefulShellRoute.indexedStack(
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state, navigationShell) {
+          return UserLayout(navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            navigatorKey: _sectionNavigatorKey,
+            routes: [
+              GoRoute(
+                name: RouterConstants.userFeed,
+                path: "/",
+                builder: (context, state) => const UserFeedPage(),
+                routes: [
+                  GoRoute(
+                    name: RouterConstants.userSearch,
+                    path: "search",
+                    builder: (context, state) => const UserSearchPage(),
+                  )
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                name: RouterConstants.nearby,
+                path: "/nearby",
+                builder: (context, state) => const NearbyPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                name: RouterConstants.profile,
+                path: "/profile",
+                builder: (context, state) {
+                  // todo: handle this in a better way
+                  final needsRefresh = context.select(
+                      (UserPreferencesProvider preferences) =>
+                          preferences.profileRefresh);
+
+                  return ProfilePage(
+                    key: ObjectKey(needsRefresh),
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
+                    name: RouterConstants.userPost,
+                    path: "post/:postId",
+                    builder: (context, state) {
+                      Map<String, dynamic>? data;
+                      if (state.extra != null) {
+                        data = state.extra as Map<String, dynamic>;
+                      }
+
+                      final PostModel? post = data?["post"];
+                      String postId = state.pathParameters["postId"]!;
+
+                      return PostPage(
+                        postId: postId,
+                        post: post,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    name: RouterConstants.pendingRequests,
+                    path: "pending-requests",
+                    builder: (context, state) => const PendingRequestPage(),
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
+                    name: RouterConstants.createPost,
+                    path: "create-post",
+                    builder: (context, state) => const CreatePostPage(),
+                    routes: [
+                      GoRoute(
+                        parentNavigatorKey: _rootNavigatorKey,
+                        name: RouterConstants.postPublish,
+                        path: "publish",
+                        builder: (context, state) {
+                          final Map<String, dynamic> data =
+                              state.extra as Map<String, dynamic>;
+                          final List<PostContent> postContent =
+                              data["postContent"];
+                          final String postId = data["postId"];
+
+                          return CreatePostPublishPage(
+                            postContent: postContent,
+                            postId: postId,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
+                    name: RouterConstants.settings,
+                    path: "settings",
+                    builder: (context, state) => const SettingsPage(),
+                    routes: [
+                      GoRoute(
+                        parentNavigatorKey: _rootNavigatorKey,
+                        name: RouterConstants.mfaSetup,
+                        path: "mfa-setup",
+                        builder: (context, state) => const MfaSetupPage(),
+                        routes: [
+                          GoRoute(
+                            parentNavigatorKey: _rootNavigatorKey,
+                            name: RouterConstants.verifyMfa,
+                            path: "verify-mfa",
+                            builder: (context, state) => const VerifyMfaPage(),
+                          ),
+                        ],
+                      ),
+                      GoRoute(
+                        parentNavigatorKey: _rootNavigatorKey,
+                        name: RouterConstants.changePassword,
+                        path: "change-password",
+                        builder: (context, state) => const ChangePasswordPage(),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
+                    name: RouterConstants.editProfile,
+                    path: "edit-profile",
+                    builder: (context, state) {
+                      final Map<String, dynamic> data =
+                          state.extra as Map<String, dynamic>;
+                      final String bio = data["bio"];
+                      return EditProfilePage(
+                        bio: bio,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
+                    name: RouterConstants.userProfile,
+                    path: "user/:username",
+                    builder: (context, state) {
+                      String username = state.pathParameters["username"]!;
+                      return UserProfilePage(username: username);
+                    },
+                    routes: [
+                      GoRoute(
+                        parentNavigatorKey: _rootNavigatorKey,
+                        name: RouterConstants.profileFriends,
+                        path: "friends",
+                        builder: (context, state) {
+                          String username = state.pathParameters["username"]!;
+                          return FriendsPage(
+                            username: username,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
     ],
   );
-
-  // previous router
-  static GoRouter loadingConfig() {
-    return GoRouter(
-      initialLocation: "/",
-      routes: [
-        GoRoute(
-          path: "/",
-          name: "loading",
-          builder: (context, state) => const Loader(),
-        ),
-      ],
-    );
-  }
-
-  static GoRouter errorConfig() {
-    return GoRouter(
-      initialLocation: "/error",
-      routes: [
-        GoRoute(
-          path: "/error",
-          name: "error",
-          builder: (context, state) => Error(),
-        ),
-      ],
-    );
-  }
-
-  static GoRouter authConfig() {
-    final authRouterRootNavigatorKey = GlobalKey<NavigatorState>();
-
-    return GoRouter(
-      navigatorKey: authRouterRootNavigatorKey,
-      initialLocation: "/login",
-      routes: [
-        GoRoute(
-          name: RouterConstants.login,
-          path: "/login",
-          builder: (context, state) {
-            return const LoginPage();
-          },
-          routes: [
-            GoRoute(
-              name: RouterConstants.mfa,
-              path: "mfa",
-              builder: (context, state) {
-                return const ConfirmMfaPage();
-              },
-            ),
-            GoRoute(
-              name: RouterConstants.signUp,
-              path: "signUp",
-              builder: (context, state) {
-                return const SignupPage();
-              },
-            ),
-            GoRoute(
-              name: RouterConstants.passwordReset,
-              path: "password-reset",
-              builder: (context, state) {
-                return const PasswordResetPage();
-              },
-              routes: [
-                GoRoute(
-                  name: RouterConstants.passwordResetConfirm,
-                  path: "password-reset-confirm/:email",
-                  builder: (context, state) {
-                    final emailValue = state.pathParameters["email"]!;
-                    return PasswordResetConfirmPage(
-                      email: emailValue,
-                    );
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  static GoRouter completeProfile() {
-    final rootNavigatorKey = GlobalKey<NavigatorState>();
-
-    return GoRouter(
-      navigatorKey: rootNavigatorKey,
-      initialLocation: "/complete-profile-username",
-      routes: [
-        GoRoute(
-          name: RouterConstants.completeProfileUsername,
-          path: "/complete-profile-username",
-          builder: (context, state) => const CompleteProfileUsernamePage(),
-          routes: [
-            GoRoute(
-              name: RouterConstants.completeProfileInfo,
-              path: "complete-profile-info/:username",
-              builder: (context, state) {
-                final usernameValue = state.pathParameters["username"]!;
-                return CompleteProfileInfoPage(
-                  username: usernameValue,
-                );
-              },
-              routes: [
-                GoRoute(
-                  name: RouterConstants.completeProfilePicture,
-                  path: "complete-profile-picture/:name/:dob",
-                  builder: (context, state) {
-                    final usernameValue = state.pathParameters["username"]!;
-                    final nameValue = state.pathParameters["name"]!;
-                    final dobValue = state.pathParameters["dob"]!;
-
-                    return CompleteProfilePicturePage(
-                      username: usernameValue,
-                      name: nameValue,
-                      dob: dobValue,
-                    );
-                  },
-                )
-              ],
-            )
-          ],
-        )
-      ],
-    );
-  }
-
-  static GoRouter homeConfig() {
-    final homeRouterRootNavigatorKey = GlobalKey<NavigatorState>();
-    final homeRouterSectionNavigatorKey = GlobalKey<NavigatorState>();
-
-    return GoRouter(
-      navigatorKey: homeRouterRootNavigatorKey,
-      initialLocation: "/profile/post/8fc53dff-8aff-4679-9862-f53f930c8d66",
-      routes: [
-        StatefulShellRoute.indexedStack(
-          builder: (context, state, navigationShell) {
-            return UserLayout(navigationShell);
-          },
-          branches: [
-            StatefulShellBranch(
-              navigatorKey: homeRouterSectionNavigatorKey,
-              routes: [
-                GoRoute(
-                  name: RouterConstants.userFeed,
-                  path: "/user-feed",
-                  builder: (context, state) => const UserFeedPage(),
-                  routes: [
-                    GoRoute(
-                      name: RouterConstants.userSearch,
-                      path: "search",
-                      builder: (context, state) => const UserSearchPage(),
-                    )
-                  ],
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  name: RouterConstants.nearby,
-                  path: "/nearby",
-                  builder: (context, state) => const NearbyPage(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  name: RouterConstants.profile,
-                  path: "/profile",
-                  builder: (context, state) {
-                    // todo: handle this in a better way
-                    final needsRefresh = context.select(
-                        (UserPreferencesProvider preferences) =>
-                            preferences.profileRefresh);
-
-                    return ProfilePage(
-                      key: ObjectKey(needsRefresh),
-                    );
-                  },
-                  routes: [
-                    GoRoute(
-                      parentNavigatorKey: homeRouterRootNavigatorKey,
-                      name: RouterConstants.userPost,
-                      path: "post/:postId",
-                      builder: (context, state) {
-                        Map<String, dynamic>? data;
-                        if (state.extra != null) {
-                          data = state.extra as Map<String, dynamic>;
-                        }
-
-                        final PostModel? post = data?["post"];
-                        String postId = state.pathParameters["postId"]!;
-
-                        return PostPage(
-                          postId: postId,
-                          post: post,
-                        );
-                      },
-                    ),
-                    GoRoute(
-                      name: RouterConstants.pendingRequests,
-                      path: "pending-requests",
-                      builder: (context, state) => const PendingRequestPage(),
-                    ),
-                    GoRoute(
-                      parentNavigatorKey: homeRouterRootNavigatorKey,
-                      name: RouterConstants.createPost,
-                      path: "create-post",
-                      builder: (context, state) => const CreatePostPage(),
-                      routes: [
-                        GoRoute(
-                          parentNavigatorKey: homeRouterRootNavigatorKey,
-                          name: RouterConstants.postPublish,
-                          path: "publish",
-                          builder: (context, state) {
-                            final Map<String, dynamic> data =
-                                state.extra as Map<String, dynamic>;
-                            final List<PostContent> postContent =
-                                data["postContent"];
-                            final String postId = data["postId"];
-
-                            return CreatePostPublishPage(
-                              postContent: postContent,
-                              postId: postId,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    GoRoute(
-                      parentNavigatorKey: homeRouterRootNavigatorKey,
-                      name: RouterConstants.settings,
-                      path: "settings",
-                      builder: (context, state) => const SettingsPage(),
-                      routes: [
-                        GoRoute(
-                          parentNavigatorKey: homeRouterRootNavigatorKey,
-                          name: RouterConstants.mfaSetup,
-                          path: "mfa-setup",
-                          builder: (context, state) => const MfaSetupPage(),
-                          routes: [
-                            GoRoute(
-                              parentNavigatorKey: homeRouterRootNavigatorKey,
-                              name: RouterConstants.verifyMfa,
-                              path: "verify-mfa",
-                              builder: (context, state) =>
-                                  const VerifyMfaPage(),
-                            ),
-                          ],
-                        ),
-                        GoRoute(
-                          parentNavigatorKey: homeRouterRootNavigatorKey,
-                          name: RouterConstants.changePassword,
-                          path: "change-password",
-                          builder: (context, state) =>
-                              const ChangePasswordPage(),
-                        ),
-                      ],
-                    ),
-                    GoRoute(
-                      parentNavigatorKey: homeRouterRootNavigatorKey,
-                      name: RouterConstants.editProfile,
-                      path: "edit-profile",
-                      builder: (context, state) {
-                        final Map<String, dynamic> data =
-                            state.extra as Map<String, dynamic>;
-                        final String bio = data["bio"];
-                        return EditProfilePage(
-                          bio: bio,
-                        );
-                      },
-                    ),
-                    GoRoute(
-                      parentNavigatorKey: homeRouterRootNavigatorKey,
-                      name: RouterConstants.userProfile,
-                      path: "user/:username",
-                      builder: (context, state) {
-                        String username = state.pathParameters["username"]!;
-                        return UserProfilePage(username: username);
-                      },
-                      routes: [
-                        GoRoute(
-                          parentNavigatorKey: homeRouterRootNavigatorKey,
-                          name: RouterConstants.profileFriends,
-                          path: "friends",
-                          builder: (context, state) {
-                            String username = state.pathParameters["username"]!;
-                            return FriendsPage(
-                              username: username,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
-    );
-  }
 }

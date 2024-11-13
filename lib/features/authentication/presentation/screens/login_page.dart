@@ -49,10 +49,11 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    if (loginStatus.status == AuthStatus.confirmMFA) {
-      _handleMfa();
-      return;
-    }
+    _handleMfa();
+    // if (loginStatus.status == AuthStatus.confirmMFA) {
+    //   _handleMfa();
+    //   return;
+    // }
   }
 
   void _handleMfa() {

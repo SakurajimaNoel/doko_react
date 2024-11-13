@@ -82,15 +82,15 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late final AuthenticationProvider _authProvider;
-  late final UserProvider _userProvider;
+  late final AuthenticationProvider authProvider;
+  late final UserProvider userProvider;
   final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
 
   @override
   void initState() {
     super.initState();
-    _authProvider = context.read<AuthenticationProvider>();
-    _userProvider = context.read<UserProvider>();
+    authProvider = context.read<AuthenticationProvider>();
+    userProvider = context.read<UserProvider>();
 
     // fetch user auth status on application startup
     fetchAuthSession();
@@ -99,16 +99,16 @@ class _MyAppState extends State<MyApp> {
     Amplify.Hub.listen(HubChannel.Auth, (AuthHubEvent event) {
       switch (event.type) {
         case AuthHubEventType.signedIn:
-          _changeAuthStatus(AuthenticationStatus.signedIn);
+          changeAuthStatus(AuthenticationStatus.signedIn);
           break;
         case AuthHubEventType.signedOut:
-          _changeAuthStatus(AuthenticationStatus.signedOut);
+          changeAuthStatus(AuthenticationStatus.signedOut);
           break;
         case AuthHubEventType.sessionExpired:
-          _changeAuthStatus(AuthenticationStatus.signedOut);
+          changeAuthStatus(AuthenticationStatus.signedOut);
           break;
         case AuthHubEventType.userDeleted:
-          _changeAuthStatus(AuthenticationStatus.signedOut);
+          changeAuthStatus(AuthenticationStatus.signedOut);
           break;
       }
     });
@@ -121,31 +121,31 @@ class _MyAppState extends State<MyApp> {
           ? AuthenticationStatus.signedIn
           : AuthenticationStatus.signedOut;
 
-      _changeAuthStatus(status);
+      changeAuthStatus(status);
     } on AuthException catch (e) {
       safePrint('Error retrieving auth session: ${e.message}');
 
-      _changeAuthStatus(AuthenticationStatus.signedOut);
+      changeAuthStatus(AuthenticationStatus.signedOut);
     } catch (e) {
       safePrint(e.toString());
-      _changeAuthStatus(AuthenticationStatus.error);
+      changeAuthStatus(AuthenticationStatus.error);
     }
   }
 
-  Future<void> _fetchMfaStatus() async {
+  Future<void> fetchMfaStatus() async {
     final cognitoPlugin = Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
     final currentPreference = await cognitoPlugin.fetchMfaPreference();
 
     AuthenticationMFAStatus mfaStatus = currentPreference.preferred != null
         ? AuthenticationMFAStatus.setUpped
         : AuthenticationMFAStatus.notSetUpped;
-    _authProvider.setMFAStatus(mfaStatus);
+    authProvider.setMFAStatus(mfaStatus);
   }
 
-  Future<void> _getCompleteUser() async {
+  Future<void> getCompleteUser() async {
     var result = await auth.getUserId();
     if (result.status == AuthStatus.error) {
-      _userProvider.apiError();
+      userProvider.apiError();
       return;
     }
 
@@ -156,33 +156,31 @@ class _MyAppState extends State<MyApp> {
     var userDetails = await graphqlService.getUser(userId);
 
     if (userDetails.status == ResponseStatus.error) {
-      _userProvider.apiError();
+      userProvider.apiError();
       return;
     }
 
     var user = userDetails.user;
     if (user == null) {
-      _userProvider.incompleteUser();
+      userProvider.incompleteUser();
       return;
     }
 
-    _userProvider.addUser(
+    userProvider.addUser(
       user: user,
     );
   }
 
-  Future<void> _changeAuthStatus(AuthenticationStatus status) async {
+  Future<void> changeAuthStatus(AuthenticationStatus status) async {
     if (status == AuthenticationStatus.signedIn) {
-      // wait for graphql client to be initialized
-      await GraphqlConfig.initGraphQLClient();
+      GraphqlConfig.initGraphQLClient();
 
-      _fetchMfaStatus();
-      _getCompleteUser();
-      _authProvider.setAuthStatus(status);
+      fetchMfaStatus();
+      getCompleteUser();
+      authProvider.setAuthStatus(status);
     } else {
-      await GraphqlConfig.clearCache();
-      _authProvider.setAuthStatus(status);
-      _authProvider.setMFAStatus(AuthenticationMFAStatus.undefined);
+      authProvider.setAuthStatus(status);
+      authProvider.setMFAStatus(AuthenticationMFAStatus.undefined);
     }
   }
 
@@ -192,35 +190,16 @@ class _MyAppState extends State<MyApp> {
         context.select((AuthenticationProvider auth) => auth.authStatus);
     final userStatus = context.select((UserProvider user) => user.status);
 
-    bool loading = authStatus == AuthenticationStatus.loading ||
-        userStatus == ProfileStatus.loading;
+    bool authLoading = authStatus == AuthenticationStatus.loading;
     bool error = authStatus == AuthenticationStatus.error ||
         userStatus == ProfileStatus.error;
+    bool userProfileLoading = authStatus != AuthenticationStatus.signedOut &&
+        userStatus == ProfileStatus.loading;
 
     GoRouter router = AppRouterConfig.router;
 
-    // if (authStatus == AuthenticationStatus.loading) {
-    //   router = AppRouterConfig.loadingConfig();
-    // } else if (authStatus == AuthenticationStatus.signedOut) {
-    //   router = AppRouterConfig.authConfig();
-    // } else if (authStatus == AuthenticationStatus.signedIn) {
-    //   switch (userStatus) {
-    //     case ProfileStatus.loading:
-    //       router = AppRouterConfig.loadingConfig();
-    //       break;
-    //     case ProfileStatus.incomplete:
-    //       router = AppRouterConfig.completeProfile();
-    //       break;
-    //     case ProfileStatus.complete:
-    //       router = AppRouterConfig.homeConfig();
-    //       break;
-    //     default:
-    //       router = AppRouterConfig.errorConfig();
-    //       break;
-    //   }
-    // } else {
-    //   router = AppRouterConfig.errorConfig();
-    // }
+    // when auth status or user status change refresh the router to trigger redirect
+    router.refresh();
 
     return Consumer<ThemeProvider>(
       builder: (context, theme, child) {
@@ -237,7 +216,7 @@ class _MyAppState extends State<MyApp> {
             themeMode = ThemeMode.system;
         }
 
-        if (loading) {
+        if (authLoading || userProfileLoading) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: "Dokii",
