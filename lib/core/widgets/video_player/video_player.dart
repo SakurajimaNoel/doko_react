@@ -54,6 +54,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   void dispose() {
     player.dispose();
+    timer?.cancel();
     super.dispose();
   }
 
