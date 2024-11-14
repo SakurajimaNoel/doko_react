@@ -97,7 +97,7 @@ class UserQueries {
   // get complete user
   static String getCompleteUser() {
     return """
-      query Users(\$where: UserWhere, \$friendsWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$likedByWhere2: UserWhere, \$sort: [UserPostsConnectionSort!]) {
+      query Users(\$where: UserWhere, \$friendsWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$likedByWhere2: UserWhere, \$sort: [UserPostsConnectionSort!], \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
         users(where: \$where) {
           id
           username
@@ -107,7 +107,7 @@ class UserQueries {
           bio
           dob
           friends(where: \$friendsWhere2) {
-            friendsConnection {
+            friendsConnection(where: \$friendsConnectionWhere3) {
               edges {
                 properties {
                   status
@@ -176,6 +176,11 @@ class UserQueries {
           }
         }
       ],
+      "friendsConnectionWhere3": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
     };
   }
 
@@ -360,58 +365,64 @@ class UserQueries {
   static String getPendingOutgoingFriendsByUsername(String? cursor) {
     if (cursor == null || cursor.isEmpty) {
       return """
-    query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
-      users(where: \$where) {
-        friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort) {
-          edges {
-            node {
-              id
-              username
-              name
-              profilePicture
-              friendsConnection(where: \$friendsConnectionWhere3) {
-                edges {
-                  requestedBy
-                  status
+        query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!]) {
+          users(where: \$where) {
+            friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort) {
+              pageInfo {
+                endCursor
+                hasNextPage
+              }
+              edges {
+                node {
+                  id
+                  username
+                  name
+                  profilePicture
+                  friendsConnection(where: \$friendsConnectionWhere3) {
+                    edges {
+                      properties {
+                        requestedBy
+                        status
+                        addedOn
+                      }
+                    }
+                  }
                 }
               }
             }
           }
-          pageInfo {
-            endCursor
-            hasNextPage
-          }
         }
-      }
-    }
     """;
     }
 
     return """
-    query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$after: String, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
-      users(where: \$where) {
-        friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort, after: \$after) {
-          edges {
-            node {
-              id
-              username
-              name
-              profilePicture
-              friendsConnection(where: \$friendsConnectionWhere3) {
-                edges {
-                  requestedBy
-                  status
+      query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$after: String) {
+        users(where: \$where) {
+          friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort, after: \$after) {
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+            edges {
+              node {
+                id
+                username
+                name
+                profilePicture
+                friendsConnection(where: \$friendsConnectionWhere3) {
+                  edges {
+                    properties {
+                      requestedBy
+                      status
+                      addedOn
+                    }
+                  }
                 }
               }
             }
           }
-          pageInfo {
-            endCursor
-            hasNextPage
-          }
         }
       }
-    }
     """;
   }
 
@@ -422,12 +433,17 @@ class UserQueries {
     if (cursor == null || cursor.isEmpty) {
       return {
         "where": {
-          "username": username,
+          "username_EQ": username,
         },
         "friendsConnectionWhere2": {
           "edge": {
-            "status": FriendStatus.pending,
-            "requestedBy": username,
+            "status_EQ": FriendStatus.pending,
+            "requestedBy_EQ": username,
+          }
+        },
+        "friendsConnectionWhere3": {
+          "node": {
+            "username_EQ": username,
           }
         },
         "first": QueryConstants.friendLimit,
@@ -438,26 +454,26 @@ class UserQueries {
             }
           }
         ],
-        "friendsConnectionWhere3": {
-          "node": {
-            "username": username,
-          }
-        },
       };
     }
 
     return {
       "where": {
-        "username": username,
+        "username_EQ": username,
       },
       "friendsConnectionWhere2": {
         "edge": {
-          "status": FriendStatus.pending,
-          "requestedBy": username,
+          "status_EQ": FriendStatus.pending,
+          "requestedBy_EQ": username,
         }
       },
-      "first": QueryConstants.friendLimit,
+      "friendsConnectionWhere3": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
       "after": cursor,
+      "first": QueryConstants.friendLimit,
       "sort": [
         {
           "edge": {
@@ -465,11 +481,6 @@ class UserQueries {
           }
         }
       ],
-      "friendsConnectionWhere3": {
-        "node": {
-          "username": username,
-        }
-      },
     };
   }
 
@@ -477,58 +488,64 @@ class UserQueries {
   static String getPendingIncomingFriendsByUsername(String? cursor) {
     if (cursor == null || cursor.isEmpty) {
       return """
-      query Query(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
+       query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!]) {
         users(where: \$where) {
           friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort) {
-            edges {
-              node {
-                id
-                name
-                username
-                profilePicture
-                friendsConnection(where: \$friendsConnectionWhere3) {
-                  edges {
-                    requestedBy
-                    status
-                  }
-                }
-              }
-            }
             pageInfo {
               endCursor
               hasNextPage
             }
-          }
-        }
-      }     
-    """;
-    }
-
-    return """
-    query Query(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$after: String) {
-      users(where: \$where) {
-        friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort, after: \$after) {
-          edges {
-            node {
-              id
-              name
-              username
-              profilePicture
-              friendsConnection(where: \$friendsConnectionWhere3) {
-                edges {
-                  requestedBy
-                  status
+            edges {
+              node {
+                id
+                username
+                name
+                profilePicture
+                friendsConnection(where: \$friendsConnectionWhere3) {
+                  edges {
+                    properties {
+                      requestedBy
+                      status
+                      addedOn
+                    }
+                  }
                 }
               }
             }
           }
-          pageInfo {
-            endCursor
-            hasNextPage
+        }
+      }
+    """;
+    }
+
+    return """
+      query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$after: String) {
+        users(where: \$where) {
+          friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort, after: \$after) {
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+            edges {
+              node {
+                id
+                username
+                name
+                profilePicture
+                friendsConnection(where: \$friendsConnectionWhere3) {
+                  edges {
+                    properties {
+                      requestedBy
+                      status
+                      addedOn
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
-    }
      """;
   }
 
@@ -539,14 +556,19 @@ class UserQueries {
     if (cursor == null || cursor.isEmpty) {
       return {
         "where": {
-          "username": username,
+          "username_EQ": username,
         },
         "friendsConnectionWhere2": {
           "edge": {
-            "status": FriendStatus.pending,
+            "status_EQ": FriendStatus.pending,
             "NOT": {
-              "requestedBy": username,
+              "requestedBy_EQ": username,
             }
+          }
+        },
+        "friendsConnectionWhere3": {
+          "node": {
+            "username_EQ": username,
           }
         },
         "first": QueryConstants.friendLimit,
@@ -556,24 +578,29 @@ class UserQueries {
               "addedOn": "DESC",
             }
           }
-        ]
+        ],
       };
     }
 
     return {
       "where": {
-        "username": username,
+        "username_EQ": username,
       },
       "friendsConnectionWhere2": {
         "edge": {
-          "status": FriendStatus.pending,
+          "status_EQ": FriendStatus.pending,
           "NOT": {
-            "requestedBy": username,
+            "requestedBy_EQ": username,
           }
         }
       },
-      "first": QueryConstants.friendLimit,
+      "friendsConnectionWhere3": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
       "after": cursor,
+      "first": QueryConstants.friendLimit,
       "sort": [
         {
           "edge": {
@@ -581,18 +608,14 @@ class UserQueries {
           }
         }
       ],
-      "friendsConnectionWhere3": {
-        "node": {
-          "username": username,
-        }
-      }
     };
+    ;
   }
 
   // update user profile
   static String updateUserProfile() {
     return """
-    mutation Mutation(\$where: UserWhere, \$update: UserUpdateInput) {
+    mutation UpdateUsers(\$where: UserWhere, \$update: UserUpdateInput) {
       updateUsers(where: \$where, update: \$update) {
         users {
           name
@@ -613,7 +636,7 @@ class UserQueries {
   }) {
     return {
       "where": {
-        "username": username,
+        "username_EQ": username,
       },
       "update": {
         "name": name,
@@ -627,8 +650,8 @@ class UserQueries {
   // TODO: search for method to merge to avoid duplicate relationship
   static String userSendFriendRequest() {
     return """
-    mutation Mutation(\$where: UserWhere, \$connect: UserConnectInput) {
-      updateUsers(where: \$where, connect: \$connect) {
+    mutation UpdateUsers(\$where: UserWhere, \$update: UserUpdateInput) {
+      updateUsers(where: \$where, update: \$update) {
         info {
           relationshipsCreated
         }
@@ -643,20 +666,24 @@ class UserQueries {
   }) {
     return {
       "where": {
-        "username": requestedByUsername,
+        "username_EQ": requestedByUsername,
       },
-      "connect": {
+      "update": {
         "friends": [
           {
-            "where": {
-              "node": {
-                "username": requestedToUsername,
-              },
-            },
-            "edge": {
-              "requestedBy": requestedByUsername,
-              "status": "PENDING",
-            }
+            "connect": [
+              {
+                "edge": {
+                  "requestedBy": requestedByUsername,
+                  "status": FriendStatus.pending,
+                },
+                "where": {
+                  "node": {
+                    "username_EQ": requestedToUsername,
+                  }
+                }
+              }
+            ]
           }
         ]
       }
@@ -666,13 +693,13 @@ class UserQueries {
   // user accept friend request
   static String userAcceptFriendRequest() {
     return """
-      mutation Mutation(\$where: UserWhere, \$update: UserUpdateInput) {
+      mutation UpdateUsers(\$where: UserWhere, \$update: UserUpdateInput) {
         updateUsers(where: \$where, update: \$update) {
           info {
             relationshipsCreated
           }
         }
-      }      
+      }     
     """;
   }
 
@@ -682,20 +709,20 @@ class UserQueries {
   }) {
     return {
       "where": {
-        "username": requestedByUsername,
+        "username_EQ": requestedByUsername,
       },
       "update": {
         "friends": [
           {
             "where": {
               "node": {
-                "username": requestedToUsername,
-              },
+                "username_EQ": requestedToUsername,
+              }
             },
             "update": {
               "edge": {
-                "status": "ACCEPTED",
-              },
+                "status": FriendStatus.accepted,
+              }
             }
           }
         ]
@@ -706,8 +733,8 @@ class UserQueries {
   // user remove friend relation
   static String userRemoveFriendRelation() {
     return """
-    mutation Mutation(\$where: UserWhere, \$disconnect: UserDisconnectInput) {
-      updateUsers(where: \$where, disconnect: \$disconnect) {
+    mutation UpdateUsers(\$where: UserWhere, \$update: UserUpdateInput) {
+      updateUsers(where: \$where, update: \$update) {
         info {
           relationshipsDeleted
         }
@@ -722,16 +749,20 @@ class UserQueries {
   }) {
     return {
       "where": {
-        "username": requestedByUsername,
+        "username_EQ": requestedByUsername,
       },
-      "disconnect": {
+      "update": {
         "friends": [
           {
-            "where": {
-              "node": {
-                "username": requestedToUsername,
+            "disconnect": [
+              {
+                "where": {
+                  "node": {
+                    "username_EQ": requestedToUsername,
+                  }
+                }
               }
-            }
+            ]
           }
         ]
       }
@@ -741,14 +772,14 @@ class UserQueries {
   // use create post
   static String userCreatePost() {
     return """
-    mutation Mutation(\$input: [PostCreateInput!]!) {
-      createPosts(input: \$input) {
-        info {
-          nodesCreated
-          relationshipsCreated
+      mutation CreatePosts(\$input: [PostCreateInput!]!) {
+        createPosts(input: \$input) {
+          info {
+            nodesCreated
+            relationshipsCreated
+          }
         }
-      }
-    }        
+      }        
     """;
   }
 
@@ -768,7 +799,7 @@ class UserQueries {
             "connect": {
               "where": {
                 "node": {
-                  "username": username,
+                  "username_EQ": username,
                 }
               }
             }
@@ -780,15 +811,24 @@ class UserQueries {
   }
 
   // post action like
+  // TODO update user like and comment count from here
   static String userAddLikePost() {
     return """
-    mutation Mutation(\$where: PostWhere, \$connect: PostConnectInput) {
-      updatePosts(where: \$where, connect: \$connect) {
-        info {
-          relationshipsCreated
+      mutation UpdatePosts(\$where: PostWhere, \$update: PostUpdateInput) {
+        updatePosts(where: \$where, update: \$update) {
+          info {
+            relationshipsCreated
+          }
+          posts {
+            likedByConnection {
+              totalCount
+            }
+            commentsConnection {
+              totalCount
+            }
+          }
         }
       }
-    }
     """;
   }
 
@@ -798,31 +838,43 @@ class UserQueries {
   }) {
     return {
       "where": {
-        "id": postId,
+        "id_EQ": postId,
       },
-      "connect": {
+      "update": {
         "likedBy": [
           {
-            "where": {
-              "node": {
-                "username": username,
+            "connect": [
+              {
+                "where": {
+                  "node": {
+                    "username_EQ": username,
+                  }
+                }
               }
-            }
+            ]
           }
         ]
-      },
+      }
     };
   }
 
   static String userRemoveLikePost() {
     return """
-    mutation Mutation(\$where: PostWhere, \$disconnect: PostDisconnectInput) {
-      updatePosts(where: \$where, disconnect: \$disconnect) {
-        info {
-          relationshipsDeleted
+      mutation UpdatePosts(\$where: PostWhere, \$update: PostUpdateInput) {
+        updatePosts(where: \$where, update: \$update) {
+          info {
+            relationshipsDeleted
+          }
+          posts {
+            likedByConnection {
+              totalCount
+            }
+            commentsConnection {
+              totalCount
+            }
+          }
         }
       }
-    }
     """;
   }
 
@@ -832,19 +884,23 @@ class UserQueries {
   }) {
     return {
       "where": {
-        "id": postId,
+        "id_EQ": postId,
       },
-      "disconnect": {
+      "update": {
         "likedBy": [
           {
-            "where": {
-              "node": {
-                "username": username,
+            "disconnect": [
+              {
+                "where": {
+                  "node": {
+                    "username_EQ": username,
+                  }
+                }
               }
-            }
+            ]
           }
         ]
-      },
+      }
     };
   }
 
