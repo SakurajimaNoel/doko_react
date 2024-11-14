@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
@@ -41,6 +42,7 @@ class AppRouterConfig {
     navigatorKey: _rootNavigatorKey,
     initialLocation: "/",
     redirect: (BuildContext context, GoRouterState state) {
+      safePrint("router redirect check");
       var userProvider = context.read<UserProvider>();
       var authProvider = context.read<AuthenticationProvider>();
 
@@ -50,14 +52,21 @@ class AppRouterConfig {
           userProvider.status == ProfileStatus.complete;
 
       bool onAuthPages = state.uri.toString().startsWith("/auth");
+      bool onProfileCompletePages =
+          state.uri.toString().startsWith("/complete");
 
+      // handle if user is logged in
       if (isUserAuthenticated) {
-        // handle if user is logged in
         if (onAuthPages) {
+          // user profile is completed
           if (isUserProfileComplete) {
-            // user profile is completed
             return "/";
           }
+          return "/complete-profile-username";
+        }
+
+        // user profile is incomplete and not on complete profile routes
+        if (!isUserProfileComplete && !onProfileCompletePages) {
           return "/complete-profile-username";
         }
       } else {

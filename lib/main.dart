@@ -181,6 +181,7 @@ class _MyAppState extends State<MyApp> {
     } else {
       authProvider.setAuthStatus(status);
       authProvider.setMFAStatus(AuthenticationMFAStatus.undefined);
+      userProvider.signOut();
     }
   }
 
@@ -198,6 +199,9 @@ class _MyAppState extends State<MyApp> {
 
     GoRouter router = AppRouterConfig.router;
 
+    safePrint("refreshing router");
+    safePrint(authStatus);
+    safePrint(userStatus);
     // when auth status or user status change refresh the router to trigger redirect
     router.refresh();
 

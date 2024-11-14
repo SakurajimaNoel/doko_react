@@ -44,6 +44,17 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void signOut() {
+    _status = ProfileStatus.loading;
+    _name = "";
+    _username = "";
+    _profilePicture = "";
+    _id = "";
+    _signedProfilePicture = "";
+
+    notifyListeners();
+  }
+
   void updateUser({required UserModel updatedUser}) {
     _name = updatedUser.name;
     _profilePicture = updatedUser.profilePicture;

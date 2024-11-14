@@ -41,19 +41,21 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     var loginStatus = await auth.signInUser(_email, _password);
+    setState(() {
+      _loading = false;
+    });
+
     if (loginStatus.status == AuthStatus.error) {
       setState(() {
-        _loading = false;
         _errorMessage = loginStatus.message!;
       });
       return;
     }
 
-    _handleMfa();
-    // if (loginStatus.status == AuthStatus.confirmMFA) {
-    //   _handleMfa();
-    //   return;
-    // }
+    if (loginStatus.status == AuthStatus.confirmMFA) {
+      _handleMfa();
+      return;
+    }
   }
 
   void _handleMfa() {
