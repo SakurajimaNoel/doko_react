@@ -37,7 +37,7 @@ class CommentInput extends StatefulWidget {
   final String postId;
   final String createdBy;
   final String commentTargetId;
-  final VoidCallback successAction;
+  final ValueSetter<CommentModel> successAction;
 
   const CommentInput({
     super.key,
@@ -392,7 +392,7 @@ class _CommentInputState extends State<CommentInput> {
       adding = false;
     });
 
-    if (!result) {
+    if (result == null) {
       if (aws) {
         storage.deleteFile(media);
       }
@@ -405,7 +405,7 @@ class _CommentInputState extends State<CommentInput> {
     // cleanup
     controller.clear();
     handleMediaRemove();
-    widget.successAction();
+    widget.successAction(result);
   }
 
   @override

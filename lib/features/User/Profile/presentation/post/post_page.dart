@@ -8,6 +8,7 @@ import 'package:doko_react/features/User/Profile/widgets/comments/comment_widget
 import 'package:doko_react/features/User/Profile/widgets/posts/comment_input.dart';
 import 'package:doko_react/features/User/Profile/widgets/posts/post_widget.dart';
 import 'package:doko_react/features/User/data/model/comment_model.dart';
+import 'package:doko_react/features/User/data/model/model.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
 import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +49,8 @@ class _PostPageState extends State<PostPage> {
   String error = "";
   CommentInfo? commentInfo;
 
+  bool commentLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -67,7 +70,39 @@ class _PostPageState extends State<PostPage> {
       });
 
       // fetch only comments
+      fetchCommentByPostId();
     }
+  }
+
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Constants.snackBarDuration,
+      ),
+    );
+  }
+
+  Future<void> fetchCommentByPostId() async {
+    setState(() {
+      commentLoading = true;
+    });
+
+    var response = await userGraphqlService.getComments(post!.id,
+        username: userProvider.username);
+
+    setState(() {
+      commentLoading = false;
+    });
+
+    if (response.status == ResponseStatus.error) {
+      showMessage("Oops! Something went wrong when fetching comments");
+      return;
+    }
+
+    setState(() {
+      commentInfo = response.commentInfo;
+    });
   }
 
   Future<void> fetchPostById({
@@ -113,6 +148,17 @@ class _PostPageState extends State<PostPage> {
 
   Widget _buildItem(BuildContext context, int index) {
     if (commentInfo == null) {
+      return const Center(
+        child: Text(
+          "No comments here",
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      );
+    }
+
+    if (index >= commentInfo!.comments.length) {
       return const Center(
         child: Text(
           "No more comments",
@@ -193,16 +239,42 @@ class _PostPageState extends State<PostPage> {
                       handlePostDisplayItem: handlePostDisplayItem,
                     ),
                   ),
-                  SliverList.separated(
-                    itemCount: itemCount,
-                    itemBuilder: (BuildContext context, int index) =>
-                        _buildItem(context, index),
-                    separatorBuilder: (BuildContext context, int index) {
-                      return const SizedBox(
+                  const SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: Constants.gap * 2,
+                    ),
+                  ),
+                  if (!commentLoading) ...[
+                    SliverList.separated(
+                      itemCount: itemCount,
+                      itemBuilder: (BuildContext context, int index) =>
+                          _buildItem(context, index),
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const SizedBox(
+                          height: Constants.gap * 2,
+                        );
+                      },
+                    ),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(
                         height: Constants.gap * 2,
-                      );
-                    },
-                  )
+                      ),
+                    ),
+                  ] else ...[
+                    const SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: Constants.gap * 2,
+                      ),
+                    ),
+                    const SliverToBoxAdapter(
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: Constants.gap * 4,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -243,12 +315,24 @@ class _PostPageState extends State<PostPage> {
                   createdBy: post!.createdBy.id,
                   postId: post!.id,
                   commentTargetId: commentTarget!.targetId,
-                  successAction: () {
+                  successAction: (CommentModel newComment) {
                     setState(() {
                       commentTarget = CommentTarget(
                         targetId: post!.id,
                         targetUsername: post!.createdBy.username,
                       );
+
+                      commentInfo ??= CommentInfo(
+                        info: NodeInfo(
+                          hasNextPage: false,
+                          endCursor: null,
+                        ),
+                        comments: [],
+                      );
+
+                      setState(() {
+                        commentInfo!.addNewlyCreatedComment(newComment);
+                      });
                     });
                   },
                 ),

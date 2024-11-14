@@ -53,6 +53,10 @@ class CommentInfo {
     comments.addAll(newComments);
   }
 
+  void addNewlyCreatedComment(CommentModel comment) {
+    comments.insert(0, comment);
+  }
+
   static Future<CommentInfo> createModel({required Map map}) async {
     var commentFutures = (map["edges"] as List)
         .map((comment) => CommentModel.createModel(map: comment["node"]))

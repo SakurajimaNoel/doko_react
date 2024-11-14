@@ -39,7 +39,7 @@ class AppRouterConfig {
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: "/profile/post/8fc53dff-8aff-4679-9862-f53f930c8d66",
+    initialLocation: "/",
     redirect: (BuildContext context, GoRouterState state) {
       var userProvider = context.read<UserProvider>();
       var authProvider = context.read<AuthenticationProvider>();
@@ -174,6 +174,7 @@ class AppRouterConfig {
                 builder: (context, state) => const UserFeedPage(),
                 routes: [
                   GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
                     name: RouterConstants.userSearch,
                     path: "search",
                     builder: (context, state) => const UserSearchPage(),
@@ -227,6 +228,7 @@ class AppRouterConfig {
                     },
                   ),
                   GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
                     name: RouterConstants.pendingRequests,
                     path: "pending-requests",
                     builder: (context, state) => const PendingRequestPage(),

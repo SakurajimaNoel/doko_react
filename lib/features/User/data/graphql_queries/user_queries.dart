@@ -1282,7 +1282,10 @@ class UserQueries {
   }
 
   // get comments
-  static String getComments(String? cursor) {
+  static String getComments(
+    bool post, {
+    String? cursor,
+  }) {
     if (cursor == null || cursor.isEmpty) {
       return '''
       query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$likedByWhere3: UserWhere, \$commentsWhere2: CommentWhere) {
@@ -1403,9 +1406,9 @@ class UserQueries {
   }
 
   static Map<String, dynamic> getCommentsVariable(
-    bool post, {
+    String nodeId, {
     String? cursor,
-    required String nodeId,
+    required bool post,
     required String username,
   }) {
     String connectionNode = post ? "Post" : "Comment";

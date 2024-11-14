@@ -90,6 +90,16 @@ class CommentUserSearchResponse {
   });
 }
 
+class CommentResponse {
+  final ResponseStatus status;
+  final CommentInfo? commentInfo;
+
+  const CommentResponse({
+    required this.status,
+    this.commentInfo,
+  });
+}
+
 class UserGraphqlService {
   late final GraphQLClient _client;
 
@@ -812,7 +822,7 @@ class UserGraphqlService {
   }
 
   // todo update return type same as get comments
-  Future<bool> addComment(CommentInputModel commentInput) async {
+  Future<CommentModel?> addComment(CommentInputModel commentInput) async {
     try {
       if (commentInput.content.isEmpty && commentInput.media.isEmpty) {
         throw Exception("no data to create comment");
@@ -829,10 +839,65 @@ class UserGraphqlService {
         throw Exception(result.exception);
       }
 
-      return true;
+      List? comment = result.data?["createComments"]["comments"];
+
+      if (comment == null || comment.isEmpty) return null;
+
+      return await CommentModel.createModel(
+        map: comment[0],
+      );
     } catch (e) {
       safePrint(e.toString());
-      return false;
+      return null;
+    }
+  }
+
+  Future<CommentResponse> getComments(
+    String nodeId, {
+    String? cursor,
+    bool post = true,
+    required String username,
+  }) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          document: gql(UserQueries.getComments(
+            post,
+            cursor: cursor,
+          )),
+          variables: UserQueries.getCommentsVariable(
+            nodeId,
+            username: username,
+            cursor: cursor,
+            post: post,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      Map? res = result.data;
+
+      if (res == null || res.isEmpty) {
+        return const CommentResponse(
+          status: ResponseStatus.success,
+        );
+      }
+
+      CommentInfo commentInfo =
+          await CommentInfo.createModel(map: res["commentsConnection"]);
+
+      return CommentResponse(
+        status: ResponseStatus.success,
+        commentInfo: commentInfo,
+      );
+    } catch (e) {
+      safePrint(e.toString());
+      return const CommentResponse(
+        status: ResponseStatus.error,
+      );
     }
   }
 }
