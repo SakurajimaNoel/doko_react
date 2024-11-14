@@ -39,7 +39,7 @@ class AppRouterConfig {
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: "/",
+    initialLocation: "/profile/post/8fc53dff-8aff-4679-9862-f53f930c8d66",
     redirect: (BuildContext context, GoRouterState state) {
       var userProvider = context.read<UserProvider>();
       var authProvider = context.read<AuthenticationProvider>();

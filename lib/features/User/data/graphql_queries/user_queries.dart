@@ -609,7 +609,6 @@ class UserQueries {
         }
       ],
     };
-    ;
   }
 
   // update user profile
@@ -907,20 +906,23 @@ class UserQueries {
   // search user based on username or name
   static String searchUserByUsernameOrName() {
     return '''
-    query Users(\$options: UserOptions, \$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
-      users(options: \$options, where: \$where) {
-        id
-        name
-        username
-        profilePicture
-        friendsConnection(where: \$friendsConnectionWhere2) {
-          edges {
-            requestedBy
-            status
+      query Users(\$where: UserWhere, \$limit: Int, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+        users(where: \$where, limit: \$limit) {
+          id
+          name
+          profilePicture
+          username
+          friendsConnection(where: \$friendsConnectionWhere2) {
+            edges {
+              properties {
+                requestedBy
+                status
+                addedOn
+              }
+            }
           }
         }
       }
-    }
     ''';
   }
 
@@ -929,22 +931,20 @@ class UserQueries {
     required String username,
   }) {
     return {
-      "options": {
-        "limit": QueryConstants.generalSearchLimit,
-      },
       "where": {
         "OR": [
           {
-            "name_CONTAINS": query,
+            "username_CONTAINS": query,
           },
           {
-            "username_CONTAINS": query,
+            "name_CONTAINS": query,
           }
-        ],
+        ]
       },
+      "limit": QueryConstants.generalSearchLimit,
       "friendsConnectionWhere2": {
         "node": {
-          "username": username,
+          "username_EQ": username,
         }
       }
     };
@@ -959,13 +959,16 @@ class UserQueries {
           edges {
             node {
               id
+              username
               name
               profilePicture
-              username
               friendsConnection(where: \$friendsConnectionWhere3) {
                 edges {
-                  requestedBy
-                  status
+                  properties {
+                    requestedBy
+                    addedOn
+                    status
+                  }
                 }
               }
             }
@@ -983,12 +986,12 @@ class UserQueries {
   }) {
     return {
       "where": {
-        "username": username,
+        "username_EQ": username,
       },
       "first": QueryConstants.friendSearchLimit,
       "friendsConnectionWhere2": {
         "edge": {
-          "status": FriendStatus.accepted,
+          "status_EQ": FriendStatus.accepted,
         },
         "node": {
           "OR": [
@@ -1003,7 +1006,7 @@ class UserQueries {
       },
       "friendsConnectionWhere3": {
         "node": {
-          "username": currentUsername,
+          "username_EQ": currentUsername,
         }
       },
     };
@@ -1012,20 +1015,20 @@ class UserQueries {
   // search user friends by username for comment mention
   static String searchUserFriendsByUsername() {
     return '''
-    query Users(\$where: UserWhere, \$first: Int, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
-      users(where: \$where) {
-        friendsConnection(first: \$first, where: \$friendsConnectionWhere2) {
-          edges {
-            node {
-              id
-              name
-              profilePicture
-              username
+      query Users(\$where: UserWhere, \$first: Int, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+        users(where: \$where) {
+          friendsConnection(first: \$first, where: \$friendsConnectionWhere2) {
+            edges {
+              node {
+                id
+                name
+                username
+                profilePicture
+              }
             }
           }
         }
       }
-    }
     ''';
   }
 
@@ -1035,7 +1038,7 @@ class UserQueries {
   }) {
     return {
       "where": {
-        "username": username,
+        "username_EQ": username,
       },
       "first": QueryConstants.friendSearchCommentLimit,
       "friendsConnectionWhere2": {
@@ -1043,7 +1046,7 @@ class UserQueries {
           "username_CONTAINS": query,
         },
         "edge": {
-          "status": FriendStatus.accepted,
+          "status_EQ": FriendStatus.accepted,
         }
       }
     };
@@ -1052,41 +1055,68 @@ class UserQueries {
   // post by id
   static String getPostById() {
     return """
-      query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$first: Int, \$sort: [PostCommentsConnectionSort!], \$likedByWhere3: UserWhere) {
-        posts(where: \$where) {
-          caption
+     query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$first: Int, \$likedByWhere3: UserWhere, \$commentsWhere2: CommentWhere, \$limit: Int, \$likedByWhere4: UserWhere, \$sort: [CommentSort!]) {
+      posts(where: \$where) {
+        id
+        createdOn
+        content
+        caption
+        createdBy {
           id
-          content
-          createdOn
-          createdBy {
-            id
-            name
-            profilePicture
-            username
+          username
+          name
+          profilePicture
+        }
+        likedBy(where: \$likedByWhere2) {
+          username
+        }
+       
+        likedByConnection {
+          totalCount
+        }
+        commentsConnection(first: \$first) {
+          totalCount
+          pageInfo {
+            endCursor
+            hasNextPage
           }
-          likedBy(where: \$likedByWhere2) {
-            id
-          }
-          commentsConnection(first: \$first, sort: \$sort) {
-            totalCount
-            pageInfo {
-              endCursor
-              hasNextPage
-            }
-            edges {
-              node {
+          edges {
+            node {
+              id
+              createdOn
+              media
+              content
+              mentions {
+                username
+              }
+              likedBy(where: \$likedByWhere3) {
+                username
+              }
+              likedByConnection {
+                totalCount
+              }
+              commentsConnection {
+                totalCount
+              }
+              commentBy {
                 id
-                createdOn
+                username
+                profilePicture
+                name
+              }
+              comments(where: \$commentsWhere2, limit: \$limit, sort: \$sort) {
+                id
                 media
                 content
-                mentions {
-                  username
-                }
+                createdOn
                 likedByConnection {
                   totalCount
                 }
-                commentsConnection {
-                  totalCount
+                mentions {
+                  username
+                }
+                likedBy(where: \$likedByWhere4) {
+                  username
                 }
                 commentBy {
                   id
@@ -1094,17 +1124,12 @@ class UserQueries {
                   name
                   profilePicture
                 }
-                likedBy(where: \$likedByWhere3) {
-                  username
-                }
               }
             }
           }
-          likedByConnection {
-            totalCount
-          }
         }
       }
+    }
     """;
   }
 
@@ -1114,38 +1139,49 @@ class UserQueries {
   }) {
     return {
       "where": {
-        "id": postId,
+        "id_EQ": postId,
       },
       "likedByWhere2": {
-        "username": username,
+        "username_EQ": username,
       },
       "first": QueryConstants.commentLimit,
+      "likedByWhere3": {
+        "username_EQ": username,
+      },
+      "commentsWhere2": {
+        "commentBy": {
+          "username_EQ": username,
+        }
+      },
+      "limit": 1, // user own comment reply first
+      "likedByWhere4": {
+        "username_EQ": username,
+      },
       "sort": [
         {
-          "node": {"createdOn": "ASC"}
+          "createdOn": "DESC",
         }
-      ],
-      "likedByWhere3": {"username": username}
+      ]
     };
   }
 
   // add comment
   static String addComment() {
     return '''
-    mutation CreateComments(\$input: [CommentCreateInput!]!, \$where: UserWhere) {
+     mutation CreateComments(\$input: [CommentCreateInput!]!, \$where: UserWhere) {
       createComments(input: \$input) {
         comments {
           id
+          createdOn
           media
+          content
           mentions {
             username
           }
-          content
-          createdOn
           commentBy {
             id
-            name
             username
+            name
             profilePicture
           }
           likedByConnection {
@@ -1171,15 +1207,13 @@ class UserQueries {
       return {
         "input": [
           {
-            "media": commentInput.media,
-            "content": commentInput.content,
             "commentBy": {
               "connect": {
                 "where": {
                   "node": {
-                    "username": commentInput.commentBy,
-                  },
-                },
+                    "username_EQ": commentInput.commentBy,
+                  }
+                }
               }
             },
             "commentOn": {
@@ -1187,16 +1221,18 @@ class UserQueries {
                 "connect": {
                   "where": {
                     "node": {
-                      "id": commentInput.commentOn,
+                      "id_EQ": commentInput.commentOn,
                     }
                   }
                 }
               }
-            }
+            },
+            "content": commentInput.content,
+            "media": commentInput.media,
           }
         ],
         "where": {
-          "username": commentInput.commentBy,
+          "username_EQ": commentInput.commentBy,
         }
       };
     }
@@ -1204,15 +1240,13 @@ class UserQueries {
     return {
       "input": [
         {
-          "media": commentInput.media,
-          "content": commentInput.content,
           "commentBy": {
             "connect": {
               "where": {
                 "node": {
-                  "username": commentInput.commentBy,
-                },
-              },
+                  "username_EQ": commentInput.commentBy,
+                }
+              }
             }
           },
           "commentOn": {
@@ -1220,7 +1254,7 @@ class UserQueries {
               "connect": {
                 "where": {
                   "node": {
-                    "id": commentInput.commentOn,
+                    "id_EQ": commentInput.commentOn,
                   }
                 }
               }
@@ -1236,52 +1270,135 @@ class UserQueries {
                 }
               }
             ],
-          }
+          },
+          "content": commentInput.content,
+          "media": commentInput.media,
         }
       ],
       "where": {
-        "username": commentInput.commentBy,
+        "username_EQ": commentInput.commentBy,
       }
     };
   }
 
   // get comments
-  static String getComments() {
-    return '''
-    query CommentsConnection(\$where: CommentWhere, \$first: Int, \$sort: [CommentSort], \$after: String, \$likedByWhere2: UserWhere) {
-      commentsConnection(where: \$where, first: \$first, sort: \$sort, after: \$after) {
-        pageInfo {
-          endCursor
-          hasNextPage
-        }
-        edges {
-          node {
-            id
-            createdOn
-            media
-            content
-            mentions {
-              username
-            }
-            likedByConnection {
-              totalCount
-            }
-            commentsConnection {
-              totalCount
-            }
-            commentBy {
+  static String getComments(String? cursor) {
+    if (cursor == null || cursor.isEmpty) {
+      return '''
+      query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$likedByWhere3: UserWhere, \$commentsWhere2: CommentWhere) {
+        commentsConnection(first: \$first, where: \$where) {
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
+          edges {
+            node {
               id
-              username
-              name
-              profilePicture
-            }
-            likedBy(where: \$likedByWhere2) {
-              username
+              createdOn
+              media
+              content
+              mentions {
+                username
+              }
+              commentsConnection {
+                totalCount
+              }
+              likedByConnection {
+                totalCount
+              }
+              likedBy(where: \$likedByWhere2) {
+                username
+              }
+              commentBy {
+                id
+                username
+                profilePicture
+                name
+              }
+              comments(where: \$commentsWhere2) {
+                id
+                createdOn
+                media
+                content
+                mentions {
+                  username
+                }
+                likedByConnection {
+                  totalCount
+                }
+                likedBy(where: \$likedByWhere3) {
+                  username
+                }
+                commentBy {
+                  id
+                  name
+                  username
+                  profilePicture
+                }
+              }
             }
           }
         }
       }
-    }  
+    ''';
+    }
+
+    return '''
+      query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$likedByWhere3: UserWhere, \$commentsWhere2: CommentWhere, \$after: String) {
+        commentsConnection(first: \$first, where: \$where, after: \$after) {
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
+          edges {
+            node {
+              id
+              createdOn
+              media
+              content
+              mentions {
+                username
+              }
+              commentsConnection {
+                totalCount
+              }
+              likedByConnection {
+                totalCount
+              }
+              likedBy(where: \$likedByWhere2) {
+                username
+              }
+              commentBy {
+                id
+                username
+                profilePicture
+                name
+              }
+              comments(where: \$commentsWhere2) {
+                id
+                createdOn
+                media
+                content
+                mentions {
+                  username
+                }
+                likedByConnection {
+                  totalCount
+                }
+                likedBy(where: \$likedByWhere3) {
+                  username
+                }
+                commentBy {
+                  id
+                  name
+                  username
+                  profilePicture
+                }
+              }
+            }
+          }
+        }
+      }
     ''';
   }
 
@@ -1293,49 +1410,51 @@ class UserQueries {
   }) {
     String connectionNode = post ? "Post" : "Comment";
 
-    if (cursor == null) {
+    if (cursor == null || cursor.isEmpty) {
       return {
+        "first": QueryConstants.commentLimit,
         "where": {
-          "commentOnConnection": {
+          "commentOn": {
             connectionNode: {
-              "node": {
-                "id": nodeId,
-              }
+              "id_EQ": nodeId,
             }
           }
         },
-        "first": QueryConstants.commentLimit,
-        "sort": [
-          {
-            "createdOn": "ASC",
-          }
-        ],
         "likedByWhere2": {
-          "username": username,
-        }
+          "username_EQ": username,
+        },
+        "likedByWhere3": {
+          "username_EQ": username,
+        },
+        "commentsWhere2": {
+          "commentBy": {
+            "username_EQ": username,
+          }
+        },
       };
     }
 
     return {
+      "first": QueryConstants.commentLimit,
       "where": {
-        "commentOnConnection": {
+        "commentOn": {
           connectionNode: {
-            "node": {
-              "id": nodeId,
-            }
+            "id_EQ": nodeId,
           }
         }
       },
-      "first": QueryConstants.commentLimit,
-      "after": cursor,
-      "sort": [
-        {
-          "createdOn": "ASC",
-        }
-      ],
       "likedByWhere2": {
-        "username": username,
-      }
+        "username_EQ": username,
+      },
+      "likedByWhere3": {
+        "username_EQ": username,
+      },
+      "commentsWhere2": {
+        "commentBy": {
+          "username_EQ": username,
+        }
+      },
+      "after": cursor
     };
   }
 }
