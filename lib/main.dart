@@ -199,9 +199,6 @@ class _MyAppState extends State<MyApp> {
 
     GoRouter router = AppRouterConfig.router;
 
-    safePrint("refreshing router");
-    safePrint(authStatus);
-    safePrint(userStatus);
     // when auth status or user status change refresh the router to trigger redirect
     router.refresh();
 

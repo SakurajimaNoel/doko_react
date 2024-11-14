@@ -24,21 +24,21 @@ class UserQueries {
   // get user query and variables
   static String getUser() {
     return """
-        query Query(\$where: UserWhere) {
-          users(where: \$where) {
-            id
-            name
-            username
-            profilePicture
-          }
+      query Users(\$where: UserWhere) {
+        users(where: \$where) {
+          id
+          username
+          name
+          profilePicture
         }
-        """;
+      }
+    """;
   }
 
   static Map<String, dynamic> getUserVariables(String userId) {
     return {
       "where": {
-        "id": userId,
+        "id_EQ": userId,
       }
     };
   }
@@ -46,18 +46,18 @@ class UserQueries {
   // check username query and variables
   static String checkUsername() {
     return """
-          query Query(\$where: UserWhere) {
-            users(where: \$where) {
-              id
-            }
-          }
-        """;
+      query Users(\$where: UserWhere) {
+        users(where: \$where) {
+          id
+        }
+      }
+    """;
   }
 
   static Map<String, dynamic> checkUsernameVariables(String username) {
     return {
       "where": {
-        "username": username,
+        "username_EQ": username,
       }
     };
   }
@@ -65,17 +65,17 @@ class UserQueries {
   // complete user profile query and variables
   static String completeUserProfile() {
     return """
-        mutation Mutation(\$input: [UserCreateInput!]!) {
-          createUsers(input: \$input) {
-             users {
-              id
-              name
-              profilePicture
-              username
-            }
+      mutation CreateUsers(\$input: [UserCreateInput!]!) {
+        createUsers(input: \$input) {
+          users {
+            id
+            name
+            profilePicture
+            username
           }
-        }        
-        """;
+        }
+      }       
+    """;
   }
 
   static Map<String, dynamic> completeUserProfileVariables(
@@ -97,54 +97,56 @@ class UserQueries {
   // get complete user
   static String getCompleteUser() {
     return """
-      query Query(\$where: UserWhere, \$first: Int, \$sort: [UserPostsConnectionSort!], \$friendsWhere2: UserWhere, \$friendsConnectionWhere4: UserFriendsConnectionWhere, \$likedByWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+      query Users(\$where: UserWhere, \$friendsWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$likedByWhere2: UserWhere, \$sort: [UserPostsConnectionSort!]) {
         users(where: \$where) {
-          username
-          profilePicture
-          name
           id
+          username
+          createdOn
+          name
+          profilePicture
           bio
           dob
-          createdOn
-          postsConnection(first: \$first, sort: \$sort) {
-            edges {
-              node {
-                content
-                id
-                createdOn
-                caption
-                likes
-                likedBy(where: \$likedByWhere2) {
-                  id
-                }
-                commentsConnection {
-                  totalCount
-                }
-                likedByConnection {
-                  totalCount
+          friends(where: \$friendsWhere2) {
+            friendsConnection {
+              edges {
+                properties {
+                  status
+                  requestedBy
+                  addedOn
                 }
               }
             }
-            pageInfo {
-              endCursor
-              hasNextPage
-            }
-            totalCount
           }
           friendsConnection(where: \$friendsConnectionWhere2) {
             totalCount
           }
-          friends(where: \$friendsWhere2) {
-            friendsConnection(where: \$friendsConnectionWhere4) {
-              edges {
-                requestedBy
-                status
+          postsConnection(first: \$first, sort: \$sort) {
+            totalCount
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+            edges {
+              node {
+                id
+                createdOn
+                content
+                caption
+                likedBy(where: \$likedByWhere2) {
+                  username
+                }
+                likedByConnection {
+                  totalCount
+                }
+                commentsConnection {
+                  totalCount
+                }
               }
             }
           }
         }
       }
-      """;
+    """;
   }
 
   static Map<String, dynamic> getCompleteUserVariables(
@@ -153,59 +155,57 @@ class UserQueries {
   }) {
     return {
       "where": {
-        "username": username,
+        "username_EQ": username,
+      },
+      "friendsWhere2": {
+        "username_EQ": currentUsername,
+      },
+      "friendsConnectionWhere2": {
+        "edge": {
+          "status_EQ": FriendStatus.accepted,
+        }
       },
       "first": QueryConstants.postLimit,
-      "sort": const [
+      "likedByWhere2": {
+        "username_EQ": currentUsername,
+      },
+      "sort": [
         {
           "node": {
             "createdOn": "DESC",
           }
         }
       ],
-      "friendsWhere2": {
-        "username": currentUsername,
-      },
-      "friendsConnectionWhere4": {
-        "node": {
-          "username": username,
-        }
-      },
-      "likedByWhere2": {
-        "username": currentUsername,
-      },
-      "friendsConnectionWhere2": {
-        "edge": {
-          "status": FriendStatus.accepted,
-        }
-      },
     };
   }
 
-  // get user accepted friends by user id
+  // get user accepted friends by username
   static String getFriendsByUsername(String? cursor) {
     if (cursor == null || cursor.isEmpty) {
       return """
-       query Query(\$where: UserWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
+       query Users(\$where: UserWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
         users(where: \$where) {
           friendsConnection(first: \$first, sort: \$sort, where: \$friendsConnectionWhere2) {
-            edges {
-              node {
-                id
-                name
-                username
-                profilePicture
-                friendsConnection(where: \$friendsConnectionWhere3) {
-                  edges {
-                    requestedBy
-                    status
-                  }
-                }
-              }
-            }
             pageInfo {
               endCursor
               hasNextPage
+            }
+            edges {
+              node {
+                id
+                username
+                name
+                profilePicture
+                friendsConnection(where: \$friendsConnectionWhere3) {
+                  edges {
+                    properties {
+                      requestedBy
+                      status
+                      addedOn
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -214,31 +214,34 @@ class UserQueries {
     }
 
     return """
-        query Query(\$where: UserWhere, \$after: String, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
-          users(where: \$where) {
-            friendsConnection(after: \$after, first: \$first, sort: \$sort, where: \$friendsConnectionWhere2) {
-              edges {
-                node {
-                  id
-                  name
-                  username
-                  profilePicture
-                  friendsConnection(where: \$friendsConnectionWhere3) {
-                    edges {
+       query Users(\$where: UserWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$after: String) {
+        users(where: \$where) {
+          friendsConnection(first: \$first, sort: \$sort, where: \$friendsConnectionWhere2, after: \$after) {
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+            edges {
+              node {
+                id
+                username
+                name
+                profilePicture
+                friendsConnection(where: \$friendsConnectionWhere3) {
+                  edges {
+                    properties {
                       requestedBy
                       status
+                      addedOn
                     }
                   }
                 }
               }
-              pageInfo {
-                endCursor
-                hasNextPage
-              }
             }
           }
         }
-        """;
+      }
+    """;
   }
 
   static Map<String, dynamic> getFriendsByUsernameVariables(
@@ -249,7 +252,7 @@ class UserQueries {
     if (cursor == null || cursor.isEmpty) {
       return {
         "where": {
-          "username": username,
+          "username_EQ": username,
         },
         "first": QueryConstants.friendLimit,
         "sort": [
@@ -257,73 +260,71 @@ class UserQueries {
             "edge": {
               "addedOn": "DESC",
             }
-          },
+          }
         ],
         "friendsConnectionWhere2": {
           "edge": {
-            "status": FriendStatus.accepted,
+            "status_EQ": FriendStatus.accepted,
           }
         },
         "friendsConnectionWhere3": {
           "node": {
-            "username": currentUsername,
+            "username_EQ": currentUsername,
           }
-        }
+        },
       };
     }
 
     return {
       "where": {
-        "username": username,
+        "username_EQ": username,
       },
       "after": cursor,
       "first": QueryConstants.friendLimit,
-      "sort": const [
+      "sort": [
         {
           "edge": {
             "addedOn": "DESC",
           }
         }
       ],
-      "friendsConnectionWhere2": const {
+      "friendsConnectionWhere2": {
         "edge": {
-          "status": FriendStatus.accepted,
+          "status_EQ": FriendStatus.accepted,
         }
       },
       "friendsConnectionWhere3": {
         "node": {
-          "username": currentUsername,
+          "username_EQ": currentUsername,
         }
-      }
+      },
     };
   }
 
-  // get user posts by user id
+  // get user posts by username
   static String getUserPostsByUsername() {
     return """
-        query Users(\$where: UserWhere, \$after: String, \$sort: [UserPostsConnectionSort!], \$first: Int, \$likedByWhere2: UserWhere) {
-          users(where: \$where) {
-            postsConnection(after: \$after, sort: \$sort, first: \$first) {
-              edges {
-                node {
-                  content
-                  caption
-                  id
-                  createdOn
-                  likedBy(where: \$likedByWhere2) {
-                    id
-                  }
-                  commentsConnection {
-                    totalCount
-                  }
-                  likedByConnection {
-                    totalCount
-                  }
+        query Posts(\$after: String, \$sort: [PostSort!], \$first: Int, \$where: PostWhere, \$likedByWhere2: UserWhere) {
+          postsConnection(after: \$after, sort: \$sort, first: \$first, where: \$where) {
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+            edges {
+              node {
+                id
+                createdOn
+                content
+                caption
+                likedBy(where: \$likedByWhere2) {
+                  username
                 }
-              }
-              pageInfo {
-                endCursor
-                hasNextPage
+                likedByConnection {
+                  totalCount
+                }
+                commentsConnection {
+                  totalCount
+                }
               }
             }
           }
@@ -338,19 +339,19 @@ class UserQueries {
   }) {
     return {
       "where": {
-        "username": username,
+        "createdBy": {
+          "username_EQ": username,
+        }
       },
-      "after": cursor,
       "first": QueryConstants.postLimit,
-      "sort": const [
+      "after": cursor,
+      "sort": [
         {
-          "node": {
-            "createdOn": "DESC",
-          }
+          "createdOn": "DESC",
         }
       ],
       "likedByWhere2": {
-        "username": currentUsername,
+        "username_EQ": currentUsername,
       },
     };
   }

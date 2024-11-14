@@ -94,7 +94,7 @@ class CompleteUserModel extends UserModel {
 
     if (friendConnection.isNotEmpty) {
       friendConnectionDetail = FriendConnectionDetail.createModel(
-          friendConnection[0]["friendsConnection"]["edges"][0]);
+          friendConnection[0]["friendsConnection"]["edges"][0]["properties"]);
     }
 
     return CompleteUserModel.fromUserModel(

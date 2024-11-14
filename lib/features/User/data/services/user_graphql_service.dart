@@ -312,7 +312,7 @@ class UserGraphqlService {
         throw Exception(result.exception);
       }
 
-      List? res = result.data?["users"];
+      Map? res = result.data;
 
       if (res == null || res.isEmpty) {
         return const PostResponse(
@@ -321,7 +321,7 @@ class UserGraphqlService {
       }
 
       ProfilePostInfo info = await ProfilePostInfo.createModel(
-        map: res[0]["postsConnection"],
+        map: res["postsConnection"],
       );
 
       return PostResponse(

@@ -1,4 +1,3 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
@@ -42,7 +41,6 @@ class AppRouterConfig {
     navigatorKey: _rootNavigatorKey,
     initialLocation: "/",
     redirect: (BuildContext context, GoRouterState state) {
-      safePrint("router redirect check");
       var userProvider = context.read<UserProvider>();
       var authProvider = context.read<AuthenticationProvider>();
 
