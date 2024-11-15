@@ -1,17 +1,16 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/debounce.dart';
-import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/widgets/general/bullet_list.dart';
 import 'package:doko_react/core/widgets/heading/settings_heading.dart';
-import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
+import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 class CompleteProfileUsernamePage extends StatefulWidget {
   const CompleteProfileUsernamePage({
@@ -27,18 +26,14 @@ class _CompleteProfileUsernamePageState
     extends State<CompleteProfileUsernamePage> {
   final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
 
-  final UserGraphqlService _graphqlService = UserGraphqlService(
-    client: GraphqlConfig.getGraphQLClient(),
-  );
-  final _formKey = GlobalKey<FormState>();
-  final Debounce _usernameDebounce = Debounce(const Duration(
+  final formKey = GlobalKey<FormState>();
+  final Debounce usernameDebounce = Debounce(const Duration(
     milliseconds: 500,
   ));
 
-  // bool _loading = false;
-  String _username = "";
-  String _apiErrorMessage = "";
-  bool _usernameAvailable = false;
+  bool usernameAvailable = false;
+  bool usernameSyntaxValid = false;
+  String username = "";
 
   final List<String> usernamePattern = [
     "Be between 3 and ${Constants.usernameLimit} characters long.",
@@ -46,26 +41,13 @@ class _CompleteProfileUsernamePageState
     "Contain only letters, numbers, underscores ( _ ), periods ( . ), and hyphens ( - ).",
   ];
 
-  Future<void> _isAvailable(String username) async {
-    var usernameResponse = await _graphqlService.checkUsername(username);
-    String message = "";
-    bool available = true;
-
-    if (usernameResponse.status == ResponseStatus.error) {
-      message = "Oops! Something went wrong. Please try again later.";
-      available = false;
-    }
-
-    if (usernameResponse.status == ResponseStatus.success &&
-        !usernameResponse.available) {
-      message = "'$_username' is already taken.";
-      available = false;
-    }
-
-    setState(() {
-      _apiErrorMessage = message;
-      _usernameAvailable = available;
-    });
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Constants.snackBarDuration,
+      ),
+    );
   }
 
   @override
@@ -110,7 +92,7 @@ class _CompleteProfileUsernamePageState
             ),
             Expanded(
               child: Form(
-                key: _formKey,
+                key: formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -127,28 +109,26 @@ class _CompleteProfileUsernamePageState
                             return usernameStatus.message;
                           },
                           autovalidateMode: AutovalidateMode.onUserInteraction,
-                          onSaved: (value) {
-                            if (value == null || value.isEmpty) {
-                              return;
-                            }
-
-                            _username = value.trim();
-                          },
                           onChanged: (value) {
-                            setState(() {
-                              _usernameAvailable = false;
-                              _apiErrorMessage = "";
-                              _username = value;
-                            });
                             var usernameStatus =
                                 ValidateInput.validateUsername(value);
 
                             if (!usernameStatus.isValid) {
-                              _usernameDebounce.dispose();
+                              setState(() {
+                                usernameSyntaxValid = false;
+                              });
+                              usernameDebounce.dispose();
                               return;
                             }
 
-                            _usernameDebounce(() => _isAvailable(value));
+                            Future<void> handleValidUsername() async {
+                              usernameSyntaxValid = true;
+                              username = value;
+
+                              setState(() {});
+                            }
+
+                            usernameDebounce(() => handleValidUsername());
                           },
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
@@ -159,26 +139,54 @@ class _CompleteProfileUsernamePageState
                         const SizedBox(
                           height: Constants.gap * 0.5,
                         ),
-                        if (_apiErrorMessage.isNotEmpty)
-                          ErrorText(_apiErrorMessage),
-                        if (_usernameAvailable)
-                          ErrorText(
-                            "'$_username' is available.",
-                            color: Colors.green,
+                        if (usernameSyntaxValid)
+                          Query(
+                            options: QueryOptions(
+                              document: gql(UserQueries.checkUsername()),
+                              variables:
+                                  UserQueries.checkUsernameVariables(username),
+                            ),
+                            builder: (QueryResult result,
+                                {Refetch? refetch, FetchMore? fetchMore}) {
+                              if (result.hasException) {
+                                return ErrorText(result.exception.toString());
+                              }
+
+                              if (result.isLoading) {
+                                return const SizedBox.shrink();
+                              }
+
+                              List? res = result.data?["users"];
+                              bool isAvailable = res == null || res.isEmpty;
+                              usernameAvailable = isAvailable;
+
+                              if (isAvailable) {
+                                return ErrorText(
+                                  "'$username' is available.",
+                                  color: Colors.green,
+                                );
+                              }
+
+                              return ErrorText("'$username' is already taken.");
+                            },
                           ),
                       ],
                     ),
                     FilledButton(
-                      onPressed: !_usernameAvailable
-                          ? null
-                          : () {
-                              context.pushNamed(
-                                RouterConstants.completeProfileInfo,
-                                pathParameters: {
-                                  "username": _username,
-                                },
-                              );
-                            },
+                      onPressed: () {
+                        if (!usernameSyntaxValid || !usernameAvailable) {
+                          showMessage(
+                              "To continue, please choose a unique and valid username.");
+                          return;
+                        }
+
+                        context.pushNamed(
+                          RouterConstants.completeProfileInfo,
+                          pathParameters: {
+                            "username": username,
+                          },
+                        );
+                      },
                       style: FilledButton.styleFrom(
                         minimumSize: const Size(
                           Constants.buttonWidth,

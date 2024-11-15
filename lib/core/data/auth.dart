@@ -1,7 +1,6 @@
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/helpers/constants.dart';
-import 'package:flutter/services.dart';
 
 enum AuthStatus { done, confirmMFA, error }
 
@@ -276,7 +275,7 @@ class AuthenticationActions {
 
       String token = (result.userPoolTokensResult.value.accessToken.raw);
 
-      Clipboard.setData(ClipboardData(text: token)).then((value) {});
+      // Clipboard.setData(ClipboardData(text: token)).then((value) {});
       return AuthenticationToken(
         status: AuthStatus.done,
         value: token,

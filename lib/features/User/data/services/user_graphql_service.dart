@@ -140,41 +140,41 @@ class UserGraphqlService {
     }
   }
 
-  Future<UsernameResponse> checkUsername(String username) async {
-    try {
-      QueryResult result = await _client.query(
-        QueryOptions(
-          fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(UserQueries.checkUsername()),
-          variables: UserQueries.checkUsernameVariables(username),
-        ),
-      );
-
-      if (result.hasException) {
-        throw Exception(result.exception);
-      }
-
-      List? res = result.data?["users"];
-
-      if (res == null || res.isEmpty) {
-        return const UsernameResponse(
-          status: ResponseStatus.success,
-          available: true,
-        );
-      }
-
-      return const UsernameResponse(
-        status: ResponseStatus.success,
-        available: false,
-      );
-    } catch (e) {
-      safePrint(e.toString());
-      return const UsernameResponse(
-        status: ResponseStatus.error,
-        available: false,
-      );
-    }
-  }
+  // Future<UsernameResponse> checkUsername(String username) async {
+  //   try {
+  //     QueryResult result = await _client.query(
+  //       QueryOptions(
+  //         fetchPolicy: FetchPolicy.networkOnly,
+  //         document: gql(UserQueries.checkUsername()),
+  //         variables: UserQueries.checkUsernameVariables(username),
+  //       ),
+  //     );
+  //
+  //     if (result.hasException) {
+  //       throw Exception(result.exception);
+  //     }
+  //
+  //     List? res = result.data?["users"];
+  //
+  //     if (res == null || res.isEmpty) {
+  //       return const UsernameResponse(
+  //         status: ResponseStatus.success,
+  //         available: true,
+  //       );
+  //     }
+  //
+  //     return const UsernameResponse(
+  //       status: ResponseStatus.success,
+  //       available: false,
+  //     );
+  //   } catch (e) {
+  //     safePrint(e.toString());
+  //     return const UsernameResponse(
+  //       status: ResponseStatus.error,
+  //       available: false,
+  //     );
+  //   }
+  // }
 
   Future<UserResponse> completeUserProfile(
       CompleteUserProfileVariables userDetails) async {

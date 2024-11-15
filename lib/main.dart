@@ -53,7 +53,10 @@ void main() async {
             create: (context) => UserPreferencesProvider(),
           ),
         ],
-        child: const MyApp(),
+        child: GraphQLProvider(
+          client: GraphqlConfig.client,
+          child: const MyApp(),
+        ),
       ),
     );
   } on AmplifyException catch (e) {
@@ -173,9 +176,12 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> changeAuthStatus(AuthenticationStatus status) async {
     if (status == AuthenticationStatus.signedIn) {
-      GraphqlConfig.initGraphQLClient();
-
       fetchMfaStatus();
+
+      /*
+        when signed in get user details based on cognito user id
+        if no node is present than user profile is incomplete
+      */
       getCompleteUser();
       authProvider.setAuthStatus(status);
     } else {

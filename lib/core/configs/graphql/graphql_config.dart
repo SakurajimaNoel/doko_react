@@ -1,6 +1,7 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/secret/secrets.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 class GraphqlConfig {
@@ -19,30 +20,28 @@ class GraphqlConfig {
 
   static GraphQLClient? _client;
 
-  static void initGraphQLClient() {
-    Link link = _authLink.concat(_httpLink);
-
-    _client = GraphQLClient(
-      link: link,
-      cache: GraphQLCache(store: HiveStore()),
-      defaultPolicies: DefaultPolicies(
-        query: Policies(
-          fetch: FetchPolicy.cacheAndNetwork,
-        ),
-        mutate: Policies(
-          fetch: FetchPolicy.noCache,
-        ),
-      ),
-    );
-
-    safePrint("graphql client initialized");
-  }
-
   static GraphQLClient getGraphQLClient() {
     if (_client == null) {
-      throw ("GraphQL client is not initialized. Ensure you call initGraphQLClient after authentication.");
+      Link link = _authLink.concat(_httpLink);
+
+      _client = GraphQLClient(
+        link: link,
+        cache: GraphQLCache(store: HiveStore()),
+        defaultPolicies: DefaultPolicies(
+          query: Policies(
+            fetch: FetchPolicy.cacheAndNetwork,
+          ),
+          mutate: Policies(
+            fetch: FetchPolicy.noCache,
+          ),
+        ),
+      );
     }
 
     return _client!;
   }
+
+  // new client used with provider
+  static ValueNotifier<GraphQLClient> client =
+      ValueNotifier(getGraphQLClient());
 }
