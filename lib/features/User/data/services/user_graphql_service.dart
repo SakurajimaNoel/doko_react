@@ -176,35 +176,35 @@ class UserGraphqlService {
   //   }
   // }
 
-  Future<UserResponse> completeUserProfile(
-      CompleteUserProfileVariables userDetails) async {
-    try {
-      QueryResult result = await _client.mutate(
-        MutationOptions(
-          document: gql(UserQueries.completeUserProfile()),
-          variables: UserQueries.completeUserProfileVariables(userDetails),
-        ),
-      );
-
-      if (result.hasException) {
-        throw Exception(result.exception);
-      }
-
-      List res = result.data?["createUsers"]["users"];
-
-      UserModel user = await UserModel.createModel(map: res[0]);
-
-      return UserResponse(
-        status: ResponseStatus.success,
-        user: user,
-      );
-    } catch (e) {
-      safePrint(e.toString());
-      return const UserResponse(
-        status: ResponseStatus.error,
-      );
-    }
-  }
+  // Future<UserResponse> completeUserProfile(
+  //     CompleteUserProfileVariables userDetails) async {
+  //   try {
+  //     QueryResult result = await _client.mutate(
+  //       MutationOptions(
+  //         document: gql(UserQueries.completeUserProfile()),
+  //         variables: UserQueries.completeUserProfileVariables(userDetails),
+  //       ),
+  //     );
+  //
+  //     if (result.hasException) {
+  //       throw Exception(result.exception);
+  //     }
+  //
+  //     List res = result.data?["createUsers"]["users"];
+  //
+  //     UserModel user = await UserModel.createModel(map: res[0]);
+  //
+  //     return UserResponse(
+  //       status: ResponseStatus.success,
+  //       user: user,
+  //     );
+  //   } catch (e) {
+  //     safePrint(e.toString());
+  //     return const UserResponse(
+  //       status: ResponseStatus.error,
+  //     );
+  //   }
+  // }
 
   Future<CompleteUserResponse> getCompleteUser(
     String username, {

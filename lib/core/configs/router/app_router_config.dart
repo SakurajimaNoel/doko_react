@@ -44,6 +44,10 @@ class AppRouterConfig {
       var userProvider = context.read<UserProvider>();
       var authProvider = context.read<AuthenticationProvider>();
 
+      String authRoute = "/auth/login";
+      String home = "/";
+      String completeProfile = "/complete-profile-username";
+
       bool isUserAuthenticated =
           authProvider.authStatus == AuthenticationStatus.signedIn;
       bool isUserProfileComplete =
@@ -53,28 +57,24 @@ class AppRouterConfig {
       bool onProfileCompletePages =
           state.uri.toString().startsWith("/complete");
 
-      // handle if user is logged in
+      // user is logged in
       if (isUserAuthenticated) {
+        // user is still on auth pages
         if (onAuthPages) {
-          // user profile is completed
-          if (isUserProfileComplete) {
-            return "/";
-          }
-          return "/complete-profile-username";
+          return isUserProfileComplete ? home : completeProfile;
+        }
+
+        // profile is complete
+        if (isUserProfileComplete) {
+          return onProfileCompletePages ? home : null;
         }
 
         // user profile is incomplete and not on complete profile routes
-        if (!isUserProfileComplete && !onProfileCompletePages) {
-          return "/complete-profile-username";
-        }
-      } else {
-        // handle if user is not logged in
-        if (!onAuthPages) {
-          return "/auth/login";
-        }
+        return onProfileCompletePages ? null : completeProfile;
       }
 
-      return null;
+      // user not logged in
+      return onAuthPages ? null : authRoute;
     },
     errorBuilder: (BuildContext context, GoRouterState state) {
       return const ErrorUnknownRoute();

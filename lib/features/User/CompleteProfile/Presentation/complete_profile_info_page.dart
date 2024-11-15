@@ -76,7 +76,7 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Complete profile"),
+        title: const Text("Profile Information"),
         actions: [
           TextButton(
             onPressed: () {

@@ -56,7 +56,7 @@ class _CompleteProfileUsernamePageState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Complete profile"),
+        title: const Text("Complete Profile"),
         actions: [
           TextButton(
             onPressed: () {
@@ -149,18 +149,20 @@ class _CompleteProfileUsernamePageState
                             builder: (QueryResult result,
                                 {Refetch? refetch, FetchMore? fetchMore}) {
                               if (result.hasException) {
-                                return ErrorText(result.exception.toString());
+                                return const ErrorText(Constants.errorMessage);
                               }
 
                               if (result.isLoading) {
-                                return const SizedBox.shrink();
+                                return Transform.scale(
+                                  scale: 0.5,
+                                  child: const CircularProgressIndicator(),
+                                );
                               }
 
                               List? res = result.data?["users"];
-                              bool isAvailable = res == null || res.isEmpty;
-                              usernameAvailable = isAvailable;
+                              usernameAvailable = res == null || res.isEmpty;
 
-                              if (isAvailable) {
+                              if (usernameAvailable) {
                                 return ErrorText(
                                   "'$username' is available.",
                                   color: Colors.green,
