@@ -3,11 +3,13 @@ import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
+import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/widgets/heading/settings_heading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -28,10 +30,13 @@ class _MfaSetupPageState extends State<MfaSetupPage> {
   String _key = "";
   String _uri = "";
 
+  late final UserProvider userProvider;
+
   @override
   void initState() {
     super.initState();
 
+    userProvider = context.read<UserProvider>();
     _setupMFA();
   }
 
@@ -45,7 +50,7 @@ class _MfaSetupPageState extends State<MfaSetupPage> {
   }
 
   void _setupMFA() async {
-    var setupMfaResult = await auth.setupMfa();
+    var setupMfaResult = await auth.setupMfa(userProvider.username);
 
     setState(() {
       _loading = false;

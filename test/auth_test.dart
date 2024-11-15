@@ -397,7 +397,7 @@ void main() {
           );
         });
 
-        final result = await auth.setupMfa();
+        final result = await auth.setupMfa(email);
 
         expect(result.status, AuthStatus.done);
         expect(result.message, code);
@@ -420,7 +420,7 @@ void main() {
           () => authCategory.setUpTotp(),
         ).thenThrow(AuthNotAuthorizedException(authExceptionString));
 
-        final result = await auth.setupMfa();
+        final result = await auth.setupMfa(email);
 
         expect(result.status, AuthStatus.error);
         expect(result.message, authExceptionString);
@@ -442,7 +442,7 @@ void main() {
           () => authCategory.setUpTotp(),
         ).thenThrow(UnknownException);
 
-        final result = await auth.setupMfa();
+        final result = await auth.setupMfa(email);
 
         expect(result.status, AuthStatus.error);
         expect(result.message, Constants.errorMessage);

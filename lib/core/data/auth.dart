@@ -208,19 +208,12 @@ class AuthenticationActions {
     }
   }
 
-  Future<AuthenticationResult> setupMfa() async {
+  Future<AuthenticationResult> setupMfa(String username) async {
     try {
-      var emailResult = await getEmail();
-      if (emailResult.status == AuthStatus.error) {
-        throw Exception(emailResult.message);
-      }
-
-      String email = emailResult.message!;
-
       final totpSetupDetails = await auth.setUpTotp();
       final setupUri = totpSetupDetails.getSetupUri(
         appName: 'Doki',
-        accountName: email,
+        accountName: username,
       );
 
       return AuthenticationResult(
