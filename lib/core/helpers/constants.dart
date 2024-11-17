@@ -70,4 +70,9 @@ class Constants {
   static const String zeroWidthSpace = "\u200B";
   static const double commentOverlayHeight = _root * 5;
   static const int commentContentDisplayLimit = 125;
+
+  // intervals
+  static const Duration userProfilePollInterval = Duration(
+    minutes: 15,
+  );
 }

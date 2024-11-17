@@ -27,14 +27,14 @@ class GraphqlConfig {
       _client = GraphQLClient(
         link: link,
         cache: GraphQLCache(store: HiveStore()),
-        defaultPolicies: DefaultPolicies(
-          query: Policies(
-            fetch: FetchPolicy.cacheAndNetwork,
-          ),
-          mutate: Policies(
-            fetch: FetchPolicy.noCache,
-          ),
-        ),
+        // defaultPolicies: DefaultPolicies(
+        // query: Policies(
+        //   fetch: FetchPolicy.cacheAndNetwork,
+        // ),
+        // mutate: Policies(
+        //   fetch: FetchPolicy.noCache,
+        // ),
+        // ),
       );
     }
 

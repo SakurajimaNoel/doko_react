@@ -90,7 +90,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             color: currScheme.error,
           ),
         ),
-      )
+      ),
     ];
   }
 
@@ -275,9 +275,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     return Query(
       options: QueryOptions(
-        pollInterval: const Duration(
-          minutes: 10,
-        ),
+        pollInterval: Constants.userProfilePollInterval,
         document: gql(UserQueries.getCompleteUser()),
         variables: UserQueries.getCompleteUserVariables(
           username,
@@ -287,7 +285,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       builder: (QueryResult result, {Refetch? refetch, FetchMore? fetchMore}) {
         List res = result.data?["users"] ?? [];
 
-        if (result.hasException) {
+        if (res.isEmpty && result.hasException) {
           return queryException(refetch);
         }
 

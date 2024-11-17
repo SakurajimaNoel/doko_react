@@ -145,7 +145,7 @@ class _MyAppState extends State<MyApp> {
     authProvider.setMFAStatus(mfaStatus);
   }
 
-  Future<void> getCompleteUser() async {
+  Future<void> getCompletedUser() async {
     var result = await auth.getUserId();
     if (result.status == AuthStatus.error) {
       userProvider.apiError();
@@ -182,7 +182,7 @@ class _MyAppState extends State<MyApp> {
         when signed in get user details based on cognito user id
         if no node is present than user profile is incomplete
       */
-      getCompleteUser();
+      getCompletedUser();
       authProvider.setAuthStatus(status);
     } else {
       authProvider.setAuthStatus(status);

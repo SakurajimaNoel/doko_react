@@ -29,6 +29,16 @@ class UserModel {
       signedProfilePicture: signedProfilePicture,
     );
   }
+
+  static UserModel createModelInfo({required Map map}) {
+    return UserModel(
+      name: map["name"],
+      username: map["username"],
+      profilePicture: map["profilePicture"] ?? "",
+      id: map["id"],
+      signedProfilePicture: "",
+    );
+  }
 }
 
 // complete user info

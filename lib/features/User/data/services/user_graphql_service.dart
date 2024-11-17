@@ -128,7 +128,7 @@ class UserGraphqlService {
         );
       }
 
-      UserModel user = await UserModel.createModel(map: res[0]);
+      UserModel user = UserModel.createModelInfo(map: res[0]);
       return UserResponse(
         status: ResponseStatus.success,
         user: user,

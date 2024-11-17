@@ -5,23 +5,26 @@ enum ProfileStatus { complete, incomplete, loading, error }
 
 class UserProvider extends ChangeNotifier {
   ProfileStatus _status = ProfileStatus.loading;
-  String _name = "";
+
+  // String _name = "";
   String _username = "";
-  String _profilePicture = "";
+
+  // String _profilePicture = "";
   String _id = "";
-  String _signedProfilePicture = "";
+
+  // String _signedProfilePicture = "";
 
   ProfileStatus get status => _status;
 
   String get id => _id;
 
-  String get name => _name;
+  // String get name => _name;
 
   String get username => _username;
 
-  String get profilePicture => _profilePicture;
+  // String get profilePicture => _profilePicture;
 
-  String get signedProfilePicture => _signedProfilePicture;
+  // String get signedProfilePicture => _signedProfilePicture;
 
   void incompleteUser() {
     _status = ProfileStatus.incomplete;
@@ -30,11 +33,11 @@ class UserProvider extends ChangeNotifier {
 
   void addUser({required UserModel user}) {
     _status = ProfileStatus.complete;
-    _name = user.name;
+    // _name = user.name;
     _username = user.username;
-    _profilePicture = user.profilePicture;
+    // _profilePicture = user.profilePicture;
     _id = user.id;
-    _signedProfilePicture = user.signedProfilePicture;
+    // _signedProfilePicture = user.signedProfilePicture;
 
     notifyListeners();
   }
@@ -46,20 +49,20 @@ class UserProvider extends ChangeNotifier {
 
   void signOut() {
     _status = ProfileStatus.loading;
-    _name = "";
+    // _name = "";
     _username = "";
-    _profilePicture = "";
+    // _profilePicture = "";
     _id = "";
-    _signedProfilePicture = "";
+    // _signedProfilePicture = "";
 
     notifyListeners();
   }
 
-  void updateUser({required UserModel updatedUser}) {
-    _name = updatedUser.name;
-    _profilePicture = updatedUser.profilePicture;
-    _signedProfilePicture = updatedUser.signedProfilePicture;
-
-    notifyListeners();
-  }
+// void updateUser({required UserModel updatedUser}) {
+//   _name = updatedUser.name;
+//   _profilePicture = updatedUser.profilePicture;
+//   _signedProfilePicture = updatedUser.signedProfilePicture;
+//
+//   notifyListeners();
+// }
 }

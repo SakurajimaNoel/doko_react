@@ -1,9 +1,16 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doko_react/core/data/auth.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
+import 'package:doko_react/core/widgets/error/error_text.dart';
+import 'package:doko_react/core/widgets/loader/loader.dart';
+import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
+import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:provider/provider.dart';
 
 class UserLayout extends StatefulWidget {
@@ -16,23 +23,67 @@ class UserLayout extends StatefulWidget {
 }
 
 class _UserLayoutState extends State<UserLayout> {
-  late final UserProvider _userProvider;
+  final AuthenticationActions auth = AuthenticationActions(auth: Amplify.Auth);
+  late final UserProvider userProvider;
   late int _index;
 
   @override
   void initState() {
     super.initState();
 
-    _userProvider = context.read<UserProvider>();
+    userProvider = context.read<UserProvider>();
     _index = widget.navigationShell.currentIndex;
+  }
+
+  Widget queryException(Refetch? refetch) {
+    var currTheme = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Doki"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              auth.signOutUser();
+            },
+            child: Text(
+              "Sign out",
+              style: TextStyle(
+                color: currTheme.error,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const ErrorText(
+              Constants.errorMessage,
+              fontSize: Constants.fontSize,
+            ),
+            const SizedBox(
+              height: Constants.height * 0.5,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (refetch != null) refetch();
+              },
+              child: const Text("Try again"),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     ColorScheme currTheme = Theme.of(context).colorScheme;
-    final UserProvider userProvider = context.watch<UserProvider>();
 
-    List<Widget> getDestinations() {
+    List<Widget> getDestinations(final UserModel user) {
       return <Widget>[
         NavigationDestination(
           selectedIcon: Icon(
@@ -51,7 +102,7 @@ class _UserLayoutState extends State<UserLayout> {
           label: "Nearby",
         ),
         NavigationDestination(
-          selectedIcon: userProvider.profilePicture.isEmpty
+          selectedIcon: user.profilePicture.isEmpty
               ? Icon(
                   Icons.account_circle,
                   color: currTheme.onPrimary,
@@ -63,8 +114,8 @@ class _UserLayoutState extends State<UserLayout> {
                     radius: 17,
                     child: ClipOval(
                       child: CachedNetworkImage(
-                        cacheKey: userProvider.profilePicture,
-                        imageUrl: userProvider.signedProfilePicture,
+                        cacheKey: user.profilePicture,
+                        imageUrl: user.signedProfilePicture,
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(),
                         ),
@@ -78,7 +129,7 @@ class _UserLayoutState extends State<UserLayout> {
                     ),
                   ),
                 ),
-          icon: userProvider.profilePicture.isEmpty
+          icon: user.profilePicture.isEmpty
               ? const Icon(Icons.account_circle_outlined)
               : CircleAvatar(
                   radius: 20,
@@ -87,8 +138,8 @@ class _UserLayoutState extends State<UserLayout> {
                     radius: 20,
                     child: ClipOval(
                       child: CachedNetworkImage(
-                        cacheKey: userProvider.profilePicture,
-                        imageUrl: userProvider.signedProfilePicture,
+                        cacheKey: user.profilePicture,
+                        imageUrl: user.signedProfilePicture,
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(),
                         ),
@@ -102,27 +153,68 @@ class _UserLayoutState extends State<UserLayout> {
                     ),
                   ),
                 ),
-          label: DisplayText.trimText(userProvider.name, len: 10),
+          label: DisplayText.trimText(user.name, len: 10),
         ),
       ];
     }
 
-    return Scaffold(
-      body: widget.navigationShell,
-      bottomNavigationBar: NavigationBar(
-        indicatorColor: _index != 2
-            ? currTheme.primary
-            : userProvider.profilePicture.isEmpty
-                ? currTheme.primary
-                : Colors.transparent,
-        selectedIndex: widget.navigationShell.currentIndex,
-        destinations: getDestinations(),
-        onDestinationSelected: _onDestinationSelected,
+    return Query(
+      options: QueryOptions(
+        document: gql(UserQueries.getUser()),
+        variables: UserQueries.getUserVariables(userProvider.id),
+        pollInterval: Constants.userProfilePollInterval,
       ),
+      builder: (QueryResult result, {Refetch? refetch, FetchMore? fetchMore}) {
+        List res = result.data?["users"] ?? [];
+
+        if (res.isEmpty && result.isLoading) {
+          return const Scaffold(
+            body: Loader(),
+          );
+        }
+
+        if ((res.isEmpty && result.hasException) || res.isEmpty) {
+          return queryException(refetch);
+        }
+
+        final Future<UserModel> futureUser = UserModel.createModel(map: res[0]);
+
+        return FutureBuilder<UserModel>(
+          future: futureUser,
+          builder: (BuildContext context, AsyncSnapshot<UserModel> snapshot) {
+            if (snapshot.hasError) {
+              return queryException(refetch);
+            }
+
+            if (!snapshot.hasData) {
+              return const Scaffold(
+                body: Loader(),
+              );
+            }
+
+            final user = snapshot.data!;
+
+            return Scaffold(
+              body: widget.navigationShell,
+              bottomNavigationBar: NavigationBar(
+                indicatorColor: _index != 2
+                    ? currTheme.primary
+                    : user.profilePicture.isEmpty
+                        ? currTheme.primary
+                        : Colors.transparent,
+                selectedIndex: widget.navigationShell.currentIndex,
+                destinations: getDestinations(user),
+                onDestinationSelected: (index) =>
+                    _onDestinationSelected(index, user),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
-  void _onDestinationSelected(index) {
+  void _onDestinationSelected(index, final UserModel user) {
     int prevInd = widget.navigationShell.currentIndex;
 
     widget.navigationShell.goBranch(
@@ -130,7 +222,7 @@ class _UserLayoutState extends State<UserLayout> {
       initialLocation: index == widget.navigationShell.currentIndex,
     );
 
-    if (prevInd == 2 && _userProvider.profilePicture.isNotEmpty) {
+    if (prevInd == 2 && user.profilePicture.isNotEmpty) {
       Future.delayed(
         const Duration(milliseconds: 100),
         () {

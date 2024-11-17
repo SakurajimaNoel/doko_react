@@ -60,8 +60,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _userProvider = context.read<UserProvider>();
 
     _nameController = TextEditingController(
-      text: _userProvider.name,
-    );
+        // text: _userProvider.name,
+        );
     _bioController = TextEditingController(
       text: _currentUserBio,
     );
@@ -91,7 +91,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     String userId = _userProvider.id;
     String name = _nameController.text;
     String bio = _bioController.text;
-    String bucketPath = _userProvider.profilePicture;
+    // String bucketPath = _userProvider.profilePicture;
+    String bucketPath = "";
 
     // when new profile picture is selected
     if (!_removeProfile && _profilePicture != null) {
@@ -118,12 +119,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
         return;
       }
 
-      storage.deleteFile(_userProvider.profilePicture);
+      // storage.deleteFile(_userProvider.profilePicture);
     }
 
     // when profile picture is removed
     if (_removeProfile) {
-      storage.deleteFile(_userProvider.profilePicture);
+      // storage.deleteFile(_userProvider.profilePicture);
       bucketPath = "";
     }
 
@@ -150,7 +151,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       return;
     }
 
-    _userProvider.updateUser(updatedUser: updateResult.user!);
+    // _userProvider.updateUser(updatedUser: updateResult.user!);
     _handleSuccess();
   }
 
@@ -283,10 +284,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               fit: BoxFit.cover,
                               cacheHeight: Constants.editProfileCachedHeight,
                             )
-                          : _userProvider.profilePicture.isNotEmpty
+                          // : _userProvider.profilePicture.isNotEmpty
+                          : false
                               ? CachedNetworkImage(
-                                  cacheKey: _userProvider.profilePicture,
-                                  imageUrl: _userProvider.signedProfilePicture,
+                                  // cacheKey: _userProvider.profilePicture,
+                                  // imageUrl: _userProvider.signedProfilePicture,
+                                  imageUrl: "",
                                   fit: BoxFit.cover,
                                   placeholder: (context, url) => const Center(
                                     child: CircularProgressIndicator(),
