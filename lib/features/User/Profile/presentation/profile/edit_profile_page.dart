@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doko_react/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/data/storage.dart';
 import 'package:doko_react/core/helpers/constants.dart';
 import 'package:doko_react/core/helpers/display.dart';
@@ -11,22 +10,22 @@ import 'package:doko_react/core/helpers/enum.dart';
 import 'package:doko_react/core/helpers/input.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
-import 'package:doko_react/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/widgets/image_picker/image_picker_widget.dart';
-import 'package:doko_react/core/widgets/loader/loader_button.dart';
-import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
+import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
+import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class EditProfilePage extends StatefulWidget {
-  final String bio;
+  final CompleteUserModel user;
 
   const EditProfilePage({
     super.key,
-    required this.bio,
+    required this.user,
   });
 
   @override
@@ -36,12 +35,8 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final StorageActions storage = StorageActions(storage: Amplify.Storage);
 
-  late final String _currentUserBio;
   late final UserProvider _userProvider;
-
-  final UserGraphqlService _userGraphqlService = UserGraphqlService(
-    client: GraphqlConfig.getGraphQLClient(),
-  );
+  late final CompleteUserModel user;
 
   late TextEditingController _nameController;
   late TextEditingController _bioController;
@@ -49,21 +44,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   bool _updating = false;
   bool _removeProfile = false;
-  String _errorMessage = "";
   XFile? _profilePicture;
 
   @override
   void initState() {
     super.initState();
 
-    _currentUserBio = widget.bio;
+    user = widget.user;
     _userProvider = context.read<UserProvider>();
 
     _nameController = TextEditingController(
-        // text: _userProvider.name,
-        );
+      text: user.name,
+    );
     _bioController = TextEditingController(
-      text: _currentUserBio,
+      text: user.bio,
     );
   }
 
@@ -75,33 +69,56 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
-  Future<void> _updateUserProfile() async {
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Constants.snackBarDuration,
+      ),
+    );
+  }
+
+  bool needsUpdate() {
+    if (user.name.trim() != _nameController.text.trim()) return true;
+    if (user.bio.trim() != _bioController.text.trim()) return true;
+
+    // check if profile is same or not
+    if (_profilePicture != null) return true;
+    if (user.profilePicture.isNotEmpty && _removeProfile) return true;
+
+    return false;
+  }
+
+  Future<void> _updateUserProfile(RunMutation runMutation) async {
     bool validate = _formKey.currentState?.validate() ?? false;
     if (!validate) {
       return;
     }
     _formKey.currentState?.save();
 
+    if (!needsUpdate()) {
+      context.pop();
+      return;
+    }
+
     setState(() {
       _updating = true;
-      _errorMessage = "";
     });
 
     String username = _userProvider.username;
     String userId = _userProvider.id;
     String name = _nameController.text;
     String bio = _bioController.text;
-    // String bucketPath = _userProvider.profilePicture;
-    String bucketPath = "";
+    String bucketPath = user.profilePicture;
 
     // when new profile picture is selected
-    if (!_removeProfile && _profilePicture != null) {
+    if (_profilePicture != null) {
       String? imageExtension =
           MediaType.getExtensionFromFileName(_profilePicture!.path);
 
       if (imageExtension == null) {
+        showMessage("Invalid image file selected.");
         setState(() {
-          _errorMessage = "Invalid image file selected.";
           _updating = false;
         });
         return;
@@ -112,47 +129,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       var imageResult = await _handleImage(bucketPath);
       if (!imageResult) {
+        showMessage("Error updating profile image.");
         setState(() {
-          _errorMessage = "Error uploading profile image.";
           _updating = false;
         });
         return;
       }
-
-      // storage.deleteFile(_userProvider.profilePicture);
     }
 
     // when profile picture is removed
     if (_removeProfile) {
-      // storage.deleteFile(_userProvider.profilePicture);
       bucketPath = "";
     }
 
-    // update graph
-    var updateResult = await _userGraphqlService.updateUserProfile(
+    runMutation(UserQueries.updateUserProfileVariables(
       username: username,
       name: name,
       bio: bio,
       profilePicture: bucketPath,
-    );
-
-    if (updateResult.status == ResponseStatus.error) {
-      String message =
-          "Updated user profile image. Error updating other fields.";
-
-      if (_profilePicture == null) {
-        message = "Error updating user profile fields.";
-      }
-
-      setState(() {
-        _errorMessage = message;
-        _updating = false;
-      });
-      return;
-    }
-
-    // _userProvider.updateUser(updatedUser: updateResult.user!);
-    _handleSuccess();
+    ));
   }
 
   Future<bool> _handleImage(String path) async {
@@ -166,14 +161,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   void _handleSuccess() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Successfully updated user profile'),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-
-    context.pop(_bioController.text);
+    showMessage('Successfully updated user profile');
+    context.pop();
   }
 
   void onSelection(List<XFile> image) async {
@@ -237,18 +226,50 @@ class _EditProfilePageState extends State<EditProfilePage> {
     var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
     var height = width * (1 / Constants.profile);
 
+    bool noProfilePictureUi = _removeProfile ||
+        (user.profilePicture.isEmpty && _profilePicture == null);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit profile"),
         actions: [
-          TextButton(
-            onPressed: _updating ? null : _updateUserProfile,
-            child: _updating
-                ? const LoaderButton(
+          Mutation(
+            options: MutationOptions(
+                document: gql(UserQueries.updateUserProfile()),
+                onError: (error) {
+                  // handle error updating graph
+                  _updating = false;
+                },
+                onCompleted: (data) async {
+                  if (_removeProfile || _profilePicture != null) {
+                    storage.deleteFile(user.profilePicture);
+                  }
+                  _updating = false;
+                  _handleSuccess();
+                }),
+            builder: (RunMutation runMutation, QueryResult? result) {
+              bool loading = _updating || (result?.isLoading ?? false);
+
+              if (loading) {
+                return const Padding(
+                  padding: EdgeInsets.only(
+                    right: Constants.padding,
+                  ),
+                  child: SizedBox(
                     width: Constants.width,
                     height: Constants.height,
-                  )
-                : const Text("Save"),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ),
+                  ),
+                );
+              }
+
+              return TextButton(
+                onPressed: () => _updateUserProfile(runMutation),
+                child: const Text("Save"),
+              );
+            },
           ),
         ],
       ),
@@ -259,7 +280,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
           if (_updating) return;
 
-          context.pop(_currentUserBio);
+          context.pop();
         },
         child: ListView(
           padding: const EdgeInsets.all(Constants.padding),
@@ -270,7 +291,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  _removeProfile
+                  noProfilePictureUi
                       ? Container(
                           color: currTheme.onSecondary,
                           child: const Icon(
@@ -284,29 +305,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               fit: BoxFit.cover,
                               cacheHeight: Constants.editProfileCachedHeight,
                             )
-                          // : _userProvider.profilePicture.isNotEmpty
-                          : false
-                              ? CachedNetworkImage(
-                                  // cacheKey: _userProvider.profilePicture,
-                                  // imageUrl: _userProvider.signedProfilePicture,
-                                  imageUrl: "",
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                  height: Constants.height * 15,
-                                  memCacheHeight:
-                                      Constants.editProfileCachedHeight,
-                                )
-                              : Container(
-                                  color: currTheme.onSecondary,
-                                  child: const Icon(
-                                    Icons.person,
-                                    size: Constants.height * 15,
-                                  ),
-                                ),
+                          : CachedNetworkImage(
+                              cacheKey: user.profilePicture,
+                              imageUrl: user.signedProfilePicture,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                              height: Constants.height * 15,
+                              memCacheHeight: Constants.editProfileCachedHeight,
+                            ),
                   Container(
                     padding: const EdgeInsets.only(
                       bottom: Constants.padding,
@@ -332,13 +342,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           onSelection: onSelection,
                           icon: const Icon(Icons.photo_camera),
                         ),
-                        IconButton.filled(
+                        if (!noProfilePictureUi)
+                          IconButton.filled(
                             onPressed: _updating
                                 ? null
                                 : () {
                                     if (!_removeProfile) {
                                       setState(() {
                                         _removeProfile = true;
+                                        _profilePicture = null;
                                       });
                                     }
                                   },
@@ -346,7 +358,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             color: currTheme.onError,
                             style: IconButton.styleFrom(
                               backgroundColor: currTheme.error,
-                            ))
+                            ),
+                          )
                       ],
                     ),
                   ),
@@ -421,10 +434,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ],
               ),
             ),
-            const SizedBox(
-              height: Constants.gap,
-            ),
-            if (_errorMessage.isNotEmpty) ErrorText(_errorMessage),
           ],
         ),
       ),

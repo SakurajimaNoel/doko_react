@@ -87,7 +87,7 @@ class UserQueries {
           "username": userDetails.username,
           "email": userDetails.email,
           "dob": DisplayText.date(userDetails.dob),
-          "name": userDetails.name,
+          "name": userDetails.name.trim(),
           "profilePicture": userDetails.profilePicture,
         }
       ]
@@ -692,8 +692,8 @@ class UserQueries {
         "username_EQ": username,
       },
       "update": {
-        "name": name,
-        "bio": bio,
+        "name": name.trim(),
+        "bio": bio.trim(),
         "profilePicture": profilePicture,
       }
     };

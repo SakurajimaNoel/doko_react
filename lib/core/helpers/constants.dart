@@ -73,6 +73,6 @@ class Constants {
 
   // intervals
   static const Duration userProfilePollInterval = Duration(
-    minutes: 15,
+    minutes: 55,
   );
 }

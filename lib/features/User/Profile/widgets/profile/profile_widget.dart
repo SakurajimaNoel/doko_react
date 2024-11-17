@@ -45,8 +45,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
   bool loading = true;
 
-  // CompleteUserModel? _user;
-
   @override
   void initState() {
     super.initState();
@@ -169,20 +167,15 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   Widget userProfileAction(CompleteUserModel user) {
     if (self) {
       return FilledButton.tonalIcon(
-        onPressed: () async {
+        onPressed: () {
           // go to edit page
           Map<String, dynamic> data = {
-            "bio": user.bio,
+            "user": user,
           };
-          String? newBio = await context.pushNamed<String>(
+          context.pushNamed<String>(
             RouterConstants.editProfile,
             extra: data,
           );
-          // if (user!.bio != newBio) {
-          //   setState(() {
-          //     user!.bio = newBio ?? "";
-          //   });
-          // }
         },
         label: const Text("Edit"),
         icon: const Icon(Icons.edit_note),

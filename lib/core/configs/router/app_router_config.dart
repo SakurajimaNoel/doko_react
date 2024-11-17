@@ -1,7 +1,6 @@
 import 'package:doko_react/core/configs/router/router_constants.dart';
 import 'package:doko_react/core/helpers/media_type.dart';
 import 'package:doko_react/core/provider/authentication_provider.dart';
-import 'package:doko_react/core/provider/user_preferences_provider.dart';
 import 'package:doko_react/core/provider/user_provider.dart';
 import 'package:doko_react/core/widgets/error/error_unknown_route.dart';
 import 'package:doko_react/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
@@ -19,6 +18,7 @@ import 'package:doko_react/features/User/Profile/presentation/profile/edit_profi
 import 'package:doko_react/features/User/Profile/presentation/profile/profile_page.dart';
 import 'package:doko_react/features/User/Profile/presentation/profile/user_profile_page.dart';
 import 'package:doko_react/features/User/data/model/post_model.dart';
+import 'package:doko_react/features/User/data/model/user_model.dart';
 import 'package:doko_react/features/User/user_layout.dart';
 import 'package:doko_react/features/application/settings/presentation/change_password_page.dart';
 import 'package:doko_react/features/application/settings/presentation/mfa_setup_page.dart';
@@ -198,14 +198,7 @@ class AppRouterConfig {
                 name: RouterConstants.profile,
                 path: "/profile",
                 builder: (context, state) {
-                  // todo: handle this in a better way
-                  final needsRefresh = context.select(
-                      (UserPreferencesProvider preferences) =>
-                          preferences.profileRefresh);
-
-                  return ProfilePage(
-                    key: ObjectKey(needsRefresh),
-                  );
+                  return const ProfilePage();
                 },
                 routes: [
                   GoRoute(
@@ -293,9 +286,10 @@ class AppRouterConfig {
                     builder: (context, state) {
                       final Map<String, dynamic> data =
                           state.extra as Map<String, dynamic>;
-                      final String bio = data["bio"];
+                      final CompleteUserModel user = data["user"];
+
                       return EditProfilePage(
-                        bio: bio,
+                        user: user,
                       );
                     },
                   ),
