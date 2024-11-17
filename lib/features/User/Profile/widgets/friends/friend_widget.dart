@@ -129,6 +129,7 @@ class _UserActionState extends State<_UserAction>
     _friend.friendRelationDetail = FriendConnectionDetail(
       requestedByUsername: requestedByUsername,
       status: FriendStatus.pending,
+      addedOn: DateTime.timestamp(),
     );
   }
 

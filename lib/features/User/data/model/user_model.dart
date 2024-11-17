@@ -1,5 +1,3 @@
-import 'package:doko_react/features/User/data/model/post_model.dart';
-
 import 'friend_model.dart';
 import 'model.dart';
 
@@ -35,19 +33,17 @@ class UserModel {
 
 // complete user info
 class CompleteUserModel extends UserModel {
-  FriendConnectionDetail? friendRelationDetail;
-  String bio;
+  final String bio;
   final DateTime dob;
   final DateTime createdOn;
-  final ProfilePostInfo postsInfo;
-  int postsCount;
-  int friendsCount;
+  final int postsCount;
+  final int friendsCount;
+  FriendConnectionDetail? friendRelationDetail;
 
   CompleteUserModel({
     required this.friendRelationDetail,
     required this.bio,
     required this.dob,
-    required this.postsInfo,
     required this.createdOn,
     required super.name,
     required super.username,
@@ -62,7 +58,6 @@ class CompleteUserModel extends UserModel {
     required UserModel user,
     required this.friendRelationDetail,
     required this.bio,
-    required this.postsInfo,
     required this.createdOn,
     required this.dob,
     required this.postsCount,
@@ -77,35 +72,24 @@ class CompleteUserModel extends UserModel {
 
   static Future<CompleteUserModel> createModel({required Map map}) async {
     // user model
-    Future<UserModel> futureUser = UserModel.createModel(map: map);
+    final UserModel user = await UserModel.createModel(map: map);
 
-    // user posts
-    Future<ProfilePostInfo> futurePostInfo = ProfilePostInfo.createModel(
-      map: map["postsConnection"],
-    );
-
-    final results = await Future.wait([
-      futureUser,
-      futurePostInfo,
-    ]);
-
-    List friendConnection = map["friends"] as List;
+    List friendConnection = map["friendsConnection"]["edges"] as List;
     FriendConnectionDetail? friendConnectionDetail;
 
     if (friendConnection.isNotEmpty) {
-      friendConnectionDetail = FriendConnectionDetail.createModel(
-          friendConnection[0]["friendsConnection"]["edges"][0]["properties"]);
+      friendConnectionDetail =
+          FriendConnectionDetail.createModel(friendConnection[0]);
     }
 
     return CompleteUserModel.fromUserModel(
-      user: results[0] as UserModel,
+      user: user,
       friendRelationDetail: friendConnectionDetail,
       bio: map["bio"] ?? "",
       dob: DateTime.parse(map["dob"]),
       createdOn: DateTime.parse(map["createdOn"]),
-      postsInfo: results[1] as ProfilePostInfo,
-      friendsCount: map["friendsConnection"]["totalCount"],
-      postsCount: map["postsConnection"]["totalCount"],
+      friendsCount: map["friendsAggregate"]["count"],
+      postsCount: map["postsAggregate"]["count"],
     );
   }
 }

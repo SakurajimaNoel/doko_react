@@ -30,11 +30,12 @@ class UsernameResponse {
 
 class CompleteUserResponse {
   final ResponseStatus status;
-  final CompleteUserModel? user;
+
+  // final CompleteUserModel? user;
 
   const CompleteUserResponse({
     required this.status,
-    this.user,
+    // this.user,
   });
 }
 
@@ -206,47 +207,47 @@ class UserGraphqlService {
   //   }
   // }
 
-  Future<CompleteUserResponse> getCompleteUser(
-    String username, {
-    required String currentUsername,
-  }) async {
-    try {
-      QueryResult result = await _client.query(
-        QueryOptions(
-          fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(UserQueries.getCompleteUser()),
-          variables: UserQueries.getCompleteUserVariables(
-            username,
-            currentUsername: currentUsername,
-          ),
-        ),
-      );
-
-      if (result.hasException) {
-        throw Exception(result.exception);
-      }
-
-      List? res = result.data?["users"];
-
-      if (res == null || res.isEmpty) {
-        return const CompleteUserResponse(
-          status: ResponseStatus.success,
-        );
-      }
-
-      CompleteUserModel user = await CompleteUserModel.createModel(map: res[0]);
-
-      return CompleteUserResponse(
-        status: ResponseStatus.success,
-        user: user,
-      );
-    } catch (e) {
-      safePrint(e.toString());
-      return const CompleteUserResponse(
-        status: ResponseStatus.error,
-      );
-    }
-  }
+  // Future<CompleteUserResponse> getCompleteUser(
+  //   String username, {
+  //   required String currentUsername,
+  // }) async {
+  //   try {
+  //     QueryResult result = await _client.query(
+  //       QueryOptions(
+  //         fetchPolicy: FetchPolicy.networkOnly,
+  //         document: gql(UserQueries.getCompleteUser()),
+  //         variables: UserQueries.getCompleteUserVariables(
+  //           username,
+  //           currentUsername: currentUsername,
+  //         ),
+  //       ),
+  //     );
+  //
+  //     if (result.hasException) {
+  //       throw Exception(result.exception);
+  //     }
+  //
+  //     List? res = result.data?["users"];
+  //
+  //     if (res == null || res.isEmpty) {
+  //       return const CompleteUserResponse(
+  //         status: ResponseStatus.success,
+  //       );
+  //     }
+  //
+  //     CompleteUserModel user = await CompleteUserModel.createModel(map: res[0]);
+  //
+  //     return CompleteUserResponse(
+  //       status: ResponseStatus.success,
+  //       user: user,
+  //     );
+  //   } catch (e) {
+  //     safePrint(e.toString());
+  //     return const CompleteUserResponse(
+  //       status: ResponseStatus.error,
+  //     );
+  //   }
+  // }
 
   Future<FriendResponse> getFriendsByUsername(
     String username, {

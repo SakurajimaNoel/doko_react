@@ -4,21 +4,24 @@ import 'model.dart';
 
 class FriendConnectionDetail {
   final String requestedByUsername;
-  String status;
+  final String status;
+  final DateTime addedOn;
 
   void updateStatus(String status) {
-    this.status = status;
+    // this.status = status;
   }
 
   FriendConnectionDetail({
     required this.requestedByUsername,
     required this.status,
+    required this.addedOn,
   });
 
   static FriendConnectionDetail createModel(Map map) {
     return FriendConnectionDetail(
       requestedByUsername: map["requestedBy"],
       status: map["status"],
+      addedOn: DateTime.parse(map["addedOn"]),
     );
   }
 }

@@ -95,58 +95,124 @@ class UserQueries {
   }
 
   // get complete user
+  // static String getCompleteUser() {
+  //   return """
+  //     query Users(\$where: UserWhere, \$friendsWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$likedByWhere2: UserWhere, \$sort: [UserPostsConnectionSort!], \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
+  //       users(where: \$where) {
+  //         id
+  //         username
+  //         createdOn
+  //         name
+  //         profilePicture
+  //         bio
+  //         dob
+  //         friends(where: \$friendsWhere2) {
+  //           friendsConnection(where: \$friendsConnectionWhere3) {
+  //             edges {
+  //               properties {
+  //                 status
+  //                 requestedBy
+  //                 addedOn
+  //               }
+  //             }
+  //           }
+  //         }
+  //         friendsConnection(where: \$friendsConnectionWhere2) {
+  //           totalCount
+  //         }
+  //         postsConnection(first: \$first, sort: \$sort) {
+  //           totalCount
+  //           pageInfo {
+  //             endCursor
+  //             hasNextPage
+  //           }
+  //           edges {
+  //             node {
+  //               id
+  //               createdOn
+  //               content
+  //               caption
+  //               likedBy(where: \$likedByWhere2) {
+  //                 username
+  //               }
+  //               likedByConnection {
+  //                 totalCount
+  //               }
+  //               commentsConnection {
+  //                 totalCount
+  //               }
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   """;
+  // }
+  //
+  // static Map<String, dynamic> getCompleteUserVariables(
+  //   String username, {
+  //   required String currentUsername,
+  // }) {
+  //   return {
+  //     "where": {
+  //       "username_EQ": username,
+  //     },
+  //     "friendsWhere2": {
+  //       "username_EQ": currentUsername,
+  //     },
+  //     "friendsConnectionWhere2": {
+  //       "edge": {
+  //         "status_EQ": FriendStatus.accepted,
+  //       }
+  //     },
+  //     "first": QueryConstants.postLimit,
+  //     "likedByWhere2": {
+  //       "username_EQ": currentUsername,
+  //     },
+  //     "sort": [
+  //       {
+  //         "node": {
+  //           "createdOn": "DESC",
+  //         }
+  //       }
+  //     ],
+  //     "friendsConnectionWhere3": {
+  //       "node": {
+  //         "username_EQ": username,
+  //       }
+  //     },
+  //   };
+  // }
+
   static String getCompleteUser() {
-    return """
-      query Users(\$where: UserWhere, \$friendsWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$likedByWhere2: UserWhere, \$sort: [UserPostsConnectionSort!], \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
+    return '''
+      query Users(\$where: UserWhere, \$friendsAggregateWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
         users(where: \$where) {
           id
           username
-          createdOn
           name
           profilePicture
-          bio
+          createdOn
           dob
-          friends(where: \$friendsWhere2) {
-            friendsConnection(where: \$friendsConnectionWhere3) {
-              edges {
-                properties {
-                  status
-                  requestedBy
-                  addedOn
-                }
-              }
-            }
+          bio
+          postsAggregate {
+            count
+          }
+          friendsAggregate(where: \$friendsAggregateWhere2) {
+            count
           }
           friendsConnection(where: \$friendsConnectionWhere2) {
-            totalCount
-          }
-          postsConnection(first: \$first, sort: \$sort) {
-            totalCount
-            pageInfo {
-              endCursor
-              hasNextPage
-            }
             edges {
-              node {
-                id
-                createdOn
-                content
-                caption
-                likedBy(where: \$likedByWhere2) {
-                  username
-                }
-                likedByConnection {
-                  totalCount
-                }
-                commentsConnection {
-                  totalCount
-                }
+              properties {
+                addedOn
+                requestedBy
+                status
               }
             }
           }
         }
       }
-    """;
+    ''';
   }
 
   static Map<String, dynamic> getCompleteUserVariables(
@@ -157,30 +223,18 @@ class UserQueries {
       "where": {
         "username_EQ": username,
       },
-      "friendsWhere2": {
-        "username_EQ": currentUsername,
-      },
-      "friendsConnectionWhere2": {
-        "edge": {
-          "status_EQ": FriendStatus.accepted,
-        }
-      },
-      "first": QueryConstants.postLimit,
-      "likedByWhere2": {
-        "username_EQ": currentUsername,
-      },
-      "sort": [
-        {
-          "node": {
-            "createdOn": "DESC",
+      "friendsAggregateWhere2": {
+        "friendsConnection_ALL": {
+          "edge": {
+            "status_EQ": FriendStatus.accepted,
           }
         }
-      ],
-      "friendsConnectionWhere3": {
-        "node": {
-          "username_EQ": username,
-        }
       },
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": currentUsername,
+        }
+      }
     };
   }
 

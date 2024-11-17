@@ -1,5 +1,5 @@
 import 'package:doko_react/core/provider/user_provider.dart';
-import 'package:doko_react/features/User/Profile/widgets/profile_widget.dart';
+import 'package:doko_react/features/User/Profile/widgets/profile/profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
