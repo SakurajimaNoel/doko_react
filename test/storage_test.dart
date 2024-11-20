@@ -1,6 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:doko_react/core/data/storage.dart';
-import 'package:doko_react/core/helpers/enum.dart';
+import 'package:doko_react/archive/core/data/storage.dart';
+import 'package:doko_react/archive/core/helpers/enum.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

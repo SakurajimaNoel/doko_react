@@ -1,7 +1,7 @@
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:doko_react/core/data/auth.dart';
-import 'package:doko_react/core/helpers/constants.dart';
+import 'package:doko_react/archive/core/data/auth.dart';
+import 'package:doko_react/archive/core/helpers/constants.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

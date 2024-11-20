@@ -65,4 +65,4 @@ amplifytools.xcconfig
 #amplify-do-not-edit-end
 
 #personal
-/lib/secret/
+/lib/archive/secret/

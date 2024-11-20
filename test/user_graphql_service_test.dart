@@ -1,7 +1,7 @@
-import 'package:doko_react/core/helpers/enum.dart';
-import 'package:doko_react/features/User/data/graphql_queries/user_queries.dart';
-import 'package:doko_react/features/User/data/model/user_model.dart';
-import 'package:doko_react/features/User/data/services/user_graphql_service.dart';
+import 'package:doko_react/archive/core/helpers/enum.dart';
+import 'package:doko_react/archive/features/User/data/graphql_queries/user_queries.dart';
+import 'package:doko_react/archive/features/User/data/model/user_model.dart';
+import 'package:doko_react/archive/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:mocktail/mocktail.dart';
