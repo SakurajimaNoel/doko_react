@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doko_react/archive/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/archive/core/configs/router/router_constants.dart';
 import 'package:doko_react/archive/core/helpers/constants.dart';
 import 'package:doko_react/archive/core/helpers/display.dart';
@@ -7,7 +6,6 @@ import 'package:doko_react/archive/core/helpers/input.dart';
 import 'package:doko_react/archive/core/provider/user_provider.dart';
 import 'package:doko_react/archive/features/User/Profile/widgets/user/user_widget.dart';
 import 'package:doko_react/archive/features/User/data/model/comment_model.dart';
-import 'package:doko_react/archive/features/User/data/services/user_graphql_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -29,7 +27,7 @@ class CommentWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final commentMediaHeight = width / Constants.commentContainer;
-    final currTheme = Theme.of(context).colorScheme;
+    // final currTheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,9 +219,10 @@ class _CommentActions extends StatefulWidget {
 
 class _CommentActionsState extends State<_CommentActions> {
   late final UserProvider userProvider;
-  final UserGraphqlService _userGraphqlService = UserGraphqlService(
-    client: GraphqlConfig.getGraphQLClient(),
-  );
+
+  // final UserGraphqlService _userGraphqlService = UserGraphqlService(
+  //   client: GraphqlConfig.getGraphQLClient(),
+  // );
   bool updating = false;
 
   @override
