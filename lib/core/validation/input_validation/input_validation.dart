@@ -1,13 +1,17 @@
 import 'package:password_strength/password_strength.dart';
 
-bool validateEmail(String email) {
+bool validateEmail(String? email) {
+  if (email == null) return false;
+
   final RegExp emailRegex =
       RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
 
   return emailRegex.hasMatch(email);
 }
 
-bool validatePassword(String password) {
+bool validatePassword(String? password) {
+  if (password == null) return false;
+
   final RegExp passwordRegex =
       RegExp(r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$");
 
