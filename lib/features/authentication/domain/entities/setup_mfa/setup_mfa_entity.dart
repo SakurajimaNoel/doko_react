@@ -4,6 +4,6 @@ class SetupMFAEntity {
     required this.sharedSecret,
   });
 
-  final String setupUri;
+  final Uri setupUri;
   final String sharedSecret;
 }

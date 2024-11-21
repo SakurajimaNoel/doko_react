@@ -24,5 +24,5 @@ abstract class AuthenticationRepository {
 
   Future<bool> verifyMFASetup(String code);
 
-  Future<bool> removeMFA();
+  Future<void> removeMFA();
 }
