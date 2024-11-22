@@ -1,5 +1,4 @@
 import 'package:doko_react/archive/core/helpers/media_type.dart';
-import 'package:doko_react/archive/core/widgets/error/error_unknown_route.dart';
 import 'package:doko_react/archive/features/User/CompleteProfile/Presentation/complete_profile_info_page.dart';
 import 'package:doko_react/archive/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
 import 'package:doko_react/archive/features/User/CompleteProfile/Presentation/complete_profile_username_page.dart';
@@ -21,13 +20,14 @@ import 'package:doko_react/archive/features/application/settings/presentation/ch
 import 'package:doko_react/archive/features/application/settings/presentation/mfa_setup_page.dart';
 import 'package:doko_react/archive/features/application/settings/presentation/settings_page.dart';
 import 'package:doko_react/archive/features/application/settings/presentation/verify_mfa_page.dart';
-import 'package:doko_react/archive/features/authentication/presentation/screens/confirm_mfa_page.dart';
-import 'package:doko_react/archive/features/authentication/presentation/screens/password_reset_confirm_page.dart';
-import 'package:doko_react/archive/features/authentication/presentation/screens/password_reset_page.dart';
-import 'package:doko_react/archive/features/authentication/presentation/screens/signup_page.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/widgets/error/error_unknown_route.dart';
+import 'package:doko_react/features/authentication/presentation/pages/login/confirm_login_page.dart';
 import 'package:doko_react/features/authentication/presentation/pages/login/login_page.dart';
+import 'package:doko_react/features/authentication/presentation/pages/password/confirm_reset_password_page.dart';
+import 'package:doko_react/features/authentication/presentation/pages/password/reset_password_page.dart';
+import 'package:doko_react/features/authentication/presentation/pages/sign-up/sign_up_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -104,10 +104,10 @@ class AppRouterConfig {
         },
         routes: [
           GoRoute(
-            name: RouterConstants.mfa,
+            name: RouterConstants.confirmLogin,
             path: "mfa",
             builder: (context, state) {
-              return const ConfirmMfaPage();
+              return const ConfirmLoginPage();
             },
           ),
         ],
@@ -116,22 +116,22 @@ class AppRouterConfig {
         name: RouterConstants.signUp,
         path: "/auth/sign-up",
         builder: (context, state) {
-          return const SignupPage();
+          return const SignUpPage();
         },
       ),
       GoRoute(
         name: RouterConstants.passwordReset,
         path: "/auth/password-reset",
         builder: (context, state) {
-          return const PasswordResetPage();
+          return const ResetPasswordPage();
         },
         routes: [
           GoRoute(
-            name: RouterConstants.passwordResetConfirm,
+            name: RouterConstants.confirmPasswordReset,
             path: "password-reset-confirm/:email",
             builder: (context, state) {
               final emailValue = state.pathParameters["email"]!;
-              return PasswordResetConfirmPage(
+              return ConfirmResetPasswordPage(
                 email: emailValue,
               );
             },

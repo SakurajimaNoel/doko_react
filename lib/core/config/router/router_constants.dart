@@ -3,10 +3,10 @@ class RouterConstants {
 
   // auth router
   static const String login = "login";
-  static const String mfa = "mfa";
+  static const String confirmLogin = "confirm-login";
   static const String signUp = "signUp";
   static const String passwordReset = "password-reset";
-  static const String passwordResetConfirm = "password-reset-confirm";
+  static const String confirmPasswordReset = "confirm-password-reset";
 
   // home router
   static const String userFeed = "userFeed";

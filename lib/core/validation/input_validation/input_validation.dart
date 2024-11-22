@@ -12,14 +12,62 @@ bool validateEmail(String? email) {
 bool validatePassword(String? password) {
   if (password == null) return false;
 
-  final RegExp passwordRegex =
-      RegExp(r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$");
+  final RegExp digitRegex = RegExp(r"\d");
+  final RegExp lowercaseRegex = RegExp(r"[a-z]");
+  final RegExp uppercaseRegex = RegExp(r"[A-Z]");
+  final RegExp specialCharRegex = RegExp(r"\W");
+  final RegExp whitespaceRegex = RegExp(r"\s");
 
-  return passwordRegex.hasMatch(password);
+  return uppercaseRegex.hasMatch(password) &&
+      lowercaseRegex.hasMatch(password) &&
+      digitRegex.hasMatch(password) &&
+      specialCharRegex.hasMatch(password) &&
+      !whitespaceRegex.hasMatch(password) &&
+      password.length >= 8 &&
+      password.length <= 24 &&
+      _validatePasswordStrength(password);
 }
 
-bool validatePasswordStrength(String password) {
-  return estimatePasswordStrength(password) < 0.5;
+String passwordInvalidateReason(String? password) {
+  if (password == null) return "Password can't be empty";
+
+  final RegExp digitRegex = RegExp(r"\d");
+  final RegExp lowercaseRegex = RegExp(r"[a-z]");
+  final RegExp uppercaseRegex = RegExp(r"[A-Z]");
+  final RegExp specialCharRegex = RegExp(r"\W");
+  final RegExp whitespaceRegex = RegExp(r"\s");
+
+  if (!uppercaseRegex.hasMatch(password)) {
+    return "Password must contain at least one uppercase letter";
+  }
+  if (!lowercaseRegex.hasMatch(password)) {
+    return "Password must contain at least one lowercase letter";
+  }
+
+  if (!digitRegex.hasMatch(password)) {
+    return "Password must contain at least one digit";
+  }
+
+  if (!specialCharRegex.hasMatch(password)) {
+    return "Password must contain at least one special character";
+  }
+
+  if (whitespaceRegex.hasMatch(password)) {
+    return "Password must not contain spaces";
+  }
+
+  // Check the length of the password
+  if (password.length < 8 || password.length > 24) {
+    return "Password must be 8-24 characters long";
+  }
+
+  return "Password too weak. Please try again.";
+}
+
+bool _validatePasswordStrength(String? password) {
+  if (password == null) return false;
+
+  return estimatePasswordStrength(password) > 0.5;
 }
 
 // used for checking if both passwords are equal

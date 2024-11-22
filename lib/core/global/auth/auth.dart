@@ -1,11 +1,14 @@
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:flutter/services.dart';
 
 Future<AuthUser> getUser() async {
   try {
     return await Amplify.Auth.getCurrentUser();
-  } catch (e) {
+  } on AuthException catch (e) {
+    throw ApplicationException(reason: e.message);
+  } catch (_) {
     rethrow;
   }
 }
@@ -19,15 +22,23 @@ Future<String> getAccessToken() async {
 
     Clipboard.setData(ClipboardData(text: token)).then((value) {});
     return token;
-  } catch (e) {
+  } on AuthException catch (e) {
+    throw ApplicationException(reason: e.message);
+  } catch (_) {
     rethrow;
   }
 }
 
 /// returns true if setup otherwise false
 Future<bool> getUserMFAStatus() async {
-  final cognitoPlugin = Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
-  final currentPreference = await cognitoPlugin.fetchMfaPreference();
+  try {
+    final cognitoPlugin = Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
+    final currentPreference = await cognitoPlugin.fetchMfaPreference();
 
-  return currentPreference.preferred != null;
+    return currentPreference.preferred != null;
+  } on AuthException catch (e) {
+    throw ApplicationException(reason: e.message);
+  } catch (_) {
+    rethrow;
+  }
 }

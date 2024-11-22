@@ -22,11 +22,32 @@ final class AuthenticationError extends AuthenticationState {
   List<Object?> get props => [message];
 }
 
-final class AuthenticationSuccess extends AuthenticationState {
-  AuthenticationSuccess({required this.status});
+final class AuthenticationLoginSuccess extends AuthenticationState {
+  AuthenticationLoginSuccess({required this.status});
 
   final LoginStatus status;
 
   @override
   List<Object?> get props => [status];
+}
+
+final class AuthenticationSignUpSuccess extends AuthenticationState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class AuthenticationResetPasswordSuccess extends AuthenticationState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class AuthenticationConfirmResetPasswordSuccess
+    extends AuthenticationState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class AuthenticationUpdatePasswordSuccess extends AuthenticationState {
+  @override
+  List<Object?> get props => [];
 }

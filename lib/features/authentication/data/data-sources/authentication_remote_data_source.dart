@@ -1,5 +1,6 @@
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/features/authentication/data/models/setup_mfa/setup_mfa_model.dart';
 import 'package:doko_react/features/authentication/domain/entities/login/login_entity.dart';
 import 'package:doko_react/features/authentication/input/authentication_input.dart';
@@ -22,7 +23,9 @@ class AuthenticationRemoteDataSource {
         result,
         loginDetails.email,
       );
-    } catch (e) {
+    } on AuthException catch (e) {
+      throw ApplicationException(reason: e.message);
+    } catch (_) {
       rethrow;
     }
   }
@@ -49,7 +52,9 @@ class AuthenticationRemoteDataSource {
       await _auth.confirmSignIn(confirmationValue: code);
 
       return LoginStatus.done;
-    } catch (e) {
+    } on AuthException catch (e) {
+      throw ApplicationException(reason: e.message);
+    } catch (_) {
       rethrow;
     }
   }
@@ -62,7 +67,9 @@ class AuthenticationRemoteDataSource {
       );
 
       return true;
-    } catch (e) {
+    } on AuthException catch (e) {
+      throw ApplicationException(reason: e.message);
+    } catch (_) {
       rethrow;
     }
   }
@@ -82,7 +89,9 @@ class AuthenticationRemoteDataSource {
       );
 
       return true;
-    } catch (e) {
+    } on AuthException catch (e) {
+      throw ApplicationException(reason: e.message);
+    } catch (_) {
       rethrow;
     }
   }
@@ -97,7 +106,9 @@ class AuthenticationRemoteDataSource {
       );
 
       return true;
-    } catch (e) {
+    } on AuthException catch (e) {
+      throw ApplicationException(reason: e.message);
+    } catch (_) {
       rethrow;
     }
   }
@@ -110,7 +121,9 @@ class AuthenticationRemoteDataSource {
       );
 
       return true;
-    } catch (e) {
+    } on AuthException catch (e) {
+      throw ApplicationException(reason: e.message);
+    } catch (_) {
       rethrow;
     }
   }
@@ -127,7 +140,9 @@ class AuthenticationRemoteDataSource {
         setupUri: setupUri,
         sharedSecret: totpSetupDetails.sharedSecret,
       );
-    } catch (e) {
+    } on AuthException catch (e) {
+      throw ApplicationException(reason: e.message);
+    } catch (_) {
       rethrow;
     }
   }
@@ -142,7 +157,9 @@ class AuthenticationRemoteDataSource {
       );
 
       return true;
-    } catch (e) {
+    } on AuthException catch (e) {
+      throw ApplicationException(reason: e.message);
+    } catch (_) {
       rethrow;
     }
   }

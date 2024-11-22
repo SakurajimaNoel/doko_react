@@ -501,14 +501,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  fpdart:
-    dependency: "direct main"
-    description:
-      name: fpdart
-      sha256: "1b84ce64453974159f08046f5d05592020d1fcb2099d7fe6ec58da0e7337af77"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.1"
   get_it:
     dependency: "direct main"
     description:
@@ -910,7 +902,7 @@ packages:
     source: hosted
     version: "1.2.5"
   meta:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: meta
       sha256: bdb68674043280c3428e9ec998512fb681678676b3c54e773629ffe74419f8c7

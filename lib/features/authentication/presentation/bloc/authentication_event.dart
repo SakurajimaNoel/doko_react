@@ -27,8 +27,8 @@ final class ResetPasswordEvent extends AuthenticationEvent {
   final ResetPasswordInput resetDetails;
 }
 
-final class ConfirmResetPassword extends AuthenticationEvent {
-  ConfirmResetPassword({required this.resetDetails});
+final class ConfirmResetPasswordEvent extends AuthenticationEvent {
+  ConfirmResetPasswordEvent({required this.resetDetails});
 
   final ConfirmResetPasswordInput resetDetails;
 }

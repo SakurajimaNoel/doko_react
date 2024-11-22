@@ -1,7 +1,12 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
+import 'package:doko_react/features/authentication/domain/entities/login/login_entity.dart';
+import 'package:doko_react/features/authentication/input/authentication_input.dart';
 import 'package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:doko_react/features/authentication/presentation/widgets/button-loading/button_loading.dart';
+import 'package:doko_react/features/authentication/presentation/widgets/heading/heading.dart';
+import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +21,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -26,6 +33,47 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  void stateActions(BuildContext context, AuthenticationState state) {
+    if (state is AuthenticationLoginSuccess) {
+      LoginStatus status = state.status;
+      formKey.currentState?.reset();
+
+      switch (status) {
+        case LoginStatus.done:
+          // handled by amplify event listener
+          return;
+        case LoginStatus.confirmMfa:
+          context.pushNamed(RouterConstants.confirmLogin);
+          return;
+        case LoginStatus.confirmSingUp:
+          String message =
+              "A verification email has been sent to your inbox. Please click the link to confirm your email address and log in.";
+          showMessage(message);
+          return;
+      }
+    }
+
+    String errorMessage = (state as AuthenticationError).message;
+    showMessage(errorMessage);
+  }
+
+  void handleLogin(BuildContext context) {
+    final isValid = formKey.currentState?.validate() ?? false;
+    if (!isValid) {
+      return;
+    }
+
+    final loginDetails = LoginInput(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
+    context.read<AuthenticationBloc>().add(
+          LoginEvent(
+            loginDetails: loginDetails,
+          ),
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
@@ -34,15 +82,14 @@ class _LoginPageState extends State<LoginPage> {
       body: Padding(
         padding: const EdgeInsets.all(Constants.padding),
         child: BlocProvider(
-          create: (context) => AuthenticationBloc(),
+          create: (context) => serviceLocator<AuthenticationBloc>(),
           child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
             listenWhen: (previousState, state) {
-              return state is AuthenticationError && previousState != state;
+              return (state is AuthenticationError ||
+                      state is AuthenticationLoginSuccess) &&
+                  previousState != state;
             },
-            listener: (BuildContext context, AuthenticationState state) {
-              String errorMessage = (state as AuthenticationError).message;
-              showMessage(errorMessage);
-            },
+            listener: stateActions,
             builder: (context, state) {
               bool loading = state is AuthenticationLoading;
 
@@ -53,13 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "Login",
-                          style: TextStyle(
-                            fontSize: Constants.heading1,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        const Heading("Login"),
                         const SizedBox(
                           height: Constants.gap * 1.5,
                         ),
@@ -68,6 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Column(
                             children: [
                               TextFormField(
+                                controller: emailController,
                                 enabled: !loading,
                                 validator: (value) {
                                   return validateEmail(value)
@@ -86,6 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                                 height: Constants.gap * 1.5,
                               ),
                               TextFormField(
+                                controller: passwordController,
                                 enabled: !loading,
                                 obscureText: true,
                                 validator: (value) {
@@ -106,16 +149,8 @@ class _LoginPageState extends State<LoginPage> {
                                 height: Constants.gap * 1.5,
                               ),
                               FilledButton(
-                                onPressed: loading
-                                    ? null
-                                    : () {
-                                        final isValid =
-                                            formKey.currentState?.validate() ??
-                                                false;
-                                        if (!isValid) {
-                                          return;
-                                        }
-                                      },
+                                onPressed:
+                                    loading ? null : () => handleLogin(context),
                                 style: FilledButton.styleFrom(
                                   minimumSize: const Size(
                                     Constants.buttonWidth,
@@ -123,13 +158,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                                 child: loading
-                                    ? const SizedBox(
-                                        height: Constants.height * 1.5,
-                                        width: Constants.height * 1.5,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 3,
-                                        ),
-                                      )
+                                    ? const ButtonLoading()
                                     : const Text("Login"),
                               ),
                             ],

@@ -1,11 +1,12 @@
 import 'dart:async';
 
 import 'package:amplify_flutter/amplify_flutter.dart' hide Emitter;
-import 'package:bloc/bloc.dart';
 import 'package:doko_react/archive/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
+import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/auth/auth.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:meta/meta.dart';
 
@@ -21,7 +22,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   FutureOr<void> _handleInit(
       UserInitEvent event, Emitter<UserState> emit) async {
     try {
-      safePrint("init event");
       // this will trigger amplify hub listener
       final result = await Amplify.Auth.fetchAuthSession();
 
@@ -29,9 +29,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         add(UserAuthenticatedEvent());
         return;
       }
-
       emit(UserUnauthenticated());
-    } on AuthException catch (e) {
+    } on ApplicationException catch (_) {
       emit(UserUnauthenticated());
     } catch (e) {
       emit(UserAuthError());
@@ -41,7 +40,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   FutureOr<void> _handeUserFetch(
       UserAuthenticatedEvent event, Emitter<UserState> emit) async {
     try {
-      safePrint("user fetch event");
       final userDetails = await getUser();
       GraphQLClient client = GraphqlConfig.getGraphQLClient();
 
@@ -76,7 +74,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         username: username,
         userMfa: mfaStatus,
       ));
-    } on AuthException catch (e) {
+    } on ApplicationException catch (_) {
       emit(UserAuthError());
     } catch (e) {
       emit(UserGraphError());

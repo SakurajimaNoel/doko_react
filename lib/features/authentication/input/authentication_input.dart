@@ -35,9 +35,7 @@ class SignupInput implements Input {
 
   @override
   bool validate() {
-    return validateEmail(email) &&
-        validatePassword(password) &&
-        validatePasswordStrength(password);
+    return validateEmail(email) && validatePassword(password);
   }
 
   @override
@@ -45,11 +43,7 @@ class SignupInput implements Input {
     if (!validateEmail(email)) return "Please provide a valid email address.";
 
     if (!validatePassword(password)) {
-      return "Incorrect password. Please try again.";
-    }
-
-    if (!validatePasswordStrength(password)) {
-      return "Password too weak. Please try again.";
+      return passwordInvalidateReason(password);
     }
 
     return "";
@@ -89,21 +83,15 @@ class ConfirmResetPasswordInput implements Input {
 
   @override
   bool validate() {
-    return validateEmail(email) &&
-        validatePassword(password) &&
-        validatePasswordStrength(password);
+    return validateEmail(email) && validatePassword(password);
   }
 
   @override
   String invalidateReason() {
     if (!validateEmail(email)) return "Please provide a valid email address.";
-    
-    if (!validatePassword(password)) {
-      return "Incorrect password. Please try again.";
-    }
 
-    if (!validatePasswordStrength(password)) {
-      return "Password too weak. Please try again.";
+    if (!validatePassword(password)) {
+      return passwordInvalidateReason(password);
     }
 
     return "";
@@ -121,19 +109,15 @@ class UpdatePasswordInput implements Input {
 
   @override
   bool validate() {
-    return validatePassword(newPassword) &&
-        validatePasswordStrength(newPassword);
+    return validatePassword(newPassword);
   }
 
   @override
   String invalidateReason() {
     if (!validatePassword(newPassword)) {
-      return "Incorrect password. Please try again.";
+      return passwordInvalidateReason(newPassword);
     }
 
-    if (!validatePasswordStrength(newPassword)) {
-      return "Password too weak. Please try again.";
-    }
     return "";
   }
 }
