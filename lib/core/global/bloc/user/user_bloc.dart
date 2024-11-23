@@ -14,32 +14,33 @@ part 'user_event.dart';
 part 'user_state.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
-  UserBloc() : super(UserLoading()) {
+  UserBloc() : super(UserLoadingState()) {
     on<UserInitEvent>(_handleInit);
     on<UserAuthenticatedEvent>(_handeUserFetch);
+    on<UserSignOutEvent>(_handleSignOut);
   }
 
   FutureOr<void> _handleInit(
       UserInitEvent event, Emitter<UserState> emit) async {
     try {
-      // this will trigger amplify hub listener
       final result = await Amplify.Auth.fetchAuthSession();
 
       if (result.isSignedIn) {
         add(UserAuthenticatedEvent());
         return;
       }
-      emit(UserUnauthenticated());
+      emit(UserUnauthenticatedState());
     } on ApplicationException catch (_) {
-      emit(UserUnauthenticated());
+      emit(UserUnauthenticatedState());
     } catch (e) {
-      emit(UserAuthError());
+      emit(UserAuthErrorState());
     }
   }
 
   FutureOr<void> _handeUserFetch(
       UserAuthenticatedEvent event, Emitter<UserState> emit) async {
     try {
+      emit(UserLoadingState());
       final userDetails = await getUser();
       GraphQLClient client = GraphqlConfig.getGraphQLClient();
 
@@ -58,7 +59,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       List? res = result.data?["users"];
 
       if (res == null || res.isEmpty) {
-        emit(UserIncomplete(
+        emit(UserIncompleteState(
           id: userDetails.userId,
           email: userDetails.username,
         ));
@@ -68,16 +69,21 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       String username = res[0]["username"];
       bool mfaStatus = await getUserMFAStatus();
 
-      emit(UserComplete(
+      emit(UserCompleteState(
         id: userDetails.userId,
         email: userDetails.username,
         username: username,
         userMfa: mfaStatus,
       ));
     } on ApplicationException catch (_) {
-      emit(UserAuthError());
+      emit(UserAuthErrorState());
     } catch (e) {
-      emit(UserGraphError());
+      emit(UserGraphErrorState());
     }
+  }
+
+  FutureOr<void> _handleSignOut(
+      UserSignOutEvent event, Emitter<UserState> emit) {
+    emit(UserUnauthenticatedState());
   }
 }

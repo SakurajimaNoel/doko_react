@@ -3,18 +3,18 @@ part of 'user_bloc.dart';
 @immutable
 sealed class UserState extends Equatable {}
 
-final class UserLoading extends UserState {
+final class UserLoadingState extends UserState {
   @override
   List<Object?> get props => [];
 }
 
-final class UserUnauthenticated extends UserState {
+final class UserUnauthenticatedState extends UserState {
   @override
   List<Object?> get props => [];
 }
 
-final class UserIncomplete extends UserState {
-  UserIncomplete({
+final class UserIncompleteState extends UserState {
+  UserIncompleteState({
     required this.id,
     required this.email,
   });
@@ -26,8 +26,8 @@ final class UserIncomplete extends UserState {
   List<Object?> get props => [id, email];
 }
 
-final class UserComplete extends UserState {
-  UserComplete({
+final class UserCompleteState extends UserState {
+  UserCompleteState({
     required this.id,
     required this.email,
     required this.username,
@@ -46,12 +46,12 @@ final class UserComplete extends UserState {
   List<Object?> get props => [id, email, username];
 }
 
-final class UserAuthError extends UserState {
+final class UserAuthErrorState extends UserState {
   @override
   List<Object?> get props => [];
 }
 
-final class UserGraphError extends UserState {
+final class UserGraphErrorState extends UserState {
   @override
   List<Object?> get props => [];
 }
