@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -30,11 +29,11 @@ Future<String> getDownloadUrlFromAWSPath(String path) async {
   }
 }
 
-Future<bool> uploadFileToAWSByPath(File file, String path) async {
+Future<bool> uploadFileToAWSByPath(String filePath, String path) async {
   try {
     await _storage
         .uploadFile(
-          localFile: AWSFilePlatform.fromFile(file),
+          localFile: AWSFilePlatform.fromPath(filePath),
           path: StoragePath.fromString(path),
         )
         .result;
