@@ -82,3 +82,8 @@ bool validateUsername(String? username) {
   final RegExp usernameRegex = RegExp(r"^" + Constants.usernameRegex + r"$");
   return usernameRegex.hasMatch(username);
 }
+
+/// used for comment media check
+bool validateUrl(String url) {
+  return url.startsWith("http");
+}
