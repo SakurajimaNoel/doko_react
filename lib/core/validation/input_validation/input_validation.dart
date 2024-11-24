@@ -87,3 +87,7 @@ bool validateUsername(String? username) {
 bool validateUrl(String url) {
   return url.startsWith("http");
 }
+
+bool validateDate(String dateString) {
+  return DateTime.tryParse(dateString) != null;
+}

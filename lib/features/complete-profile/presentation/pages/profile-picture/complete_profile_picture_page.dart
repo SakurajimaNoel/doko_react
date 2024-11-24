@@ -1,13 +1,19 @@
 import 'dart:io';
 
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/media/image-cropper/image_cropper_helper.dart';
 import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
+import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/public/sign-out-button/sign_out_button.dart';
+import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
+import 'package:doko_react/features/complete-profile/presentation/bloc/complete_profile_bloc.dart';
+import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -30,60 +36,126 @@ class CompleteProfilePicturePage extends StatefulWidget {
 
 class _CompleteProfilePicturePageState
     extends State<CompleteProfilePicturePage> {
-  XFile? profilePicture;
+  String? profilePicture;
 
-  void selectProfilePicture(XFile selectedImage) {
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Constants.snackBarDuration,
+      ),
+    );
+  }
+
+  void selectProfilePicture(String selectedImagePath) {
     setState(() {
-      profilePicture = selectedImage;
+      profilePicture = selectedImagePath;
     });
+  }
+
+  void stateActions(BuildContext context, CompleteProfileState state) {
+    if (state is CompleteProfileCompletedState) {
+      // send event to userbloc
+      var user = context.read<UserBloc>();
+      var userState = user.state as UserIncompleteState;
+      user.add(UserProfileCompleteEvent(
+        username: widget.username,
+        userId: userState.id,
+        email: userState.email,
+      ));
+      return;
+    }
+
+    String errorMessage = (state as CompleteProfileErrorState).message;
+    showMessage(errorMessage);
+  }
+
+  void handleCompleteProfile(BuildContext context) {
+    var user = context.read<UserBloc>();
+    var userState = user.state as UserIncompleteState;
+
+    var completeUserDetails = CompleteProfileInput(
+      userId: userState.id,
+      username: widget.username,
+      email: userState.email,
+      profilePath: profilePicture!,
+      name: widget.name,
+      dob: DateTime.parse(
+        widget.dob,
+      ),
+    );
+
+    context.read<CompleteProfileBloc>().add(
+          CompleteProfileDetailsEvent(completeUserDetails: completeUserDetails),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Profile Photo"),
-        actions: const [
-          SignOutButton(),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(Constants.padding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
+    return BlocProvider(
+      create: (context) => serviceLocator<CompleteProfileBloc>(),
+      child: BlocConsumer<CompleteProfileBloc, CompleteProfileState>(
+        listenWhen: (previousState, state) {
+          return (state is CompleteProfileErrorState ||
+                  state is CompleteProfileCompletedState) &&
+              previousState != state;
+        },
+        listener: stateActions,
+        builder: (context, state) {
+          bool loading = state is CompleteProfileLoadingState;
+
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("Profile Photo"),
+              actions: [
+                if (!loading) const SignOutButton(),
+              ],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(Constants.padding),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Heading.left(
-                    "Profile Information",
-                    size: Constants.largeFontSize,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Heading.left(
+                          "Profile Information",
+                          size: Constants.largeFontSize,
+                        ),
+                        const Text(
+                            "Almost there! Select an image to add as your profile picture."),
+                        const SizedBox(
+                          height: Constants.gap,
+                        ),
+                        _ImageSelection(
+                          key: const ValueKey("profile-image-selection"),
+                          setProfile: selectProfilePicture,
+                          loading: loading,
+                        ),
+                      ],
+                    ),
                   ),
-                  const Text(
-                      "Almost there! Select an image to add as your profile picture."),
-                  const SizedBox(
-                    height: Constants.gap,
-                  ),
-                  _ImageSelection(
-                    key: const ValueKey("profile-image-selection"),
-                    setProfile: selectProfilePicture,
+                  FilledButton(
+                    onPressed: profilePicture == null || loading
+                        ? null
+                        : () => handleCompleteProfile(context),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(
+                        Constants.buttonWidth,
+                        Constants.buttonHeight,
+                      ),
+                    ),
+                    child: loading
+                        ? const SmallLoadingIndicator()
+                        : const Text("Complete"),
                   ),
                 ],
               ),
             ),
-            FilledButton(
-              onPressed: profilePicture == null ? null : () {},
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(
-                  Constants.buttonWidth,
-                  Constants.buttonHeight,
-                ),
-              ),
-              child: const Text("Complete"),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -93,16 +165,18 @@ class _ImageSelection extends StatefulWidget {
   const _ImageSelection({
     super.key,
     required this.setProfile,
+    required this.loading,
   });
 
-  final ValueSetter<XFile> setProfile;
+  final ValueSetter<String> setProfile;
+  final bool loading;
 
   @override
   State<_ImageSelection> createState() => _ImageSelectionState();
 }
 
 class _ImageSelectionState extends State<_ImageSelection> {
-  XFile? profilePicture;
+  String? profilePicture;
 
   Future<bool> checkAnimatedImage(String path) async {
     String? extension = getFileExtensionFromFileName(path);
@@ -119,7 +193,7 @@ class _ImageSelectionState extends State<_ImageSelection> {
     // check if selected image is animated or not
     if (await checkAnimatedImage(selectedImage.path)) {
       setState(() {
-        profilePicture = selectedImage;
+        profilePicture = selectedImage.path;
       });
       return;
     }
@@ -132,10 +206,9 @@ class _ImageSelectionState extends State<_ImageSelection> {
     );
 
     if (croppedImage == null) return;
-    final finalImage = XFile(croppedImage.path);
-    widget.setProfile(finalImage);
+    widget.setProfile(croppedImage.path);
     setState(() {
-      profilePicture = finalImage;
+      profilePicture = croppedImage.path;
     });
   }
 
@@ -153,6 +226,7 @@ class _ImageSelectionState extends State<_ImageSelection> {
           getProfileImage(),
           ProfilePictureFilter(
             child: ImagePickerWidget(
+              disabled: widget.loading,
               onSelection: onSelection,
               icon: const Icon(Icons.photo_camera),
             ),
@@ -176,7 +250,7 @@ class _ImageSelectionState extends State<_ImageSelection> {
     }
 
     return Image.file(
-      File(profilePicture!.path),
+      File(profilePicture!),
       fit: BoxFit.cover,
       cacheHeight: Constants.editProfileCachedHeight,
     );

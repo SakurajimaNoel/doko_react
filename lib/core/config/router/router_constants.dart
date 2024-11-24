@@ -1,5 +1,7 @@
 class RouterConstants {
   static const String loading = "loading";
+  static const String error = "error";
+  static const String graphError = "error-graph";
 
   // auth router
   static const String login = "login";

@@ -1,6 +1,7 @@
-import 'package:doko_react/archive/core/helpers/display.dart';
 import 'package:doko_react/archive/features/User/data/model/comment_model.dart';
 import 'package:doko_react/core/config/graphql/queries/graphql_query_constants.dart';
+import 'package:doko_react/core/helpers/display/display_helper.dart';
+import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
 
 class CompleteUserProfileVariables {
   final String id;
@@ -79,16 +80,16 @@ class GraphqlQueries {
   }
 
   static Map<String, dynamic> completeUserProfileVariables(
-      CompleteUserProfileVariables userDetails) {
+      CompleteProfileInput userDetails, String bucketPath) {
     return {
       "input": [
         {
-          "id": userDetails.id,
+          "id": userDetails.userId,
           "username": userDetails.username,
           "email": userDetails.email,
-          "dob": DisplayText.date(userDetails.dob),
+          "dob": dateToIsoString(userDetails.dob),
           "name": userDetails.name.trim(),
-          "profilePicture": userDetails.profilePicture,
+          "profilePicture": bucketPath,
         }
       ]
     };

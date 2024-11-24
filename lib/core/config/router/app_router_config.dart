@@ -66,6 +66,48 @@ class AppRouterConfig {
       return const ErrorUnknownRoute();
     },
     routes: [
+      GoRoute(
+        path: "/",
+        name: RouterConstants.userFeed,
+        builder: (context, state) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("dokii"),
+            ),
+            body: const Center(
+              child: Text("profile is completed"),
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: "/error",
+        name: RouterConstants.error,
+        builder: (context, state) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("dokii"),
+            ),
+            body: const Center(
+              child: Text("generic error page"),
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: "graph",
+        name: RouterConstants.graphError,
+        builder: (context, state) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("dokii"),
+            ),
+            body: const Center(
+              child: Text("graph error page"),
+            ),
+          );
+        },
+      ),
       // loading
       GoRoute(
         path: "/loading",

@@ -10,3 +10,11 @@ final class CompleteProfileUsernameEvent extends CompleteProfileEvent {
 
   final UsernameInput usernameInput;
 }
+
+final class CompleteProfileDetailsEvent extends CompleteProfileEvent {
+  CompleteProfileDetailsEvent({
+    required this.completeUserDetails,
+  });
+
+  final CompleteProfileInput completeUserDetails;
+}

@@ -111,7 +111,9 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
                         TextFormField(
                           controller: nameController,
                           validator: (value) {
-                            return null;
+                            return value == null || value.isEmpty
+                                ? "Name can't be empty."
+                                : null;
                           },
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           onChanged: (value) {},

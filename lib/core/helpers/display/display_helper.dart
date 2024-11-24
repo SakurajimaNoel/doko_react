@@ -26,7 +26,8 @@ String dateString(
   return "$weekDay, $day $month $year";
 }
 
-String date(DateTime date) {
+// used when adding node to graph
+String dateToIsoString(DateTime date) {
   String dateOnly = date.toIso8601String().split('T').first;
   return dateOnly;
 }

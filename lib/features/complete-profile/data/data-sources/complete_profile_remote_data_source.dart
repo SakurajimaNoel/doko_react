@@ -1,5 +1,6 @@
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
+import 'package:doko_react/core/global/storage/storage.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
@@ -33,6 +34,43 @@ class CompleteProfileRemoteDataSource {
       }
       return false;
     } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<bool> completeUserProfile(
+      CompleteProfileInput userDetails, String bucketPath) async {
+    try {
+      // upload profile picture to bucket
+      await uploadFileToAWSByPath(userDetails.profilePath, bucketPath);
+
+      // create node in graph
+      QueryResult result = await _client.mutate(
+        MutationOptions(
+          document: gql(GraphqlQueries.completeUserProfile()),
+          variables: GraphqlQueries.completeUserProfileVariables(
+              userDetails, bucketPath),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+            reason: result.exception?.graphqlErrors.toString() ??
+                "Can't complete user profile right now.");
+      }
+
+      // check if user data is present
+      List res = result.data?["createUsers"]["users"];
+      if (res.isEmpty) {
+        throw const ApplicationException(
+            reason: "Something went wrong when complete user profile.");
+      }
+
+      // if all done return true
+      return true;
+    } catch (_) {
+      // clean up if profile can't be completed
+      deleteFileFromAWSByPath(bucketPath);
       rethrow;
     }
   }

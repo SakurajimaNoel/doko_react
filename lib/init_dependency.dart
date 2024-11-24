@@ -16,6 +16,7 @@ import "package:doko_react/features/authentication/presentation/bloc/authenticat
 import "package:doko_react/features/complete-profile/data/data-sources/complete_profile_remote_data_source.dart";
 import "package:doko_react/features/complete-profile/data/repositories/complete_profile_repository_impl.dart";
 import "package:doko_react/features/complete-profile/domain/repositories/complete_profile_repository.dart";
+import "package:doko_react/features/complete-profile/domain/use-case/complete-profile-user-case/complete_profile_use_case.dart";
 import "package:doko_react/features/complete-profile/domain/use-case/username-use-case/username_use_case.dart";
 import "package:doko_react/features/complete-profile/presentation/bloc/complete_profile_bloc.dart";
 import "package:flutter/foundation.dart";
@@ -146,9 +147,17 @@ void _initCompleteProfile() {
     ),
   );
 
+  // complete profile details use case
+  serviceLocator.registerFactory<CompleteProfileUseCase>(
+    () => CompleteProfileUseCase(
+      completeProfile: serviceLocator<CompleteProfileRepository>(),
+    ),
+  );
+
   serviceLocator.registerFactory<CompleteProfileBloc>(
     () => CompleteProfileBloc(
       usernameUseCase: serviceLocator<UsernameUseCase>(),
+      completeProfileUseCase: serviceLocator<CompleteProfileUseCase>(),
     ),
   );
 }

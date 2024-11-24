@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart' hide Emitter;
-import 'package:doko_react/archive/core/configs/graphql/graphql_config.dart';
+import 'package:doko_react/core/config/graphql/graphql_config.dart';
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/auth/auth.dart';
@@ -18,6 +19,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<UserInitEvent>(_handleInit);
     on<UserAuthenticatedEvent>(_handeUserFetch);
     on<UserSignOutEvent>(_handleSignOut);
+    on<UserProfileCompleteEvent>(_handleUserProfileCompleteEvent);
   }
 
   FutureOr<void> _handleInit(
@@ -59,9 +61,12 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       List? res = result.data?["users"];
 
       if (res == null || res.isEmpty) {
+        var email = (userDetails.signInDetails as CognitoSignInDetailsApiBased)
+            .username;
+
         emit(UserIncompleteState(
           id: userDetails.userId,
-          email: userDetails.username,
+          email: email,
         ));
         return;
       }
@@ -85,5 +90,27 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   FutureOr<void> _handleSignOut(
       UserSignOutEvent event, Emitter<UserState> emit) {
     emit(UserUnauthenticatedState());
+  }
+
+  FutureOr<void> _handleUserProfileCompleteEvent(
+      UserProfileCompleteEvent event, Emitter<UserState> emit) async {
+    try {
+      String userId = event.userId;
+      String username = event.username;
+      String email = event.email;
+
+      emit(UserLoadingState());
+      bool mfaStatus = await getUserMFAStatus();
+      emit(UserCompleteState(
+        id: userId,
+        email: email,
+        username: username,
+        userMfa: mfaStatus,
+      ));
+    } on ApplicationException catch (_) {
+      emit(UserUnauthenticatedState());
+    } catch (e) {
+      emit(UserAuthErrorState());
+    }
   }
 }

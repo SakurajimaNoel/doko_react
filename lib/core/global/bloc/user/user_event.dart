@@ -9,4 +9,14 @@ final class UserAuthenticatedEvent extends UserEvent {}
 
 final class UserSignOutEvent extends UserEvent {}
 
-final class UserProfileCompleteEvent extends UserEvent {}
+final class UserProfileCompleteEvent extends UserEvent {
+  UserProfileCompleteEvent({
+    required this.username,
+    required this.userId,
+    required this.email,
+  });
+
+  final String username;
+  final String userId;
+  final String email;
+}

@@ -13,4 +13,10 @@ class CompleteProfileRepositoryImpl extends CompleteProfileRepository {
   Future<bool> checkUsernameAvailability(UsernameInput usernameInput) {
     return _remoteDataSource.checkUsernameAvailability(usernameInput);
   }
+
+  @override
+  Future<bool> completeUserProfile(
+      CompleteProfileInput userDetails, String bucketPath) {
+    return _remoteDataSource.completeUserProfile(userDetails, bucketPath);
+  }
 }

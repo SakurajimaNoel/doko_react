@@ -46,3 +46,8 @@ final class CompleteProfileErrorState extends CompleteProfileState {
   @override
   List<Object?> get props => [message];
 }
+
+final class CompleteProfileCompletedState extends CompleteProfileState {
+  @override
+  List<Object?> get props => [];
+}

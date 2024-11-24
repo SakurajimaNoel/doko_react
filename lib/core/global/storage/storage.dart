@@ -7,11 +7,11 @@ import 'package:doko_react/core/exceptions/application_exceptions.dart';
 
 final StorageCategory _storage = Amplify.Storage;
 
-Future<String> getDownloadUrlFromAWSPath(String path) async {
+Future<String> getDownloadUrlFromAWSPath(String bucketPath) async {
   try {
     final result = await _storage
         .getUrl(
-          path: StoragePath.fromString(path),
+          path: StoragePath.fromString(bucketPath),
           options: const StorageGetUrlOptions(
             pluginOptions: S3GetUrlPluginOptions(
               expiresIn: Duration(
@@ -29,12 +29,12 @@ Future<String> getDownloadUrlFromAWSPath(String path) async {
   }
 }
 
-Future<bool> uploadFileToAWSByPath(String filePath, String path) async {
+Future<bool> uploadFileToAWSByPath(String filePath, String bucketPath) async {
   try {
     await _storage
         .uploadFile(
           localFile: AWSFilePlatform.fromPath(filePath),
-          path: StoragePath.fromString(path),
+          path: StoragePath.fromString(bucketPath),
         )
         .result;
     return true;
@@ -45,12 +45,13 @@ Future<bool> uploadFileToAWSByPath(String filePath, String path) async {
   }
 }
 
-Future<bool> uploadFileBytesToAWSByPath(Uint8List data, String path) async {
+Future<bool> uploadFileBytesToAWSByPath(
+    Uint8List data, String bucketPath) async {
   try {
     await _storage
         .uploadFile(
           localFile: AWSFile.fromData(data),
-          path: StoragePath.fromString(path),
+          path: StoragePath.fromString(bucketPath),
         )
         .result;
     return true;
@@ -61,11 +62,11 @@ Future<bool> uploadFileBytesToAWSByPath(Uint8List data, String path) async {
   }
 }
 
-Future<bool> deleteFileFromAWSByPath(String path) async {
+Future<bool> deleteFileFromAWSByPath(String bucketPath) async {
   try {
     await _storage
         .remove(
-          path: StoragePath.fromString(path),
+          path: StoragePath.fromString(bucketPath),
         )
         .result;
 
