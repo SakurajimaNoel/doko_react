@@ -1,4 +1,3 @@
-import 'package:doko_react/archive/features/User/CompleteProfile/Presentation/complete_profile_picture_page.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/widgets/error/error_unknown_route.dart';
@@ -8,6 +7,7 @@ import 'package:doko_react/features/authentication/presentation/pages/password/c
 import 'package:doko_react/features/authentication/presentation/pages/password/reset_password_page.dart';
 import 'package:doko_react/features/authentication/presentation/pages/sign-up/sign_up_page.dart';
 import 'package:doko_react/features/complete-profile/presentation/pages/info/complete_profile_info_page.dart';
+import 'package:doko_react/features/complete-profile/presentation/pages/profile-picture/complete_profile_picture_page.dart';
 import 'package:doko_react/features/complete-profile/presentation/pages/username/complete_profile_username_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
