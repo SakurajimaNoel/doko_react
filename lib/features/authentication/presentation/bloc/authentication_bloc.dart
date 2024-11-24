@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
+import 'package:doko_react/core/use-cases/use_cases.dart';
 import 'package:doko_react/features/authentication/domain/entities/login/login_entity.dart';
 import 'package:doko_react/features/authentication/domain/use-cases/login-use-case/confirm_login_use_case.dart';
 import 'package:doko_react/features/authentication/domain/use-cases/login-use-case/login_use_case.dart';
+import 'package:doko_react/features/authentication/domain/use-cases/logout-use-case/logout_use_case.dart';
 import 'package:doko_react/features/authentication/domain/use-cases/password-use-case/confirm_reset_password_use_case.dart';
 import 'package:doko_react/features/authentication/domain/use-cases/password-use-case/reset_password_use_case.dart';
 import 'package:doko_react/features/authentication/domain/use-cases/password-use-case/update_reset_password_use_case.dart';
@@ -25,6 +27,7 @@ class AuthenticationBloc
   final ResetPasswordUseCase _resetPasswordUseCase;
   final ConfirmResetPasswordUseCase _confirmResetPasswordUseCase;
   final UpdatePasswordUseCase _updatePasswordUseCase;
+  final LogoutUseCase _logoutUseCase;
 
   AuthenticationBloc({
     required LoginUseCase loginUseCase,
@@ -33,12 +36,14 @@ class AuthenticationBloc
     required ResetPasswordUseCase resetPasswordUseCase,
     required ConfirmResetPasswordUseCase confirmResetPasswordUseCase,
     required UpdatePasswordUseCase updatePasswordUseCase,
+    required LogoutUseCase logoutUseCase,
   })  : _loginUseCase = loginUseCase,
         _confirmLoginUseCase = confirmLoginUseCase,
         _signUpUseCase = signUpUseCase,
         _resetPasswordUseCase = resetPasswordUseCase,
         _confirmResetPasswordUseCase = confirmResetPasswordUseCase,
         _updatePasswordUseCase = updatePasswordUseCase,
+        _logoutUseCase = logoutUseCase,
         super(AuthenticationInitial()) {
     on<LoginEvent>(_handleLoginEvent);
     on<ConfirmLoginEvent>(_handleConfirmLoginEvent);
@@ -46,6 +51,7 @@ class AuthenticationBloc
     on<ResetPasswordEvent>(_handleResetPasswordEvent);
     on<ConfirmResetPasswordEvent>(_handleConfirmResetPasswordEvent);
     on<UpdatePasswordEvent>(_handleUpdatePasswordEvent);
+    on<LogoutEvent>(_handleLogoutEvent);
   }
 
   FutureOr<void> _handleLoginEvent(
@@ -131,6 +137,19 @@ class AuthenticationBloc
       emit(AuthenticationLoading());
       await _updatePasswordUseCase(event.updateDetails);
       emit(AuthenticationUpdatePasswordSuccess());
+    } on ApplicationException catch (e) {
+      emit(AuthenticationError(message: e.reason));
+    } catch (_) {
+      emit(AuthenticationError(
+        message: Constants.errorMessage,
+      ));
+    }
+  }
+
+  FutureOr<void> _handleLogoutEvent(
+      LogoutEvent event, Emitter<AuthenticationState> emit) async {
+    try {
+      await _logoutUseCase(NoParams());
     } on ApplicationException catch (e) {
       emit(AuthenticationError(message: e.reason));
     } catch (_) {

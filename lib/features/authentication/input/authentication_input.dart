@@ -114,7 +114,7 @@ class UpdatePasswordInput implements Input {
 
   @override
   String invalidateReason() {
-    if (!validatePassword(newPassword)) {
+    if (!validate()) {
       return passwordInvalidateReason(newPassword);
     }
 
