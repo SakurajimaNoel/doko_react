@@ -12,7 +12,7 @@ class ErrorUnknownRoute extends StatelessWidget {
   TextSpan getNextStep(BuildContext context, UserState state) {
     var currTheme = Theme.of(context).colorScheme;
 
-    if (state is UserUnauthenticated) {
+    if (state is UserUnauthenticatedState) {
       return TextSpan(
         text: "To continue, please ",
         style: TextStyle(
@@ -46,7 +46,7 @@ class ErrorUnknownRoute extends StatelessWidget {
       );
     }
 
-    if (state is UserComplete) {
+    if (state is UserCompleteState) {
       return TextSpan(
         text: "Let's head back to your ",
         style: TextStyle(
@@ -94,7 +94,6 @@ class ErrorUnknownRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // todo: check for padding in rich text
     return Scaffold(
       appBar: AppBar(
         title: const Text("Doki"),
@@ -102,7 +101,7 @@ class ErrorUnknownRoute extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(Constants.padding),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               "Looks like you've wandered off!",

@@ -68,7 +68,7 @@ class _CompleteProfileUsernamePageState
                 color: currTheme.error,
               ),
             ),
-          )
+          ),
         ],
       ),
       body: Padding(

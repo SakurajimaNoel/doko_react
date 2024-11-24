@@ -13,6 +13,7 @@ class GraphqlConfig {
 
   static GraphQLClient? _client;
 
+  // todo: replace flutter_graphql package with graphql package
   static GraphQLClient getGraphQLClient() {
     if (_client == null) {
       Link link = _authLink.concat(_httpLink);

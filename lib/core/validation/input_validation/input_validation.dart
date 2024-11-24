@@ -1,3 +1,4 @@
+import 'package:doko_react/core/constants/constants.dart';
 import 'package:password_strength/password_strength.dart';
 
 bool validateEmail(String? email) {
@@ -73,4 +74,11 @@ bool _validatePasswordStrength(String? password) {
 // used for checking if both passwords are equal
 bool compareString(String stringOne, String stringTwo) {
   return stringOne == stringTwo;
+}
+
+bool validateUsername(String? username) {
+  if (username == null || username.isEmpty) return false;
+
+  final RegExp usernameRegex = RegExp(r"^" + Constants.usernameRegex + r"$");
+  return usernameRegex.hasMatch(username);
 }

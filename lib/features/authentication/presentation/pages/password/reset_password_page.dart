@@ -1,10 +1,10 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
+import 'package:doko_react/core/widgets/heading/heading.dart';
+import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/authentication/input/authentication_input.dart';
 import 'package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart';
-import 'package:doko_react/features/authentication/presentation/widgets/button-loading/button_loading.dart';
-import 'package:doko_react/features/authentication/presentation/widgets/heading/heading.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -136,7 +136,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             ),
                           ),
                           child: loading
-                              ? const ButtonLoading()
+                              ? const SmallLoadingIndicator()
                               : const Text("Continue"),
                         ),
                         const SizedBox(
