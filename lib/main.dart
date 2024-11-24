@@ -1,16 +1,25 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/archive/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/config/router/app_router_config.dart';
+import 'package:doko_react/core/config/theme/theme_data.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker_android/image_picker_android.dart';
+import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 
 void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
     await initDependency();
+
+    final ImagePickerPlatform imagePickerImplementation =
+        ImagePickerPlatform.instance;
+    if (imagePickerImplementation is ImagePickerAndroid) {
+      imagePickerImplementation.useAndroidPhotoPicker = true;
+    }
 
     runApp(
       MultiBlocProvider(
@@ -84,6 +93,9 @@ class _DokiState extends State<Doki> {
         routerConfig: router,
         debugShowCheckedModeBanner: false,
         title: 'Doki',
+        themeMode: ThemeMode.light,
+        darkTheme: GlobalThemeData.darkCustomThemeData(Colors.deepPurple),
+        theme: GlobalThemeData.lightCustomThemeData(Colors.deepPurple),
       ),
     );
   }
