@@ -27,7 +27,7 @@ class RouterConstants {
   static const String settings = "settings";
   static const String mfaSetup = "mfa-setup";
   static const String verifyMfa = "verify-mfa";
-  static const String changePassword = "change-password";
+  static const String updatePassword = "update-password";
 
   // complete profile
   static const String completeProfileUsername = "complete-profile-username";

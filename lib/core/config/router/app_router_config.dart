@@ -7,6 +7,7 @@ import 'package:doko_react/features/authentication/presentation/pages/mfa/setup_
 import 'package:doko_react/features/authentication/presentation/pages/mfa/verify_mfa_page.dart';
 import 'package:doko_react/features/authentication/presentation/pages/password/confirm_reset_password_page.dart';
 import 'package:doko_react/features/authentication/presentation/pages/password/reset_password_page.dart';
+import 'package:doko_react/features/authentication/presentation/pages/password/update_password_page.dart';
 import 'package:doko_react/features/authentication/presentation/pages/sign-up/sign_up_page.dart';
 import 'package:doko_react/features/complete-profile/presentation/pages/info/complete_profile_info_page.dart';
 import 'package:doko_react/features/complete-profile/presentation/pages/profile-picture/complete_profile_picture_page.dart';
@@ -210,25 +211,29 @@ class AppRouterConfig {
         ],
       ),
       GoRoute(
-          path: "/",
-          name: RouterConstants.settings,
-          builder: (context, state) => const SettingsPage(),
-          routes: [
-            GoRoute(
-              parentNavigatorKey: _rootNavigatorKey,
-              name: RouterConstants.mfaSetup,
-              path: "mfa-setup",
-              builder: (context, state) => const SetupMfaPage(),
-              routes: [
-                GoRoute(
-                  parentNavigatorKey: _rootNavigatorKey,
-                  name: RouterConstants.verifyMfa,
-                  path: "verify-mfa",
-                  builder: (context, state) => const VerifyMfaPage(),
-                ),
-              ],
-            ),
-          ]),
+        path: "/",
+        name: RouterConstants.settings,
+        builder: (context, state) => const SettingsPage(),
+        routes: [
+          GoRoute(
+            name: RouterConstants.mfaSetup,
+            path: "mfa-setup",
+            builder: (context, state) => const SetupMfaPage(),
+            routes: [
+              GoRoute(
+                name: RouterConstants.verifyMfa,
+                path: "verify-mfa",
+                builder: (context, state) => const VerifyMfaPage(),
+              ),
+              GoRoute(
+                name: RouterConstants.updatePassword,
+                path: "change-password",
+                builder: (context, state) => const UpdatePasswordPage(),
+              ),
+            ],
+          ),
+        ],
+      ),
       // complete profile routes
       // StatefulShellRoute.indexedStack(
       //   // parentNavigatorKey: _rootNavigatorKey,

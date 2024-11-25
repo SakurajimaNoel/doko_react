@@ -67,7 +67,7 @@ class _VerifyMfaPage extends State<VerifyMfaPage> {
     // Show the SnackBar
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Successfully added MFA to this account!'),
+        content: Text('Successfully added MFA to your account!'),
         duration: Constants.snackBarDuration,
       ),
     );

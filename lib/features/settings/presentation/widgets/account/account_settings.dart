@@ -26,47 +26,73 @@ class _AccountSettingsState extends State<AccountSettings> {
           height: Constants.gap * 0.5,
         ),
         const SettingsHeading("Multi-factor Authentication"),
-        BlocBuilder<UserBloc, UserState>(
-          builder: (BuildContext context, UserState state) {
-            if (state is! UserCompleteState) {
-              return const StyledText.error(
-                Constants.errorMessage,
-                size: Constants.smallFontSize,
-              );
-            }
-
-            if (state.userMfa) {
-              return const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                      "Your account is already protected by multi-factor authentication."),
-                  RemoveMfaButton(),
-                ],
-              );
-            }
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                    "Multi-factor authentication adds an extra layer of protection beyond just a password, making it significantly harder for unauthorized individuals to access your information."),
-                const Text(
-                    "Enhance your account security by enabling multi-factor authentication. It's quick and easy to set up."),
-                TextButton(
-                  style: const ButtonStyle(
-                    padding: WidgetStatePropertyAll(EdgeInsets.zero),
-                  ),
-                  onPressed: () {
-                    context.pushNamed(RouterConstants.mfaSetup);
-                  },
-                  child: const Text("Setup MFA"),
-                ),
-              ],
-            );
+        const _MFAAction(),
+        const SizedBox(
+          height: Constants.gap * 0.5,
+        ),
+        const SettingsHeading("Update Password"),
+        const Text(
+            "Consider changing your password every few months to enhance security."),
+        TextButton(
+          style: const ButtonStyle(
+            padding: WidgetStatePropertyAll(EdgeInsets.zero),
+          ),
+          onPressed: () {
+            context.pushNamed(RouterConstants.updatePassword);
           },
-        )
+          child: const Text(
+            "Update password",
+          ),
+        ),
       ],
+    );
+  }
+}
+
+class _MFAAction extends StatelessWidget {
+  const _MFAAction();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<UserBloc, UserState>(
+      builder: (BuildContext context, UserState state) {
+        if (state is! UserCompleteState) {
+          return const StyledText.error(
+            Constants.errorMessage,
+            size: Constants.smallFontSize,
+          );
+        }
+
+        if (state.userMfa) {
+          return const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                  "Your account is already protected by multi-factor authentication."),
+              RemoveMfaButton(),
+            ],
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+                "Multi-factor authentication adds an extra layer of protection beyond just a password, making it significantly harder for unauthorized individuals to access your information."),
+            const Text(
+                "Enhance your account security by enabling multi-factor authentication. It's quick and easy to set up."),
+            TextButton(
+              style: const ButtonStyle(
+                padding: WidgetStatePropertyAll(EdgeInsets.zero),
+              ),
+              onPressed: () {
+                context.pushNamed(RouterConstants.mfaSetup);
+              },
+              child: const Text("Setup MFA"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

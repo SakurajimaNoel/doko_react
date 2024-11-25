@@ -109,12 +109,16 @@ class UpdatePasswordInput implements Input {
 
   @override
   bool validate() {
-    return validatePassword(newPassword);
+    return oldPassword != newPassword && validatePassword(newPassword);
   }
 
   @override
   String invalidateReason() {
     if (!validate()) {
+      if (oldPassword == newPassword) {
+        return "New password is same as old password.";
+      }
+
       return passwordInvalidateReason(newPassword);
     }
 
