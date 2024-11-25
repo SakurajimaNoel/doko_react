@@ -47,8 +47,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   }
 
   @override
-  Future<SetupMFAEntity> setupMFA(String email) async {
-    final result = await _remoteDataSource.setupMFA(email);
+  Future<SetupMFAEntity> setupMFA(String username) async {
+    final result = await _remoteDataSource.setupMFA(username);
     return result.toEntity();
   }
 

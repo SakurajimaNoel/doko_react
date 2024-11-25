@@ -41,10 +41,14 @@ final class UpdatePasswordEvent extends AuthenticationEvent {
   final UpdatePasswordInput updateDetails;
 }
 
-final class SetupMFAEvent extends AuthenticationEvent {}
+final class SetupMFAEvent extends AuthenticationEvent {
+  SetupMFAEvent({required this.username});
 
-final class ConfirmMFAEvent extends AuthenticationEvent {
-  ConfirmMFAEvent({required this.code});
+  final String username;
+}
+
+final class VerifyMFAEvent extends AuthenticationEvent {
+  VerifyMFAEvent({required this.code});
 
   final String code;
 }

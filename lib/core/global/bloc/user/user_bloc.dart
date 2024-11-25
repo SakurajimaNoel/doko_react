@@ -20,6 +20,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<UserAuthenticatedEvent>(_handeUserFetch);
     on<UserSignOutEvent>(_handleSignOut);
     on<UserProfileCompleteEvent>(_handleUserProfileCompleteEvent);
+    on<UserUpdateMFAEvent>(_handleUserUpdateMFAEvent);
   }
 
   FutureOr<void> _handleInit(
@@ -112,5 +113,12 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     } catch (e) {
       emit(UserAuthErrorState());
     }
+  }
+
+  FutureOr<void> _handleUserUpdateMFAEvent(
+      UserUpdateMFAEvent event, Emitter<UserState> emit) async {
+    if (state is! UserCompleteState) return;
+
+    emit((state as UserCompleteState).updateMFA(event.mfaStatus));
   }
 }

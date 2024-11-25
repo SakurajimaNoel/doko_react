@@ -3,6 +3,8 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/widgets/error/error_unknown_route.dart';
 import 'package:doko_react/features/authentication/presentation/pages/login/confirm_login_page.dart';
 import 'package:doko_react/features/authentication/presentation/pages/login/login_page.dart';
+import 'package:doko_react/features/authentication/presentation/pages/mfa/setup_mfa_page.dart';
+import 'package:doko_react/features/authentication/presentation/pages/mfa/verify_mfa_page.dart';
 import 'package:doko_react/features/authentication/presentation/pages/password/confirm_reset_password_page.dart';
 import 'package:doko_react/features/authentication/presentation/pages/password/reset_password_page.dart';
 import 'package:doko_react/features/authentication/presentation/pages/sign-up/sign_up_page.dart';
@@ -208,10 +210,25 @@ class AppRouterConfig {
         ],
       ),
       GoRoute(
-        path: "/",
-        name: RouterConstants.settings,
-        builder: (context, state) => const SettingsPage(),
-      ),
+          path: "/",
+          name: RouterConstants.settings,
+          builder: (context, state) => const SettingsPage(),
+          routes: [
+            GoRoute(
+              parentNavigatorKey: _rootNavigatorKey,
+              name: RouterConstants.mfaSetup,
+              path: "mfa-setup",
+              builder: (context, state) => const SetupMfaPage(),
+              routes: [
+                GoRoute(
+                  parentNavigatorKey: _rootNavigatorKey,
+                  name: RouterConstants.verifyMfa,
+                  path: "verify-mfa",
+                  builder: (context, state) => const VerifyMfaPage(),
+                ),
+              ],
+            ),
+          ]),
       // complete profile routes
       // StatefulShellRoute.indexedStack(
       //   // parentNavigatorKey: _rootNavigatorKey,

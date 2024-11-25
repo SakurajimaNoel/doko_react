@@ -20,7 +20,7 @@ abstract class AuthenticationRepository {
   /// don't require checking for email validation
   Future<bool> updatePassword(UpdatePasswordInput updatePasswordDetails);
 
-  Future<SetupMFAEntity> setupMFA(String email);
+  Future<SetupMFAEntity> setupMFA(String username);
 
   Future<bool> verifyMFASetup(String code);
 

@@ -51,3 +51,22 @@ final class AuthenticationUpdatePasswordSuccess extends AuthenticationState {
   @override
   List<Object?> get props => [];
 }
+
+final class AuthenticationRemoveMFASuccess extends AuthenticationState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class AuthenticationVerifyMFASuccess extends AuthenticationState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class AuthenticationMFASetupSuccess extends AuthenticationState {
+  AuthenticationMFASetupSuccess({required this.setupData});
+
+  final SetupMFAEntity setupData;
+
+  @override
+  List<Object?> get props => [];
+}

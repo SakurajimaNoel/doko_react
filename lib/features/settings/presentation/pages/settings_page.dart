@@ -1,4 +1,5 @@
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/features/settings/presentation/widgets/account/account_settings.dart';
 import 'package:doko_react/features/settings/presentation/widgets/theme/theme_settings.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +19,13 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: ListView(
         padding: const EdgeInsets.all(Constants.padding),
-        children: [const ThemeSettings()],
+        children: const [
+          ThemeSettings(),
+          SizedBox(
+            height: Constants.gap * 2,
+          ),
+          AccountSettings(),
+        ],
       ),
     );
   }

@@ -20,3 +20,9 @@ final class UserProfileCompleteEvent extends UserEvent {
   final String userId;
   final String email;
 }
+
+final class UserUpdateMFAEvent extends UserEvent {
+  UserUpdateMFAEvent({required this.mfaStatus});
+
+  final bool mfaStatus;
+}

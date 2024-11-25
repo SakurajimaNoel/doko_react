@@ -8,9 +8,12 @@ import "package:doko_react/features/authentication/domain/repositories/authentic
 import "package:doko_react/features/authentication/domain/use-cases/login-use-case/confirm_login_use_case.dart";
 import "package:doko_react/features/authentication/domain/use-cases/login-use-case/login_use_case.dart";
 import "package:doko_react/features/authentication/domain/use-cases/logout-use-case/logout_use_case.dart";
+import "package:doko_react/features/authentication/domain/use-cases/mfa-use-case/remove_mfa_use_case.dart";
+import "package:doko_react/features/authentication/domain/use-cases/mfa-use-case/setup_mfa_use_case.dart";
+import "package:doko_react/features/authentication/domain/use-cases/mfa-use-case/verify_mfa_use_case.dart";
 import "package:doko_react/features/authentication/domain/use-cases/password-use-case/confirm_reset_password_use_case.dart";
 import "package:doko_react/features/authentication/domain/use-cases/password-use-case/reset_password_use_case.dart";
-import "package:doko_react/features/authentication/domain/use-cases/password-use-case/update_reset_password_use_case.dart";
+import "package:doko_react/features/authentication/domain/use-cases/password-use-case/update_password_use_case.dart";
 import "package:doko_react/features/authentication/domain/use-cases/sign-up-use-case/sign_up_use_case.dart";
 import "package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart";
 import "package:doko_react/features/complete-profile/data/data-sources/complete_profile_remote_data_source.dart";
@@ -113,6 +116,27 @@ void _initAuth() {
     ),
   );
 
+  // for remove mfa use case
+  serviceLocator.registerFactory<RemoveMFAUseCase>(
+    () => RemoveMFAUseCase(
+      auth: serviceLocator(),
+    ),
+  );
+
+  // for mfa setup use case
+  serviceLocator.registerFactory<SetupMFAUseCase>(
+    () => SetupMFAUseCase(
+      auth: serviceLocator(),
+    ),
+  );
+
+  // for mfa verify use case
+  serviceLocator.registerFactory<VerifyMFAUseCase>(
+    () => VerifyMFAUseCase(
+      auth: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerFactory<AuthenticationBloc>(
     () => AuthenticationBloc(
       loginUseCase: serviceLocator<LoginUseCase>(),
@@ -123,6 +147,9 @@ void _initAuth() {
           serviceLocator<ConfirmResetPasswordUseCase>(),
       updatePasswordUseCase: serviceLocator<UpdatePasswordUseCase>(),
       logoutUseCase: serviceLocator<LogoutUseCase>(),
+      removeMFAUseCase: serviceLocator<RemoveMFAUseCase>(),
+      setupMFAUseCase: serviceLocator<SetupMFAUseCase>(),
+      verifyMFAUseCase: serviceLocator<VerifyMFAUseCase>(),
     ),
   );
 }

@@ -128,12 +128,12 @@ class AuthenticationRemoteDataSource {
     }
   }
 
-  Future<SetupMFAModel> setupMFA(String email) async {
+  Future<SetupMFAModel> setupMFA(String username) async {
     try {
       final totpSetupDetails = await _auth.setUpTotp();
       final setupUri = totpSetupDetails.getSetupUri(
         appName: 'Doki',
-        accountName: email,
+        accountName: username,
       );
 
       return SetupMFAModel(
@@ -165,10 +165,16 @@ class AuthenticationRemoteDataSource {
   }
 
   Future<void> removeMFA() async {
-    final cognitoPlugin = _auth.getPlugin(AmplifyAuthCognito.pluginKey);
+    try {
+      final cognitoPlugin = _auth.getPlugin(AmplifyAuthCognito.pluginKey);
 
-    await cognitoPlugin.updateMfaPreference(
-      totp: MfaPreference.disabled,
-    );
+      await cognitoPlugin.updateMfaPreference(
+        totp: MfaPreference.disabled,
+      );
+    } on AuthException catch (e) {
+      throw ApplicationException(reason: e.message);
+    } catch (_) {
+      rethrow;
+    }
   }
 }

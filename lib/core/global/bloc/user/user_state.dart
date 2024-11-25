@@ -39,11 +39,17 @@ final class UserCompleteState extends UserState {
   final String username;
   final bool userMfa;
 
-  /// don't want to refresh router when mfa status is changed
-  /// storing mfa status as fetching it on settings page takes time
-  /// so storing it during startup
   @override
-  List<Object?> get props => [id, email, username];
+  List<Object?> get props => [id, email, username, userMfa];
+
+  UserCompleteState updateMFA(bool mfa) {
+    return UserCompleteState(
+      id: id,
+      email: email,
+      username: username,
+      userMfa: mfa,
+    );
+  }
 }
 
 final class UserAuthErrorState extends UserState {
