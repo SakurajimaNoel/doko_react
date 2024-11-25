@@ -1,6 +1,7 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/theme/theme_bloc.dart';
 import 'package:doko_react/features/settings/presentation/widgets/heading/settings_heading.dart';
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -21,6 +22,14 @@ class ThemeSettings extends StatelessWidget {
           height: Constants.gap * 0.25,
         ),
         _ThemeWidget(),
+        SizedBox(
+          height: Constants.gap * 0.75,
+        ),
+        SettingsHeading("Application Accent"),
+        SizedBox(
+          height: Constants.gap * 0.5,
+        ),
+        _AccentWidget(),
       ],
     );
   }
@@ -59,9 +68,11 @@ class _ThemeWidget extends StatelessWidget {
                 ],
                 selected: {state.mode},
                 onSelectionChanged: (newSelection) {
-                  context.read<ThemeBloc>().add(ThemeChangeEvent(
-                        selectedMode: newSelection.first,
-                      ));
+                  context.read<ThemeBloc>().add(
+                        ThemeChangeEvent(
+                          selectedMode: newSelection.first,
+                        ),
+                      );
                 },
               );
             },
@@ -69,5 +80,109 @@ class _ThemeWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _AccentWidget extends StatefulWidget {
+  const _AccentWidget();
+
+  @override
+  State<_AccentWidget> createState() => _AccentWidgetState();
+}
+
+class _AccentWidgetState extends State<_AccentWidget> {
+  late Color currentAccentColor;
+
+  @override
+  void initState() {
+    super.initState();
+
+    currentAccentColor = context.read<ThemeBloc>().state.accent;
+  }
+
+  void updateGlobalAccent(Color accent) {
+    context.read<ThemeBloc>().add(ThemeChangeAccentEvent(
+          selectedAccent: accent,
+        ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: currentAccentColor,
+          ),
+        ),
+        TextButton(
+          onPressed: openColorPicker,
+          child: const Text('Change Accent'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> openColorPicker() async {
+    Color previousSelection = currentAccentColor;
+
+    final selectedColor = await showDialog<Color>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Change Accent Color'),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 340,
+            child: ColorPicker(
+              color: currentAccentColor,
+              onColorChanged: (Color newColor) {
+                setState(() {
+                  currentAccentColor = newColor;
+                });
+                updateGlobalAccent(newColor);
+              },
+              borderRadius: 20,
+              spacing: 10,
+              runSpacing: 10,
+              wheelDiameter: 250,
+              wheelWidth: 25,
+              pickersEnabled: const {
+                ColorPickerType.primary: false,
+                ColorPickerType.accent: true,
+                ColorPickerType.wheel: true,
+              },
+              enableShadesSelection: false,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(currentAccentColor);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (selectedColor == null) {
+      // revert the changes
+      setState(() {
+        currentAccentColor = previousSelection;
+      });
+
+      updateGlobalAccent(previousSelection);
+    }
   }
 }

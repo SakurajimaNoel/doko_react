@@ -25,7 +25,7 @@ class ThemeState extends Equatable {
   Map<String, dynamic>? toJson() {
     return {
       "mode": mode.toString(),
-      "accent": accent.hashCode,
+      "accent": accent.value,
     };
   }
 
