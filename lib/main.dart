@@ -2,6 +2,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/archive/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/config/router/app_router_config.dart';
 import 'package:doko_react/core/config/theme/theme_data.dart';
+import 'package:doko_react/core/global/bloc/theme/theme_bloc.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
@@ -29,9 +30,9 @@ void main() async {
             create: (BuildContext context) => UserBloc()..add(UserInitEvent()),
           ),
           // global theme bloc
-          // BlocProvider(
-          //   create: (BuildContext context) => ThemeBloc(),
-          // ),
+          BlocProvider(
+            create: (BuildContext context) => ThemeBloc(),
+          ),
         ],
         child: const Doki(),
       ),
@@ -89,13 +90,20 @@ class _DokiState extends State<Doki> {
       listener: (context, state) {
         router.refresh();
       },
-      child: MaterialApp.router(
-        routerConfig: router,
-        debugShowCheckedModeBanner: false,
-        title: 'Doki',
-        themeMode: ThemeMode.light,
-        darkTheme: GlobalThemeData.darkCustomThemeData(Colors.deepPurple),
-        theme: GlobalThemeData.lightCustomThemeData(Colors.deepPurple),
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        buildWhen: (previousState, state) {
+          return previousState != state;
+        },
+        builder: (context, state) {
+          return MaterialApp.router(
+            routerConfig: router,
+            debugShowCheckedModeBanner: false,
+            title: 'Doki',
+            themeMode: state.mode,
+            darkTheme: GlobalThemeData.darkCustomThemeData(state.accent),
+            theme: GlobalThemeData.lightCustomThemeData(state.accent),
+          );
+        },
       ),
     );
   }

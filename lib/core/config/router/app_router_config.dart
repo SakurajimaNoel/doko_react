@@ -9,6 +9,7 @@ import 'package:doko_react/features/authentication/presentation/pages/sign-up/si
 import 'package:doko_react/features/complete-profile/presentation/pages/info/complete_profile_info_page.dart';
 import 'package:doko_react/features/complete-profile/presentation/pages/profile-picture/complete_profile_picture_page.dart';
 import 'package:doko_react/features/complete-profile/presentation/pages/username/complete_profile_username_page.dart';
+import 'package:doko_react/features/settings/presentation/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -66,20 +67,28 @@ class AppRouterConfig {
       return const ErrorUnknownRoute();
     },
     routes: [
-      GoRoute(
-        path: "/",
-        name: RouterConstants.userFeed,
-        builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("dokii"),
-            ),
-            body: const Center(
-              child: Text("profile is completed"),
-            ),
-          );
-        },
-      ),
+      // GoRoute(
+      //   path: "/",
+      //   name: RouterConstants.userFeed,
+      //   builder: (context, state) {
+      //     return Scaffold(
+      //       appBar: AppBar(
+      //         title: const Text("dokii"),
+      //         actions: [
+      //           IconButton(
+      //             onPressed: () {
+      //               context.pushNamed(RouterConstants.settings);
+      //             },
+      //             icon: const Icon(Icons.settings),
+      //           ),
+      //         ],
+      //       ),
+      //       body: const Center(
+      //         child: Text("profile is completed"),
+      //       ),
+      //     );
+      //   },
+      // ),
       GoRoute(
         path: "/error",
         name: RouterConstants.error,
@@ -197,6 +206,11 @@ class AppRouterConfig {
             ],
           )
         ],
+      ),
+      GoRoute(
+        path: "/",
+        name: RouterConstants.settings,
+        builder: (context, state) => const SettingsPage(),
       ),
       // complete profile routes
       // StatefulShellRoute.indexedStack(

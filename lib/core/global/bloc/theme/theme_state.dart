@@ -1,6 +1,43 @@
 part of 'theme_bloc.dart';
 
-@immutable
-sealed class ThemeState {}
+class ThemeState extends Equatable {
+  const ThemeState({
+    required this.mode,
+    required this.accent,
+  });
 
-final class ThemeInitial extends ThemeState {}
+  final ThemeMode mode;
+  final Color accent;
+
+  @override
+  List<Object?> get props => [mode, accent];
+
+  ThemeState copyWith({
+    ThemeMode? mode,
+    Color? accent,
+  }) {
+    return ThemeState(
+      mode: mode ?? this.mode,
+      accent: accent ?? this.accent,
+    );
+  }
+
+  Map<String, dynamic>? toJson() {
+    return {
+      "mode": mode.toString(),
+      "accent": accent.hashCode,
+    };
+  }
+
+  static ThemeState? fromJson(Map<String, dynamic> json) {
+    List<ThemeMode> modes = ThemeMode.values;
+    ThemeMode mode = modes.firstWhere((val) => val.toString() == json["mode"]);
+
+    Color accent = Color(json["accent"] as int);
+
+    return ThemeState(
+      mode: mode,
+      accent: accent,
+    );
+  }
+}
