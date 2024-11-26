@@ -13,6 +13,10 @@ import 'package:doko_react/features/complete-profile/presentation/pages/info/com
 import 'package:doko_react/features/complete-profile/presentation/pages/profile-picture/complete_profile_picture_page.dart';
 import 'package:doko_react/features/complete-profile/presentation/pages/username/complete_profile_username_page.dart';
 import 'package:doko_react/features/settings/presentation/pages/settings_page.dart';
+import 'package:doko_react/features/user-profile/presentation/pages/nearby/nearby_page.dart';
+import 'package:doko_react/features/user-profile/presentation/pages/profile/profile_page.dart';
+import 'package:doko_react/features/user-profile/presentation/pages/user-feed/user_feed_page.dart';
+import 'package:doko_react/features/user-profile/user_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -70,28 +74,6 @@ class AppRouterConfig {
       return const ErrorUnknownRoute();
     },
     routes: [
-      // GoRoute(
-      //   path: "/",
-      //   name: RouterConstants.userFeed,
-      //   builder: (context, state) {
-      //     return Scaffold(
-      //       appBar: AppBar(
-      //         title: const Text("dokii"),
-      //         actions: [
-      //           IconButton(
-      //             onPressed: () {
-      //               context.pushNamed(RouterConstants.settings);
-      //             },
-      //             icon: const Icon(Icons.settings),
-      //           ),
-      //         ],
-      //       ),
-      //       body: const Center(
-      //         child: Text("profile is completed"),
-      //       ),
-      //     );
-      //   },
-      // ),
       GoRoute(
         path: "/error",
         name: RouterConstants.error,
@@ -211,7 +193,7 @@ class AppRouterConfig {
         ],
       ),
       GoRoute(
-        path: "/",
+        path: "/settings",
         name: RouterConstants.settings,
         builder: (context, state) => const SettingsPage(),
         routes: [
@@ -235,168 +217,168 @@ class AppRouterConfig {
         ],
       ),
       // complete profile routes
-      // StatefulShellRoute.indexedStack(
-      //   // parentNavigatorKey: _rootNavigatorKey,
-      //   builder: (context, state, navigationShell) {
-      //     return UserLayout(navigationShell);
-      //   },
-      //   branches: [
-      //     StatefulShellBranch(
-      //       navigatorKey: _sectionNavigatorKey,
-      //       routes: [
-      //         GoRoute(
-      //           name: RouterConstants.userFeed,
-      //           path: "/",
-      //           builder: (context, state) => const UserFeedPage(),
-      //           routes: [
-      //             GoRoute(
-      //               parentNavigatorKey: _rootNavigatorKey,
-      //               name: RouterConstants.userSearch,
-      //               path: "search",
-      //               builder: (context, state) => const UserSearchPage(),
-      //             )
-      //           ],
-      //         ),
-      //       ],
-      //     ),
-      //     StatefulShellBranch(
-      //       routes: [
-      //         GoRoute(
-      //           name: RouterConstants.nearby,
-      //           path: "/nearby",
-      //           builder: (context, state) => const NearbyPage(),
-      //         ),
-      //       ],
-      //     ),
-      //     StatefulShellBranch(
-      //       routes: [
-      //         GoRoute(
-      //           name: RouterConstants.profile,
-      //           path: "/profile",
-      //           builder: (context, state) {
-      //             return const ProfilePage();
-      //           },
-      //           routes: [
-      //             GoRoute(
-      //               parentNavigatorKey: _rootNavigatorKey,
-      //               name: RouterConstants.userPost,
-      //               path: "post/:postId",
-      //               builder: (context, state) {
-      //                 Map<String, dynamic>? data;
-      //                 if (state.extra != null) {
-      //                   data = state.extra as Map<String, dynamic>;
-      //                 }
-      //
-      //                 final PostModel? post = data?["post"];
-      //                 String postId = state.pathParameters["postId"]!;
-      //
-      //                 return PostPage(
-      //                   postId: postId,
-      //                   post: post,
-      //                 );
-      //               },
-      //             ),
-      //             GoRoute(
-      //               parentNavigatorKey: _rootNavigatorKey,
-      //               name: RouterConstants.pendingRequests,
-      //               path: "pending-requests",
-      //               builder: (context, state) => const PendingRequestPage(),
-      //             ),
-      //             GoRoute(
-      //               parentNavigatorKey: _rootNavigatorKey,
-      //               name: RouterConstants.createPost,
-      //               path: "create-post",
-      //               builder: (context, state) => const CreatePostPage(),
-      //               routes: [
-      //                 GoRoute(
-      //                   parentNavigatorKey: _rootNavigatorKey,
-      //                   name: RouterConstants.postPublish,
-      //                   path: "publish",
-      //                   builder: (context, state) {
-      //                     final Map<String, dynamic> data =
-      //                         state.extra as Map<String, dynamic>;
-      //                     final List<PostContent> postContent =
-      //                         data["postContent"];
-      //                     final String postId = data["postId"];
-      //
-      //                     return CreatePostPublishPage(
-      //                       postContent: postContent,
-      //                       postId: postId,
-      //                     );
-      //                   },
-      //                 ),
-      //               ],
-      //             ),
-      //             GoRoute(
-      //               parentNavigatorKey: _rootNavigatorKey,
-      //               name: RouterConstants.settings,
-      //               path: "settings",
-      //               builder: (context, state) => const SettingsPage(),
-      //               routes: [
-      //                 GoRoute(
-      //                   parentNavigatorKey: _rootNavigatorKey,
-      //                   name: RouterConstants.mfaSetup,
-      //                   path: "mfa-setup",
-      //                   builder: (context, state) => const MfaSetupPage(),
-      //                   routes: [
-      //                     GoRoute(
-      //                       parentNavigatorKey: _rootNavigatorKey,
-      //                       name: RouterConstants.verifyMfa,
-      //                       path: "verify-mfa",
-      //                       builder: (context, state) => const VerifyMfaPage(),
-      //                     ),
-      //                   ],
-      //                 ),
-      //                 GoRoute(
-      //                   parentNavigatorKey: _rootNavigatorKey,
-      //                   name: RouterConstants.changePassword,
-      //                   path: "change-password",
-      //                   builder: (context, state) => const ChangePasswordPage(),
-      //                 ),
-      //               ],
-      //             ),
-      //             GoRoute(
-      //               parentNavigatorKey: _rootNavigatorKey,
-      //               name: RouterConstants.editProfile,
-      //               path: "edit-profile",
-      //               builder: (context, state) {
-      //                 final Map<String, dynamic> data =
-      //                     state.extra as Map<String, dynamic>;
-      //                 final CompleteUserModel user = data["user"];
-      //
-      //                 return EditProfilePage(
-      //                   user: user,
-      //                 );
-      //               },
-      //             ),
-      //             GoRoute(
-      //               parentNavigatorKey: _rootNavigatorKey,
-      //               name: RouterConstants.userProfile,
-      //               path: "user/:username",
-      //               builder: (context, state) {
-      //                 String username = state.pathParameters["username"]!;
-      //                 return UserProfilePage(username: username);
-      //               },
-      //               routes: [
-      //                 GoRoute(
-      //                   parentNavigatorKey: _rootNavigatorKey,
-      //                   name: RouterConstants.profileFriends,
-      //                   path: "friends",
-      //                   builder: (context, state) {
-      //                     String username = state.pathParameters["username"]!;
-      //                     return FriendsPage(
-      //                       username: username,
-      //                     );
-      //                   },
-      //                 ),
-      //               ],
-      //             ),
-      //           ],
-      //         ),
-      //       ],
-      //     ),
-      //   ],
-      // ),
+      StatefulShellRoute.indexedStack(
+        // parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state, navigationShell) {
+          return UserLayout(navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            navigatorKey: _sectionNavigatorKey,
+            routes: [
+              GoRoute(
+                name: RouterConstants.userFeed,
+                path: "/",
+                builder: (context, state) => const UserFeedPage(),
+                // routes: [
+                //   GoRoute(
+                //     parentNavigatorKey: _rootNavigatorKey,
+                //     name: RouterConstants.userSearch,
+                //     path: "search",
+                //     builder: (context, state) => const UserSearchPage(),
+                //   )
+                // ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                name: RouterConstants.nearby,
+                path: "/nearby",
+                builder: (context, state) => const NearbyPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                name: RouterConstants.profile,
+                path: "/profile",
+                builder: (context, state) {
+                  return const ProfilePage();
+                },
+                // routes: [
+                //   GoRoute(
+                //     parentNavigatorKey: _rootNavigatorKey,
+                //     name: RouterConstants.userPost,
+                //     path: "post/:postId",
+                //     builder: (context, state) {
+                //       Map<String, dynamic>? data;
+                //       if (state.extra != null) {
+                //         data = state.extra as Map<String, dynamic>;
+                //       }
+                //
+                //       final PostModel? post = data?["post"];
+                //       String postId = state.pathParameters["postId"]!;
+                //
+                //       return PostPage(
+                //         postId: postId,
+                //         post: post,
+                //       );
+                //     },
+                //   ),
+                //   GoRoute(
+                //     parentNavigatorKey: _rootNavigatorKey,
+                //     name: RouterConstants.pendingRequests,
+                //     path: "pending-requests",
+                //     builder: (context, state) => const PendingRequestPage(),
+                //   ),
+                //   GoRoute(
+                //     parentNavigatorKey: _rootNavigatorKey,
+                //     name: RouterConstants.createPost,
+                //     path: "create-post",
+                //     builder: (context, state) => const CreatePostPage(),
+                //     routes: [
+                //       GoRoute(
+                //         parentNavigatorKey: _rootNavigatorKey,
+                //         name: RouterConstants.postPublish,
+                //         path: "publish",
+                //         builder: (context, state) {
+                //           final Map<String, dynamic> data =
+                //               state.extra as Map<String, dynamic>;
+                //           final List<PostContent> postContent =
+                //               data["postContent"];
+                //           final String postId = data["postId"];
+                //
+                //           return CreatePostPublishPage(
+                //             postContent: postContent,
+                //             postId: postId,
+                //           );
+                //         },
+                //       ),
+                //     ],
+                //   ),
+                //   GoRoute(
+                //     parentNavigatorKey: _rootNavigatorKey,
+                //     name: RouterConstants.settings,
+                //     path: "settings",
+                //     builder: (context, state) => const SettingsPage(),
+                //     routes: [
+                //       GoRoute(
+                //         parentNavigatorKey: _rootNavigatorKey,
+                //         name: RouterConstants.mfaSetup,
+                //         path: "mfa-setup",
+                //         builder: (context, state) => const MfaSetupPage(),
+                //         routes: [
+                //           GoRoute(
+                //             parentNavigatorKey: _rootNavigatorKey,
+                //             name: RouterConstants.verifyMfa,
+                //             path: "verify-mfa",
+                //             builder: (context, state) => const VerifyMfaPage(),
+                //           ),
+                //         ],
+                //       ),
+                //       GoRoute(
+                //         parentNavigatorKey: _rootNavigatorKey,
+                //         name: RouterConstants.changePassword,
+                //         path: "change-password",
+                //         builder: (context, state) => const ChangePasswordPage(),
+                //       ),
+                //     ],
+                //   ),
+                //   GoRoute(
+                //     parentNavigatorKey: _rootNavigatorKey,
+                //     name: RouterConstants.editProfile,
+                //     path: "edit-profile",
+                //     builder: (context, state) {
+                //       final Map<String, dynamic> data =
+                //           state.extra as Map<String, dynamic>;
+                //       final CompleteUserModel user = data["user"];
+                //
+                //       return EditProfilePage(
+                //         user: user,
+                //       );
+                //     },
+                //   ),
+                //   GoRoute(
+                //     parentNavigatorKey: _rootNavigatorKey,
+                //     name: RouterConstants.userProfile,
+                //     path: "user/:username",
+                //     builder: (context, state) {
+                //       String username = state.pathParameters["username"]!;
+                //       return UserProfilePage(username: username);
+                //     },
+                //     routes: [
+                //       GoRoute(
+                //         parentNavigatorKey: _rootNavigatorKey,
+                //         name: RouterConstants.profileFriends,
+                //         path: "friends",
+                //         builder: (context, state) {
+                //           String username = state.pathParameters["username"]!;
+                //           return FriendsPage(
+                //             username: username,
+                //           );
+                //         },
+                //       ),
+                //     ],
+                //   ),
+                // ],
+              ),
+            ],
+          ),
+        ],
+      ),
     ],
   );
 }
