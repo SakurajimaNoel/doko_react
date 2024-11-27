@@ -6,6 +6,8 @@ import 'package:doko_react/core/config/graphql/graphql_config.dart';
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/auth/auth.dart';
+import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
+import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -75,6 +77,17 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       String username = res[0]["username"];
       bool mfaStatus = await getUserMFAStatus();
 
+      // adding user in graph
+      final UserEntity currentUser = await UserEntity.createEntity(map: res[0]);
+      final UserGraph graph = UserGraph();
+      String key = generateUserNodeKey(username);
+
+      if (!graph.containsKey(key)) {
+        graph.updateValue((map) {
+          map[key] = currentUser;
+        });
+      }
+
       emit(UserCompleteState(
         id: userDetails.userId,
         email: userDetails.username,
@@ -84,6 +97,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     } on ApplicationException catch (_) {
       emit(UserAuthErrorState());
     } catch (e) {
+      safePrint(e.toString());
       emit(UserGraphErrorState());
     }
   }

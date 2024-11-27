@@ -2,6 +2,8 @@ import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/storage/storage.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
+import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
+import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 class CompleteProfileRemoteDataSource {
@@ -64,6 +66,15 @@ class CompleteProfileRemoteDataSource {
       if (res.isEmpty) {
         throw const ApplicationException(
             reason: "Something went wrong when complete user profile.");
+      }
+
+      final UserEntity currentUser = await UserEntity.createEntity(map: res[0]);
+      final UserGraph graph = UserGraph();
+
+      if (!graph.containsKey("user:${currentUser.username}")) {
+        graph.updateValue((map) {
+          map["user:${currentUser.username}"] = currentUser;
+        });
       }
 
       // if all done return true

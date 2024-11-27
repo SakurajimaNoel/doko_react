@@ -2,10 +2,12 @@ import 'package:doko_react/core/global/cache/cache.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
-
+import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
+import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 part 'post_content_entity.dart';
 
-class PostEntity {
+class PostEntity extends ProfileEntity {
   PostEntity({
     required this.id,
     required this.caption,
@@ -43,6 +45,15 @@ class PostEntity {
     /// check if user:username exists in map
     /// if not add the user to map and save reference
     final String createdByUsername = map["createdBy"]["username"];
+
+    final UserGraph graph = UserGraph();
+    if (!graph.containsKey(createdByUsername)) {
+      UserEntity user = await UserEntity.createEntity(map: map["createdBy"]);
+
+      graph.updateValue((Map map) {
+        map["user:$createdByUsername"] = user;
+      });
+    }
 
     List mapContent = [];
     if (map["content"] != null) {

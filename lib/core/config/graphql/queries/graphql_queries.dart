@@ -25,12 +25,21 @@ class GraphqlQueries {
   // get user query and variables
   static String getUser() {
     return """
-      query Users(\$where: UserWhere) {
+      query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
         users(where: \$where) {
           id
           username
           name
           profilePicture
+          friendsConnection(where: \$friendsConnectionWhere2) {
+            edges {
+              properties {
+                addedOn
+                requestedBy
+                status
+              }
+            }
+          }
         }
       }
     """;
@@ -40,6 +49,11 @@ class GraphqlQueries {
     return {
       "where": {
         "id_EQ": userId,
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          "id_EQ": userId,
+        }
       }
     };
   }
@@ -73,6 +87,15 @@ class GraphqlQueries {
             name
             profilePicture
             username
+            friendsConnection {
+              edges {
+                properties {
+                  addedOn
+                  requestedBy
+                  status
+                }
+              }
+            }
           }
         }
       }       

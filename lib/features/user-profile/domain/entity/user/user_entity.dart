@@ -1,6 +1,7 @@
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
+import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 
 /// user entity to use with user widget
 /// across pages with connection detail
@@ -9,7 +10,7 @@ import 'package:doko_react/core/global/entity/user-relation-info/user_relation_i
 /// full profile is requested CompleteUserEntity
 /// instance will be used
 /// all mutable fields are non final
-class UserEntity {
+class UserEntity extends ProfileEntity {
   UserEntity({
     required this.userId,
     required this.username,

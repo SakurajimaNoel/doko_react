@@ -13,9 +13,9 @@ import 'package:doko_react/features/complete-profile/presentation/pages/info/com
 import 'package:doko_react/features/complete-profile/presentation/pages/profile-picture/complete_profile_picture_page.dart';
 import 'package:doko_react/features/complete-profile/presentation/pages/username/complete_profile_username_page.dart';
 import 'package:doko_react/features/settings/presentation/pages/settings_page.dart';
-import 'package:doko_react/features/user-profile/presentation/pages/nearby/nearby_page.dart';
-import 'package:doko_react/features/user-profile/presentation/pages/profile/profile_page.dart';
-import 'package:doko_react/features/user-profile/presentation/pages/user-feed/user_feed_page.dart';
+import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/profile_page.dart';
+import 'package:doko_react/features/user-profile/user-features/user-feed/user_feed_page.dart';
 import 'package:doko_react/features/user-profile/user_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,7 +89,7 @@ class AppRouterConfig {
         },
       ),
       GoRoute(
-        path: "graph",
+        path: "/error/graph",
         name: RouterConstants.graphError,
         builder: (context, state) {
           return Scaffold(

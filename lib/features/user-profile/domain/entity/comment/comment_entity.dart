@@ -1,8 +1,11 @@
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
+import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
+import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 
-class CommentEntity {
+class CommentEntity extends ProfileEntity {
   CommentEntity({
     required this.id,
     required this.createdOn,
@@ -39,7 +42,17 @@ class CommentEntity {
   static Future<CommentEntity> createEntity({required Map map}) async {
     /// check if user:username exists in map
     /// if not add the user to map and save reference
-    final String commentByUsername = map["createdBy"]["username"];
+    final String commentByUsername = map["commentBy"]["username"];
+
+    final UserGraph graph = UserGraph();
+    if (!graph.containsKey(commentByUsername)) {
+      UserEntity user = await UserEntity.createEntity(map: map["commentBy"]);
+
+      graph.updateValue((Map map) {
+        map["user:$commentByUsername"] = user;
+      });
+    }
+
     bool userLike = (map["likedBy"] as List).length == 1;
 
     StorageResource media;
