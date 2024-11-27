@@ -14,7 +14,7 @@ import 'package:doko_react/features/complete-profile/presentation/pages/profile-
 import 'package:doko_react/features/complete-profile/presentation/pages/username/complete_profile_username_page.dart';
 import 'package:doko_react/features/settings/presentation/pages/settings_page.dart';
 import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
-import 'package:doko_react/features/user-profile/user-features/profile/profile_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/user-feed/user_feed_page.dart';
 import 'package:doko_react/features/user-profile/user_layout.dart';
 import 'package:flutter/material.dart';

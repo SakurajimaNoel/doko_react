@@ -18,24 +18,15 @@ class Heading extends StatelessWidget {
   final double? size;
   final bool centred;
 
-  Widget generateTextWidget() {
+  @override
+  Widget build(BuildContext context) {
     return Text(
       text,
+      textAlign: centred ? TextAlign.center : TextAlign.left,
       style: TextStyle(
         fontSize: size ?? Constants.heading1,
         fontWeight: FontWeight.w600,
       ),
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (centred) {
-      return Center(
-        child: generateTextWidget(),
-      );
-    }
-
-    return generateTextWidget();
   }
 }

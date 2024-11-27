@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/bloc/event_transformer.dart';
-import 'package:doko_react/features/complete-profile/domain/use-case/complete-profile-user-case/complete_profile_use_case.dart';
+import 'package:doko_react/features/complete-profile/domain/use-case/complete-profile-use-case/complete_profile_use_case.dart';
 import 'package:doko_react/features/complete-profile/domain/use-case/username-use-case/username_use_case.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
 import 'package:equatable/equatable.dart';

@@ -210,8 +210,8 @@ class GraphqlQueries {
 
   static String getCompleteUser() {
     return '''
-      query Users(\$where: UserWhere, \$friendsAggregateWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
-        users(where: \$where) {
+      query Users(\$where: UserWhere, \$friendsAggregateWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$limit: Int, \$first: Int, \$postsConnectionWhere2: PostWhere, \$sort: [PostSort!], \$likedByWhere2: UserWhere) {
+        users(where: \$where, limit: \$limit) {
           id
           username
           name
@@ -231,6 +231,32 @@ class GraphqlQueries {
                 addedOn
                 requestedBy
                 status
+              }
+            }
+          }
+        }
+        postsConnection(first: \$first, where: \$postsConnectionWhere2, sort: \$sort) {
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
+          edges {
+            node {
+              id
+              createdOn
+              content
+              caption
+              createdBy {
+                username
+              }
+              commentsConnection {
+                totalCount
+              }
+              likedByConnection {
+                totalCount
+              }
+              likedBy(where: \$likedByWhere2) {
+                username
               }
             }
           }
@@ -258,7 +284,21 @@ class GraphqlQueries {
         "node": {
           "username_EQ": currentUsername,
         }
-      }
+      },
+      "first": GraphqlQueryConstants.postLimit,
+      "postsConnectionWhere2": {
+        "createdBy": {
+          "username_EQ": username,
+        }
+      },
+      "sort": [
+        {
+          "createdOn": "DESC",
+        }
+      ],
+      "likedByWhere2": {
+        "username_EQ": currentUsername,
+      },
     };
   }
 

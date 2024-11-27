@@ -1,7 +1,7 @@
 import 'package:doko_react/features/authentication/data/data-sources/authentication_remote_data_source.dart';
 import 'package:doko_react/features/authentication/domain/entities/login/login_entity.dart';
 import 'package:doko_react/features/authentication/domain/entities/setup_mfa/setup_mfa_entity.dart';
-import 'package:doko_react/features/authentication/domain/repositories/authentication_repository.dart';
+import 'package:doko_react/features/authentication/domain/repository/authentication_repository.dart';
 import 'package:doko_react/features/authentication/input/authentication_input.dart';
 
 class AuthenticationRepositoryImpl implements AuthenticationRepository {

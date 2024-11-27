@@ -9,6 +9,10 @@ class PageInfo {
     required this.hasNextPage,
   });
 
+  PageInfo.empty()
+      : endCursor = null,
+        hasNextPage = false;
+
   final String? endCursor;
   final bool hasNextPage;
 

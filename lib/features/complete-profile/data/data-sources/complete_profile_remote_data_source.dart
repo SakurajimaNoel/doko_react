@@ -65,17 +65,14 @@ class CompleteProfileRemoteDataSource {
       List res = result.data?["createUsers"]["users"];
       if (res.isEmpty) {
         throw const ApplicationException(
-            reason: "Something went wrong when complete user profile.");
+            reason: "Something went wrong when completing user profile.");
       }
 
       final UserEntity currentUser = await UserEntity.createEntity(map: res[0]);
       final UserGraph graph = UserGraph();
+      String key = generateUserNodeKey(currentUser.username);
 
-      if (!graph.containsKey("user:${currentUser.username}")) {
-        graph.updateValue((map) {
-          map["user:${currentUser.username}"] = currentUser;
-        });
-      }
+      graph.addEntity(key, currentUser);
 
       // if all done return true
       return true;

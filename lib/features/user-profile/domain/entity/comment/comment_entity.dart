@@ -28,7 +28,7 @@ class CommentEntity extends ProfileEntity {
   int likesCount;
   int commentsCount;
   bool userLike;
-  final Nodes? comments;
+  final Nodes comments;
 
   void updateUserLikes(bool userLike, int likesCount) {
     this.likesCount = likesCount;
@@ -47,10 +47,9 @@ class CommentEntity extends ProfileEntity {
     final UserGraph graph = UserGraph();
     if (!graph.containsKey(commentByUsername)) {
       UserEntity user = await UserEntity.createEntity(map: map["commentBy"]);
+      String key = generateUserNodeKey(user.username);
 
-      graph.updateValue((Map map) {
-        map["user:$commentByUsername"] = user;
-      });
+      graph.addEntity(key, user);
     }
 
     bool userLike = (map["likedBy"] as List).length == 1;
@@ -89,7 +88,7 @@ class CommentEntity extends ProfileEntity {
       likesCount: map["likedByConnection"]["totalCount"],
       userLike: userLike,
       commentsCount: map["commentsConnection"]["totalCount"],
-      comments: null,
+      comments: Nodes.empty(),
     );
   }
 }

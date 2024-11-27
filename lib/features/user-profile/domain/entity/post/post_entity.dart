@@ -5,6 +5,7 @@ import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.d
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+
 part 'post_content_entity.dart';
 
 class PostEntity extends ProfileEntity {
@@ -28,7 +29,7 @@ class PostEntity extends ProfileEntity {
   int likesCount;
   int commentsCount;
   bool userLike;
-  final Nodes? comments;
+  final Nodes comments;
 
   void updateUserLikes(bool userLike, int likesCount) {
     this.likesCount = likesCount;
@@ -44,15 +45,17 @@ class PostEntity extends ProfileEntity {
   static Future<PostEntity> createEntity({required Map map}) async {
     /// check if user:username exists in map
     /// if not add the user to map and save reference
+    /// when fetching post for user profile user will always
+    /// be there so no need to get user info in every post item
     final String createdByUsername = map["createdBy"]["username"];
+    String key = generateUserNodeKey(createdByUsername);
 
     final UserGraph graph = UserGraph();
-    if (!graph.containsKey(createdByUsername)) {
+    if (!graph.containsKey(key)) {
       UserEntity user = await UserEntity.createEntity(map: map["createdBy"]);
+      String key = generateUserNodeKey(user.username);
 
-      graph.updateValue((Map map) {
-        map["user:$createdByUsername"] = user;
-      });
+      graph.addEntity(key, user);
     }
 
     List mapContent = [];
@@ -74,8 +77,8 @@ class PostEntity extends ProfileEntity {
       caption: map["caption"],
       createdOn: DateTime.parse(map["createdOn"]),
       content: results,
-      createdBy: "user:$createdByUsername",
-      comments: null,
+      createdBy: key,
+      comments: Nodes.empty(),
       likesCount: map["likedByConnection"]["totalCount"],
       commentsCount: map["commentsConnection"]["totalCount"],
       userLike: userLike,

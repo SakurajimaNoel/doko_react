@@ -90,8 +90,8 @@ class CompleteUserEntity extends UserEntity {
   final DateTime createdOn;
   int postsCount;
   int friendsCount;
-  final Nodes? friends;
-  final Nodes? posts;
+  Nodes friends;
+  Nodes posts;
 
   void updateUserDetails({
     required String bio,
@@ -111,6 +111,19 @@ class CompleteUserEntity extends UserEntity {
     friendsCount = newFriendsCount;
   }
 
+  CompleteUserEntity updateUserEntityValues(UserEntity user) {
+    return CompleteUserEntity.fromUserEntity(
+      user: user,
+      bio: bio,
+      dob: dob,
+      createdOn: createdOn,
+      postsCount: postsCount,
+      friendsCount: friendsCount,
+      friends: friends,
+      posts: posts,
+    );
+  }
+
   static Future<CompleteUserEntity> createEntity({required Map map}) async {
     final UserEntity user = await UserEntity.createEntity(
       map: map,
@@ -123,8 +136,8 @@ class CompleteUserEntity extends UserEntity {
       createdOn: DateTime.parse(map["createdOn"]),
       postsCount: map["postsAggregate"]["count"],
       friendsCount: map["friendsAggregate"]["count"],
-      friends: null,
-      posts: null,
+      friends: Nodes.empty(),
+      posts: Nodes.empty(),
     );
   }
 }

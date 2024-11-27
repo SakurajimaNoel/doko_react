@@ -79,14 +79,10 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
       // adding user in graph
       final UserEntity currentUser = await UserEntity.createEntity(map: res[0]);
+
       final UserGraph graph = UserGraph();
       String key = generateUserNodeKey(username);
-
-      if (!graph.containsKey(key)) {
-        graph.updateValue((map) {
-          map[key] = currentUser;
-        });
-      }
+      graph.addEntity(key, currentUser);
 
       emit(UserCompleteState(
         id: userDetails.userId,

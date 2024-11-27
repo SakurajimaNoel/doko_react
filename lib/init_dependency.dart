@@ -3,8 +3,8 @@ import "package:amplify_flutter/amplify_flutter.dart";
 import "package:amplify_storage_s3/amplify_storage_s3.dart";
 import "package:doko_react/archive/core/configs/graphql/graphql_config.dart";
 import "package:doko_react/features/authentication/data/data-sources/authentication_remote_data_source.dart";
-import "package:doko_react/features/authentication/data/repositories/authentication_repository_impl.dart";
-import "package:doko_react/features/authentication/domain/repositories/authentication_repository.dart";
+import "package:doko_react/features/authentication/data/repository/authentication_repository_impl.dart";
+import "package:doko_react/features/authentication/domain/repository/authentication_repository.dart";
 import "package:doko_react/features/authentication/domain/use-cases/login-use-case/confirm_login_use_case.dart";
 import "package:doko_react/features/authentication/domain/use-cases/login-use-case/login_use_case.dart";
 import "package:doko_react/features/authentication/domain/use-cases/logout-use-case/logout_use_case.dart";
@@ -17,11 +17,16 @@ import "package:doko_react/features/authentication/domain/use-cases/password-use
 import "package:doko_react/features/authentication/domain/use-cases/sign-up-use-case/sign_up_use_case.dart";
 import "package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart";
 import "package:doko_react/features/complete-profile/data/data-sources/complete_profile_remote_data_source.dart";
-import "package:doko_react/features/complete-profile/data/repositories/complete_profile_repository_impl.dart";
-import "package:doko_react/features/complete-profile/domain/repositories/complete_profile_repository.dart";
-import "package:doko_react/features/complete-profile/domain/use-case/complete-profile-user-case/complete_profile_use_case.dart";
+import "package:doko_react/features/complete-profile/data/repository/complete_profile_repository_impl.dart";
+import "package:doko_react/features/complete-profile/domain/repository/complete_profile_repository.dart";
+import "package:doko_react/features/complete-profile/domain/use-case/complete-profile-use-case/complete_profile_use_case.dart";
 import "package:doko_react/features/complete-profile/domain/use-case/username-use-case/username_use_case.dart";
 import "package:doko_react/features/complete-profile/presentation/bloc/complete_profile_bloc.dart";
+import "package:doko_react/features/user-profile/user-features/profile/data/data-sources/profile_remote_data_source.dart";
+import "package:doko_react/features/user-profile/user-features/profile/data/repository/profile_repository_impl.dart";
+import "package:doko_react/features/user-profile/user-features/profile/domain/repository/profile_repository.dart";
+import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/profile_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart";
 import "package:flutter/foundation.dart";
 import "package:get_it/get_it.dart";
 import "package:graphql_flutter/graphql_flutter.dart";
@@ -51,6 +56,33 @@ Future<void> initDependency() async {
 
   _initAuth();
   _initCompleteProfile();
+  _initProfile();
+}
+
+void _initProfile() {
+  serviceLocator.registerFactory<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSource(
+      client: serviceLocator<GraphQLClient>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<ProfileRepository>(
+    () => ProfileRepositoryImpl(
+      remoteDataSource: serviceLocator<ProfileRemoteDataSource>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<ProfileUseCase>(
+    () => ProfileUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<ProfileBloc>(
+    () => ProfileBloc(
+      profileUseCase: serviceLocator(),
+    ),
+  );
 }
 
 void _initAuth() {
