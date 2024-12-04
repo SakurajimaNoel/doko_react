@@ -4,6 +4,7 @@ import 'package:doko_react/core/config/router/app_router_config.dart';
 import 'package:doko_react/core/config/theme/theme_data.dart';
 import 'package:doko_react/core/global/bloc/theme/theme_bloc.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,6 +22,7 @@ void main() async {
     if (imagePickerImplementation is ImagePickerAndroid) {
       imagePickerImplementation.useAndroidPhotoPicker = true;
     }
+    // todo: try to dispose all the text editing controller
 
     runApp(
       MultiBlocProvider(
@@ -32,6 +34,9 @@ void main() async {
           // global theme bloc
           BlocProvider(
             create: (BuildContext context) => ThemeBloc(),
+          ),
+          BlocProvider(
+            create: (BuildContext context) => UserActionBloc(),
           ),
         ],
         child: const Doki(),

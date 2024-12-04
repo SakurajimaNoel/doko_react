@@ -23,6 +23,13 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
       TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
 
+  @override
+  void dispose() {
+    currentPasswordController.dispose();
+    newPasswordController.dispose();
+    super.dispose();
+  }
+
   void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

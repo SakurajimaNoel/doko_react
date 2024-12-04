@@ -21,8 +21,15 @@ class ProfilePictureFilter extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
+            // increase to increase breakpoint
             currTheme.surface.withOpacity(0.25),
             currTheme.surface.withOpacity(0.15),
+            currTheme.surface.withOpacity(0.05),
+            currTheme.surface.withOpacity(0.025),
+            currTheme.surface.withOpacity(0.025),
+            currTheme.surface.withOpacity(0.025),
+            currTheme.surface.withOpacity(0.025),
+            currTheme.surface.withOpacity(0.05),
             currTheme.surface.withOpacity(0.15),
             currTheme.surface.withOpacity(0.25),
           ],

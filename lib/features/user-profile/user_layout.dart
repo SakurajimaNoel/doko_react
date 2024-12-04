@@ -109,35 +109,32 @@ class _UserLayoutState extends State<UserLayout> {
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
 
-    return BlocProvider(
-      create: (context) => UserActionBloc(),
-      child: BlocBuilder<UserActionBloc, UserActionState>(
-        buildWhen: (previousState, state) {
-          return state is UserActionUpdateProfile;
-        },
-        builder: (context, state) {
-          final username =
-              (context.read<UserBloc>().state as UserCompleteState).username;
-          String key = generateUserNodeKey(username);
+    return BlocBuilder<UserActionBloc, UserActionState>(
+      buildWhen: (previousState, state) {
+        return state is UserActionUpdateProfile;
+      },
+      builder: (context, state) {
+        final username =
+            (context.read<UserBloc>().state as UserCompleteState).username;
+        String key = generateUserNodeKey(username);
 
-          final UserGraph graph = UserGraph();
-          UserEntity user = graph.getValueByKey(key)! as UserEntity;
-          bool profileEmpty = user.profilePicture.bucketPath.isEmpty;
+        final UserGraph graph = UserGraph();
+        UserEntity user = graph.getValueByKey(key)! as UserEntity;
+        bool profileEmpty = user.profilePicture.bucketPath.isEmpty;
 
-          return Scaffold(
-            body: widget.navigationShell,
-            bottomNavigationBar: NavigationBar(
-              indicatorColor: (activeIndex != 2 || profileEmpty)
-                  ? currTheme.primary
-                  : Colors.transparent,
-              selectedIndex: widget.navigationShell.currentIndex,
-              destinations: getDestinations(user),
-              onDestinationSelected: (index) =>
-                  onDestinationSelected(index, profileEmpty),
-            ),
-          );
-        },
-      ),
+        return Scaffold(
+          body: widget.navigationShell,
+          bottomNavigationBar: NavigationBar(
+            indicatorColor: (activeIndex != 2 || profileEmpty)
+                ? currTheme.primary
+                : Colors.transparent,
+            selectedIndex: widget.navigationShell.currentIndex,
+            destinations: getDestinations(user),
+            onDestinationSelected: (index) =>
+                onDestinationSelected(index, profileEmpty),
+          ),
+        );
+      },
     );
   }
 

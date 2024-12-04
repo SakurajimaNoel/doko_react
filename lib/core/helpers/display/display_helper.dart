@@ -52,7 +52,7 @@ String displayDateDifference(DateTime date) {
   }
 }
 
-String displayNumberFormant(int likes) {
+String displayNumberFormat(int likes) {
   if (likes < 1000) {
     return likes.toString();
   } else if (likes < 10000) {

@@ -14,7 +14,6 @@ class ProfileRemoteDataSource {
 
   final GraphQLClient _client;
 
-  // todo: improve this function
   Future<bool> getCompleteUserDetails(
     String username, {
     required String currentUsername,

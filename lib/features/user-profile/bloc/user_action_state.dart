@@ -88,41 +88,41 @@ final class UserActionCommentAddReply extends UserActionState {
 
 /// user friend relation change
 class UserActionFriendRelationChange extends UserActionState {
+  UserActionFriendRelationChange({
+    required this.friendUsername,
+  });
+
+  final String friendUsername;
+
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [friendUsername];
 }
 
 class UserActionRemoveFriendRelation extends UserActionFriendRelationChange {
   UserActionRemoveFriendRelation({
-    required this.friendId,
+    required super.friendUsername,
   });
 
-  final String friendId;
-
   @override
-  List<Object?> get props => [friendId];
+  List<Object?> get props => [];
 }
 
 class UserActionSendFriendReq extends UserActionFriendRelationChange {
   UserActionSendFriendReq({
-    required this.friendId,
+    required super.friendUsername,
   });
 
-  final String friendId;
-
   @override
-  List<Object?> get props => [friendId];
+  List<Object?> get props => [];
 }
 
 class UserActionAcceptFriendReq extends UserActionFriendRelationChange {
   UserActionAcceptFriendReq({
-    required this.friendId,
+    required super.friendUsername,
   });
 
-  final String friendId;
-
   @override
-  List<Object?> get props => [friendId];
+  List<Object?> get props => [];
 }
 
 class UserActionUpdateProfile extends UserActionState {

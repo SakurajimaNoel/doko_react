@@ -8,7 +8,8 @@ part 'user_action_state.dart';
 class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   UserActionBloc() : super(UserActionInitial()) {
     on<UserActionEvent>((event, emit) {
-      // TODO: implement event handler
+      emit(UserActionUpdateProfile(
+          name: "name", bio: "bio", profilePicture: "profilePicture"));
     });
   }
 }
