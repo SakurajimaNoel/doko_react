@@ -1,4 +1,3 @@
-import 'package:doko_react/features/authentication/presentation/widgets/public/sign-out-button/sign_out_button.dart';
 import 'package:flutter/material.dart';
 
 class UserFeedPage extends StatefulWidget {
@@ -13,7 +12,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [SignOutButton()],
+        title: const Text("Doki"),
       ),
     );
   }
