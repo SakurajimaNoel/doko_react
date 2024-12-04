@@ -156,13 +156,17 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         child: BlocBuilder<UserActionBloc, UserActionState>(
           buildWhen: (previousState, state) {
             return (self && state is UserActionUpdateProfile) ||
+                state is ProfileLoading;
+
+            // use this in friend relation
+            return (self && state is UserActionUpdateProfile) ||
                 (state is UserActionFriendRelationChange &&
                     state.friendUsername == username);
           },
           builder: (context, state) {
             return BlocBuilder<ProfileBloc, ProfileState>(
               builder: (context, state) {
-                if (state is ProfileLoading) {
+                if (state is ProfileLoading || state is ProfileInitial) {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );

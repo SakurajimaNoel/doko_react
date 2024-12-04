@@ -1,5 +1,6 @@
 import 'package:doko_react/features/user-profile/user-features/profile/data/data-sources/profile_remote_data_source.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/repository/profile_repository.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
   const ProfileRepositoryImpl({required remoteDataSource})
@@ -14,5 +15,11 @@ class ProfileRepositoryImpl implements ProfileRepository {
       username,
       currentUsername: currentUsername,
     );
+  }
+
+  @override
+  Future<bool> editUserProfile(
+      EditProfileInput editDetails, String bucketPath) async {
+    return _remoteDataSource.editUserProfile(editDetails, bucketPath);
   }
 }

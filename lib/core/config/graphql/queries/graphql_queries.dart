@@ -25,21 +25,13 @@ class GraphqlQueries {
   // get user query and variables
   static String getUser() {
     return """
-      query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+      query Users(\$where: UserWhere) {
         users(where: \$where) {
           id
           username
           name
           profilePicture
-          friendsConnection(where: \$friendsConnectionWhere2) {
-            edges {
-              properties {
-                addedOn
-                requestedBy
-                status
-              }
-            }
-          }
+         
         }
       }
     """;
@@ -50,11 +42,6 @@ class GraphqlQueries {
       "where": {
         "id_EQ": userId,
       },
-      "friendsConnectionWhere2": {
-        "node": {
-          "id_EQ": userId,
-        }
-      }
     };
   }
 
@@ -86,16 +73,7 @@ class GraphqlQueries {
             id
             name
             profilePicture
-            username
-            friendsConnection {
-              edges {
-                properties {
-                  addedOn
-                  requestedBy
-                  status
-                }
-              }
-            }
+            username            
           }
         }
       }       
@@ -117,96 +95,6 @@ class GraphqlQueries {
       ]
     };
   }
-
-  // get complete user
-  // static String getCompleteUser() {
-  //   return """
-  //     query Users(\$where: UserWhere, \$friendsWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$likedByWhere2: UserWhere, \$sort: [UserPostsConnectionSort!], \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
-  //       users(where: \$where) {
-  //         id
-  //         username
-  //         createdOn
-  //         name
-  //         profilePicture
-  //         bio
-  //         dob
-  //         friends(where: \$friendsWhere2) {
-  //           friendsConnection(where: \$friendsConnectionWhere3) {
-  //             edges {
-  //               properties {
-  //                 status
-  //                 requestedBy
-  //                 addedOn
-  //               }
-  //             }
-  //           }
-  //         }
-  //         friendsConnection(where: \$friendsConnectionWhere2) {
-  //           totalCount
-  //         }
-  //         postsConnection(first: \$first, sort: \$sort) {
-  //           totalCount
-  //           pageInfo {
-  //             endCursor
-  //             hasNextPage
-  //           }
-  //           edges {
-  //             node {
-  //               id
-  //               createdOn
-  //               content
-  //               caption
-  //               likedBy(where: \$likedByWhere2) {
-  //                 username
-  //               }
-  //               likedByConnection {
-  //                 totalCount
-  //               }
-  //               commentsConnection {
-  //                 totalCount
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   """;
-  // }
-  //
-  // static Map<String, dynamic> getCompleteUserVariables(
-  //   String username, {
-  //   required String currentUsername,
-  // }) {
-  //   return {
-  //     "where": {
-  //       "username_EQ": username,
-  //     },
-  //     "friendsWhere2": {
-  //       "username_EQ": currentUsername,
-  //     },
-  //     "friendsConnectionWhere2": {
-  //       "edge": {
-  //         "status_EQ": FriendStatus.accepted,
-  //       }
-  //     },
-  //     "first": GraphqlQueryConstants.postLimit,
-  //     "likedByWhere2": {
-  //       "username_EQ": currentUsername,
-  //     },
-  //     "sort": [
-  //       {
-  //         "node": {
-  //           "createdOn": "DESC",
-  //         }
-  //       }
-  //     ],
-  //     "friendsConnectionWhere3": {
-  //       "node": {
-  //         "username_EQ": username,
-  //       }
-  //     },
-  //   };
-  // }
 
   static String getCompleteUser() {
     return '''

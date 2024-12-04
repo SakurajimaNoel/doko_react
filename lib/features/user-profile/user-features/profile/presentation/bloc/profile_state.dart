@@ -14,3 +14,5 @@ final class ProfileError extends ProfileState {
 
   final String message;
 }
+
+final class ProfileEditSuccess extends ProfileState {}

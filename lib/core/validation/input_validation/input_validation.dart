@@ -91,3 +91,11 @@ bool validateUrl(String url) {
 bool validateDate(String dateString) {
   return DateTime.tryParse(dateString) != null;
 }
+
+bool validateBio(String? bio) {
+  if (bio != null && bio.length > 160) {
+    return false;
+  }
+
+  return true;
+}

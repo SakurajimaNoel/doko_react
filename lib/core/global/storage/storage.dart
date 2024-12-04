@@ -64,6 +64,8 @@ Future<bool> uploadFileBytesToAWSByPath(
 
 Future<bool> deleteFileFromAWSByPath(String bucketPath) async {
   try {
+    if (bucketPath.isEmpty) return true;
+
     await _storage
         .remove(
           path: StoragePath.fromString(bucketPath),

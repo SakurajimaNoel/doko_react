@@ -2,9 +2,11 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
+import 'package:doko_react/core/global/storage/storage.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 class ProfileRemoteDataSource {
@@ -65,6 +67,68 @@ class ProfileRemoteDataSource {
         newPosts: posts,
         pageInfo: info,
       );
+
+      return true;
+    } catch (e) {
+      safePrint(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<bool> editUserProfile(
+      EditProfileInput editDetails, String bucketPath) async {
+    try {
+      // upload profile to s3
+      if (bucketPath.isNotEmpty && bucketPath != editDetails.currentProfile) {
+        // new profile
+        await uploadFileToAWSByPath(editDetails.newProfile!, bucketPath);
+
+        // delete existing image
+        deleteFileFromAWSByPath(editDetails.currentProfile);
+      }
+
+      // remove existing profile
+      if (bucketPath.isEmpty) {
+        deleteFileFromAWSByPath(editDetails.currentProfile);
+      }
+
+      QueryResult result = await _client.mutate(
+        MutationOptions(
+          document: gql(GraphqlQueries.updateUserProfile()),
+          variables: GraphqlQueries.updateUserProfileVariables(
+            username: editDetails.username,
+            name: editDetails.name,
+            bio: editDetails.bio,
+            profilePicture: bucketPath,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+            reason: result.exception?.graphqlErrors.toString() ??
+                "Can't edit user profile right now.");
+      }
+
+      // check if user data is present
+      List res = result.data?["updateUsers"]["users"];
+      if (res.isEmpty) {
+        throw const ApplicationException(
+            reason: "Something went wrong when editing user profile.");
+      }
+
+      final UserEntity updatedUser = await UserEntity.createEntity(
+        map: res[0],
+      );
+      final UserGraph graph = UserGraph();
+      String key = generateUserNodeKey(updatedUser.username);
+
+      final user = graph.getValueByKey(key)! as CompleteUserEntity;
+      user.bio = editDetails.bio;
+      user.name = updatedUser.name;
+      user.profilePicture = updatedUser.profilePicture;
+
+      graph.addEntity(key, user);
 
       return true;
     } catch (e) {

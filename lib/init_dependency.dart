@@ -25,6 +25,7 @@ import "package:doko_react/features/complete-profile/presentation/bloc/complete_
 import "package:doko_react/features/user-profile/user-features/profile/data/data-sources/profile_remote_data_source.dart";
 import "package:doko_react/features/user-profile/user-features/profile/data/repository/profile_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/repository/profile_repository.dart";
+import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/edit-profile-use-case/edit_profile_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/profile_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart";
 import "package:flutter/foundation.dart";
@@ -78,9 +79,16 @@ void _initProfile() {
     ),
   );
 
+  serviceLocator.registerFactory<EditProfileUseCase>(
+    () => EditProfileUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
+  );
+
   serviceLocator.registerFactory<ProfileBloc>(
     () => ProfileBloc(
       profileUseCase: serviceLocator(),
+      editProfileUseCase: serviceLocator(),
     ),
   );
 }

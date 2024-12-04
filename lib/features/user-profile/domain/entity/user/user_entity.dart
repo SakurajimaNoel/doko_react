@@ -34,12 +34,15 @@ class UserEntity extends ProfileEntity {
     final StorageResource profilePicture =
         await StorageResource.createStorageResource(map["profilePicture"]);
 
-    List friendConnection = map["friendsConnection"]["edges"] as List;
     UserRelationInfo? relationInfo;
+    if (map.containsKey("friendsConnection")) {
+      List friends = map["friendsConnection"]["edges"] as List;
 
-    if (friendConnection.isNotEmpty) {
-      relationInfo =
-          UserRelationInfo.createEntity(map: friendConnection[0]["properties"]);
+      if (friends.isNotEmpty) {
+        relationInfo = UserRelationInfo.createEntity(
+          map: friends[0]["properties"],
+        );
+      }
     }
 
     return UserEntity(
