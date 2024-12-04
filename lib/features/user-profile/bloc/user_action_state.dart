@@ -125,6 +125,7 @@ class UserActionAcceptFriendReq extends UserActionFriendRelationChange {
   List<Object?> get props => [];
 }
 
+// edit profile action
 class UserActionUpdateProfile extends UserActionState {
   UserActionUpdateProfile({
     required this.name,
@@ -138,4 +139,18 @@ class UserActionUpdateProfile extends UserActionState {
 
   @override
   List<Object?> get props => [name, bio, profilePicture];
+}
+
+// more post action
+class UserActionLoadPosts extends UserActionState {
+  UserActionLoadPosts({
+    required this.loadedPostCount,
+    required this.username,
+  });
+
+  final String username;
+  final int loadedPostCount;
+
+  @override
+  List<Object?> get props => [username, loadedPostCount];
 }

@@ -2,6 +2,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/archive/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/config/router/app_router_config.dart';
 import 'package:doko_react/core/config/theme/theme_data.dart';
+import 'package:doko_react/core/global/bloc/preferences/preferences_bloc.dart';
 import 'package:doko_react/core/global/bloc/theme/theme_bloc.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
@@ -11,11 +12,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker_android/image_picker_android.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:media_kit/media_kit.dart';
 
 void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
     await initDependency();
+    MediaKit.ensureInitialized();
 
     final ImagePickerPlatform imagePickerImplementation =
         ImagePickerPlatform.instance;
@@ -34,6 +37,9 @@ void main() async {
           // global theme bloc
           BlocProvider(
             create: (BuildContext context) => ThemeBloc(),
+          ),
+          BlocProvider(
+            create: (BuildContext context) => PreferencesBloc(),
           ),
           BlocProvider(
             create: (BuildContext context) => UserActionBloc(),

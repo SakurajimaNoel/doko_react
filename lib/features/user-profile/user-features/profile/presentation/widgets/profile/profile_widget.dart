@@ -11,6 +11,7 @@ import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/widgets/posts/profile_post.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,6 +33,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   late final bool self;
   late final String username;
   late final String currentUsername;
+
+  final UserGraph graph = UserGraph();
 
   @override
   void initState() {
@@ -78,57 +81,66 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     return const SizedBox.shrink();
   }
 
-  Widget userProfileInfo(CompleteUserEntity user) {
+  Widget userProfileInfo(String key) {
     var currTheme = Theme.of(context).colorScheme;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Material(
-          shape: Border(
-            bottom: BorderSide(
-              color: currTheme.primary,
-              width: Constants.sliverBorder * 3,
-            ),
-          ),
-          child: SizedBox(
-            height: double.infinity,
-            child: Row(
-              children: [
-                Icon(
-                  Icons.calendar_view_month,
+    return BlocBuilder<UserActionBloc, UserActionState>(
+      buildWhen: (previousState, state) {
+        return (self && state is UserActionUpdateProfile);
+      },
+      builder: (context, state) {
+        final user = graph.getValueByKey(key)! as CompleteUserEntity;
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Material(
+              shape: Border(
+                bottom: BorderSide(
                   color: currTheme.primary,
+                  width: Constants.sliverBorder * 3,
                 ),
-                const SizedBox(
-                  width: Constants.gap * 0.5,
+              ),
+              child: SizedBox(
+                height: double.infinity,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_view_month,
+                      color: currTheme.primary,
+                    ),
+                    const SizedBox(
+                      width: Constants.gap * 0.5,
+                    ),
+                    Text(
+                      "Posts: ${displayNumberFormat(user.postsCount)}",
+                      style: TextStyle(
+                        color: currTheme.primary,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  "Posts: ${displayNumberFormat(user.postsCount)}",
-                  style: TextStyle(
-                    color: currTheme.primary,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-        TextButton.icon(
-          style: TextButton.styleFrom(
-            iconColor: currTheme.secondary,
-            foregroundColor: currTheme.secondary,
-          ),
-          onPressed: () {
-            context.pushNamed(
-              RouterConstants.profileFriends,
-              pathParameters: {
-                "username": username,
+            TextButton.icon(
+              style: TextButton.styleFrom(
+                iconColor: currTheme.secondary,
+                foregroundColor: currTheme.secondary,
+              ),
+              onPressed: () {
+                context.pushNamed(
+                  RouterConstants.profileFriends,
+                  pathParameters: {
+                    "username": username,
+                  },
+                );
               },
-            );
-          },
-          icon: const Icon(Icons.group),
-          label: Text("Friends: ${displayNumberFormat(user.friendsCount)}"),
-        ),
-      ],
+              icon: const Icon(Icons.group),
+              label: Text("Friends: ${displayNumberFormat(user.friendsCount)}"),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -138,7 +150,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       username: username,
       currentUsername: currentUsername,
     );
-    final UserGraph graph = UserGraph();
+
     final key = generateUserNodeKey(username);
 
     final currTheme = Theme.of(context).colorScheme;
@@ -153,54 +165,49 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               userDetails: details,
             ),
           ),
-        child: BlocBuilder<UserActionBloc, UserActionState>(
-          buildWhen: (previousState, state) {
-            return (self && state is UserActionUpdateProfile) ||
-                state is ProfileLoading;
-
-            // use this in friend relation
-            return (self && state is UserActionUpdateProfile) ||
-                (state is UserActionFriendRelationChange &&
-                    state.friendUsername == username);
-          },
+        child: BlocBuilder<ProfileBloc, ProfileState>(
           builder: (context, state) {
-            return BlocBuilder<ProfileBloc, ProfileState>(
-              builder: (context, state) {
-                if (state is ProfileLoading || state is ProfileInitial) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+            if (state is ProfileLoading || state is ProfileInitial) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
 
-                if (state is ProfileError) {
-                  return Column(
-                    children: [
-                      StyledText.error(state.message),
-                      ElevatedButton(
-                        onPressed: () {
-                          context.read<ProfileBloc>().add(GetUserProfileEvent(
-                                userDetails: details,
-                              ));
+            if (state is ProfileError) {
+              return Column(
+                children: [
+                  StyledText.error(state.message),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<ProfileBloc>().add(GetUserProfileEvent(
+                            userDetails: details,
+                          ));
+                    },
+                    child: const Text("Retry"),
+                  ),
+                ],
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: () async {},
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    expandedHeight: height,
+                    title: Text(username),
+                    actions: appBarActions(),
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: BlocBuilder<UserActionBloc, UserActionState>(
+                        buildWhen: (previousState, state) {
+                          return (self && state is UserActionUpdateProfile);
                         },
-                        child: const Text("Retry"),
-                      ),
-                    ],
-                  );
-                }
-
-                final user = graph.getValueByKey(key)! as CompleteUserEntity;
-                return RefreshIndicator(
-                  onRefresh: () async {},
-                  child: CustomScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      SliverAppBar(
-                        pinned: true,
-                        expandedHeight: height,
-                        title: Text(user.username),
-                        actions: appBarActions(),
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: Stack(
+                        builder: (context, state) {
+                          final user =
+                              graph.getValueByKey(key)! as CompleteUserEntity;
+                          return Stack(
                             fit: StackFit.expand,
                             children: [
                               user.profilePicture.bucketPath.isNotEmpty
@@ -236,13 +243,22 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                 ),
                               )
                             ],
-                          ),
-                        ),
+                          );
+                        },
                       ),
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.all(Constants.padding),
-                          child: Column(
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(Constants.padding),
+                      child: BlocBuilder<UserActionBloc, UserActionState>(
+                        buildWhen: (previousState, state) {
+                          return (self && state is UserActionUpdateProfile);
+                        },
+                        builder: (context, state) {
+                          final user =
+                              graph.getValueByKey(key)! as CompleteUserEntity;
+                          return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               if (user.bio.isNotEmpty) ...[
@@ -253,19 +269,32 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                               ],
                               userProfileAction(user),
                             ],
-                          ),
-                        ),
+                          );
+                        },
                       ),
-                      SliverPersistentHeader(
-                        pinned: true,
-                        delegate: _SliverAppBarDelegate(
-                          userProfileInfo(user),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                );
-              },
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: _SliverAppBarDelegate(
+                      userProfileInfo(key),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: Constants.gap * 2,
+                    ),
+                  ),
+                  ProfilePost(
+                    username: username,
+                  ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: Constants.gap * 2,
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         ),
