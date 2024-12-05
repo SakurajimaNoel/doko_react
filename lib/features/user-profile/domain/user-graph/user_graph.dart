@@ -79,9 +79,6 @@ class UserGraph {
     // updating user
     user.posts.addEntityItems(postKeys);
     user.posts.updatePageInfo(pageInfo);
-
-    // updating graph
-    addEntity(key, user);
   }
 
   /// adding newly added post to user
@@ -97,9 +94,6 @@ class UserGraph {
     // update user
     user.updatePostCount(user.postsCount + 1);
     user.posts.addItem(postKey);
-
-    // update graph
-    addEntity(key, user);
   }
 
   /// adding friends to user
@@ -144,9 +138,6 @@ class UserGraph {
     // updating user
     user.friends.addEntityItems(postKeys);
     user.friends.updatePageInfo(pageInfo);
-
-    // updating graph
-    addEntity(key, user);
   }
 
   /// used to update friends relation
@@ -181,9 +172,6 @@ class UserGraph {
     // update user
     user.friends.addItem(friendKey);
     user.updateFriendsCount(friendCount);
-
-    // update graph
-    addEntity(key, user);
   }
 
   // remove friend
@@ -217,8 +205,6 @@ class UserGraph {
     final PostEntity post = getValueByKey(key) as PostEntity;
     post.comments.addItem(commentKey);
     post.updateCommentsCount(commentCount);
-
-    addEntity(commentKey, post);
   }
 
   void addReplyToCommentEntity(
@@ -233,19 +219,18 @@ class UserGraph {
 
     if (!containsKey(key)) return;
 
-    final CommentEntity post = getValueByKey(key) as CommentEntity;
+    final CommentEntity existingComment = getValueByKey(key) as CommentEntity;
 
     // adding at the end of visible replies
-    post.comments.addEntityItems([commentKey]);
-    post.updateCommentsCount(commentCount);
-
-    addEntity(commentKey, post);
+    existingComment.comments.addEntityItems([commentKey]);
+    existingComment.updateCommentsCount(commentCount);
   }
 
   void handleUserLikeActionForPostEntity(
     String postId, {
     required bool userLike,
     required int likesCount,
+    required int commentsCount,
   }) {
     String key = generatePostNodeKey(postId);
 
@@ -253,14 +238,14 @@ class UserGraph {
 
     final post = getValueByKey(key) as PostEntity;
     post.updateUserLikes(userLike, likesCount);
-
-    addEntity(key, post);
+    post.updateCommentsCount(commentsCount);
   }
 
   void handleUserLikeActionForCommentEntity(
     String commentId, {
     required bool userLike,
     required int likesCount,
+    required int commentsCount,
   }) {
     String key = generateCommentNodeKey(commentId);
 
@@ -268,8 +253,7 @@ class UserGraph {
 
     final comment = getValueByKey(key) as CommentEntity;
     comment.updateUserLikes(userLike, likesCount);
-
-    addEntity(key, comment);
+    comment.updateCommentsCount(commentsCount);
   }
 
   @override

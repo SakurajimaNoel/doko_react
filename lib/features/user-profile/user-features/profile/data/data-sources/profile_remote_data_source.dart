@@ -128,8 +128,6 @@ class ProfileRemoteDataSource {
       user.name = updatedUser.name;
       user.profilePicture = updatedUser.profilePicture;
 
-      graph.addEntity(key, user);
-
       return true;
     } catch (e) {
       safePrint(e.toString());

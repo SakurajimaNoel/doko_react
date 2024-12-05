@@ -41,13 +41,13 @@ class UserProfileRemoteDataSource {
 
       PostActionModel model = PostActionModel.createModel(res[0]);
       UserGraph graph = UserGraph();
-      String postKey = generatePostNodeKey(postId);
 
-      PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
-      post.updateUserLikes(model.userLike, model.likesCount);
-      post.updateCommentsCount(model.commentsCount);
-
-      graph.addEntity(postKey, post);
+      graph.handleUserLikeActionForPostEntity(
+        postId,
+        userLike: model.userLike,
+        likesCount: model.likesCount,
+        commentsCount: model.commentsCount,
+      );
 
       return true;
     } catch (_) {

@@ -41,13 +41,19 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       Emitter<UserActionState> emit) async {
     String postKey = generatePostNodeKey(event.postId);
     PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
-    int initLike = post.likesCount;
 
+    int initLike = post.likesCount;
     int newLike = event.userLike ? initLike + 1 : initLike - 1;
 
     try {
       // optimistic update
-      post.updateUserLikes(event.userLike, newLike);
+      graph.handleUserLikeActionForPostEntity(
+        event.postId,
+        userLike: event.userLike,
+        likesCount: newLike,
+        commentsCount: post.commentsCount,
+      );
+
       emit(UserActionNodeActionState(
         nodeId: post.id,
         userLike: post.userLike,
@@ -67,8 +73,6 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         ));
       }
 
-      // get latest post snapshot after success
-      post = graph.getValueByKey(postKey)! as PostEntity;
       emit(UserActionNodeActionState(
         nodeId: post.id,
         userLike: post.userLike,
@@ -77,7 +81,12 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
     } catch (_) {
       // optimistic failure revert
-      post.updateUserLikes(!event.userLike, initLike);
+      graph.handleUserLikeActionForPostEntity(
+        event.postId,
+        userLike: !event.userLike,
+        likesCount: initLike,
+        commentsCount: post.commentsCount,
+      );
 
       emit(UserActionNodeActionState(
         nodeId: post.id,
