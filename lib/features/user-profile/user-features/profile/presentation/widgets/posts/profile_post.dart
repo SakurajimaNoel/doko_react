@@ -1,9 +1,12 @@
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/posts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,6 +30,8 @@ class _ProfilePostState extends State<ProfilePost> {
   late final String graphKey;
   late CompleteUserEntity user;
 
+  bool loading = false;
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +39,15 @@ class _ProfilePostState extends State<ProfilePost> {
     username = widget.username;
     graphKey = generateUserNodeKey(username);
     user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
+  }
+
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Constants.snackBarDuration,
+      ),
+    );
   }
 
   Widget buildPostItem(BuildContext context, int index) {
@@ -53,6 +67,18 @@ class _ProfilePostState extends State<ProfilePost> {
       }
 
       // fetch more post
+      if (!loading) {
+        loading = true;
+        context.read<ProfileBloc>().add(LoadMoreProfilePost(
+              postDetails: UserProfilePostInput(
+                username: username,
+                cursor: userPost.pageInfo.endCursor!,
+                currentUsername:
+                    (context.read<UserBloc>().state as UserCompleteState)
+                        .username,
+              ),
+            ));
+      }
 
       return const Center(
         child: SmallLoadingIndicator(),
@@ -78,24 +104,46 @@ class _ProfilePostState extends State<ProfilePost> {
       );
     }
 
-    return BlocBuilder<UserActionBloc, UserActionState>(
-      buildWhen: (previousState, state) {
-        return state is UserActionLoadPosts && state.username == username;
+    return BlocListener<ProfileBloc, ProfileState>(
+      listenWhen: (previousState, state) {
+        return state is ProfilePostLoadResponse;
       },
-      builder: (context, state) {
+      listener: (context, state) {
+        loading = false;
+
+        if (state is ProfilePostLoadError) {
+          showMessage(state.message);
+          return;
+        }
+
+        // handle post success
         user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
         final Nodes userPost = user.posts;
 
-        return SliverList.separated(
-          itemCount: userPost.items.length + 1,
-          itemBuilder: buildPostItem,
-          separatorBuilder: (BuildContext context, int index) {
-            return const SizedBox(
-              height: Constants.gap * 2.5,
-            );
-          },
-        );
+        context.read<UserActionBloc>().add(UserActionPostLoadEvent(
+              postCount: userPost.items.length,
+              username: username,
+            ));
       },
+      child: BlocBuilder<UserActionBloc, UserActionState>(
+        buildWhen: (previousState, state) {
+          return state is UserActionLoadPosts && state.username == username;
+        },
+        builder: (context, state) {
+          user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
+          final Nodes userPost = user.posts;
+
+          return SliverList.separated(
+            itemCount: userPost.items.length + 1,
+            itemBuilder: buildPostItem,
+            separatorBuilder: (BuildContext context, int index) {
+              return const SizedBox(
+                height: Constants.gap * 2.5,
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

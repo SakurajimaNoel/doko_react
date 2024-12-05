@@ -15,20 +15,6 @@ final class UserActionUpdateEvent extends UserActionEvent {
   final String profilePicture;
 }
 
-// final class UserActionPostActionEvent extends UserActionEvent {
-//   UserActionPostActionEvent({
-//     required this.postId,
-//     required this.userLike,
-//     required this.likesCount,
-//     required this.commentsCount,
-//   });
-//
-//   final String postId;
-//   final int likesCount;
-//   final bool userLike;
-//   final int commentsCount;
-// }
-
 final class UserActionPostLikeActionEvent extends UserActionEvent {
   UserActionPostLikeActionEvent({
     required this.postId,
@@ -38,5 +24,15 @@ final class UserActionPostLikeActionEvent extends UserActionEvent {
 
   final String postId;
   final bool userLike;
+  final String username;
+}
+
+final class UserActionPostLoadEvent extends UserActionEvent {
+  UserActionPostLoadEvent({
+    required this.postCount,
+    required this.username,
+  });
+
+  final int postCount;
   final String username;
 }

@@ -1,5 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
+import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/storage/storage.dart';
@@ -70,7 +71,6 @@ class ProfileRemoteDataSource {
 
       return true;
     } catch (e) {
-      safePrint(e.toString());
       rethrow;
     }
   }
@@ -131,6 +131,56 @@ class ProfileRemoteDataSource {
       return true;
     } catch (e) {
       safePrint(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<bool> loadUserProfilePost(UserProfilePostInput postDetails) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          document: gql(GraphqlQueries.getUserPostsByUsername()),
+          variables: GraphqlQueries.getUserPostsByUsernameVariables(
+            postDetails.username,
+            cursor: postDetails.cursor,
+            currentUsername: postDetails.currentUsername,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+            reason: result.exception?.graphqlErrors.toString() ??
+                "Can't fetch more user posts");
+      }
+
+      Map? res = result.data?["postsConnection"];
+
+      if (res == null || res.isEmpty) {
+        throw ApplicationException(
+          reason: result.exception?.graphqlErrors.toString() ??
+              Constants.errorMessage,
+        );
+      }
+
+      UserGraph graph = UserGraph();
+
+      PageInfo info = PageInfo.createEntity(map: res["pageInfo"]);
+      List postList = res["edges"];
+
+      var postFutures = (postList)
+          .map((post) => PostEntity.createEntity(map: post["node"]))
+          .toList();
+
+      List<PostEntity> posts = await Future.wait(postFutures);
+      graph.addPostEntityListToUser(
+        postDetails.username,
+        newPosts: posts,
+        pageInfo: info,
+      );
+
+      return true;
+    } catch (e) {
       rethrow;
     }
   }

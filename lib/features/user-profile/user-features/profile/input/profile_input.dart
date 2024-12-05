@@ -48,3 +48,15 @@ class EditProfileInput extends Input {
     return true;
   }
 }
+
+class UserProfilePostInput {
+  const UserProfilePostInput({
+    required this.username,
+    required this.cursor,
+    required this.currentUsername,
+  });
+
+  final String username;
+  final String currentUsername;
+  final String cursor;
+}

@@ -327,6 +327,9 @@ class GraphqlQueries {
                 createdOn
                 content
                 caption
+                createdBy {
+                  username
+                }
                 likedBy(where: \$likedByWhere2) {
                   username
                 }

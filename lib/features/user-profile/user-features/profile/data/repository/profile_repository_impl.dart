@@ -22,4 +22,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
       EditProfileInput editDetails, String bucketPath) async {
     return _remoteDataSource.editUserProfile(editDetails, bucketPath);
   }
+
+  @override
+  Future<bool> loadMoreUserPost(UserProfilePostInput postDetails) async {
+    return _remoteDataSource.loadUserProfilePost(postDetails);
+  }
 }

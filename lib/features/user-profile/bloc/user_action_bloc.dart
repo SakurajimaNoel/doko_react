@@ -25,6 +25,12 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         super(UserActionInitial()) {
     on<UserActionUpdateEvent>(_handleUserActionUpdateEvent);
     on<UserActionPostLikeActionEvent>(_handleUserActionPostLikeActionEvent);
+    on<UserActionPostLoadEvent>((event, emit) {
+      emit(UserActionLoadPosts(
+        loadedPostCount: event.postCount,
+        username: event.username,
+      ));
+    });
   }
 
   FutureOr<void> _handleUserActionUpdateEvent(

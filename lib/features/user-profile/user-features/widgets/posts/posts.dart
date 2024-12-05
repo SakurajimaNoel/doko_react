@@ -213,7 +213,7 @@ class _PostContentIndicatorState extends State<_PostContentIndicator> {
     return Column(
       children: [
         const SizedBox(
-          height: Constants.gap * 0.5,
+          height: Constants.gap,
         ),
         AnimatedSmoothIndicator(
           activeIndex: activeItem,

@@ -4,4 +4,6 @@ abstract class ProfileRepository {
   Future<bool> getCompleteUserProfile(String username, String currentUsername);
 
   Future<bool> editUserProfile(EditProfileInput editDetails, String bucketPath);
+
+  Future<bool> loadMoreUserPost(UserProfilePostInput postDetails);
 }

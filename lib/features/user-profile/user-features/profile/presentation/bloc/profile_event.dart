@@ -18,3 +18,11 @@ final class EditUserProfileEvent extends ProfileEvent {
 
   final EditProfileInput editDetails;
 }
+
+final class LoadMoreProfilePost extends ProfileEvent {
+  LoadMoreProfilePost({
+    required this.postDetails,
+  });
+
+  final UserProfilePostInput postDetails;
+}
