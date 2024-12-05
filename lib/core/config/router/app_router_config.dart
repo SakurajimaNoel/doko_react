@@ -16,6 +16,7 @@ import 'package:doko_react/features/settings/presentation/pages/settings_page.da
 import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/edit_profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/user_profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/user-feed/user_feed_page.dart';
 import 'package:doko_react/features/user-profile/user_layout.dart';
 import 'package:flutter/material.dart';
@@ -219,7 +220,6 @@ class AppRouterConfig {
       ),
       // complete profile routes
       StatefulShellRoute.indexedStack(
-        // parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state, navigationShell) {
           return UserLayout(navigationShell);
         },
@@ -319,28 +319,30 @@ class AppRouterConfig {
                   //     ],
                   //   ),
 
-                  //   GoRoute(
-                  //     parentNavigatorKey: _rootNavigatorKey,
-                  //     name: RouterConstants.userProfile,
-                  //     path: "user/:username",
-                  //     builder: (context, state) {
-                  //       String username = state.pathParameters["username"]!;
-                  //       return UserProfilePage(username: username);
-                  //     },
-                  //     routes: [
-                  //       GoRoute(
-                  //         parentNavigatorKey: _rootNavigatorKey,
-                  //         name: RouterConstants.profileFriends,
-                  //         path: "friends",
-                  //         builder: (context, state) {
-                  //           String username = state.pathParameters["username"]!;
-                  //           return FriendsPage(
-                  //             username: username,
-                  //           );
-                  //         },
-                  //       ),
-                  //     ],
-                  //   ),
+                  GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
+                    name: RouterConstants.userProfile,
+                    path: "user/:username",
+                    builder: (context, state) {
+                      String username = state.pathParameters["username"]!;
+                      return UserProfilePage(
+                        username: username,
+                      );
+                    },
+                    // routes: [
+                    //   GoRoute(
+                    //     parentNavigatorKey: _rootNavigatorKey,
+                    //     name: RouterConstants.profileFriends,
+                    //     path: "friends",
+                    //     builder: (context, state) {
+                    //       String username = state.pathParameters["username"]!;
+                    //       return FriendsPage(
+                    //         username: username,
+                    //       );
+                    //     },
+                    //   ),
+                    // ],
+                  ),
                 ],
               ),
             ],

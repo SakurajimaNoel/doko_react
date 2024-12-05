@@ -37,6 +37,17 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   FutureOr<void> _handleGetUserProfileEvent(
       GetUserProfileEvent event, Emitter<ProfileState> emit) async {
     try {
+      final userKey = generateUserNodeKey(event.userDetails.username);
+      if (graph.containsKey(userKey)) {
+        // check if user exists
+        final user = graph.getValueByKey(userKey)!;
+
+        if (user is CompleteUserEntity) {
+          emit(ProfileSuccess());
+          return;
+        }
+      }
+
       emit(ProfileLoading());
       await _profileUseCase(event.userDetails);
       emit(ProfileSuccess());

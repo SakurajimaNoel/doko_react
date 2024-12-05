@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
@@ -7,6 +8,7 @@ import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class User extends StatelessWidget {
   const User({
@@ -31,7 +33,12 @@ class User extends StatelessWidget {
 
         return GestureDetector(
           onTap: () {
-            // todo: redirect to user profile
+            context.pushNamed(
+              RouterConstants.userProfile,
+              pathParameters: {
+                "username": user.username,
+              },
+            );
           },
           child: Row(
             children: [
