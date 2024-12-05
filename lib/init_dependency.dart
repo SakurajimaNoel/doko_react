@@ -22,6 +22,12 @@ import "package:doko_react/features/complete-profile/domain/repository/complete_
 import "package:doko_react/features/complete-profile/domain/use-case/complete-profile-use-case/complete_profile_use_case.dart";
 import "package:doko_react/features/complete-profile/domain/use-case/username-use-case/username_use_case.dart";
 import "package:doko_react/features/complete-profile/presentation/bloc/complete_profile_bloc.dart";
+import "package:doko_react/features/user-profile/bloc/user_action_bloc.dart";
+import "package:doko_react/features/user-profile/data/data-sources/user_profile_remote_data_source.dart";
+import "package:doko_react/features/user-profile/data/repository/user_profile_repository_impl.dart";
+import "package:doko_react/features/user-profile/domain/repository/user_profile_repository.dart";
+import "package:doko_react/features/user-profile/domain/use-case/posts/post_add_like_use_case.dart";
+import "package:doko_react/features/user-profile/domain/use-case/posts/post_remove_like_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/data/data-sources/profile_remote_data_source.dart";
 import "package:doko_react/features/user-profile/user-features/profile/data/repository/profile_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/repository/profile_repository.dart";
@@ -58,6 +64,40 @@ Future<void> initDependency() async {
   _initAuth();
   _initCompleteProfile();
   _initProfile();
+  _initUserAction();
+}
+
+void _initUserAction() {
+  serviceLocator.registerFactory<UserProfileRemoteDataSource>(
+    () => UserProfileRemoteDataSource(
+      client: serviceLocator<GraphQLClient>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UserProfileRepository>(
+    () => UserProfileRepositoryImpl(
+      remoteDataSource: serviceLocator<UserProfileRemoteDataSource>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<PostAddLikeUseCase>(
+    () => PostAddLikeUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<PostRemoveLikeUseCase>(
+    () => PostRemoveLikeUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UserActionBloc>(
+    () => UserActionBloc(
+      postAddLikeUseCase: serviceLocator(),
+      postRemoveLikeUseCase: serviceLocator(),
+    ),
+  );
 }
 
 void _initProfile() {

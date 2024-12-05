@@ -820,17 +820,17 @@ class GraphqlQueries {
   // TODO update user like and comment count from here
   static String userAddLikePost() {
     return """
-      mutation UpdatePosts(\$where: PostWhere, \$update: PostUpdateInput) {
+      mutation UpdatePosts(\$where: PostWhere, \$update: PostUpdateInput, \$likedByWhere2: UserWhere) {
         updatePosts(where: \$where, update: \$update) {
-          info {
-            relationshipsCreated
-          }
           posts {
             likedByConnection {
               totalCount
             }
             commentsConnection {
               totalCount
+            }
+            likedBy(where: \$likedByWhere2) {
+              username
             }
           }
         }
@@ -860,23 +860,26 @@ class GraphqlQueries {
             ]
           }
         ]
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
       }
     };
   }
 
   static String userRemoveLikePost() {
     return """
-      mutation UpdatePosts(\$where: PostWhere, \$update: PostUpdateInput) {
+      mutation UpdatePosts(\$where: PostWhere, \$update: PostUpdateInput, \$likedByWhere2: UserWhere) {
         updatePosts(where: \$where, update: \$update) {
-          info {
-            relationshipsDeleted
-          }
           posts {
             likedByConnection {
               totalCount
             }
             commentsConnection {
               totalCount
+            }
+            likedBy(where: \$likedByWhere2) {
+              username
             }
           }
         }
@@ -906,6 +909,9 @@ class GraphqlQueries {
             ]
           }
         ]
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
       }
     };
   }

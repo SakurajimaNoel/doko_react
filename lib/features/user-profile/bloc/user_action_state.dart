@@ -8,123 +8,6 @@ final class UserActionInitial extends UserActionState {
   List<Object?> get props => [];
 }
 
-/// user post like action
-class UserActionPostLikeAction extends UserActionState {
-  @override
-  List<Object?> get props => [];
-}
-
-final class UserActionPostAddLike extends UserActionPostLikeAction {
-  UserActionPostAddLike({
-    required this.postId,
-  });
-
-  final String postId;
-
-  @override
-  List<Object?> get props => [postId];
-}
-
-final class UserActionPostRemoveLike extends UserActionPostLikeAction {
-  UserActionPostRemoveLike({
-    required this.postId,
-  });
-
-  final String postId;
-
-  @override
-  List<Object?> get props => [postId];
-}
-
-final class UserActionPostAddComment extends UserActionState {
-  UserActionPostAddComment({
-    required this.postId,
-  });
-
-  final String postId;
-
-  @override
-  List<Object?> get props => [postId];
-}
-
-/// user comment like action
-class UserActionCommentLikeAction extends UserActionState {
-  @override
-  List<Object?> get props => [];
-}
-
-final class UserActionCommentAddLike extends UserActionCommentLikeAction {
-  UserActionCommentAddLike({
-    required this.commentId,
-  });
-
-  final String commentId;
-
-  @override
-  List<Object?> get props => [commentId];
-}
-
-final class UserActionCommentRemoveLike extends UserActionCommentLikeAction {
-  UserActionCommentRemoveLike({
-    required this.commentId,
-  });
-
-  final String commentId;
-
-  @override
-  List<Object?> get props => [commentId];
-}
-
-final class UserActionCommentAddReply extends UserActionState {
-  UserActionCommentAddReply({
-    required this.commentId,
-  });
-
-  final String commentId;
-
-  @override
-  List<Object?> get props => [commentId];
-}
-
-/// user friend relation change
-class UserActionFriendRelationChange extends UserActionState {
-  UserActionFriendRelationChange({
-    required this.friendUsername,
-  });
-
-  final String friendUsername;
-
-  @override
-  List<Object?> get props => [friendUsername];
-}
-
-class UserActionRemoveFriendRelation extends UserActionFriendRelationChange {
-  UserActionRemoveFriendRelation({
-    required super.friendUsername,
-  });
-
-  @override
-  List<Object?> get props => [];
-}
-
-class UserActionSendFriendReq extends UserActionFriendRelationChange {
-  UserActionSendFriendReq({
-    required super.friendUsername,
-  });
-
-  @override
-  List<Object?> get props => [];
-}
-
-class UserActionAcceptFriendReq extends UserActionFriendRelationChange {
-  UserActionAcceptFriendReq({
-    required super.friendUsername,
-  });
-
-  @override
-  List<Object?> get props => [];
-}
-
 // edit profile action
 class UserActionUpdateProfile extends UserActionState {
   UserActionUpdateProfile({
@@ -153,4 +36,25 @@ class UserActionLoadPosts extends UserActionState {
 
   @override
   List<Object?> get props => [username, loadedPostCount];
+}
+
+/// user post action state
+/// used when updating ui for post action
+/// when new comment is added or like is changed
+/// this will be used with both post and comment
+class UserActionNodeActionState extends UserActionState {
+  UserActionNodeActionState({
+    required this.nodeId,
+    required this.userLike,
+    required this.likesCount,
+    required this.commentsCount,
+  });
+
+  final String nodeId;
+  final int likesCount;
+  final bool userLike;
+  final int commentsCount;
+
+  @override
+  List<Object?> get props => [nodeId, likesCount, userLike, commentsCount];
 }

@@ -42,7 +42,7 @@ void main() async {
             create: (BuildContext context) => PreferencesBloc(),
           ),
           BlocProvider(
-            create: (BuildContext context) => UserActionBloc(),
+            create: (BuildContext context) => serviceLocator<UserActionBloc>(),
           ),
         ],
         child: const Doki(),

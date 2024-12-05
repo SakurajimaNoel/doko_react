@@ -1,16 +1,20 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/widgets/carousel/custom_carousel_view.dart'
     as custom;
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/core/widgets/video-player/video_player.dart';
+import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Posts extends StatelessWidget {
@@ -59,6 +63,21 @@ class Posts extends StatelessWidget {
             content: post.content,
           )
         ],
+        Padding(
+          padding: const EdgeInsets.all(Constants.padding),
+          child: _PostCaption(
+            caption: post.caption,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Constants.padding,
+            vertical: Constants.padding * 0.125,
+          ),
+          child: _PostAction(
+            postId: post.id,
+          ),
+        ),
       ],
     );
   }
@@ -207,6 +226,132 @@ class _PostContentIndicatorState extends State<_PostContentIndicator> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PostCaption extends StatefulWidget {
+  const _PostCaption({required this.caption});
+
+  final String caption;
+
+  @override
+  State<_PostCaption> createState() => _PostCaptionState();
+}
+
+class _PostCaptionState extends State<_PostCaption> {
+  bool viewMore = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final currTheme = Theme.of(context).colorScheme;
+
+    String displayCaption = viewMore
+        ? widget.caption
+        : trimText(
+            widget.caption,
+            len: Constants.postCaptionDisplayLimit,
+          );
+
+    bool showButton = widget.caption.length > Constants.postCaptionDisplayLimit;
+    String buttonText = viewMore ? "View less" : "View More";
+
+    return RichText(
+      text: TextSpan(
+        text: displayCaption,
+        style: TextStyle(
+          color: currTheme.onSurface,
+          fontSize: Constants.fontSize,
+        ),
+        children: showButton
+            ? [
+                TextSpan(
+                    text: " $buttonText",
+                    style: TextStyle(
+                      color: currTheme.primary,
+                      fontWeight: FontWeight.w500,
+                      fontSize: Constants.smallFontSize,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        setState(() {
+                          viewMore = !viewMore;
+                        });
+                      }),
+              ]
+            : [],
+      ),
+    );
+  }
+}
+
+class _PostAction extends StatelessWidget {
+  _PostAction({
+    required this.postId,
+  }) : graphKey = generatePostNodeKey(postId);
+
+  final String postId;
+  final UserGraph graph = UserGraph();
+  final String graphKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final currTheme = Theme.of(context).colorScheme;
+    final String username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
+    return BlocBuilder<UserActionBloc, UserActionState>(
+      buildWhen: (previousState, state) {
+        return (state is UserActionNodeActionState && state.nodeId == postId);
+      },
+      builder: (context, state) {
+        PostEntity post = graph.getValueByKey(graphKey)! as PostEntity;
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () {
+                context
+                    .read<UserActionBloc>()
+                    .add(UserActionPostLikeActionEvent(
+                      postId: post.id,
+                      userLike: !post.userLike,
+                      username: username,
+                    ));
+              },
+              child: post.userLike
+                  ? Icon(
+                      Icons.thumb_up,
+                      color: currTheme.primary,
+                    )
+                  : const Icon(Icons.thumb_up_outlined),
+            ),
+            const SizedBox(
+              width: Constants.gap * 0.5,
+            ),
+            Text(displayNumberFormat(post.likesCount)),
+            const SizedBox(
+              width: Constants.gap * 1.5,
+            ),
+            GestureDetector(
+              onTap: () {},
+              child: const Icon(Icons.insert_comment_outlined),
+            ),
+            const SizedBox(
+              width: Constants.gap * 0.5,
+            ),
+            Text(displayNumberFormat(post.commentsCount)),
+            const SizedBox(
+              width: Constants.gap * 1.5,
+            ),
+            GestureDetector(
+              onTap: () {},
+              child: const Icon(Icons.share),
+            ),
+          ],
+        );
+      },
     );
   }
 }
