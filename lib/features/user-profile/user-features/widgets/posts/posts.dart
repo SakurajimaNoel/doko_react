@@ -63,20 +63,22 @@ class Posts extends StatelessWidget {
             content: post.content,
           )
         ],
-        Padding(
-          padding: const EdgeInsets.all(Constants.padding),
-          child: _PostCaption(
-            caption: post.caption,
-          ),
+        const SizedBox(
+          height: Constants.gap * 0.5,
         ),
         Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: Constants.padding,
-            vertical: Constants.padding * 0.125,
           ),
-          child: _PostAction(
-            postId: post.id,
+          child: _PostCaption(
+            caption: post.caption,
           ),
+        ),
+        const SizedBox(
+          height: Constants.gap * 0.5,
+        ),
+        _PostAction(
+          postId: post.id,
         ),
       ],
     );
@@ -310,8 +312,8 @@ class _PostAction extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: () {
+            IconButton(
+              onPressed: () {
                 context
                     .read<UserActionBloc>()
                     .add(UserActionPostLikeActionEvent(
@@ -320,7 +322,7 @@ class _PostAction extends StatelessWidget {
                       username: username,
                     ));
               },
-              child: post.userLike
+              icon: post.userLike
                   ? Icon(
                       Icons.thumb_up,
                       color: currTheme.primary,
@@ -328,26 +330,26 @@ class _PostAction extends StatelessWidget {
                   : const Icon(Icons.thumb_up_outlined),
             ),
             const SizedBox(
-              width: Constants.gap * 0.5,
+              width: Constants.gap * 0.125,
             ),
             Text(displayNumberFormat(post.likesCount)),
             const SizedBox(
-              width: Constants.gap * 1.5,
+              width: Constants.gap * 0.75,
             ),
-            GestureDetector(
-              onTap: () {},
-              child: const Icon(Icons.insert_comment_outlined),
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.insert_comment_outlined),
             ),
             const SizedBox(
-              width: Constants.gap * 0.5,
+              width: Constants.gap * 0.125,
             ),
             Text(displayNumberFormat(post.commentsCount)),
             const SizedBox(
-              width: Constants.gap * 1.5,
+              width: Constants.gap * 0.75,
             ),
-            GestureDetector(
-              onTap: () {},
-              child: const Icon(Icons.share),
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.share),
             ),
           ],
         );
