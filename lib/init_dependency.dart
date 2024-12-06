@@ -28,6 +28,9 @@ import "package:doko_react/features/user-profile/data/repository/user_profile_re
 import "package:doko_react/features/user-profile/domain/repository/user_profile_repository.dart";
 import "package:doko_react/features/user-profile/domain/use-case/posts/post_add_like_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/posts/post_remove_like_use_case.dart";
+import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_accepts_friend_relation_use_case.dart";
+import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_create_friend_relation_use_case.dart";
+import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_remove_friend_relation_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/data/data-sources/profile_remote_data_source.dart";
 import "package:doko_react/features/user-profile/user-features/profile/data/repository/profile_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/repository/profile_repository.dart";
@@ -93,10 +96,31 @@ void _initUserAction() {
     ),
   );
 
+  serviceLocator.registerFactory<UserCreateFriendRelationUseCase>(
+    () => UserCreateFriendRelationUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UserAcceptFriendRelationUseCase>(
+    () => UserAcceptFriendRelationUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UserRemoveFriendRelationUseCase>(
+    () => UserRemoveFriendRelationUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerFactory<UserActionBloc>(
     () => UserActionBloc(
       postAddLikeUseCase: serviceLocator(),
       postRemoveLikeUseCase: serviceLocator(),
+      userCreateFriendRelationUseCase: serviceLocator(),
+      userRemoveFriendRelationUseCase: serviceLocator(),
+      userAcceptFriendRelationUseCase: serviceLocator(),
     ),
   );
 }

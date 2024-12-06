@@ -8,7 +8,7 @@ import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.da
 
 part 'post_content_entity.dart';
 
-class PostEntity extends ProfileEntity {
+class PostEntity extends GraphEntity {
   PostEntity({
     required this.id,
     required this.caption,

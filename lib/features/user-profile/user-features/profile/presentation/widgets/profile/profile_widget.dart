@@ -12,6 +12,7 @@ import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.da
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/widgets/posts/profile_post.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/user/user_to_user_relation_widget.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -78,7 +79,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       );
     }
 
-    return const SizedBox.shrink();
+    return UserToUserRelationWidget.label(
+      username: username,
+    );
   }
 
   Widget userProfileInfo(String key) {
@@ -174,18 +177,21 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             }
 
             if (state is ProfileError) {
-              return Column(
-                children: [
-                  StyledText.error(state.message),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<ProfileBloc>().add(GetUserProfileEvent(
-                            userDetails: details,
-                          ));
-                    },
-                    child: const Text("Retry"),
-                  ),
-                ],
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    StyledText.error(state.message),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<ProfileBloc>().add(GetUserProfileEvent(
+                              userDetails: details,
+                            ));
+                      },
+                      child: const Text("Retry"),
+                    ),
+                  ],
+                ),
               );
             }
 

@@ -75,4 +75,7 @@ class Constants {
   static const Duration userProfilePollInterval = Duration(
     minutes: 55,
   );
+
+  // icon size
+  static const double iconButtonSize = _root * 1.5;
 }

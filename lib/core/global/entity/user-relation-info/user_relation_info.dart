@@ -1,3 +1,5 @@
+
+
 /// this defines user to user relation between
 /// any two users
 class UserRelationInfo {
@@ -16,6 +18,18 @@ class UserRelationInfo {
       requestedBy: map["requestedBy"],
       status: map["status"],
       addedOn: DateTime.parse(map["addedOn"]),
+    );
+  }
+
+  UserRelationInfo copyWith({
+    String? requestedBy,
+    String? status,
+    DateTime? addedOn,
+  }) {
+    return UserRelationInfo(
+      requestedBy: requestedBy ?? this.requestedBy,
+      status: status ?? this.status,
+      addedOn: addedOn ?? this.addedOn,
     );
   }
 }

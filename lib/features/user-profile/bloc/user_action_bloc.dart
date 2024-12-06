@@ -1,8 +1,15 @@
 import 'dart:async';
 
+import 'package:doko_react/core/config/graphql/queries/graphql_query_constants.dart';
+import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
+import 'package:doko_react/core/helpers/relation/user_to_user_relation.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_add_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_remove_like_use_case.dart';
+import 'package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_accepts_friend_relation_use_case.dart';
+import 'package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_create_friend_relation_use_case.dart';
+import 'package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_remove_friend_relation_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
 import 'package:equatable/equatable.dart';
@@ -16,12 +23,21 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final UserGraph graph = UserGraph();
   final PostAddLikeUseCase _postAddLikeUseCase;
   final PostRemoveLikeUseCase _postRemoveLikeUseCase;
+  final UserCreateFriendRelationUseCase _userCreateFriendRelationUseCase;
+  final UserAcceptFriendRelationUseCase _userAcceptFriendRelationUseCase;
+  final UserRemoveFriendRelationUseCase _userRemoveFriendRelationUseCase;
 
-  UserActionBloc(
-      {required PostAddLikeUseCase postAddLikeUseCase,
-      required PostRemoveLikeUseCase postRemoveLikeUseCase})
-      : _postAddLikeUseCase = postAddLikeUseCase,
+  UserActionBloc({
+    required PostAddLikeUseCase postAddLikeUseCase,
+    required PostRemoveLikeUseCase postRemoveLikeUseCase,
+    required UserCreateFriendRelationUseCase userCreateFriendRelationUseCase,
+    required UserAcceptFriendRelationUseCase userAcceptFriendRelationUseCase,
+    required UserRemoveFriendRelationUseCase userRemoveFriendRelationUseCase,
+  })  : _postAddLikeUseCase = postAddLikeUseCase,
         _postRemoveLikeUseCase = postRemoveLikeUseCase,
+        _userCreateFriendRelationUseCase = userCreateFriendRelationUseCase,
+        _userAcceptFriendRelationUseCase = userAcceptFriendRelationUseCase,
+        _userRemoveFriendRelationUseCase = userRemoveFriendRelationUseCase,
         super(UserActionInitial()) {
     on<UserActionUpdateEvent>(_handleUserActionUpdateEvent);
     on<UserActionPostLikeActionEvent>(_handleUserActionPostLikeActionEvent);
@@ -31,6 +47,12 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         username: event.username,
       ));
     });
+    on<UserActionCreateFriendRelationEvent>(
+        _handleUserActionCreateFriendRelation);
+    on<UserActionAcceptFriendRelationEvent>(
+        _handleUserActionAcceptFriendRelation);
+    on<UserActionRemoveFriendRelationEvent>(
+        _handleUserActionRemoveFriendRelation);
   }
 
   FutureOr<void> _handleUserActionUpdateEvent(
@@ -99,6 +121,150 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         userLike: post.userLike,
         likesCount: post.likesCount,
         commentsCount: post.commentsCount,
+      ));
+    }
+  }
+
+  FutureOr<void> _handleUserActionCreateFriendRelation(
+      UserActionCreateFriendRelationEvent event,
+      Emitter<UserActionState> emit) async {
+    /// optimistically update only affected user relation status
+    /// friends list, friends count and pending request list
+    /// will be handled by data source
+    String friendKey = generateUserNodeKey(event.username);
+    final user = graph.getValueByKey(friendKey)! as UserEntity;
+
+    final initRelation = user.relationInfo;
+
+    try {
+      UserToUserRelationDetails details = UserToUserRelationDetails(
+        initiator: event.currentUsername,
+        participant: event.username,
+        username: event.username,
+        currentUsername: event.currentUsername,
+      );
+
+      final tempRelation = UserRelationInfo(
+        requestedBy: details.currentUsername,
+        status: FriendStatus.pending,
+        addedOn: DateTime.now(),
+      );
+      user.updateRelationInfo(tempRelation);
+      emit(UserActionUserRelationState(
+        username: details.username,
+        relation: UserToUserRelation.optimisticOutgoingReq,
+      ));
+
+      await _userCreateFriendRelationUseCase(details);
+
+      emit(UserActionUserRelationState(
+        username: details.username,
+        relation: UserToUserRelation.outgoingReq,
+      ));
+    } catch (_) {
+      // optimistic failure
+      user.updateRelationInfo(initRelation);
+
+      emit(UserActionUserRelationState(
+        username: event.username,
+        relation: getUserToUserRelation(
+          initRelation,
+          currentUsername: event.currentUsername,
+        ),
+      ));
+    }
+  }
+
+  FutureOr<void> _handleUserActionAcceptFriendRelation(
+      UserActionAcceptFriendRelationEvent event,
+      Emitter<UserActionState> emit) async {
+    /// optimistically update only affected user relation status
+    /// friends list, friends count and pending request list
+    /// will be handled by data source
+    String friendKey = generateUserNodeKey(event.username);
+    final user = graph.getValueByKey(friendKey)! as UserEntity;
+
+    final initRelation = user.relationInfo;
+
+    try {
+      UserToUserRelationDetails details = UserToUserRelationDetails(
+        initiator: event.requestedBy,
+        participant: event.currentUsername,
+        username: event.username,
+        currentUsername: event.currentUsername,
+      );
+      final tempRelation = initRelation!.copyWith(
+        status: FriendStatus.accepted,
+      );
+      user.updateRelationInfo(tempRelation);
+      emit(UserActionUserRelationState(
+        username: details.username,
+        relation: UserToUserRelation.optimisticFriends,
+      ));
+
+      await _userAcceptFriendRelationUseCase(details);
+
+      emit(UserActionUserRelationState(
+        username: details.username,
+        relation: UserToUserRelation.friends,
+      ));
+    } catch (_) {
+      // optimistic failure
+      user.updateRelationInfo(initRelation);
+
+      emit(UserActionUserRelationState(
+        username: event.username,
+        relation: getUserToUserRelation(
+          initRelation,
+          currentUsername: event.currentUsername,
+        ),
+      ));
+    }
+  }
+
+  FutureOr<void> _handleUserActionRemoveFriendRelation(
+      UserActionRemoveFriendRelationEvent event,
+      Emitter<UserActionState> emit) async {
+    /// optimistically update only affected user relation status
+    /// friends list, friends count and pending request list
+    /// will be handled by data source
+    String friendKey = generateUserNodeKey(event.username);
+    final user = graph.getValueByKey(friendKey)! as UserEntity;
+
+    final initRelation = user.relationInfo;
+
+    try {
+      UserToUserRelationDetails details = UserToUserRelationDetails(
+        initiator: event.requestedBy,
+        participant: event.requestedBy == event.username
+            ? event.currentUsername
+            : event.username,
+        username: event.username,
+        currentUsername: event.currentUsername,
+      );
+
+      user.updateRelationInfo(null);
+      emit(UserActionUserRelationState(
+        username: details.username,
+        relation: UserToUserRelation.optimisticUnrelated,
+      ));
+
+      await _userRemoveFriendRelationUseCase(details);
+
+      emit(UserActionUserRelationState(
+        username: details.username,
+        relation: UserToUserRelation.unrelated,
+      ));
+    } catch (_) {
+      // optimistic failure
+      user.updateRelationInfo(initRelation);
+
+      emit(UserActionUserRelationState(
+        username: event.username,
+        relation: getUserToUserRelation(
+          initRelation,
+          currentUsername: event.currentUsername,
+        ),
       ));
     }
   }

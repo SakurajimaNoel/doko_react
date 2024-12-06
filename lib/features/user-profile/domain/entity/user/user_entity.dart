@@ -10,7 +10,7 @@ import 'package:doko_react/features/user-profile/domain/entity/profile_entity.da
 /// full profile is requested CompleteUserEntity
 /// instance will be used
 /// all mutable fields are non final
-class UserEntity extends ProfileEntity {
+class UserEntity extends GraphEntity {
   UserEntity({
     required this.userId,
     required this.username,
@@ -52,6 +52,22 @@ class UserEntity extends ProfileEntity {
       profilePicture: profilePicture,
       relationInfo: relationInfo,
     );
+  }
+
+  static UserRelationInfo? getRelationInfo(Map map) {
+    UserRelationInfo? relationInfo;
+
+    if (map.containsKey("friendsConnection")) {
+      List friends = map["friendsConnection"]["edges"] as List;
+
+      if (friends.isNotEmpty) {
+        relationInfo = UserRelationInfo.createEntity(
+          map: friends[0]["properties"],
+        );
+      }
+    }
+
+    return relationInfo;
   }
 }
 

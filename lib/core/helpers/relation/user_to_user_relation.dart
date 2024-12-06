@@ -6,6 +6,10 @@ enum UserToUserRelation {
   incomingReq,
   outgoingReq,
   unrelated,
+  // used when sending optimistic updates
+  optimisticFriends,
+  optimisticOutgoingReq,
+  optimisticUnrelated,
 }
 
 UserToUserRelation getUserToUserRelation(

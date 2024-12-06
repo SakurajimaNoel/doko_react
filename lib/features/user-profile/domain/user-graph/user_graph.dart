@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
@@ -9,7 +10,7 @@ import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.
 
 /// single source of truth for any node information
 class UserGraph {
-  final Map<String, ProfileEntity> _graph;
+  final Map<String, GraphEntity> _graph;
 
   // using hashmap because order preservation is not necessary
   UserGraph._internal() : _graph = HashMap();
@@ -28,21 +29,21 @@ class UserGraph {
   /// this will be used to get the instance in widgets
   /// to display information
   /// keys are user:username, post:post_id, comment:comment_id
-  ProfileEntity? getValueByKey(String key) {
+  GraphEntity? getValueByKey(String key) {
     return _graph[key];
   }
 
-  void addEntity(String key, ProfileEntity entity) {
+  void addEntity(String key, GraphEntity entity) {
     _graph[key] = entity;
   }
 
-  void addEntityMap(Map<String, ProfileEntity> map) {
+  void addEntityMap(Map<String, GraphEntity> map) {
     _graph.addAll(map);
   }
 
   /// each individual operation will handle updating the graph
   /// to support their use case and needs
-  // void updateValue(ValueSetter<Map<String, ProfileEntity>> func) {
+  // void updateValue(ValueSetter<Map<String, GraphEntity>> func) {
   //   func(_graph);
   // }
 
@@ -61,7 +62,7 @@ class UserGraph {
     final CompleteUserEntity user = getValueByKey(key)! as CompleteUserEntity;
 
     // create temp map to hold all the posts in the map
-    Map<String, ProfileEntity> tempMap = HashMap();
+    Map<String, GraphEntity> tempMap = HashMap();
 
     /// create list of individual post items key
     /// to store it in user posts
@@ -97,7 +98,7 @@ class UserGraph {
   }
 
   /// adding friends to user
-  void addUserFriendsToUser(
+  void addUserFriendsListToUser(
     String username, {
     required List<UserEntity> newUsers,
     required PageInfo pageInfo,
@@ -110,7 +111,7 @@ class UserGraph {
     final CompleteUserEntity user = getValueByKey(key)! as CompleteUserEntity;
 
     // create temp map to hold all the posts in the map
-    Map<String, ProfileEntity> tempMap = HashMap();
+    Map<String, GraphEntity> tempMap = HashMap();
 
     /// create list of individual post items key
     /// to store it in user posts
@@ -142,27 +143,32 @@ class UserGraph {
 
   /// used to update friends relation
   /// this will also be directly used
-  /// when sending req or cancelling req
+  /// when sending request
   void updateFriendRelation(
       String friendUsername, UserRelationInfo? relationInfo) {
     String key = generateUserNodeKey(friendUsername);
-    if (!containsKey(key)) return;
 
     final friend = getValueByKey(key)! as UserEntity;
     friend.updateRelationInfo(relationInfo);
+  }
 
-    addEntity(key, friend);
+  void sendRequest(String friendUsername, UserRelationInfo? relationInfo) {
+    // add to outgoing req
+    addOutgoingRequest(friendUsername);
+    updateFriendRelation(friendUsername, relationInfo);
   }
 
   // newly added friend when accepting request
   void addFriendToUser(
     String username, {
     required String friendUsername,
-    required UserRelationInfo relationInfo,
-    required int friendCount,
+    required UserRelationInfo? relationInfo,
   }) {
     String key = generateUserNodeKey(username);
     String friendKey = generateUserNodeKey(friendUsername);
+
+    // remove from incoming req
+    removeIncomingRequest(friendUsername);
 
     updateFriendRelation(friendUsername, relationInfo);
 
@@ -171,13 +177,24 @@ class UserGraph {
 
     // update user
     user.friends.addItem(friendKey);
-    user.updateFriendsCount(friendCount);
+    user.updateFriendsCount(user.friendsCount + 1);
+
+    final friend = getValueByKey(friendKey)!;
+    if (friend is! CompleteUserEntity) return;
+
+    // update friend
+    friend.friends.addItem(key);
+    friend.updateFriendsCount(friend.friendsCount + 1);
   }
 
   // remove friend
   void removeFriend(String username, String friendUsername) {
     String userKey = generateUserNodeKey(username);
     String friendKey = generateUserNodeKey(friendUsername);
+
+    // remove from incoming and outgoing if present
+    removeIncomingRequest(friendUsername);
+    removeOutgoingRequest(friendUsername);
 
     updateFriendRelation(friendUsername, null);
 
@@ -186,7 +203,58 @@ class UserGraph {
     if (user is! CompleteUserEntity) return;
 
     user.friends.removeItem(friendKey);
-    addEntity(userKey, user);
+    user.updateFriendsCount(user.friendsCount - 1);
+
+    final friend = getValueByKey(friendKey)!;
+    if (friend is! CompleteUserEntity) return;
+
+    friend.friends.removeItem(userKey);
+    friend.updateFriendsCount(friend.friendsCount - 1);
+  }
+
+  void addOutgoingRequest(String friendUsername) {
+    String key = generateUserNodeKey(friendUsername);
+
+    String outgoingReqKey = generatePendingOutgoingReqKey();
+    final outgoingReq = getValueByKey(outgoingReqKey);
+
+    if (outgoingReq is Nodes) {
+      outgoingReq.addItem(key);
+    }
+  }
+
+  void addIncomingRequest(String friendUsername) {
+    String key = generateUserNodeKey(friendUsername);
+
+    // Todo: handle adding user if not present
+    if (!containsKey(key)) return;
+
+    String incomingReqKey = generatePendingIncomingReqKey();
+    final incomingReq = getValueByKey(incomingReqKey);
+
+    if (incomingReq is Nodes) {
+      incomingReq.addItem(key);
+    }
+  }
+
+  void removeOutgoingRequest(String friendUsername) {
+    String friendKey = generateUserNodeKey(friendUsername);
+    String outgoingReqKey = generatePendingOutgoingReqKey();
+
+    final outgoingReq = getValueByKey(outgoingReqKey);
+    if (outgoingReq is Nodes) {
+      outgoingReq.removeItem(friendKey);
+    }
+  }
+
+  void removeIncomingRequest(String friendUsername) {
+    String friendKey = generateUserNodeKey(friendUsername);
+    String incomingReqKey = generatePendingIncomingReqKey();
+
+    final incomingReq = getValueByKey(incomingReqKey);
+    if (incomingReq is Nodes) {
+      incomingReq.removeItem(friendKey);
+    }
   }
 
   // adding comment to post
@@ -273,4 +341,12 @@ String generatePostNodeKey(String postId) {
 
 String generateCommentNodeKey(String commentId) {
   return "comment:$commentId";
+}
+
+String generatePendingIncomingReqKey() {
+  return "pending-incoming-request";
+}
+
+String generatePendingOutgoingReqKey() {
+  return "pending-outgoing-request";
 }

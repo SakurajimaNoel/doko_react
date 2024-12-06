@@ -5,7 +5,7 @@ import 'package:doko_react/features/user-profile/domain/entity/profile_entity.da
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 
-class CommentEntity extends ProfileEntity {
+class CommentEntity extends GraphEntity {
   CommentEntity({
     required this.id,
     required this.createdOn,

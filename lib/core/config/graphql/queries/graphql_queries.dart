@@ -2,6 +2,7 @@ import 'package:doko_react/archive/features/User/data/model/comment_model.dart';
 import 'package:doko_react/core/config/graphql/queries/graphql_query_constants.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
+import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
 
 class CompleteUserProfileVariables {
   final String id;
@@ -656,26 +657,31 @@ class GraphqlQueries {
   }
 
   // user send friend request
-  // TODO: search for method to merge to avoid duplicate relationship
-  static String userSendFriendRequest() {
+  static String userCreateFriendRelation() {
     return """
-    mutation UpdateUsers(\$where: UserWhere, \$update: UserUpdateInput) {
-      updateUsers(where: \$where, update: \$update) {
-        info {
-          relationshipsCreated
+      mutation UpdateUsers(\$where: UserWhere, \$update: UserUpdateInput, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+        updateUsers(where: \$where, update: \$update) {
+          users {
+            friendsConnection(where: \$friendsConnectionWhere2) {
+              edges {
+                properties {
+                  requestedBy
+                  status
+                  addedOn
+                }
+              }
+            }
+          }
         }
-      }
-    }    
+      } 
     """;
   }
 
-  static Map<String, dynamic> userSendFriendRequestVariables({
-    required String requestedByUsername,
-    required String requestedToUsername,
-  }) {
+  static Map<String, dynamic> userCreateFriendRelationVariables(
+      UserToUserRelationDetails relationDetails) {
     return {
       "where": {
-        "username_EQ": requestedByUsername,
+        "username_EQ": relationDetails.initiator,
       },
       "update": {
         "friends": [
@@ -683,49 +689,61 @@ class GraphqlQueries {
             "connect": [
               {
                 "edge": {
-                  "requestedBy": requestedByUsername,
+                  "requestedBy": relationDetails.initiator,
                   "status": FriendStatus.pending,
                 },
                 "where": {
                   "node": {
-                    "username_EQ": requestedToUsername,
+                    "username_EQ": relationDetails.participant,
                   }
                 }
               }
             ]
           }
         ]
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          // this should be respect to initiator
+          "username_EQ": relationDetails.username,
+        }
       }
     };
   }
 
   // user accept friend request
-  static String userAcceptFriendRequest() {
+  static String userAcceptFriendRelation() {
     return """
-      mutation UpdateUsers(\$where: UserWhere, \$update: UserUpdateInput) {
+      mutation UpdateUsers(\$where: UserWhere, \$update: UserUpdateInput, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
         updateUsers(where: \$where, update: \$update) {
-          info {
-            relationshipsCreated
+          users {
+            friendsConnection(where: \$friendsConnectionWhere2) {
+              edges {
+                properties {
+                  requestedBy
+                  status
+                  addedOn
+                }
+              }
+            }
           }
         }
-      }     
+      } 
     """;
   }
 
-  static Map<String, dynamic> userAcceptFriendRequestVariables({
-    required String requestedByUsername,
-    required String requestedToUsername,
-  }) {
+  static Map<String, dynamic> userAcceptFriendRelationVariables(
+      UserToUserRelationDetails relationDetails) {
     return {
       "where": {
-        "username_EQ": requestedByUsername,
+        "username_EQ": relationDetails.initiator,
       },
       "update": {
         "friends": [
           {
             "where": {
               "node": {
-                "username_EQ": requestedToUsername,
+                "username_EQ": relationDetails.participant,
               }
             },
             "update": {
@@ -735,6 +753,12 @@ class GraphqlQueries {
             }
           }
         ]
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          // this should be respect to initiator
+          "username_EQ": relationDetails.currentUsername,
+        }
       }
     };
   }
@@ -742,23 +766,29 @@ class GraphqlQueries {
   // user remove friend relation
   static String userRemoveFriendRelation() {
     return """
-    mutation UpdateUsers(\$where: UserWhere, \$update: UserUpdateInput) {
-      updateUsers(where: \$where, update: \$update) {
-        info {
-          relationshipsDeleted
+      mutation UpdateUsers(\$where: UserWhere, \$update: UserUpdateInput, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+        updateUsers(where: \$where, update: \$update) {
+          users {
+            friendsConnection(where: \$friendsConnectionWhere2) {
+              edges {
+                properties {
+                  requestedBy
+                  status
+                  addedOn
+                }
+              }
+            }
+          }
         }
       }
-    }
-  """;
+    """;
   }
 
-  static Map<String, dynamic> userRemoveFriendRelationVariables({
-    required String requestedByUsername,
-    required String requestedToUsername,
-  }) {
+  static Map<String, dynamic> userRemoveFriendRelationVariables(
+      UserToUserRelationDetails relationDetails) {
     return {
       "where": {
-        "username_EQ": requestedByUsername,
+        "username_EQ": relationDetails.initiator,
       },
       "update": {
         "friends": [
@@ -767,13 +797,21 @@ class GraphqlQueries {
               {
                 "where": {
                   "node": {
-                    "username_EQ": requestedToUsername,
+                    "username_EQ": relationDetails.participant,
                   }
                 }
               }
             ]
           }
         ]
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          // this should be respect to initiator
+          "username_EQ": relationDetails.initiator == relationDetails.username
+              ? relationDetails.currentUsername
+              : relationDetails.username,
+        }
       }
     };
   }
@@ -820,7 +858,6 @@ class GraphqlQueries {
   }
 
   // post action like
-  // TODO update user like and comment count from here
   static String userAddLikePost() {
     return """
       mutation UpdatePosts(\$where: PostWhere, \$update: PostUpdateInput, \$likedByWhere2: UserWhere) {

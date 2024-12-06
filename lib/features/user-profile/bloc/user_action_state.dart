@@ -58,3 +58,21 @@ class UserActionNodeActionState extends UserActionState {
   @override
   List<Object?> get props => [nodeId, likesCount, userLike, commentsCount];
 }
+
+/// used in user to user relation widget
+/// in user friends list
+/// and self pending request
+class UserActionUserRelationState extends UserActionState {
+  UserActionUserRelationState({
+    required this.username,
+    required this.relation,
+  });
+
+  final String username;
+  final UserToUserRelation relation;
+
+  @override
+  List<Object?> get props => [username, relation];
+}
+
+// todo: handle friend list and friends count in different way
