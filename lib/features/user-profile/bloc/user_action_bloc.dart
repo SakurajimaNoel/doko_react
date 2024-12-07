@@ -161,6 +161,12 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         username: details.username,
         relation: UserToUserRelation.outgoingReq,
       ));
+
+      // update current user pending list
+      emit(UserActionUpdateUserPendingFriendsListState(
+        currentUsername: details.currentUsername,
+        username: details.username,
+      ));
     } catch (_) {
       // optimistic failure
       user.updateRelationInfo(initRelation);
@@ -208,6 +214,12 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         username: details.username,
         relation: UserToUserRelation.friends,
       ));
+
+      // update current user friends list and involved user friends list
+      emit(UserActionUpdateUserAcceptedFriendsListState(
+        currentUsername: details.currentUsername,
+        username: details.username,
+      ));
     } catch (_) {
       // optimistic failure
       user.updateRelationInfo(initRelation);
@@ -254,6 +266,16 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       emit(UserActionUserRelationState(
         username: details.username,
         relation: UserToUserRelation.unrelated,
+      ));
+
+      // update current user pending list, current user friend list and involved user friend list
+      emit(UserActionUpdateUserPendingFriendsListState(
+        currentUsername: details.currentUsername,
+        username: details.username,
+      ));
+      emit(UserActionUpdateUserAcceptedFriendsListState(
+        currentUsername: details.currentUsername,
+        username: details.username,
       ));
     } catch (_) {
       // optimistic failure

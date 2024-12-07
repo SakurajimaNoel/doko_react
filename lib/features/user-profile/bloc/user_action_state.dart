@@ -75,4 +75,29 @@ class UserActionUserRelationState extends UserActionState {
   List<Object?> get props => [username, relation];
 }
 
-// todo: handle friend list and friends count in different way
+// user friend list updates
+class UserActionUpdateUserAcceptedFriendsListState extends UserActionState {
+  UserActionUpdateUserAcceptedFriendsListState({
+    required this.currentUsername,
+    required this.username,
+  });
+
+  final String currentUsername;
+  final String username;
+
+  @override
+  List<Object?> get props => [username, currentUsername];
+}
+
+class UserActionUpdateUserPendingFriendsListState extends UserActionState {
+  UserActionUpdateUserPendingFriendsListState({
+    required this.currentUsername,
+    required this.username,
+  });
+
+  final String currentUsername;
+  final String username;
+
+  @override
+  List<Object?> get props => [username, currentUsername];
+}
