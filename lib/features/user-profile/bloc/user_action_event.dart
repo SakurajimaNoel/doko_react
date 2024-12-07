@@ -37,6 +37,16 @@ final class UserActionPostLoadEvent extends UserActionEvent {
   final String username;
 }
 
+final class UserActionFriendLoadEvent extends UserActionEvent {
+  UserActionFriendLoadEvent({
+    required this.friendsCount,
+    required this.username,
+  });
+
+  final int friendsCount;
+  final String username;
+}
+
 // user to user relation
 final class UserActionCreateFriendRelationEvent extends UserActionEvent {
   UserActionCreateFriendRelationEvent({

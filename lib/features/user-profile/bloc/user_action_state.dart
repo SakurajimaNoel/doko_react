@@ -38,6 +38,29 @@ class UserActionLoadPosts extends UserActionState {
   List<Object?> get props => [username, loadedPostCount];
 }
 
+class UserActionNewPostState extends UserActionState {
+  UserActionNewPostState() : date = DateTime.now();
+
+  final DateTime date;
+
+  @override
+  List<Object?> get props => [date];
+}
+
+// more friends action
+class UserActionLoadFriends extends UserActionState {
+  UserActionLoadFriends({
+    required this.loadedFriendsCount,
+    required this.username,
+  });
+
+  final String username;
+  final int loadedFriendsCount;
+
+  @override
+  List<Object?> get props => [username, loadedFriendsCount];
+}
+
 /// user post action state
 /// used when updating ui for post action
 /// when new comment is added or like is changed

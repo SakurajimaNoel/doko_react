@@ -50,7 +50,7 @@ class _ProfilePostState extends State<ProfilePost> {
     );
   }
 
-  Widget buildPostItem(BuildContext context, int index) {
+  Widget buildPostItems(BuildContext context, int index) {
     final Nodes userPost = user.posts;
 
     if (index >= userPost.items.length) {
@@ -69,8 +69,8 @@ class _ProfilePostState extends State<ProfilePost> {
       // fetch more post
       if (!loading) {
         loading = true;
-        context.read<ProfileBloc>().add(LoadMoreProfilePost(
-              postDetails: UserProfilePostInput(
+        context.read<ProfileBloc>().add(LoadMoreProfilePostEvent(
+              postDetails: UserProfileNodesInput(
                 username: username,
                 cursor: userPost.pageInfo.endCursor!,
                 currentUsername:
@@ -86,24 +86,13 @@ class _ProfilePostState extends State<ProfilePost> {
     }
 
     // show user post
-    return Posts(postKey: userPost.items[index]);
+    return Posts(
+      postKey: userPost.items[index],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (user.posts.items.isEmpty) {
-      return SliverFillRemaining(
-        child: Center(
-          child: Text(
-            "${user.name} has not uploaded any posts.",
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-      );
-    }
-
     return BlocListener<ProfileBloc, ProfileState>(
       listenWhen: (previousState, state) {
         return state is ProfilePostLoadResponse;
@@ -116,8 +105,7 @@ class _ProfilePostState extends State<ProfilePost> {
           return;
         }
 
-        // handle post success
-        user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
+        // handle post load success
         final Nodes userPost = user.posts;
 
         context.read<UserActionBloc>().add(UserActionPostLoadEvent(
@@ -130,12 +118,24 @@ class _ProfilePostState extends State<ProfilePost> {
           return state is UserActionLoadPosts && state.username == username;
         },
         builder: (context, state) {
-          user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
           final Nodes userPost = user.posts;
+
+          if (userPost.items.isEmpty) {
+            return SliverFillRemaining(
+              child: Center(
+                child: Text(
+                  "${user.name} has not uploaded any posts.",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            );
+          }
 
           return SliverList.separated(
             itemCount: userPost.items.length + 1,
-            itemBuilder: buildPostItem,
+            itemBuilder: buildPostItems,
             separatorBuilder: (BuildContext context, int index) {
               return const SizedBox(
                 height: Constants.gap * 2.5,

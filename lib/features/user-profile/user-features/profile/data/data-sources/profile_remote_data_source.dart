@@ -135,7 +135,7 @@ class ProfileRemoteDataSource {
     }
   }
 
-  Future<bool> loadUserProfilePost(UserProfilePostInput postDetails) async {
+  Future<bool> loadUserProfilePost(UserProfileNodesInput postDetails) async {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
@@ -177,6 +177,58 @@ class ProfileRemoteDataSource {
         postDetails.username,
         newPosts: posts,
         pageInfo: info,
+      );
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getUserProfileFriends(
+      UserProfileNodesInput friendsDetails) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          document:
+              gql(GraphqlQueries.getFriendsByUsername(friendsDetails.cursor)),
+          variables: GraphqlQueries.getFriendsByUsernameVariables(
+            friendsDetails.username,
+            cursor: friendsDetails.cursor,
+            currentUsername: friendsDetails.currentUsername,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+            reason: result.exception?.graphqlErrors.toString() ??
+                "Can't fetch more user friends");
+      }
+
+      Map? res = result.data?["users"][0]["friendsConnection"];
+
+      if (res == null || res.isEmpty) {
+        throw ApplicationException(
+          reason: result.exception?.graphqlErrors.toString() ??
+              Constants.errorMessage,
+        );
+      }
+
+      UserGraph graph = UserGraph();
+
+      PageInfo info = PageInfo.createEntity(map: res["pageInfo"]);
+      List userList = res["edges"];
+
+      var userFutures = (userList)
+          .map((user) => UserEntity.createEntity(map: user["node"]))
+          .toList();
+
+      List<UserEntity> users = await Future.wait(userFutures);
+      graph.addUserFriendsListToUser(
+        friendsDetails.username,
+        pageInfo: info,
+        newUsers: users,
       );
 
       return true;

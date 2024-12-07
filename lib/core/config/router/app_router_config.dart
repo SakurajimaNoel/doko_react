@@ -16,6 +16,7 @@ import 'package:doko_react/features/settings/presentation/pages/settings_page.da
 import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/edit_profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/user_friends_list_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/user_profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/user-feed/user_feed_page.dart';
 import 'package:doko_react/features/user-profile/user_layout.dart';
@@ -329,19 +330,19 @@ class AppRouterConfig {
                         username: username,
                       );
                     },
-                    // routes: [
-                    //   GoRoute(
-                    //     parentNavigatorKey: _rootNavigatorKey,
-                    //     name: RouterConstants.profileFriends,
-                    //     path: "friends",
-                    //     builder: (context, state) {
-                    //       String username = state.pathParameters["username"]!;
-                    //       return FriendsPage(
-                    //         username: username,
-                    //       );
-                    //     },
-                    //   ),
-                    // ],
+                    routes: [
+                      GoRoute(
+                        parentNavigatorKey: _rootNavigatorKey,
+                        name: RouterConstants.profileFriends,
+                        path: "friends",
+                        builder: (context, state) {
+                          String username = state.pathParameters["username"]!;
+                          return UserFriendsListPage(
+                            username: username,
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -7,14 +7,17 @@ class Nodes extends GraphEntity {
   Nodes({
     required PageInfo pageInfo,
     required this.items,
-  }) : _pageInfo = pageInfo;
+  })  : _pageInfo = pageInfo,
+        _empty = false;
 
   Nodes.empty()
       : _pageInfo = PageInfo.empty(),
-        items = [];
+        items = [],
+        _empty = true;
 
   void updatePageInfo(PageInfo pageInfo) {
     _pageInfo = pageInfo;
+    _empty = false;
   }
 
   void addEntityItems(List<String> newItems) {
@@ -29,8 +32,13 @@ class Nodes extends GraphEntity {
     items.remove(key);
   }
 
+  bool get isEmpty => _empty;
+
   PageInfo _pageInfo;
   final List<String> items;
+
+  // used to identify if Nodes are fetched or is just empty
+  bool _empty;
 
   PageInfo get pageInfo => _pageInfo;
 }

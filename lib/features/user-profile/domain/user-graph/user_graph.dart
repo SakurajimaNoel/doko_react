@@ -37,7 +37,7 @@ class UserGraph {
     _graph[key] = entity;
   }
 
-  void addEntityMap(Map<String, GraphEntity> map) {
+  void _addEntityMap(Map<String, GraphEntity> map) {
     _graph.addAll(map);
   }
 
@@ -75,7 +75,7 @@ class UserGraph {
     }).toList();
 
     // adding all posts to map
-    addEntityMap(tempMap);
+    _addEntityMap(tempMap);
 
     // updating user
     user.posts.addEntityItems(postKeys);
@@ -105,7 +105,7 @@ class UserGraph {
   }) {
     String key = generateUserNodeKey(username);
 
-    /// posts can only be added to complete user entity
+    /// friends can only be added to complete user entity
     /// if user is null or not a instance of complete user entity
     /// than something is wrong and it will throw error while typecasting
     final CompleteUserEntity user = getValueByKey(key)! as CompleteUserEntity;
@@ -113,10 +113,10 @@ class UserGraph {
     // create temp map to hold all the posts in the map
     Map<String, GraphEntity> tempMap = HashMap();
 
-    /// create list of individual post items key
+    /// create list of individual friend items key
     /// to store it in user posts
-    List<String> postKeys = newUsers.map((userItem) {
-      String userKey = generatePostNodeKey(userItem.username);
+    List<String> friendKeys = newUsers.map((userItem) {
+      String userKey = generateUserNodeKey(userItem.username);
 
       /// check if its complete user entity
       /// if complete just update user relation
@@ -134,17 +134,16 @@ class UserGraph {
     }).toList();
 
     // adding all posts to map
-    addEntityMap(tempMap);
+    _addEntityMap(tempMap);
 
     // updating user
-    user.friends.addEntityItems(postKeys);
+    user.friends.addEntityItems(friendKeys);
     user.friends.updatePageInfo(pageInfo);
   }
 
   /// used to update friends relation
   /// this will also be directly used
-  /// when sending request
-  void updateFriendRelation(
+  void _updateFriendRelation(
       String friendUsername, UserRelationInfo? relationInfo) {
     String key = generateUserNodeKey(friendUsername);
 
@@ -155,7 +154,7 @@ class UserGraph {
   void sendRequest(String friendUsername, UserRelationInfo? relationInfo) {
     // add to outgoing req
     addOutgoingRequest(friendUsername);
-    updateFriendRelation(friendUsername, relationInfo);
+    _updateFriendRelation(friendUsername, relationInfo);
   }
 
   // newly added friend when accepting request
@@ -168,9 +167,9 @@ class UserGraph {
     String friendKey = generateUserNodeKey(friendUsername);
 
     // remove from incoming req
-    removeIncomingRequest(friendUsername);
+    _removeIncomingRequest(friendUsername);
 
-    updateFriendRelation(friendUsername, relationInfo);
+    _updateFriendRelation(friendUsername, relationInfo);
 
     final user = getValueByKey(key)!;
     if (user is! CompleteUserEntity) return;
@@ -193,10 +192,10 @@ class UserGraph {
     String friendKey = generateUserNodeKey(friendUsername);
 
     // remove from incoming and outgoing if present
-    removeIncomingRequest(friendUsername);
-    removeOutgoingRequest(friendUsername);
+    _removeIncomingRequest(friendUsername);
+    _removeOutgoingRequest(friendUsername);
 
-    updateFriendRelation(friendUsername, null);
+    _updateFriendRelation(friendUsername, null);
 
     // remove friend from friend list
     final user = getValueByKey(userKey)!;
@@ -237,7 +236,7 @@ class UserGraph {
     }
   }
 
-  void removeOutgoingRequest(String friendUsername) {
+  void _removeOutgoingRequest(String friendUsername) {
     String friendKey = generateUserNodeKey(friendUsername);
     String outgoingReqKey = generatePendingOutgoingReqKey();
 
@@ -247,7 +246,7 @@ class UserGraph {
     }
   }
 
-  void removeIncomingRequest(String friendUsername) {
+  void _removeIncomingRequest(String friendUsername) {
     String friendKey = generateUserNodeKey(friendUsername);
     String incomingReqKey = generatePendingIncomingReqKey();
 
@@ -333,6 +332,10 @@ class UserGraph {
 // functions to generate keys
 String generateUserNodeKey(String username) {
   return "user:$username";
+}
+
+String generateUsernameFromKey(String userKey) {
+  return userKey.substring(5);
 }
 
 String generatePostNodeKey(String postId) {

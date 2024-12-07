@@ -47,7 +47,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
   }
 
   // create
-  void createFriendRelation(UserEntity user) {
+  void createFriendRelation() {
     if (updating) return;
     updating = true;
 
@@ -116,14 +116,14 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
         if (status == UserToUserRelation.unrelated) {
           if (label) {
             return FilledButton.tonalIcon(
-              onPressed: () => createFriendRelation(user),
+              onPressed: () => createFriendRelation(),
               icon: const Icon(Icons.person_add_alt_1),
               label: const Text("Add"),
             );
           }
 
           return IconButton(
-            onPressed: () => createFriendRelation(user),
+            onPressed: () => createFriendRelation(),
             icon: Icon(
               Icons.person_add_alt_1,
               color: currTheme.primary,

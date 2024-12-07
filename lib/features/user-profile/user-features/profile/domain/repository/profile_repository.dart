@@ -5,5 +5,7 @@ abstract class ProfileRepository {
 
   Future<bool> editUserProfile(EditProfileInput editDetails, String bucketPath);
 
-  Future<bool> loadMoreUserPost(UserProfilePostInput postDetails);
+  Future<bool> loadMoreUserPost(UserProfileNodesInput postDetails);
+
+  Future<bool> getUserFriends(UserProfileNodesInput friendsDetails);
 }

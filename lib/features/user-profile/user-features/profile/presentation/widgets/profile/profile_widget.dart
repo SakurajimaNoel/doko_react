@@ -89,7 +89,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
-        return (self && state is UserActionUpdateProfile);
+        return (state is UserActionUpdateUserAcceptedFriendsListState &&
+                (self || state.username == username)) ||
+            (self && state is UserActionNewPostState);
       },
       builder: (context, state) {
         final user = graph.getValueByKey(key)! as CompleteUserEntity;

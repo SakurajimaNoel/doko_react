@@ -49,8 +49,8 @@ class EditProfileInput extends Input {
   }
 }
 
-class UserProfilePostInput {
-  const UserProfilePostInput({
+class UserProfileNodesInput {
+  const UserProfileNodesInput({
     required this.username,
     required this.cursor,
     required this.currentUsername,
