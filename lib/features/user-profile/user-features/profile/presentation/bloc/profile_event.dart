@@ -51,6 +51,14 @@ final class GetUserFriendsEvent extends ProfileEvent {
   final GetProfileInput userDetails;
 }
 
+final class GetUserFriendsRefreshEvent extends ProfileEvent {
+  GetUserFriendsRefreshEvent({
+    required this.userDetails,
+  });
+
+  final GetProfileInput userDetails;
+}
+
 final class LoadMoreProfileFriendsEvent extends ProfileEvent {
   LoadMoreProfileFriendsEvent({
     required this.friendDetails,

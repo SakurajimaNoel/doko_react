@@ -106,13 +106,13 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
       appBar: AppBar(
         title: Text("$username friends"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(Constants.padding),
-        child: BlocProvider(
-          create: (context) => serviceLocator<ProfileBloc>()
-            ..add(GetUserFriendsEvent(
-              userDetails: details,
-            )),
+      body: BlocProvider(
+        create: (context) => serviceLocator<ProfileBloc>()
+          ..add(GetUserFriendsEvent(
+            userDetails: details,
+          )),
+        child: Padding(
+          padding: const EdgeInsets.all(Constants.padding),
           child: BlocConsumer<ProfileBloc, ProfileState>(
             listenWhen: (previousState, state) {
               return state is ProfileFriendLoadResponse;
@@ -163,37 +163,57 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
               }
 
               // render profile friends
-              return BlocBuilder<UserActionBloc, UserActionState>(
-                buildWhen: (previousState, state) {
-                  return (state is UserActionLoadFriends &&
-                          state.username == username) ||
-                      (state is UserActionUpdateUserAcceptedFriendsListState &&
-                          (self || state.username == username));
-                },
-                builder: (context, state) {
-                  final Nodes userFriends = user.friends;
+              return RefreshIndicator(
+                onRefresh: () async {
+                  Future profileBloc = context.read<ProfileBloc>().stream.first;
 
-                  if (userFriends.items.isEmpty) {
-                    return Center(
-                      child: Text(
-                        "${user.name} has no friends right now.",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    );
+                  context.read<ProfileBloc>().add(GetUserFriendsRefreshEvent(
+                        userDetails: details,
+                      ));
+
+                  final ProfileState state = await profileBloc;
+                  if (state is ProfileRefreshError) {
+                    showMessage(state.message);
                   }
-
-                  return ListView.separated(
-                    itemCount: userFriends.items.length + 1,
-                    itemBuilder: buildFriendItems,
-                    separatorBuilder: (BuildContext context, int index) {
-                      return const SizedBox(
-                        height: Constants.gap * 1.5,
-                      );
-                    },
-                  );
                 },
+                child: BlocBuilder<UserActionBloc, UserActionState>(
+                  buildWhen: (previousState, state) {
+                    return (state is UserActionLoadFriends &&
+                            state.username == username) ||
+                        (state is UserActionUpdateUserAcceptedFriendsListState &&
+                            (self || state.username == username));
+                  },
+                  builder: (context, state) {
+                    final Nodes userFriends = user.friends;
+
+                    if (userFriends.items.isEmpty) {
+                      return CustomScrollView(
+                        slivers: [
+                          SliverFillRemaining(
+                            child: Center(
+                              child: Text(
+                                "${user.name} has no friends right now.",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      );
+                    }
+
+                    return ListView.separated(
+                      itemCount: userFriends.items.length + 1,
+                      itemBuilder: buildFriendItems,
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const SizedBox(
+                          height: Constants.gap * 1.5,
+                        );
+                      },
+                    );
+                  },
+                ),
               );
             },
           ),

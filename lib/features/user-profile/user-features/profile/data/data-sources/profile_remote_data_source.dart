@@ -2,6 +2,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
+import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/storage/storage.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
@@ -52,6 +53,7 @@ class ProfileRemoteDataSource {
       CompleteUserEntity user = await CompleteUserEntity.createEntity(
         map: res[0],
       );
+
       String key = generateUserNodeKey(user.username);
       graph.addEntity(key, user);
 
@@ -139,6 +141,7 @@ class ProfileRemoteDataSource {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
           document: gql(GraphqlQueries.getUserPostsByUsername()),
           variables: GraphqlQueries.getUserPostsByUsernameVariables(
             postDetails.username,
@@ -190,6 +193,7 @@ class ProfileRemoteDataSource {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
           document:
               gql(GraphqlQueries.getFriendsByUsername(friendsDetails.cursor)),
           variables: GraphqlQueries.getFriendsByUsernameVariables(
@@ -225,6 +229,17 @@ class ProfileRemoteDataSource {
           .toList();
 
       List<UserEntity> users = await Future.wait(userFutures);
+
+      if (friendsDetails.cursor.isEmpty) {
+        /// when cursor is empty
+        /// it means first time fetching
+        /// or refresh so reset the friends of user
+        /// so reset the friends
+        String userKey = generateUserNodeKey(friendsDetails.username);
+        final user = graph.getValueByKey(userKey)! as CompleteUserEntity;
+
+        user.friends = Nodes.empty();
+      }
       graph.addUserFriendsListToUser(
         friendsDetails.username,
         pageInfo: info,
