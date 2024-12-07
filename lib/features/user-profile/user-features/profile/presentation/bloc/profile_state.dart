@@ -15,8 +15,12 @@ final class ProfileLoading extends ProfileState {
 }
 
 final class ProfileSuccess extends ProfileState {
+  ProfileSuccess() : time = DateTime.now();
+  
+  final DateTime time;
+
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [time];
 }
 
 final class ProfileError extends ProfileState {
@@ -28,6 +32,18 @@ final class ProfileError extends ProfileState {
 
   @override
   List<Object?> get props => [message];
+}
+
+final class ProfileRefreshError extends ProfileState {
+  ProfileRefreshError({
+    required this.message,
+  }) : time = DateTime.now();
+
+  final String message;
+  final DateTime time;
+
+  @override
+  List<Object?> get props => [message, time];
 }
 
 final class ProfileEditSuccess extends ProfileState {

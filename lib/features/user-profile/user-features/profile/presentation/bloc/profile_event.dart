@@ -18,6 +18,14 @@ final class GetUserProfileEvent extends ProfileEvent {
   final bool indirect;
 }
 
+final class GetUserProfileRefreshEvent extends ProfileEvent {
+  GetUserProfileRefreshEvent({
+    required this.userDetails,
+  });
+
+  final GetProfileInput userDetails;
+}
+
 final class EditUserProfileEvent extends ProfileEvent {
   EditUserProfileEvent({
     required this.editDetails,

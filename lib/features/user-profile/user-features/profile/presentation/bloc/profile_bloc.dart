@@ -38,6 +38,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<LoadMoreProfilePostEvent>(_handleLoadMoreProfilePostEvent);
     on<GetUserFriendsEvent>(_handleGetUserFriendsEvent);
     on<LoadMoreProfileFriendsEvent>(_handleMoreProfileFriendsEvent);
+    on<GetUserProfileRefreshEvent>(_handleGetUserProfileRefreshEvent);
   }
 
   FutureOr<void> _handleGetUserProfileEvent(
@@ -171,6 +172,22 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       ));
     } catch (_) {
       emit(ProfileFriendLoadError(
+        message: Constants.errorMessage,
+      ));
+    }
+  }
+
+  FutureOr<void> _handleGetUserProfileRefreshEvent(
+      GetUserProfileRefreshEvent event, Emitter<ProfileState> emit) async {
+    try {
+      await _profileUseCase(event.userDetails);
+      emit(ProfileSuccess());
+    } on ApplicationException catch (e) {
+      emit(ProfileRefreshError(
+        message: e.reason,
+      ));
+    } catch (_) {
+      emit(ProfileRefreshError(
         message: Constants.errorMessage,
       ));
     }

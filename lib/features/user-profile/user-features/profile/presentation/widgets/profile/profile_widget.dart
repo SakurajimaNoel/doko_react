@@ -48,6 +48,15 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     self = username == currentUsername;
   }
 
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Constants.snackBarDuration,
+      ),
+    );
+  }
+
   List<Widget> appBarActions() {
     if (!self) {
       return [];
@@ -198,7 +207,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             }
 
             return RefreshIndicator(
-              onRefresh: () async {},
+              onRefresh: () async {
+                Future profileBloc = context.read<ProfileBloc>().stream.first;
+
+                context.read<ProfileBloc>().add(GetUserProfileRefreshEvent(
+                      userDetails: details,
+                    ));
+
+                final ProfileState state = await profileBloc;
+                if (state is ProfileRefreshError) {
+                  showMessage(state.message);
+                }
+              },
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
