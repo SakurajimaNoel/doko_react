@@ -309,47 +309,134 @@ class _PostAction extends StatelessWidget {
       builder: (context, state) {
         PostEntity post = graph.getValueByKey(graphKey)! as PostEntity;
 
+        return Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Constants.padding,
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                      "${displayNumberFormat(post.likesCount)} Like${post.likesCount > 1 ? "s" : ""}"),
+                  Text(
+                      "${displayNumberFormat(post.commentsCount)} Comment${post.commentsCount > 1 ? "s" : ""}"),
+                ],
+              ),
+              const SizedBox(
+                height: Constants.gap * 0.5,
+              ),
+              Container(
+                height: Constants.height * 0.125,
+                color: currTheme.surfaceContainerHighest,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          context
+                              .read<UserActionBloc>()
+                              .add(UserActionPostLikeActionEvent(
+                                postId: post.id,
+                                userLike: !post.userLike,
+                                username: username,
+                              ));
+                        },
+                        icon: post.userLike
+                            ? Icon(
+                                Icons.thumb_up,
+                                color: currTheme.primary,
+                                size: Constants.iconButtonSize,
+                              )
+                            : const Icon(
+                                Icons.thumb_up_outlined,
+                                size: Constants.iconButtonSize,
+                              ),
+                      ),
+                      const SizedBox(
+                        width: Constants.gap,
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text("Comment"),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    width: Constants.gap * 0.75,
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text("Share"),
+                  ),
+                ],
+              )
+            ],
+          ),
+        );
+
         return Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              onPressed: () {
-                context
-                    .read<UserActionBloc>()
-                    .add(UserActionPostLikeActionEvent(
-                      postId: post.id,
-                      userLike: !post.userLike,
-                      username: username,
-                    ));
-              },
-              icon: post.userLike
-                  ? Icon(
-                      Icons.thumb_up,
-                      color: currTheme.primary,
-                    )
-                  : const Icon(Icons.thumb_up_outlined),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    context
+                        .read<UserActionBloc>()
+                        .add(UserActionPostLikeActionEvent(
+                          postId: post.id,
+                          userLike: !post.userLike,
+                          username: username,
+                        ));
+                  },
+                  icon: post.userLike
+                      ? Icon(
+                          Icons.thumb_up,
+                          color: currTheme.primary,
+                          size: Constants.iconButtonSize,
+                        )
+                      : const Icon(
+                          Icons.thumb_up_outlined,
+                          size: Constants.iconButtonSize,
+                        ),
+                ),
+                const SizedBox(
+                  width: Constants.gap * 0.125,
+                ),
+                Text(displayNumberFormat(post.likesCount)),
+                const SizedBox(
+                  width: Constants.gap * 0.75,
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: Text("Comment"),
+                ),
+                // IconButton(
+                //   onPressed: () {},
+                //   icon: const Icon(Icons.insert_comment_outlined),
+                // ),
+                const SizedBox(
+                  width: Constants.gap * 0.125,
+                ),
+                Text(displayNumberFormat(post.commentsCount)),
+              ],
             ),
-            const SizedBox(
-              width: Constants.gap * 0.125,
-            ),
-            Text(displayNumberFormat(post.likesCount)),
+
             const SizedBox(
               width: Constants.gap * 0.75,
             ),
-            IconButton(
+            // IconButton(
+            //   onPressed: () {},
+            //   icon: const Icon(Icons.share),
+            // ),
+            TextButton(
               onPressed: () {},
-              icon: const Icon(Icons.insert_comment_outlined),
-            ),
-            const SizedBox(
-              width: Constants.gap * 0.125,
-            ),
-            Text(displayNumberFormat(post.commentsCount)),
-            const SizedBox(
-              width: Constants.gap * 0.75,
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.share),
+              child: Text("Share"),
             ),
           ],
         );
