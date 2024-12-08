@@ -83,3 +83,44 @@ final class UserFriendsSearchEvent extends ProfileEvent {
 
   final UserFriendsSearchInput searchDetails;
 }
+
+// user pending events
+final class PendingIncomingRequestInitial extends ProfileEvent {
+  PendingIncomingRequestInitial({
+    required this.username,
+    bool? refresh,
+  }) : refetch = refresh ?? false;
+
+  final String username;
+  final bool refetch;
+}
+
+final class PendingOutgoingRequestInitial extends ProfileEvent {
+  PendingOutgoingRequestInitial({
+    required this.username,
+    bool? refresh,
+  }) : refetch = refresh ?? false;
+
+  final String username;
+  final bool refetch;
+}
+
+final class PendingIncomingRequestMore extends ProfileEvent {
+  PendingIncomingRequestMore({
+    required this.username,
+    required this.cursor,
+  });
+
+  final String username;
+  final String cursor;
+}
+
+final class PendingOutgoingRequestMore extends ProfileEvent {
+  PendingOutgoingRequestMore({
+    required this.username,
+    required this.cursor,
+  });
+
+  final String username;
+  final String cursor;
+}

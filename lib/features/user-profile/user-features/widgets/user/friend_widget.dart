@@ -19,9 +19,11 @@ class FriendWidget extends StatelessWidget {
       children: [
         User(
           userKey: userKey,
+          key: ValueKey("${userKey}_user"),
         ),
         UserToUserRelationWidget(
           username: generateUsernameFromKey(userKey),
+          key: ValueKey("${userKey}_relation"),
         ),
       ],
     );

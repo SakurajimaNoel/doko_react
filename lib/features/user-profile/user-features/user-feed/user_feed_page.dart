@@ -30,7 +30,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
           ),
           IconButton(
             onPressed: () {
-              // context.pushNamed(RouterConstants.pendingRequests);
+              context.pushNamed(RouterConstants.pendingRequests);
             },
             icon: const Icon(Icons.person),
           ),

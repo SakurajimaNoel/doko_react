@@ -216,13 +216,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     ));
 
                 final ProfileState state = await profileBloc;
+
                 if (state is ProfileRefreshError) {
                   showMessage(state.message);
                 } else {
                   // trigger ui rebuilds
-                  context.read<UserActionBloc>().add(UserActionUserRefreshEvent(
-                        username: username,
-                      ));
+                  if (mounted) {
+                    context
+                        .read<UserActionBloc>()
+                        .add(UserActionUserRefreshEvent(
+                          username: username,
+                        ));
+                  }
                 }
               },
               child: CustomScrollView(

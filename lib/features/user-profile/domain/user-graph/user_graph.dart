@@ -223,6 +223,9 @@ class UserGraph {
   void addOutgoingRequest(String friendUsername) {
     String key = generateUserNodeKey(friendUsername);
 
+    // Todo: handle adding user if not present
+    if (!containsKey(key)) return;
+
     String outgoingReqKey = generatePendingOutgoingReqKey();
     final outgoingReq = getValueByKey(outgoingReqKey);
 
@@ -263,6 +266,68 @@ class UserGraph {
     if (incomingReq is Nodes) {
       incomingReq.removeItem(friendKey);
     }
+  }
+
+  void addPendingIncomingRequests(
+      List<UserEntity> pendingIncomingRequest, PageInfo info) {
+    String key = generatePendingIncomingReqKey();
+
+    Map<String, GraphEntity> tempMap = HashMap();
+
+    List<String> friendKeys = pendingIncomingRequest.map((userItem) {
+      String userKey = generateUserNodeKey(userItem.username);
+
+      if (containsKey(userKey) &&
+          getValueByKey(userKey)! is CompleteUserEntity) {
+        final completeUser = getValueByKey(userKey)! as CompleteUserEntity;
+        tempMap[userKey] = completeUser.updateUserEntityValues(userItem);
+      } else {
+        tempMap[userKey] = userItem;
+      }
+
+      return userKey;
+    }).toList();
+
+    _addEntityMap(tempMap);
+
+    if (!containsKey(key)) {
+      addEntity(key, Nodes.empty());
+    }
+
+    Nodes items = getValueByKey(key)! as Nodes;
+    items.addEntityItems(friendKeys);
+    items.updatePageInfo(info);
+  }
+
+  void addPendingOutgoingRequests(
+      List<UserEntity> pendingOutgoingRequest, PageInfo info) {
+    String key = generatePendingOutgoingReqKey();
+
+    Map<String, GraphEntity> tempMap = HashMap();
+
+    List<String> friendKeys = pendingOutgoingRequest.map((userItem) {
+      String userKey = generateUserNodeKey(userItem.username);
+
+      if (containsKey(userKey) &&
+          getValueByKey(userKey)! is CompleteUserEntity) {
+        final completeUser = getValueByKey(userKey)! as CompleteUserEntity;
+        tempMap[userKey] = completeUser.updateUserEntityValues(userItem);
+      } else {
+        tempMap[userKey] = userItem;
+      }
+
+      return userKey;
+    }).toList();
+
+    _addEntityMap(tempMap);
+
+    if (!containsKey(key)) {
+      addEntity(key, Nodes.empty());
+    }
+
+    Nodes items = getValueByKey(key)! as Nodes;
+    items.addEntityItems(friendKeys);
+    items.updatePageInfo(info);
   }
 
   // adding comment to post

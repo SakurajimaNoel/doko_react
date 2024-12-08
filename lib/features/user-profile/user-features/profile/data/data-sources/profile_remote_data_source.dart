@@ -291,6 +291,7 @@ class ProfileRemoteDataSource {
 
       return graph.addUserSearchEntry(users);
     } catch (e) {
+      safePrint("error searching");
       safePrint(e.toString());
       rethrow;
     }
@@ -351,6 +352,128 @@ class ProfileRemoteDataSource {
       List<UserEntity> users = await Future.wait(userFutures);
 
       return graph.addUserSearchEntry(users);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getUserPendingIncomingFriendRequests(
+      UserProfileNodesInput details) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.getPendingIncomingFriendsByUsername(
+              details.cursor)),
+          variables:
+              GraphqlQueries.getPendingIncomingFriendsByUsernameVariables(
+            details.username,
+            cursor: details.cursor,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+            reason: result.exception?.graphqlErrors.toString() ??
+                "Can't fetch user pending incoming requests.");
+      }
+
+      Map? res = result.data?["users"][0]["friendsConnection"];
+
+      if (res == null || res.isEmpty) {
+        throw ApplicationException(
+          reason: result.exception?.graphqlErrors.toString() ??
+              Constants.errorMessage,
+        );
+      }
+
+      UserGraph graph = UserGraph();
+
+      PageInfo info = PageInfo.createEntity(map: res["pageInfo"]);
+      List userList = res["edges"];
+
+      var userFutures = (userList)
+          .map((user) => UserEntity.createEntity(map: user["node"]))
+          .toList();
+
+      List<UserEntity> users = await Future.wait(userFutures);
+
+      if (details.cursor.isEmpty) {
+        /// when cursor is empty
+        /// it means first time fetching
+        /// or refresh so reset the friends of user
+        /// so reset the friends
+        String key = generatePendingIncomingReqKey();
+        graph.addEntity(key, Nodes.empty());
+      }
+      graph.addPendingIncomingRequests(
+        users,
+        info,
+      );
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getUserPendingOutgoingFriendRequests(
+      UserProfileNodesInput details) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.getPendingOutgoingFriendsByUsername(
+              details.cursor)),
+          variables:
+              GraphqlQueries.getPendingOutgoingFriendsByUsernameVariables(
+            details.username,
+            cursor: details.cursor,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+            reason: result.exception?.graphqlErrors.toString() ??
+                "Can't fetch user pending outgoing requests.");
+      }
+
+      Map? res = result.data?["users"][0]["friendsConnection"];
+
+      if (res == null || res.isEmpty) {
+        throw ApplicationException(
+          reason: result.exception?.graphqlErrors.toString() ??
+              Constants.errorMessage,
+        );
+      }
+
+      UserGraph graph = UserGraph();
+
+      PageInfo info = PageInfo.createEntity(map: res["pageInfo"]);
+      List userList = res["edges"];
+
+      var userFutures = (userList)
+          .map((user) => UserEntity.createEntity(map: user["node"]))
+          .toList();
+
+      List<UserEntity> users = await Future.wait(userFutures);
+
+      if (details.cursor.isEmpty) {
+        /// when cursor is empty
+        /// it means first time fetching
+        /// or refresh so reset the friends of user
+        /// so reset the friends
+        String key = generatePendingOutgoingReqKey();
+        graph.addEntity(key, Nodes.empty());
+      }
+      graph.addPendingOutgoingRequests(
+        users,
+        info,
+      );
+
+      return true;
     } catch (e) {
       rethrow;
     }

@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/bloc/event_transformer.dart';
+import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/edit-profile-use-case/edit_profile_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/pending-request-use-case/pending_incoming_request_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/pending-request-use-case/pending_outgoing_request_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/profile_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-friends-use-case/user_friends_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-post-use-case/user_post_use_case.dart';
@@ -27,6 +30,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final UserFriendsUseCase _userFriendsUseCase;
   final UserSearchUseCase _userSearchUseCase;
   final UserFriendsSearchUseCase _userFriendsSearchUseCase;
+  final PendingIncomingRequestUseCase _pendingIncomingRequestUseCase;
+  final PendingOutgoingRequestUseCase _pendingOutgoingRequestUseCase;
 
   ProfileBloc({
     required ProfileUseCase profileUseCase,
@@ -35,12 +40,16 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required UserFriendsUseCase userFriendsUseCase,
     required UserSearchUseCase userSearchUseCase,
     required UserFriendsSearchUseCase userFriendsSearchUseCase,
+    required PendingIncomingRequestUseCase pendingIncomingRequestUseCase,
+    required PendingOutgoingRequestUseCase pendingOutgoingRequestUseCase,
   })  : _profileUseCase = profileUseCase,
         _editProfileUseCase = editProfileUseCase,
         _userPostUseCase = userPostUseCase,
         _userFriendsUseCase = userFriendsUseCase,
         _userSearchUseCase = userSearchUseCase,
         _userFriendsSearchUseCase = userFriendsSearchUseCase,
+        _pendingIncomingRequestUseCase = pendingIncomingRequestUseCase,
+        _pendingOutgoingRequestUseCase = pendingOutgoingRequestUseCase,
         super(ProfileInitial()) {
     on<GetUserProfileEvent>(_handleGetUserProfileEvent);
     on<EditUserProfileEvent>(_handleEditUserProfileEvent);
@@ -65,6 +74,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
       ),
     );
+    on<PendingIncomingRequestInitial>(_handlePendingIncomingRequestInitial);
+    on<PendingOutgoingRequestInitial>(_handlePendingOutgoingRequestInitial);
+    on<PendingIncomingRequestMore>(_handlePendingIncomingRequestMore);
+    on<PendingOutgoingRequestMore>(_handlePendingOutgoingRequestMore);
   }
 
   FutureOr<void> _handleGetUserProfileEvent(
@@ -284,6 +297,110 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       ));
     } catch (_) {
       emit(ProfileUserSearchErrorState(
+        message: Constants.errorMessage,
+      ));
+    }
+  }
+
+  FutureOr<void> _handlePendingIncomingRequestInitial(
+      PendingIncomingRequestInitial event, Emitter<ProfileState> emit) async {
+    try {
+      String key = generatePendingIncomingReqKey();
+      if (!event.refetch && graph.containsKey(key)) {
+        emit(ProfileSuccess());
+        return;
+      }
+
+      emit(ProfileLoading());
+      await _pendingIncomingRequestUseCase(UserProfileNodesInput(
+        username: event.username,
+        cursor: "",
+        currentUsername: event.username,
+      ));
+      emit(ProfileSuccess());
+    } on ApplicationException catch (e) {
+      emit(ProfileError(
+        message: e.reason,
+      ));
+    } catch (_) {
+      emit(ProfileError(
+        message: Constants.errorMessage,
+      ));
+    }
+  }
+
+  FutureOr<void> _handlePendingOutgoingRequestInitial(
+      PendingOutgoingRequestInitial event, Emitter<ProfileState> emit) async {
+    try {
+      String key = generatePendingOutgoingReqKey();
+      if (!event.refetch && graph.containsKey(key)) {
+        emit(ProfileSuccess());
+        return;
+      }
+
+      emit(ProfileLoading());
+      await _pendingOutgoingRequestUseCase(UserProfileNodesInput(
+        username: event.username,
+        cursor: "",
+        currentUsername: event.username,
+      ));
+      emit(ProfileSuccess());
+    } on ApplicationException catch (e) {
+      emit(ProfileError(
+        message: e.reason,
+      ));
+    } catch (_) {
+      emit(ProfileError(
+        message: Constants.errorMessage,
+      ));
+    }
+  }
+
+  FutureOr<void> _handlePendingIncomingRequestMore(
+      PendingIncomingRequestMore event, Emitter<ProfileState> emit) async {
+    try {
+      await _pendingIncomingRequestUseCase(UserProfileNodesInput(
+        username: event.username,
+        cursor: event.cursor,
+        currentUsername: event.username,
+      ));
+
+      final pendingIncomingReq =
+          graph.getValueByKey(generatePendingIncomingReqKey())! as Nodes;
+      emit(PendingRequestLoadSuccessState(
+        cursor: pendingIncomingReq.pageInfo.endCursor,
+      ));
+    } on ApplicationException catch (e) {
+      emit(PendingRequestLoadError(
+        message: e.reason,
+      ));
+    } catch (_) {
+      emit(PendingRequestLoadError(
+        message: Constants.errorMessage,
+      ));
+    }
+  }
+
+  FutureOr<void> _handlePendingOutgoingRequestMore(
+      PendingOutgoingRequestMore event, Emitter<ProfileState> emit) async {
+    try {
+      await _pendingOutgoingRequestUseCase(UserProfileNodesInput(
+        username: event.username,
+        cursor: event.cursor,
+        currentUsername: event.username,
+      ));
+
+      final pendingOutgoingRequest =
+          graph.getValueByKey(generatePendingOutgoingReqKey())! as Nodes;
+      emit(PendingRequestLoadSuccessState(
+        cursor: pendingOutgoingRequest.pageInfo.endCursor,
+      ));
+    } on ApplicationException catch (e) {
+      emit(PendingRequestLoadError(
+        message: e.reason,
+      ));
+    } catch (_) {
+      emit(PendingRequestLoadError(
         message: Constants.errorMessage,
       ));
     }

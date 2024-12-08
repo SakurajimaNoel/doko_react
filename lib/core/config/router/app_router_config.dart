@@ -15,6 +15,7 @@ import 'package:doko_react/features/complete-profile/presentation/pages/username
 import 'package:doko_react/features/settings/presentation/pages/settings_page.dart';
 import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/edit-profile/edit_profile_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-friends/pending_request_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-friends/user_friends_list_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile/profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile/user_profile_page.dart';
@@ -286,12 +287,12 @@ class AppRouterConfig {
                   //       );
                   //     },
                   //   ),
-                  //   GoRoute(
-                  //     parentNavigatorKey: _rootNavigatorKey,
-                  //     name: RouterConstants.pendingRequests,
-                  //     path: "pending-requests",
-                  //     builder: (context, state) => const PendingRequestPage(),
-                  //   ),
+                  GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
+                    name: RouterConstants.pendingRequests,
+                    path: "pending-requests",
+                    builder: (context, state) => const PendingRequestPage(),
+                  ),
                   //   GoRoute(
                   //     parentNavigatorKey: _rootNavigatorKey,
                   //     name: RouterConstants.createPost,

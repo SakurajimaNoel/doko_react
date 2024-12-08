@@ -35,6 +35,8 @@ import "package:doko_react/features/user-profile/user-features/profile/data/data
 import "package:doko_react/features/user-profile/user-features/profile/data/repository/profile_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/repository/profile_repository.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/edit-profile-use-case/edit_profile_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/pending-request-use-case/pending_incoming_request_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/pending-request-use-case/pending_outgoing_request_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/profile_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-friends-use-case/user_friends_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-post-use-case/user_post_use_case.dart";
@@ -177,6 +179,18 @@ void _initProfile() {
     ),
   );
 
+  serviceLocator.registerFactory<PendingOutgoingRequestUseCase>(
+    () => PendingOutgoingRequestUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<PendingIncomingRequestUseCase>(
+    () => PendingIncomingRequestUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
+  );
+
   serviceLocator.registerFactory<ProfileBloc>(
     () => ProfileBloc(
       profileUseCase: serviceLocator(),
@@ -185,6 +199,8 @@ void _initProfile() {
       userFriendsUseCase: serviceLocator(),
       userSearchUseCase: serviceLocator(),
       userFriendsSearchUseCase: serviceLocator(),
+      pendingIncomingRequestUseCase: serviceLocator(),
+      pendingOutgoingRequestUseCase: serviceLocator(),
     ),
   );
 }

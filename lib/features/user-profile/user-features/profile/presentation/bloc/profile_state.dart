@@ -134,3 +134,31 @@ final class ProfileUserSearchSuccessState extends ProfileState {
   @override
   List<Object?> get props => [searchResults];
 }
+
+// pending req more success state
+class PendingRequestLoadResponse extends ProfileState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class PendingRequestLoadSuccessState extends PendingRequestLoadResponse {
+  PendingRequestLoadSuccessState({
+    required this.cursor,
+  });
+
+  final String? cursor;
+
+  @override
+  List<Object?> get props => [cursor];
+}
+
+final class PendingRequestLoadError extends PendingRequestLoadResponse {
+  PendingRequestLoadError({
+    required this.message,
+  });
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
+}

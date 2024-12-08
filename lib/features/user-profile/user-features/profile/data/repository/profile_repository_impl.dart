@@ -44,4 +44,14 @@ class ProfileRepositoryImpl implements ProfileRepository {
       UserFriendsSearchInput searchDetails) {
     return _remoteDataSource.searchUserFriendsByNameOrUsername(searchDetails);
   }
+
+  @override
+  Future<bool> getUserPendingIncomingRequests(UserProfileNodesInput details) {
+    return _remoteDataSource.getUserPendingIncomingFriendRequests(details);
+  }
+
+  @override
+  Future<bool> getUserPendingOutgoingRequests(UserProfileNodesInput details) {
+    return _remoteDataSource.getUserPendingOutgoingFriendRequests(details);
+  }
 }

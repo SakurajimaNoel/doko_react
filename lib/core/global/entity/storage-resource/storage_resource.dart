@@ -18,10 +18,10 @@ class StorageResource {
   final String accessURI;
 
   static Future<StorageResource> createStorageResource(
-      String bucketPath) async {
-    if (bucketPath.isEmpty) {
+      String? bucketPath) async {
+    if (bucketPath == null || bucketPath.isEmpty) {
       return StorageResource._internal(
-        bucketPath: bucketPath,
+        bucketPath: bucketPath ?? "",
         accessURI: "",
       );
     }
