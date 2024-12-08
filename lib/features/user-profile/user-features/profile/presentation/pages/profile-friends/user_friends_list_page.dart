@@ -128,8 +128,8 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
               // handle friends load success
               final Nodes userFriends = user.friends;
 
-              context.read<UserActionBloc>().add(UserActionPostLoadEvent(
-                    postCount: userFriends.items.length,
+              context.read<UserActionBloc>().add(UserActionFriendLoadEvent(
+                    friendsCount: userFriends.items.length,
                     username: username,
                   ));
             },

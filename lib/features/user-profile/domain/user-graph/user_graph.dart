@@ -327,6 +327,32 @@ class UserGraph {
   String toString() {
     return _graph.toString();
   }
+
+  List<String> addUserSearchEntry(List<UserEntity> searchResults) {
+    Map<String, GraphEntity> tempMap = HashMap();
+
+    List<String> userKeys = searchResults.map((userItem) {
+      String userKey = generateUserNodeKey(userItem.username);
+
+      /// check if its complete user entity
+      /// if complete just update user relation
+      /// and user entity values and rest same
+      /// if user entity or null just add it
+      if (containsKey(userKey) &&
+          getValueByKey(userKey)! is CompleteUserEntity) {
+        final completeUser = getValueByKey(userKey)! as CompleteUserEntity;
+        tempMap[userKey] = completeUser.updateUserEntityValues(userItem);
+      } else {
+        tempMap[userKey] = userItem;
+      }
+
+      return userKey;
+    }).toList();
+
+    _addEntityMap(tempMap);
+
+    return userKeys;
+  }
 }
 
 // functions to generate keys

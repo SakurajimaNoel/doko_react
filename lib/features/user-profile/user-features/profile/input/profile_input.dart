@@ -60,3 +60,13 @@ class UserProfileNodesInput {
   final String currentUsername;
   final String cursor;
 }
+
+class UserSearchInput {
+  const UserSearchInput({
+    required this.username,
+    required this.query,
+  });
+
+  final String query;
+  final String username;
+}

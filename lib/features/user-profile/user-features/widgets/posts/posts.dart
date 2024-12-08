@@ -378,68 +378,6 @@ class _PostAction extends StatelessWidget {
             ],
           ),
         );
-
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () {
-                    context
-                        .read<UserActionBloc>()
-                        .add(UserActionPostLikeActionEvent(
-                          postId: post.id,
-                          userLike: !post.userLike,
-                          username: username,
-                        ));
-                  },
-                  icon: post.userLike
-                      ? Icon(
-                          Icons.thumb_up,
-                          color: currTheme.primary,
-                          size: Constants.iconButtonSize,
-                        )
-                      : const Icon(
-                          Icons.thumb_up_outlined,
-                          size: Constants.iconButtonSize,
-                        ),
-                ),
-                const SizedBox(
-                  width: Constants.gap * 0.125,
-                ),
-                Text(displayNumberFormat(post.likesCount)),
-                const SizedBox(
-                  width: Constants.gap * 0.75,
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text("Comment"),
-                ),
-                // IconButton(
-                //   onPressed: () {},
-                //   icon: const Icon(Icons.insert_comment_outlined),
-                // ),
-                const SizedBox(
-                  width: Constants.gap * 0.125,
-                ),
-                Text(displayNumberFormat(post.commentsCount)),
-              ],
-            ),
-
-            const SizedBox(
-              width: Constants.gap * 0.75,
-            ),
-            // IconButton(
-            //   onPressed: () {},
-            //   icon: const Icon(Icons.share),
-            // ),
-            TextButton(
-              onPressed: () {},
-              child: Text("Share"),
-            ),
-          ],
-        );
       },
     );
   }

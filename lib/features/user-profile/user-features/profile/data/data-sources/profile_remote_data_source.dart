@@ -251,4 +251,44 @@ class ProfileRemoteDataSource {
       rethrow;
     }
   }
+
+  // this will return list of keys
+  Future<List<String>> searchUserByNameOrUsername(
+      UserSearchInput searchDetails) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          document: gql(GraphqlQueries.searchUserByUsernameOrName()),
+          variables: GraphqlQueries.searchUserByUsernameOrNameVariables(
+            searchDetails.query,
+            username: searchDetails.username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+            reason: result.exception?.graphqlErrors.toString() ??
+                "Can't search right now.");
+      }
+
+      List? res = result.data?["users"];
+
+      if (res == null || res.isEmpty) {
+        // no search results found
+        return [];
+      }
+
+      var userFutures = (res)
+          .map((user) => UserEntity.createEntity(map: user["node"]))
+          .toList();
+
+      List<UserEntity> users = await Future.wait(userFutures);
+      final UserGraph graph = UserGraph();
+
+      return graph.addUserSearchEntry(users);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

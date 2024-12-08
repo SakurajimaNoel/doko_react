@@ -14,10 +14,11 @@ import 'package:doko_react/features/complete-profile/presentation/pages/profile-
 import 'package:doko_react/features/complete-profile/presentation/pages/username/complete_profile_username_page.dart';
 import 'package:doko_react/features/settings/presentation/pages/settings_page.dart';
 import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
-import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/edit_profile_page.dart';
-import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile_page.dart';
-import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/user_friends_list_page.dart';
-import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/user_profile_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/edit-profile/edit_profile_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-friends/user_friends_list_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile/profile_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile/user_profile_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/search/search_page.dart';
 import 'package:doko_react/features/user-profile/user-features/user-feed/user_feed_page.dart';
 import 'package:doko_react/features/user-profile/user_layout.dart';
 import 'package:flutter/material.dart';
@@ -219,6 +220,11 @@ class AppRouterConfig {
           ),
         ],
       ),
+      GoRoute(
+        name: RouterConstants.userSearch,
+        path: "/search",
+        builder: (context, state) => const SearchPage(),
+      ),
       // complete profile routes
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -232,14 +238,6 @@ class AppRouterConfig {
                 name: RouterConstants.userFeed,
                 path: "/",
                 builder: (context, state) => const UserFeedPage(),
-                // routes: [
-                //   GoRoute(
-                //     parentNavigatorKey: _rootNavigatorKey,
-                //     name: RouterConstants.userSearch,
-                //     path: "search",
-                //     builder: (context, state) => const UserSearchPage(),
-                //   )
-                // ],
               ),
             ],
           ),

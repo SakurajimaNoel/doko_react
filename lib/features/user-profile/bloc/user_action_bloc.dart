@@ -47,6 +47,12 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         username: event.username,
       ));
     });
+    on<UserActionFriendLoadEvent>((event, emit) {
+      emit(UserActionLoadFriends(
+        loadedFriendsCount: event.friendsCount,
+        username: event.username,
+      ));
+    });
     on<UserActionCreateFriendRelationEvent>(
         _handleUserActionCreateFriendRelation);
     on<UserActionAcceptFriendRelationEvent>(
