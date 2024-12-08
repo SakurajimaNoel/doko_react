@@ -30,6 +30,8 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
   late final String currentUsername;
   late final bool self;
 
+  final TextEditingController queryController = TextEditingController();
+
   late final CompleteUserEntity user;
   late final String graphKey;
   final graph = UserGraph();
@@ -96,11 +98,21 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
   }
 
   @override
+  void dispose() {
+    queryController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final GetProfileInput details = GetProfileInput(
       username: username,
       currentUsername: currentUsername,
     );
+
+    final currTheme = Theme.of(context).colorScheme;
+
+    List<String> tempSearchResults = [];
 
     return Scaffold(
       appBar: AppBar(
@@ -112,16 +124,28 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
             userDetails: details,
           )),
         child: Padding(
-          padding: const EdgeInsets.all(Constants.padding),
+          padding: const EdgeInsets.only(
+            left: Constants.padding,
+            right: Constants.padding,
+            bottom: Constants.padding,
+          ),
           child: BlocConsumer<ProfileBloc, ProfileState>(
             listenWhen: (previousState, state) {
               return state is ProfileFriendLoadResponse;
             },
             listener: (context, state) {
               loading = false;
+              String errorMessage = "";
 
               if (state is ProfileFriendLoadError) {
-                showMessage(state.message);
+                errorMessage = state.message;
+              }
+              if (state is ProfileUserSearchErrorState) {
+                errorMessage = state.message;
+              }
+
+              if (errorMessage.isNotEmpty) {
+                showMessage(errorMessage);
                 return;
               }
 
@@ -137,6 +161,13 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
               return state is! ProfileFriendLoadResponse;
             },
             builder: (context, state) {
+              bool searching = state is ProfileUserSearchLoadingState;
+              bool searchResult = state is ProfileUserSearchSuccessState &&
+                  queryController.text.trim().isNotEmpty;
+              if (searchResult) {
+                tempSearchResults = state.searchResults;
+              }
+
               if (state is ProfileLoading || state is ProfileInitial) {
                 return const Center(
                   child: CircularProgressIndicator(),
@@ -170,6 +201,8 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
                   context.read<ProfileBloc>().add(GetUserFriendsRefreshEvent(
                         userDetails: details,
                       ));
+                  queryController.clear();
+                  FocusScope.of(context).unfocus();
 
                   final ProfileState state = await profileBloc;
                   if (state is ProfileRefreshError) {
@@ -203,14 +236,80 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
                       );
                     }
 
-                    return ListView.separated(
-                      itemCount: userFriends.items.length + 1,
-                      itemBuilder: buildFriendItems,
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const SizedBox(
-                          height: Constants.gap * 1.5,
-                        );
-                      },
+                    return Flex(
+                      direction: Axis.vertical,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Stack(
+                          alignment: AlignmentDirectional.centerEnd,
+                          children: [
+                            TextField(
+                              controller: queryController,
+                              onChanged: (String value) {
+                                UserFriendsSearchInput searchDetails =
+                                    UserFriendsSearchInput(
+                                  username: username,
+                                  query: value,
+                                  currentUsername: currentUsername,
+                                );
+
+                                context
+                                    .read<ProfileBloc>()
+                                    .add(UserFriendsSearchEvent(
+                                      searchDetails: searchDetails,
+                                    ));
+                              },
+                              decoration: const InputDecoration(
+                                labelText: "Search",
+                                hintText: "Search user by username or name.",
+                              ),
+                            ),
+                            if (searching) const SmallLoadingIndicator(),
+                            if (!searching && state is! ProfileInitial)
+                              Icon(
+                                Icons.check,
+                                color: currTheme.primary,
+                              ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: Constants.gap * 2,
+                        ),
+                        Flexible(
+                          child: searchResult
+                              ? tempSearchResults.isEmpty
+                                  ? Center(
+                                      child: Text(
+                                          "No user found with \"${queryController.text.trim()}\""),
+                                    )
+                                  : ListView.separated(
+                                      itemCount: tempSearchResults.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return FriendWidget(
+                                          userKey: tempSearchResults[index],
+                                        );
+                                      },
+                                      separatorBuilder:
+                                          (BuildContext context, int index) {
+                                        return const SizedBox(
+                                          height: Constants.gap,
+                                        );
+                                      },
+                                    )
+                              : ListView.separated(
+                                  itemCount: userFriends.items.length + 1,
+                                  itemBuilder: buildFriendItems,
+                                  separatorBuilder:
+                                      (BuildContext context, int index) {
+                                    return const SizedBox(
+                                      height: Constants.gap,
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
                     );
                   },
                 ),

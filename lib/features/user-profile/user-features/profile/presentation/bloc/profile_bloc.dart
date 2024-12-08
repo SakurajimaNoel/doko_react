@@ -268,7 +268,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       UserFriendsSearchEvent event, Emitter<ProfileState> emit) async {
     try {
       if (event.searchDetails.query.isEmpty) {
-        emit(ProfileInitial());
+        emit(ProfileSuccess());
         return;
       }
       emit(ProfileUserSearchLoadingState());

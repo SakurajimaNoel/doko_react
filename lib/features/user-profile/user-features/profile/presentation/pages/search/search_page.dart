@@ -19,6 +19,7 @@ class SearchPage extends StatelessWidget {
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
     String query = "";
+    List<String> tempResults = [];
 
     return Scaffold(
       body: BlocProvider(
@@ -29,6 +30,9 @@ class SearchPage extends StatelessWidget {
               bool loading = state is ProfileUserSearchLoadingState;
               bool error = state is ProfileUserSearchErrorState;
               bool searchResult = state is ProfileUserSearchSuccessState;
+              if (searchResult) {
+                tempResults = state.searchResults;
+              }
 
               return Padding(
                 padding: const EdgeInsets.all(Constants.padding),
@@ -92,22 +96,22 @@ class SearchPage extends StatelessWidget {
                           ? Center(
                               child: StyledText.error(state.message),
                             )
-                          : !searchResult
+                          : state is ProfileInitial
                               ? const Center(
                                   child: Text(
                                       "Type to search users by username or name."),
                                 )
-                              : state.searchResults.isEmpty
+                              : tempResults.isEmpty
                                   ? Center(
                                       child:
                                           Text("No user found with \"$query\""),
                                     )
                                   : ListView.separated(
-                                      itemCount: state.searchResults.length,
+                                      itemCount: tempResults.length,
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return FriendWidget(
-                                          userKey: state.searchResults[index],
+                                          userKey: tempResults[index],
                                         );
                                       },
                                       separatorBuilder:
