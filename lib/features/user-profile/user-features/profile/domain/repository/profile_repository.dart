@@ -8,4 +8,10 @@ abstract class ProfileRepository {
   Future<bool> loadMoreUserPost(UserProfileNodesInput postDetails);
 
   Future<bool> getUserFriends(UserProfileNodesInput friendsDetails);
+
+  Future<List<String>> searchUserByUsernameOrName(
+      UserSearchInput searchDetails);
+
+  Future<List<String>> searchUserFriendsByUsernameOrName(
+      UserFriendsSearchInput searchDetails);
 }

@@ -32,4 +32,16 @@ class ProfileRepositoryImpl implements ProfileRepository {
   Future<bool> getUserFriends(UserProfileNodesInput friendsDetails) {
     return _remoteDataSource.getUserProfileFriends(friendsDetails);
   }
+
+  @override
+  Future<List<String>> searchUserByUsernameOrName(
+      UserSearchInput searchDetails) {
+    return _remoteDataSource.searchUserByNameOrUsername(searchDetails);
+  }
+
+  @override
+  Future<List<String>> searchUserFriendsByUsernameOrName(
+      UserFriendsSearchInput searchDetails) {
+    return _remoteDataSource.searchUserFriendsByNameOrUsername(searchDetails);
+  }
 }

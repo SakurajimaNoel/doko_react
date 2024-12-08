@@ -66,3 +66,20 @@ final class LoadMoreProfileFriendsEvent extends ProfileEvent {
 
   final UserProfileNodesInput friendDetails;
 }
+
+// user search events
+final class UserSearchEvent extends ProfileEvent {
+  UserSearchEvent({
+    required this.searchDetails,
+  });
+
+  final UserSearchInput searchDetails;
+}
+
+final class UserFriendsSearchEvent extends ProfileEvent {
+  UserFriendsSearchEvent({
+    required this.searchDetails,
+  });
+
+  final UserFriendsSearchInput searchDetails;
+}

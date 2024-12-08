@@ -34,6 +34,8 @@ class Nodes extends GraphEntity {
 
   bool get isEmpty => _empty;
 
+  bool get isNotEmpty => !_empty;
+
   PageInfo _pageInfo;
   final List<String> items;
 

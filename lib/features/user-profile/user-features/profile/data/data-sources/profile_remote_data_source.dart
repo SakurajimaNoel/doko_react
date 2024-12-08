@@ -258,6 +258,7 @@ class ProfileRemoteDataSource {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
           document: gql(GraphqlQueries.searchUserByUsernameOrName()),
           variables: GraphqlQueries.searchUserByUsernameOrNameVariables(
             searchDetails.query,
@@ -280,11 +281,74 @@ class ProfileRemoteDataSource {
       }
 
       var userFutures = (res)
-          .map((user) => UserEntity.createEntity(map: user["node"]))
+          .map((user) => UserEntity.createEntity(
+                map: user,
+              ))
           .toList();
 
       List<UserEntity> users = await Future.wait(userFutures);
       final UserGraph graph = UserGraph();
+
+      return graph.addUserSearchEntry(users);
+    } catch (e) {
+      safePrint(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<List<String>> searchUserFriendsByNameOrUsername(
+      UserFriendsSearchInput searchDetails) async {
+    try {
+      final UserGraph graph = UserGraph();
+      final String key = generateUserNodeKey(searchDetails.username);
+      final user = graph.getValueByKey(key)! as CompleteUserEntity;
+
+      if (user.friends.isNotEmpty && !user.friends.pageInfo.hasNextPage) {
+        /// we have all the friends fetched
+        /// so just filter the required results
+        /// from the friends
+        final filteredUsers = user.friends.items.where((String userKey) {
+          final userItem = graph.getValueByKey(userKey)! as UserEntity;
+
+          return userItem.username.contains(searchDetails.query) ||
+              userItem.name.contains(searchDetails.query);
+        }).toList();
+
+        return filteredUsers;
+      }
+
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.searchUserFriendsByUsernameOrName()),
+          variables: GraphqlQueries.searchUserFriendsByUsernameOrNameVariables(
+            searchDetails.username,
+            currentUsername: searchDetails.currentUsername,
+            query: searchDetails.query,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+            reason: result.exception?.graphqlErrors.toString() ??
+                "Can't search right now.");
+      }
+
+      List? res = result.data?["users"];
+
+      if (res == null || res.isEmpty) {
+        // no search results found
+        return [];
+      }
+
+      var friends = res[0]["friendsConnection"]["edges"] as List;
+
+      var userFutures = (friends)
+          .map((user) => UserEntity.createEntity(map: user["node"]))
+          .toList();
+
+      List<UserEntity> users = await Future.wait(userFutures);
 
       return graph.addUserSearchEntry(users);
     } catch (e) {

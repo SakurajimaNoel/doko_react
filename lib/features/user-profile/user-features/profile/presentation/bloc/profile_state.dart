@@ -16,7 +16,7 @@ final class ProfileLoading extends ProfileState {
 
 final class ProfileSuccess extends ProfileState {
   ProfileSuccess() : time = DateTime.now();
-  
+
   final DateTime time;
 
   @override
@@ -105,4 +105,32 @@ final class ProfileFriendLoadSuccess extends ProfileFriendLoadResponse {
 
   @override
   List<Object?> get props => [cursor];
+}
+
+// search results
+final class ProfileUserSearchLoadingState extends ProfileState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class ProfileUserSearchErrorState extends ProfileState {
+  ProfileUserSearchErrorState({
+    required this.message,
+  });
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
+}
+
+final class ProfileUserSearchSuccessState extends ProfileState {
+  ProfileUserSearchSuccessState({
+    required this.searchResults,
+  });
+
+  final List<String> searchResults;
+
+  @override
+  List<Object?> get props => [searchResults];
 }

@@ -70,3 +70,15 @@ class UserSearchInput {
   final String query;
   final String username;
 }
+
+class UserFriendsSearchInput {
+  const UserFriendsSearchInput({
+    required this.username,
+    required this.query,
+    required this.currentUsername,
+  });
+
+  final String query;
+  final String username;
+  final String currentUsername;
+}

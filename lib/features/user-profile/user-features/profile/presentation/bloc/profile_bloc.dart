@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
+import 'package:doko_react/core/global/bloc/event_transformer.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/edit-profile-use-case/edit_profile_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/profile_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-friends-use-case/user_friends_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-post-use-case/user_post_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/user_friend_search_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/user_search_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,16 +25,22 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final EditProfileUseCase _editProfileUseCase;
   final UserPostUseCase _userPostUseCase;
   final UserFriendsUseCase _userFriendsUseCase;
+  final UserSearchUseCase _userSearchUseCase;
+  final UserFriendsSearchUseCase _userFriendsSearchUseCase;
 
   ProfileBloc({
     required ProfileUseCase profileUseCase,
     required EditProfileUseCase editProfileUseCase,
     required UserPostUseCase userPostUseCase,
     required UserFriendsUseCase userFriendsUseCase,
+    required UserSearchUseCase userSearchUseCase,
+    required UserFriendsSearchUseCase userFriendsSearchUseCase,
   })  : _profileUseCase = profileUseCase,
         _editProfileUseCase = editProfileUseCase,
         _userPostUseCase = userPostUseCase,
         _userFriendsUseCase = userFriendsUseCase,
+        _userSearchUseCase = userSearchUseCase,
+        _userFriendsSearchUseCase = userFriendsSearchUseCase,
         super(ProfileInitial()) {
     on<GetUserProfileEvent>(_handleGetUserProfileEvent);
     on<EditUserProfileEvent>(_handleEditUserProfileEvent);
@@ -40,6 +49,22 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<LoadMoreProfileFriendsEvent>(_handleMoreProfileFriendsEvent);
     on<GetUserProfileRefreshEvent>(_handleGetUserProfileRefreshEvent);
     on<GetUserFriendsRefreshEvent>(_handleGetUserFriendsRefreshEvent);
+    on<UserSearchEvent>(
+      _handleUserSearchEvent,
+      transformer: debounce(
+        const Duration(
+          milliseconds: 500,
+        ),
+      ),
+    );
+    on<UserFriendsSearchEvent>(
+      _handleUserFriendsSearchEvent,
+      transformer: debounce(
+        const Duration(
+          milliseconds: 500,
+        ),
+      ),
+    );
   }
 
   FutureOr<void> _handleGetUserProfileEvent(
@@ -124,7 +149,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         // check if user exists
         final user = graph.getValueByKey(userKey)!;
 
-        if (user is CompleteUserEntity && !user.friends.isEmpty) {
+        if (user is CompleteUserEntity && user.friends.isNotEmpty) {
           emit(ProfileSuccess());
           return;
         }
@@ -209,6 +234,56 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       ));
     } catch (_) {
       emit(ProfileRefreshError(
+        message: Constants.errorMessage,
+      ));
+    }
+  }
+
+  FutureOr<void> _handleUserSearchEvent(
+      UserSearchEvent event, Emitter<ProfileState> emit) async {
+    try {
+      if (event.searchDetails.query.isEmpty) {
+        emit(ProfileInitial());
+        return;
+      }
+
+      emit(ProfileUserSearchLoadingState());
+      final searchResults = await _userSearchUseCase(event.searchDetails);
+
+      emit(ProfileUserSearchSuccessState(
+        searchResults: searchResults,
+      ));
+    } on ApplicationException catch (e) {
+      emit(ProfileUserSearchErrorState(
+        message: e.reason,
+      ));
+    } catch (_) {
+      emit(ProfileUserSearchErrorState(
+        message: Constants.errorMessage,
+      ));
+    }
+  }
+
+  FutureOr<void> _handleUserFriendsSearchEvent(
+      UserFriendsSearchEvent event, Emitter<ProfileState> emit) async {
+    try {
+      if (event.searchDetails.query.isEmpty) {
+        emit(ProfileInitial());
+        return;
+      }
+      emit(ProfileUserSearchLoadingState());
+      final searchResults =
+          await _userFriendsSearchUseCase(event.searchDetails);
+
+      emit(ProfileUserSearchSuccessState(
+        searchResults: searchResults,
+      ));
+    } on ApplicationException catch (e) {
+      emit(ProfileUserSearchErrorState(
+        message: e.reason,
+      ));
+    } catch (_) {
+      emit(ProfileUserSearchErrorState(
         message: Constants.errorMessage,
       ));
     }

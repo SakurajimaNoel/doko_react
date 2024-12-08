@@ -38,6 +38,8 @@ import "package:doko_react/features/user-profile/user-features/profile/domain/us
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/profile_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-friends-use-case/user_friends_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-post-use-case/user_post_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/user_friend_search_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/user_search_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart";
 import "package:flutter/foundation.dart";
 import "package:get_it/get_it.dart";
@@ -163,12 +165,26 @@ void _initProfile() {
     ),
   );
 
+  serviceLocator.registerFactory<UserSearchUseCase>(
+    () => UserSearchUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UserFriendsSearchUseCase>(
+    () => UserFriendsSearchUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
+  );
+
   serviceLocator.registerFactory<ProfileBloc>(
     () => ProfileBloc(
       profileUseCase: serviceLocator(),
       editProfileUseCase: serviceLocator(),
       userPostUseCase: serviceLocator(),
       userFriendsUseCase: serviceLocator(),
+      userSearchUseCase: serviceLocator(),
+      userFriendsSearchUseCase: serviceLocator(),
     ),
   );
 }
