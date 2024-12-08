@@ -100,7 +100,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       buildWhen: (previousState, state) {
         return (state is UserActionUpdateUserAcceptedFriendsListState &&
                 (self || state.username == username)) ||
-            (self && state is UserActionNewPostState);
+            (self && state is UserActionNewPostState) ||
+            (state is UserActionUserRefreshState && state.username == username);
       },
       builder: (context, state) {
         final user = graph.getValueByKey(key)! as CompleteUserEntity;
@@ -217,6 +218,11 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 final ProfileState state = await profileBloc;
                 if (state is ProfileRefreshError) {
                   showMessage(state.message);
+                } else {
+                  // trigger ui rebuilds
+                  context.read<UserActionBloc>().add(UserActionUserRefreshEvent(
+                        username: username,
+                      ));
                 }
               },
               child: CustomScrollView(
@@ -230,7 +236,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     flexibleSpace: FlexibleSpaceBar(
                       background: BlocBuilder<UserActionBloc, UserActionState>(
                         buildWhen: (previousState, state) {
-                          return (self && state is UserActionUpdateProfile);
+                          return (self && state is UserActionUpdateProfile) ||
+                              (state is UserActionUserRefreshState &&
+                                  state.username == username);
                         },
                         builder: (context, state) {
                           final user =
@@ -281,7 +289,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                       padding: const EdgeInsets.all(Constants.padding),
                       child: BlocBuilder<UserActionBloc, UserActionState>(
                         buildWhen: (previousState, state) {
-                          return (self && state is UserActionUpdateProfile);
+                          return (self && state is UserActionUpdateProfile) ||
+                              (state is UserActionUserRefreshState &&
+                                  state.username == username);
                         },
                         builder: (context, state) {
                           final user =

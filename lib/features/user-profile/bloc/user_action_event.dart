@@ -85,3 +85,11 @@ final class UserActionRemoveFriendRelationEvent extends UserActionEvent {
   // requested by value is ambiguous
   final String requestedBy;
 }
+
+final class UserActionUserRefreshEvent extends UserActionEvent {
+  UserActionUserRefreshEvent({
+    required this.username,
+  });
+
+  final String username;
+}

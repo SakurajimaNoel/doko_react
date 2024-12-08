@@ -124,3 +124,16 @@ class UserActionUpdateUserPendingFriendsListState extends UserActionState {
   @override
   List<Object?> get props => [username, currentUsername];
 }
+
+// user refresh state
+class UserActionUserRefreshState extends UserActionState {
+  UserActionUserRefreshState({
+    required this.username,
+  }) : now = DateTime.now();
+
+  final String username;
+  final DateTime now;
+
+  @override
+  List<Object?> get props => [username, now];
+}

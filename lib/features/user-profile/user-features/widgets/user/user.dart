@@ -25,7 +25,10 @@ class User extends StatelessWidget {
 
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
-        return (state is UserActionUpdateProfile && userKey == currentUserKey);
+        return (state is UserActionUpdateProfile &&
+                userKey == currentUserKey) ||
+            (state is UserActionUserRefreshState &&
+                generateUserNodeKey(state.username) == userKey);
       },
       builder: (context, state) {
         final UserGraph graph = UserGraph();

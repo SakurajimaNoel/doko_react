@@ -97,6 +97,7 @@ class GraphqlQueries {
     };
   }
 
+  // todo: update how we are getting friends count
   static String getCompleteUser() {
     return '''
       query Users(\$where: UserWhere, \$friendsAggregateWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$limit: Int, \$first: Int, \$postsConnectionWhere2: PostWhere, \$sort: [PostSort!], \$likedByWhere2: UserWhere) {

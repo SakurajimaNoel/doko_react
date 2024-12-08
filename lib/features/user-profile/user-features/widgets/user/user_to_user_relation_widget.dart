@@ -103,7 +103,8 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
       },
       buildWhen: (previousState, state) {
         return (state is UserActionUserRelationState &&
-            state.username == username);
+                state.username == username) ||
+            (state is UserActionUserRefreshState && state.username == username);
       },
       builder: (context, state) {
         final user = graph.getValueByKey(graphKey)! as UserEntity;

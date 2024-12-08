@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
+import 'package:doko_react/core/helpers/relation/user_to_user_relation.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
@@ -172,11 +173,11 @@ class UserGraph {
     _updateFriendRelation(friendUsername, relationInfo);
 
     final user = getValueByKey(key)!;
-    if (user is! CompleteUserEntity) return;
-
-    // update user
-    user.friends.addItem(friendKey);
-    user.updateFriendsCount(user.friendsCount + 1);
+    if (user is CompleteUserEntity) {
+      // update user
+      user.friends.addItem(friendKey);
+      user.updateFriendsCount(user.friendsCount + 1);
+    }
 
     final friend = getValueByKey(friendKey)!;
     if (friend is! CompleteUserEntity) return;
@@ -191,6 +192,14 @@ class UserGraph {
     String userKey = generateUserNodeKey(username);
     String friendKey = generateUserNodeKey(friendUsername);
 
+    /// see if existing friends than remove
+    /// using prevRelationInfo because of optimistic update
+    bool friends = getUserToUserRelation(
+          (getValueByKey(friendKey)! as UserEntity).prevRelationInfo,
+          currentUsername: username,
+        ) ==
+        UserToUserRelation.friends;
+
     // remove from incoming and outgoing if present
     _removeIncomingRequest(friendUsername);
     _removeOutgoingRequest(friendUsername);
@@ -199,16 +208,16 @@ class UserGraph {
 
     // remove friend from friend list
     final user = getValueByKey(userKey)!;
-    if (user is! CompleteUserEntity) return;
-
-    user.friends.removeItem(friendKey);
-    user.updateFriendsCount(user.friendsCount - 1);
+    if (user is CompleteUserEntity) {
+      user.friends.removeItem(friendKey);
+      if (friends) user.updateFriendsCount(user.friendsCount - 1);
+    }
 
     final friend = getValueByKey(friendKey)!;
     if (friend is! CompleteUserEntity) return;
 
     friend.friends.removeItem(userKey);
-    friend.updateFriendsCount(friend.friendsCount - 1);
+    if (friends) friend.updateFriendsCount(friend.friendsCount - 1);
   }
 
   void addOutgoingRequest(String friendUsername) {

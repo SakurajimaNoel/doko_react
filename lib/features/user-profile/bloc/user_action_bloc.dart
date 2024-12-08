@@ -59,6 +59,11 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         _handleUserActionAcceptFriendRelation);
     on<UserActionRemoveFriendRelationEvent>(
         _handleUserActionRemoveFriendRelation);
+    on<UserActionUserRefreshEvent>((event, emit) {
+      emit(UserActionUserRefreshState(
+        username: event.username,
+      ));
+    });
   }
 
   FutureOr<void> _handleUserActionUpdateEvent(
