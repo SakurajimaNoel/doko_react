@@ -64,6 +64,13 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         username: event.username,
       ));
     });
+    on<UserActionNewPostEvent>(
+      (event, emit) => emit(
+        UserActionNewPostState(
+          postId: event.postId,
+        ),
+      ),
+    );
   }
 
   FutureOr<void> _handleUserActionUpdateEvent(

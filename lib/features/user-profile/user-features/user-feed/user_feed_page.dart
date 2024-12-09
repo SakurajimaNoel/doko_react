@@ -1,4 +1,5 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
+import 'package:doko_react/core/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,6 +20,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
           TextButton(
             onPressed: () {
               // context.pushNamed(RouterConstants.createPost);
+              createOptions();
             },
             child: const Text("Create"),
           ),
@@ -36,6 +38,43 @@ class _UserFeedPageState extends State<UserFeedPage> {
           ),
         ],
       ),
+    );
+  }
+
+  void createOptions() {
+    showModalBottomSheet(
+      useRootNavigator: true,
+      context: context,
+      showDragHandle: true,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: Constants.height * 12.5,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              FilledButton.tonalIcon(
+                onPressed: () {},
+                label: const Text("Story"),
+                icon: const Icon(Icons.add_a_photo_outlined),
+              ),
+              FilledButton.tonalIcon(
+                onPressed: () {
+                  context.pop();
+                  context.pushNamed(RouterConstants.createPost);
+                },
+                label: const Text("Post"),
+                icon: const Icon(Icons.add_box_outlined),
+              ),
+              FilledButton.tonalIcon(
+                onPressed: () {},
+                label: const Text("Page"),
+                icon: const Icon(Icons.post_add),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

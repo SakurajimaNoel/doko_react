@@ -31,6 +31,11 @@ import "package:doko_react/features/user-profile/domain/use-case/posts/post_remo
 import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_accepts_friend_relation_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_create_friend_relation_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_remove_friend_relation_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/node-create/data/data-source/node_create_remote_data_source.dart";
+import "package:doko_react/features/user-profile/user-features/node-create/data/repository/node_create_repository_impl.dart";
+import "package:doko_react/features/user-profile/user-features/node-create/domain/repository/node_create_repository.dart";
+import "package:doko_react/features/user-profile/user-features/node-create/domain/use-case/post-create-use-case/post_create_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/node-create/presentation/bloc/node_create_bloc.dart";
 import "package:doko_react/features/user-profile/user-features/profile/data/data-sources/profile_remote_data_source.dart";
 import "package:doko_react/features/user-profile/user-features/profile/data/repository/profile_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/repository/profile_repository.dart";
@@ -74,6 +79,33 @@ Future<void> initDependency() async {
   _initCompleteProfile();
   _initProfile();
   _initUserAction();
+  _initNodeCreate();
+}
+
+void _initNodeCreate() {
+  serviceLocator.registerFactory<NodeCreateRemoteDataSource>(
+    () => NodeCreateRemoteDataSource(
+      client: serviceLocator<GraphQLClient>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<NodeCreateRepository>(
+    () => NodeCreateRepositoryImpl(
+      remoteDataSource: serviceLocator<NodeCreateRemoteDataSource>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<PostCreateUseCase>(
+    () => PostCreateUseCase(
+      nodeCreateRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<NodeCreateBloc>(
+    () => NodeCreateBloc(
+      postCreateUseCase: serviceLocator(),
+    ),
+  );
 }
 
 void _initUserAction() {

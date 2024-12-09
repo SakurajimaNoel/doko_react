@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/archive/core/configs/graphql/graphql_config.dart';
 import 'package:doko_react/archive/core/configs/router/router_constants.dart';
@@ -116,8 +118,9 @@ class _CreatePostPublishPageState extends State<CreatePostPublishPage> {
       if (item.type == MediaTypeValue.thumbnail ||
           item.type == MediaTypeValue.unknown) continue;
 
-      fileUploadFuture.add(storage.uploadFile(item.file!, item.path));
-      Cache.addFileToCache(item.file!.path, item.path);
+      fileUploadFuture
+          .add(storage.uploadFile(File(item.file!), item.bucketPath));
+      Cache.addFileToCache(item.file!, item.bucketPath);
     }
 
     List<StorageResult> results = await Future.wait(fileUploadFuture);

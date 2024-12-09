@@ -1,5 +1,4 @@
 import 'package:doko_react/archive/core/helpers/constants.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -26,7 +25,7 @@ class ImagePickerWidget extends StatelessWidget {
   final Icon? icon;
 
   /// callback to call when media file is selected
-  final AsyncValueSetter<List<XFile>> onSelection;
+  final ValueSetter<List<XFile>> onSelection;
 
   /// allowing multiple media images to be selected
   /// default is false
@@ -84,16 +83,7 @@ class ImagePickerWidget extends StatelessWidget {
                   handleGallery(context);
                 },
                 icon: const Icon(Icons.photo),
-                label:
-                    showLabel ? const Text("Gallery") : const SizedBox.shrink(),
-              ),
-              FilledButton.tonalIcon(
-                onPressed: () {
-                  handleCamera(context);
-                },
-                icon: const Icon(Icons.photo_camera),
-                label:
-                    showLabel ? const Text("Camera") : const SizedBox.shrink(),
+                label: const Text("Gallery"),
               ),
               if (video)
                 FilledButton.tonalIcon(
@@ -101,9 +91,22 @@ class ImagePickerWidget extends StatelessWidget {
                     handleVideo(context);
                   },
                   icon: const Icon(Icons.video_collection),
-                  label:
-                      showLabel ? const Text("Video") : const SizedBox.shrink(),
+                  label: const Text("Video"),
                 ),
+              showLabel
+                  ? FilledButton.tonalIcon(
+                      onPressed: () {
+                        handleCamera(context);
+                      },
+                      icon: const Icon(Icons.photo_camera),
+                      label: const Text("Camera"),
+                    )
+                  : IconButton.filledTonal(
+                      onPressed: () {
+                        handleCamera(context);
+                      },
+                      icon: const Icon(Icons.photo_camera),
+                    ),
             ],
           ),
         );

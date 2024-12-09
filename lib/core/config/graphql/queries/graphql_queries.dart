@@ -820,14 +820,28 @@ class GraphqlQueries {
   // use create post
   static String userCreatePost() {
     return """
-      mutation CreatePosts(\$input: [PostCreateInput!]!) {
-        createPosts(input: \$input) {
-          info {
-            nodesCreated
-            relationshipsCreated
+     mutation CreatePosts(\$input: [PostCreateInput!]!, \$where: UserWhere) {
+      createPosts(input: \$input) {
+        posts {
+          id
+          createdOn
+          content
+          caption
+          createdBy {
+            username
+          }
+          likedByConnection {
+            totalCount
+          }
+          commentsConnection {
+            totalCount
+          }
+          likedBy(where: \$where) {
+            username
           }
         }
-      }        
+      }
+    }       
     """;
   }
 
@@ -843,18 +857,21 @@ class GraphqlQueries {
           "id": postId,
           "caption": caption,
           "content": content,
+          "likes": 0,
           "createdBy": {
             "connect": {
               "where": {
                 "node": {
                   "username_EQ": username,
-                }
-              }
-            }
+                },
+              },
+            },
           },
-          "likes": 0,
-        }
+        },
       ],
+      "where": {
+        "username_EQ": username,
+      }
     };
   }
 

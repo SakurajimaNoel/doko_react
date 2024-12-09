@@ -39,12 +39,14 @@ class UserActionLoadPosts extends UserActionState {
 }
 
 class UserActionNewPostState extends UserActionState {
-  UserActionNewPostState() : date = DateTime.now();
+  UserActionNewPostState({
+    required this.postId,
+  });
 
-  final DateTime date;
+  final String postId;
 
   @override
-  List<Object?> get props => [date];
+  List<Object?> get props => [postId];
 }
 
 // more friends action

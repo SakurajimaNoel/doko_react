@@ -61,7 +61,10 @@ class Posts extends StatelessWidget {
           ),
           _PostContent(
             content: post.content,
-          )
+          ),
+          const SizedBox(
+            height: Constants.gap * 0.5,
+          ),
         ],
         const SizedBox(
           height: Constants.gap * 0.5,
@@ -69,6 +72,7 @@ class Posts extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: Constants.padding,
+            vertical: Constants.padding * 0.5,
           ),
           child: _PostCaption(
             caption: post.caption,

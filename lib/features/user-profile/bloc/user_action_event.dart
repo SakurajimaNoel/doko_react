@@ -37,6 +37,14 @@ final class UserActionPostLoadEvent extends UserActionEvent {
   final String username;
 }
 
+final class UserActionNewPostEvent extends UserActionEvent {
+  UserActionNewPostEvent({
+    required this.postId,
+  });
+
+  final String postId;
+}
+
 final class UserActionFriendLoadEvent extends UserActionEvent {
   UserActionFriendLoadEvent({
     required this.friendsCount,

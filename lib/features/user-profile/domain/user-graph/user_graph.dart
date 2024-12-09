@@ -87,11 +87,11 @@ class UserGraph {
   void addPostEntityToUser(String username, PostEntity newPost) {
     String key = generateUserNodeKey(username);
 
-    final user = getValueByKey(key)!;
-    if (user is! CompleteUserEntity) return;
-
     String postKey = generatePostNodeKey(newPost.id);
     addEntity(postKey, newPost);
+
+    final user = getValueByKey(key)!;
+    if (user is! CompleteUserEntity) return;
 
     // update user
     user.updatePostCount(user.postsCount + 1);

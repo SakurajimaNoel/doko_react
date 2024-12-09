@@ -29,7 +29,7 @@ Future<String> getDownloadUrlFromAWSPath(String bucketPath) async {
   }
 }
 
-Future<bool> uploadFileToAWSByPath(String filePath, String bucketPath) async {
+Future<String> uploadFileToAWSByPath(String filePath, String bucketPath) async {
   try {
     await _storage
         .uploadFile(
@@ -37,7 +37,7 @@ Future<bool> uploadFileToAWSByPath(String filePath, String bucketPath) async {
           path: StoragePath.fromString(bucketPath),
         )
         .result;
-    return true;
+    return bucketPath;
   } on StorageException catch (e) {
     return throw ApplicationException(reason: e.message);
   } catch (e) {

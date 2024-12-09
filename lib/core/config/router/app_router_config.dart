@@ -14,6 +14,9 @@ import 'package:doko_react/features/complete-profile/presentation/pages/profile-
 import 'package:doko_react/features/complete-profile/presentation/pages/username/complete_profile_username_page.dart';
 import 'package:doko_react/features/settings/presentation/pages/settings_page.dart';
 import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/create_post_page.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/post_publish_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/edit-profile/edit_profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-friends/pending_request_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-friends/user_friends_list_page.dart';
@@ -226,6 +229,27 @@ class AppRouterConfig {
         path: "/search",
         builder: (context, state) => const SearchPage(),
       ),
+      GoRoute(
+        name: RouterConstants.createPost,
+        path: "/create-post",
+        builder: (context, state) => const CreatePostPage(),
+        routes: [
+          GoRoute(
+            parentNavigatorKey: _rootNavigatorKey,
+            name: RouterConstants.postPublish,
+            path: "publish",
+            builder: (context, state) {
+              final Map<String, dynamic> data =
+                  state.extra as Map<String, dynamic>;
+              final PostPublishPageData postDetails = data["postDetails"];
+
+              return PostPublishPage(
+                postDetails: postDetails,
+              );
+            },
+          ),
+        ],
+      ),
       // complete profile routes
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -293,31 +317,6 @@ class AppRouterConfig {
                     path: "pending-requests",
                     builder: (context, state) => const PendingRequestPage(),
                   ),
-                  //   GoRoute(
-                  //     parentNavigatorKey: _rootNavigatorKey,
-                  //     name: RouterConstants.createPost,
-                  //     path: "create-post",
-                  //     builder: (context, state) => const CreatePostPage(),
-                  //     routes: [
-                  //       GoRoute(
-                  //         parentNavigatorKey: _rootNavigatorKey,
-                  //         name: RouterConstants.postPublish,
-                  //         path: "publish",
-                  //         builder: (context, state) {
-                  //           final Map<String, dynamic> data =
-                  //               state.extra as Map<String, dynamic>;
-                  //           final List<PostContent> postContent =
-                  //               data["postContent"];
-                  //           final String postId = data["postId"];
-                  //
-                  //           return CreatePostPublishPage(
-                  //             postContent: postContent,
-                  //             postId: postId,
-                  //           );
-                  //         },
-                  //       ),
-                  //     ],
-                  //   ),
 
                   GoRoute(
                     parentNavigatorKey: _rootNavigatorKey,

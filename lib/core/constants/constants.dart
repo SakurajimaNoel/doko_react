@@ -55,6 +55,7 @@ class Constants {
   static const double actionWidth = _root * 2.5;
   static const double actionEdgeGap = _root * 0.125;
   static const int postLimit = 10;
+  static const int postCaptionLimit = 1024;
   static const int postCaptionDisplayLimit = 125;
   static const double carouselDots = 6;
   static const double carouselActiveDotScale = 1.5;
