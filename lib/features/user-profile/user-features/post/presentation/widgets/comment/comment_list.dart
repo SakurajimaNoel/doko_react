@@ -74,7 +74,7 @@ class _CommentListState extends State<CommentList> {
   Widget build(BuildContext context) {
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
-        return state is UserActionNewCommentState && state.postId == postId;
+        return state is UserActionNewCommentState && state.nodeId == postId;
       },
       builder: (context, state) {
         bool isEmpty = post.comments.items.isEmpty;

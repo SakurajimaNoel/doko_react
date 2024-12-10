@@ -144,12 +144,12 @@ class UserActionUserRefreshState extends UserActionState {
 // individual post related states
 class UserActionNewCommentState extends UserActionState {
   UserActionNewCommentState({
-    required this.postId,
+    required this.nodeId,
   }) : now = DateTime.now();
 
-  final String postId;
+  final String nodeId;
   final DateTime now;
 
   @override
-  List<Object?> get props => [postId, now];
+  List<Object?> get props => [nodeId, now];
 }
