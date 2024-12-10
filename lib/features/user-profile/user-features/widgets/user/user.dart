@@ -14,14 +14,25 @@ class User extends StatelessWidget {
   const User({
     super.key,
     required this.userKey,
-  });
+  }) : small = false;
+
+  const User.small({
+    super.key,
+    required this.userKey,
+  }) : small = true;
 
   final String userKey;
+  final bool small;
 
   @override
   Widget build(BuildContext context) {
     final currentUserKey = generateUserNodeKey(
         (context.read<UserBloc>().state as UserCompleteState).username);
+
+    double usernameScale = small ? 0.9 : 1;
+    double nameScale = small ? 1.1 : 1.2;
+
+    double gapScale = small ? 0.75 : 1;
 
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
@@ -46,18 +57,23 @@ class User extends StatelessWidget {
           child: Row(
             children: [
               userAvtar(user.profilePicture),
-              const SizedBox(
-                width: Constants.gap,
+              SizedBox(
+                width: Constants.gap * gapScale,
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(user.name),
+                  Text(
+                    user.name,
+                    style: TextStyle(
+                      fontSize: Constants.smallFontSize * nameScale,
+                    ),
+                  ),
                   Text(
                     "@${user.username}",
-                    style: const TextStyle(
-                      fontSize: Constants.smallFontSize,
-                      fontWeight: FontWeight.w500,
+                    style: TextStyle(
+                      fontSize: Constants.smallFontSize * usernameScale,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -70,13 +86,18 @@ class User extends StatelessWidget {
   }
 
   Widget userAvtar(StorageResource profilePicture) {
+    double imageDiameter = 40;
+    double avtarRadius = small ? 17.5 : 20;
+
     if (profilePicture.bucketPath.isEmpty) {
-      return const CircleAvatar(
+      return CircleAvatar(
+        radius: avtarRadius,
         child: Icon(Icons.person),
       );
     }
 
     return CircleAvatar(
+      radius: avtarRadius,
       child: ClipOval(
         child: CachedNetworkImage(
           cacheKey: profilePicture.bucketPath,
@@ -86,8 +107,8 @@ class User extends StatelessWidget {
           ),
           errorWidget: (context, url, error) => const Icon(Icons.error),
           fit: BoxFit.cover,
-          width: 40,
-          height: 40,
+          width: imageDiameter,
+          height: imageDiameter,
           memCacheHeight: Constants.thumbnailCacheHeight,
         ),
       ),

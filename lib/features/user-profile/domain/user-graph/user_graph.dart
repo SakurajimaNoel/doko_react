@@ -331,6 +331,30 @@ class UserGraph {
   }
 
   // adding comment to post
+  void addCommentListToPostEntity(
+    String postId, {
+    required List<CommentEntity> comments,
+    required PageInfo pageInfo,
+  }) {
+    String key = generatePostNodeKey(postId);
+
+    Map<String, GraphEntity> tempMap = HashMap();
+    List<String> commentKeys = comments.map((commentItem) {
+      String commentKey = generateCommentNodeKey(commentItem.id);
+      // adding comment entity
+      tempMap[commentKey] = commentItem;
+
+      return commentKey;
+    }).toList();
+
+    _addEntityMap(tempMap);
+
+    PostEntity post = getValueByKey(key)! as PostEntity;
+
+    post.comments.updatePageInfo(pageInfo);
+    post.comments.addEntityItems(commentKeys);
+  }
+
   void addCommentToPostEntity(
     String postId, {
     required CommentEntity comment,
@@ -346,6 +370,30 @@ class UserGraph {
     final PostEntity post = getValueByKey(key) as PostEntity;
     post.comments.addItem(commentKey);
     post.updateCommentsCount(commentCount);
+  }
+
+  void addCommentListToReply(
+    String commentId, {
+    required List<CommentEntity> comments,
+    required PageInfo pageInfo,
+  }) {
+    String key = generateCommentNodeKey(commentId);
+
+    Map<String, GraphEntity> tempMap = HashMap();
+    List<String> commentKeys = comments.map((commentItem) {
+      String commentKey = generateCommentNodeKey(commentItem.id);
+      // adding comment entity
+      tempMap[commentKey] = commentItem;
+
+      return commentKey;
+    }).toList();
+
+    _addEntityMap(tempMap);
+
+    CommentEntity comment = getValueByKey(key)! as CommentEntity;
+
+    comment.comments.updatePageInfo(pageInfo);
+    comment.comments.addEntityItems(commentKeys);
   }
 
   void addReplyToCommentEntity(
@@ -442,8 +490,16 @@ String generatePostNodeKey(String postId) {
   return "post:$postId";
 }
 
+String generatePostIdFromPostKey(String postKey) {
+  return postKey.substring(8);
+}
+
 String generateCommentNodeKey(String commentId) {
   return "comment:$commentId";
+}
+
+String generateCommentIdFromCommentKey(String commentKey) {
+  return commentKey.substring(8);
 }
 
 String generatePendingIncomingReqKey() {

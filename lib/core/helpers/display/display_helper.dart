@@ -67,5 +67,6 @@ String displayNumberFormat(int likes) {
 }
 
 String getUsernameFromCommentInput(String username) {
+  // trimming initial @ and end zero-width-whitespace
   return username.substring(1, username.length - 1);
 }

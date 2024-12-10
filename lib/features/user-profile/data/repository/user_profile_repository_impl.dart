@@ -35,4 +35,14 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
       UserToUserRelationDetails relationDetails) {
     return _remoteDataSource.userRemoveFriendRelation(relationDetails);
   }
+
+  @override
+  Future<bool> userAddCommentLike(String commentId, String username) {
+    return _remoteDataSource.userAddCommentLike(commentId, username);
+  }
+
+  @override
+  Future<bool> userRemoveCommentLike(String commentId, String username) {
+    return _remoteDataSource.userRemoveCommentLike(commentId, username);
+  }
 }

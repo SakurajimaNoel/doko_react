@@ -1531,4 +1531,103 @@ class GraphqlQueries {
       "after": cursor
     };
   }
+
+  // user like comment
+  static String userAddLikeComment() {
+    return """
+      mutation UpdateComments(\$where: CommentWhere, \$update: CommentUpdateInput, \$likedByWhere2: UserWhere) {
+        updateComments(where: \$where, update: \$update) {
+          comments {
+            likedByConnection {
+              totalCount
+            }
+            commentsConnection {
+              totalCount
+            }
+            likedBy(where: \$likedByWhere2) {
+              username
+            }
+          }
+        }
+      }
+    """;
+  }
+
+  static Map<String, dynamic> userAddCommentLikeVariables(
+    String commentId, {
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": commentId,
+      },
+      "update": {
+        "likedBy": [
+          {
+            "connect": [
+              {
+                "where": {
+                  "node": {
+                    "username_EQ": username,
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      }
+    };
+  }
+
+  static String userRemoveCommentLike() {
+    return """
+      mutation UpdateComments(\$where: CommentWhere, \$update: CommentUpdateInput, \$likedByWhere2: UserWhere) {
+        updateComments(where: \$where, update: \$update) {
+          comments {
+            commentsConnection {
+              totalCount
+            }
+            likedByConnection {
+              totalCount
+            }
+            likedBy(where: \$likedByWhere2) {
+              username
+            }
+          }
+        }
+      }
+    """;
+  }
+
+  static Map<String, dynamic> userRemoveCommentLikeVariables(
+    String commentId, {
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": commentId,
+      },
+      "update": {
+        "likedBy": [
+          {
+            "disconnect": [
+              {
+                "where": {
+                  "node": {
+                    "username_EQ": username,
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      }
+    };
+  }
 }

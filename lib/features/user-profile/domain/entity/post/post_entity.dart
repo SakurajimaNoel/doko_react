@@ -29,7 +29,7 @@ class PostEntity extends GraphEntity {
   int likesCount;
   int commentsCount;
   bool userLike;
-  final Nodes comments;
+  Nodes comments;
 
   void updateUserLikes(bool userLike, int likesCount) {
     this.likesCount = likesCount;

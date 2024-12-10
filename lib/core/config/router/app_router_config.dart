@@ -17,6 +17,7 @@ import 'package:doko_react/features/user-profile/user-features/nearby/nearby_pag
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/create_post_page.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/post_publish_page.dart';
+import 'package:doko_react/features/user-profile/user-features/post/presentation/pages/post/post_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/edit-profile/edit_profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-friends/pending_request_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-friends/user_friends_list_page.dart';
@@ -292,32 +293,24 @@ class AppRouterConfig {
                       return const EditProfilePage();
                     },
                   ),
-                  //   GoRoute(
-                  //     parentNavigatorKey: _rootNavigatorKey,
-                  //     name: RouterConstants.userPost,
-                  //     path: "post/:postId",
-                  //     builder: (context, state) {
-                  //       Map<String, dynamic>? data;
-                  //       if (state.extra != null) {
-                  //         data = state.extra as Map<String, dynamic>;
-                  //       }
-                  //
-                  //       final PostModel? post = data?["post"];
-                  //       String postId = state.pathParameters["postId"]!;
-                  //
-                  //       return PostPage(
-                  //         postId: postId,
-                  //         post: post,
-                  //       );
-                  //     },
-                  //   ),
+                  GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
+                    name: RouterConstants.userPost,
+                    path: "post/:postId",
+                    builder: (context, state) {
+                      String postId = state.pathParameters["postId"]!;
+
+                      return PostPage(
+                        postId: postId,
+                      );
+                    },
+                  ),
                   GoRoute(
                     parentNavigatorKey: _rootNavigatorKey,
                     name: RouterConstants.pendingRequests,
                     path: "pending-requests",
                     builder: (context, state) => const PendingRequestPage(),
                   ),
-
                   GoRoute(
                     parentNavigatorKey: _rootNavigatorKey,
                     name: RouterConstants.userProfile,

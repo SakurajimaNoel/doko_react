@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:doko_react/core/config/graphql/queries/graphql_query_constants.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/core/helpers/relation/user_to_user_relation.dart';
+import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
+import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_add_like_use_case.dart';
+import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_remove_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_add_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_remove_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_accepts_friend_relation_use_case.dart';
@@ -26,6 +29,8 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final UserCreateFriendRelationUseCase _userCreateFriendRelationUseCase;
   final UserAcceptFriendRelationUseCase _userAcceptFriendRelationUseCase;
   final UserRemoveFriendRelationUseCase _userRemoveFriendRelationUseCase;
+  final CommentAddLikeUseCase _commentAddLikeUseCase;
+  final CommentRemoveLikeUseCase _commentRemoveLikeUseCase;
 
   UserActionBloc({
     required PostAddLikeUseCase postAddLikeUseCase,
@@ -33,11 +38,15 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     required UserCreateFriendRelationUseCase userCreateFriendRelationUseCase,
     required UserAcceptFriendRelationUseCase userAcceptFriendRelationUseCase,
     required UserRemoveFriendRelationUseCase userRemoveFriendRelationUseCase,
+    required CommentAddLikeUseCase commentAddLikeUseCase,
+    required CommentRemoveLikeUseCase commentRemoveLikeUseCase,
   })  : _postAddLikeUseCase = postAddLikeUseCase,
         _postRemoveLikeUseCase = postRemoveLikeUseCase,
         _userCreateFriendRelationUseCase = userCreateFriendRelationUseCase,
         _userAcceptFriendRelationUseCase = userAcceptFriendRelationUseCase,
         _userRemoveFriendRelationUseCase = userRemoveFriendRelationUseCase,
+        _commentAddLikeUseCase = commentAddLikeUseCase,
+        _commentRemoveLikeUseCase = commentRemoveLikeUseCase,
         super(UserActionInitial()) {
     on<UserActionUpdateEvent>(_handleUserActionUpdateEvent);
     on<UserActionPostLikeActionEvent>(_handleUserActionPostLikeActionEvent);
@@ -71,6 +80,8 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         ),
       ),
     );
+    on<UserActionCommentLikeActionEvent>(
+        _handleUserActionCommentLikeActionEvent);
   }
 
   FutureOr<void> _handleUserActionUpdateEvent(
@@ -108,13 +119,13 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
 
       if (event.userLike) {
-        await _postAddLikeUseCase(UserPostLikeActionInput(
-          postId: event.postId,
+        await _postAddLikeUseCase(UserNodeLikeActionInput(
+          nodeId: event.postId,
           username: event.username,
         ));
       } else {
-        await _postRemoveLikeUseCase(UserPostLikeActionInput(
-          postId: event.postId,
+        await _postRemoveLikeUseCase(UserNodeLikeActionInput(
+          nodeId: event.postId,
           username: event.username,
         ));
       }
@@ -305,6 +316,67 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
           initRelation,
           currentUsername: event.currentUsername,
         ),
+      ));
+    }
+  }
+
+  FutureOr<void> _handleUserActionCommentLikeActionEvent(
+      UserActionCommentLikeActionEvent event,
+      Emitter<UserActionState> emit) async {
+    String commentKey = generateCommentNodeKey(event.commentId);
+    CommentEntity comment = graph.getValueByKey(commentKey)! as CommentEntity;
+
+    int initLike = comment.likesCount;
+    int newLike = event.userLike ? initLike + 1 : initLike - 1;
+
+    try {
+      // optimistic update
+      graph.handleUserLikeActionForCommentEntity(
+        event.commentId,
+        userLike: event.userLike,
+        likesCount: newLike,
+        commentsCount: comment.commentsCount,
+      );
+
+      emit(UserActionNodeActionState(
+        nodeId: comment.id,
+        userLike: comment.userLike,
+        likesCount: comment.likesCount,
+        commentsCount: comment.commentsCount,
+      ));
+
+      if (event.userLike) {
+        await _commentAddLikeUseCase(UserNodeLikeActionInput(
+          nodeId: event.commentId,
+          username: event.username,
+        ));
+      } else {
+        await _commentRemoveLikeUseCase(UserNodeLikeActionInput(
+          nodeId: event.commentId,
+          username: event.username,
+        ));
+      }
+
+      emit(UserActionNodeActionState(
+        nodeId: comment.id,
+        userLike: comment.userLike,
+        likesCount: comment.likesCount,
+        commentsCount: comment.commentsCount,
+      ));
+    } catch (_) {
+      // optimistic failure revert
+      graph.handleUserLikeActionForCommentEntity(
+        event.commentId,
+        userLike: !event.userLike,
+        likesCount: initLike,
+        commentsCount: comment.commentsCount,
+      );
+
+      emit(UserActionNodeActionState(
+        nodeId: comment.id,
+        userLike: comment.userLike,
+        likesCount: comment.likesCount,
+        commentsCount: comment.commentsCount,
       ));
     }
   }

@@ -28,7 +28,7 @@ class CommentEntity extends GraphEntity {
   int likesCount;
   int commentsCount;
   bool userLike;
-  final Nodes comments;
+  Nodes comments;
 
   void updateUserLikes(bool userLike, int likesCount) {
     this.likesCount = likesCount;
@@ -43,9 +43,10 @@ class CommentEntity extends GraphEntity {
     /// check if user:username exists in map
     /// if not add the user to map and save reference
     final String commentByUsername = map["commentBy"]["username"];
+    final String userKey = generateUserNodeKey(commentByUsername);
 
     final UserGraph graph = UserGraph();
-    if (!graph.containsKey(commentByUsername)) {
+    if (!graph.containsKey(userKey)) {
       UserEntity user = await UserEntity.createEntity(map: map["commentBy"]);
       String key = generateUserNodeKey(user.username);
 

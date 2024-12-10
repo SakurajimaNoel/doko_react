@@ -56,7 +56,7 @@ class Constants {
   static const double actionEdgeGap = _root * 0.125;
   static const int postLimit = 10;
   static const int postCaptionLimit = 1024;
-  static const int postCaptionDisplayLimit = 125;
+  static const int postCaptionDisplayLimit = 128;
   static const double carouselDots = 6;
   static const double carouselActiveDotScale = 1.5;
 
@@ -70,7 +70,7 @@ class Constants {
   static const double commentContainer = (commentWidth / commentHeight);
   static const String zeroWidthSpace = "\u200B";
   static const double commentOverlayHeight = _root * 5;
-  static const int commentContentDisplayLimit = 125;
+  static const int commentContentDisplayLimit = 128;
 
   // intervals
   static const Duration userProfilePollInterval = Duration(
@@ -78,5 +78,5 @@ class Constants {
   );
 
   // icon size
-  static const double iconButtonSize = _root * 1.25;
+  static const double iconButtonSize = _root * 1.5;
 }

@@ -1,5 +1,7 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doko_react/archive/core/data/extensions.dart';
+import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
@@ -15,6 +17,8 @@ import 'package:doko_react/features/user-profile/user-features/widgets/user/user
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Posts extends StatelessWidget {
@@ -274,8 +278,8 @@ class _PostCaptionState extends State<_PostCaption> {
                 TextSpan(
                     text: " $buttonText",
                     style: TextStyle(
-                      color: currTheme.primary,
-                      fontWeight: FontWeight.w500,
+                      color: currTheme.outline,
+                      fontWeight: FontWeight.w600,
                       fontSize: Constants.smallFontSize,
                     ),
                     recognizer: TapGestureRecognizer()
@@ -291,14 +295,34 @@ class _PostCaptionState extends State<_PostCaption> {
   }
 }
 
-class _PostAction extends StatelessWidget {
+class _PostAction extends StatefulWidget {
   _PostAction({
     required this.postId,
   }) : graphKey = generatePostNodeKey(postId);
 
   final String postId;
-  final UserGraph graph = UserGraph();
   final String graphKey;
+
+  @override
+  State<_PostAction> createState() => _PostActionState();
+}
+
+class _PostActionState extends State<_PostAction>
+    with SingleTickerProviderStateMixin {
+  final UserGraph graph = UserGraph();
+  late final AnimationController controller = AnimationController(
+    duration: const Duration(
+      milliseconds: 200,
+    ),
+    vsync: this,
+    value: 1.0,
+  );
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -308,10 +332,11 @@ class _PostAction extends StatelessWidget {
 
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
-        return (state is UserActionNodeActionState && state.nodeId == postId);
+        return (state is UserActionNodeActionState &&
+            state.nodeId == widget.postId);
       },
       builder: (context, state) {
-        PostEntity post = graph.getValueByKey(graphKey)! as PostEntity;
+        PostEntity post = graph.getValueByKey(widget.graphKey)! as PostEntity;
 
         return Padding(
           padding: const EdgeInsets.symmetric(
@@ -340,32 +365,66 @@ class _PostAction extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      IconButton(
-                        onPressed: () {
-                          context
-                              .read<UserActionBloc>()
-                              .add(UserActionPostLikeActionEvent(
-                                postId: post.id,
-                                userLike: !post.userLike,
-                                username: username,
-                              ));
-                        },
-                        icon: post.userLike
-                            ? Icon(
-                                Icons.thumb_up,
-                                color: currTheme.primary,
-                                size: Constants.iconButtonSize,
-                              )
-                            : const Icon(
-                                Icons.thumb_up_outlined,
-                                size: Constants.iconButtonSize,
-                              ),
+                      ScaleTransition(
+                        scale: Tween(begin: 1.25, end: 1.0).animate(
+                          CurvedAnimation(
+                            parent: controller,
+                            curve: Curves.easeOut,
+                          ),
+                        ),
+                        child: IconButton(
+                          onPressed: () {
+                            if (!post.userLike) {
+                              controller
+                                  .reverse()
+                                  .then((value) => controller.forward());
+                            }
+
+                            context
+                                .read<UserActionBloc>()
+                                .add(UserActionPostLikeActionEvent(
+                                  postId: post.id,
+                                  userLike: !post.userLike,
+                                  username: username,
+                                ));
+                          },
+                          icon: post.userLike
+                              ? Icon(
+                                  Icons.thumb_up,
+                                  color: currTheme.primary,
+                                  size: Constants.iconButtonSize,
+                                )
+                              : const Icon(
+                                  Icons.thumb_up_outlined,
+                                  size: Constants.iconButtonSize,
+                                ),
+                        ),
                       ),
                       const SizedBox(
                         width: Constants.gap,
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          String currentRoute =
+                              GoRouter.of(context).currentRouteName ?? "";
+                          bool isPostPage =
+                              currentRoute == RouterConstants.userPost;
+
+                          if (isPostPage) {
+                            // todo: think of a way to add focus to comment input if it is there
+                            return;
+                          }
+
+                          context.pushNamed(
+                            RouterConstants.userPost,
+                            pathParameters: {
+                              "postId": post.id,
+                            },
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: currTheme.secondary,
+                        ),
                         child: const Text("Comment"),
                       ),
                     ],
@@ -374,7 +433,16 @@ class _PostAction extends StatelessWidget {
                     width: Constants.gap * 0.75,
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // todo : allow sending to user chat
+                      Share.share(
+                        "https://doki.com/post/${post.id}",
+                        subject: "Check this post on doki.",
+                      );
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: currTheme.secondary,
+                    ),
                     child: const Text("Share"),
                   ),
                 ],

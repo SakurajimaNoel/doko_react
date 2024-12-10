@@ -26,6 +26,8 @@ import "package:doko_react/features/user-profile/bloc/user_action_bloc.dart";
 import "package:doko_react/features/user-profile/data/data-sources/user_profile_remote_data_source.dart";
 import "package:doko_react/features/user-profile/data/repository/user_profile_repository_impl.dart";
 import "package:doko_react/features/user-profile/domain/repository/user_profile_repository.dart";
+import "package:doko_react/features/user-profile/domain/use-case/comments/comment_add_like_use_case.dart";
+import "package:doko_react/features/user-profile/domain/use-case/comments/comment_remove_like_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/posts/post_add_like_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/posts/post_remove_like_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_accepts_friend_relation_use_case.dart";
@@ -36,6 +38,13 @@ import "package:doko_react/features/user-profile/user-features/node-create/data/
 import "package:doko_react/features/user-profile/user-features/node-create/domain/repository/node_create_repository.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/domain/use-case/post-create-use-case/post_create_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/presentation/bloc/node_create_bloc.dart";
+import "package:doko_react/features/user-profile/user-features/post/data/data-source/post_remote_data_source.dart";
+import "package:doko_react/features/user-profile/user-features/post/data/repository/post_repository_impl.dart";
+import "package:doko_react/features/user-profile/user-features/post/domain/repository/post_repository.dart";
+import "package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/comments-use-case.dart";
+import "package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/replies-use-case.dart";
+import "package:doko_react/features/user-profile/user-features/post/domain/use-case/post-use-case/post_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/post/presentation/bloc/post_bloc.dart";
 import "package:doko_react/features/user-profile/user-features/profile/data/data-sources/profile_remote_data_source.dart";
 import "package:doko_react/features/user-profile/user-features/profile/data/repository/profile_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/repository/profile_repository.dart";
@@ -80,6 +89,47 @@ Future<void> initDependency() async {
   _initProfile();
   _initUserAction();
   _initNodeCreate();
+  _initPost();
+}
+
+void _initPost() {
+  serviceLocator.registerFactory<PostRemoteDataSource>(
+    () => PostRemoteDataSource(
+      client: serviceLocator<GraphQLClient>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<PostRepository>(
+    () => PostRepositoryImpl(
+      remoteDataSource: serviceLocator<PostRemoteDataSource>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<PostUseCase>(
+    () => PostUseCase(
+      postRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<CommentsUseCase>(
+    () => CommentsUseCase(
+      postRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<RepliesUseCase>(
+    () => RepliesUseCase(
+      postRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<PostBloc>(
+    () => PostBloc(
+      postUseCase: serviceLocator(),
+      commentsUseCase: serviceLocator(),
+      repliesUseCase: serviceLocator(),
+    ),
+  );
 }
 
 void _initNodeCreate() {
@@ -151,6 +201,18 @@ void _initUserAction() {
     ),
   );
 
+  serviceLocator.registerFactory<CommentAddLikeUseCase>(
+    () => CommentAddLikeUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<CommentRemoveLikeUseCase>(
+    () => CommentRemoveLikeUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerFactory<UserActionBloc>(
     () => UserActionBloc(
       postAddLikeUseCase: serviceLocator(),
@@ -158,6 +220,8 @@ void _initUserAction() {
       userCreateFriendRelationUseCase: serviceLocator(),
       userRemoveFriendRelationUseCase: serviceLocator(),
       userAcceptFriendRelationUseCase: serviceLocator(),
+      commentAddLikeUseCase: serviceLocator(),
+      commentRemoveLikeUseCase: serviceLocator(),
     ),
   );
 }

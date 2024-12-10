@@ -67,6 +67,7 @@ class UserActionLoadFriends extends UserActionState {
 /// used when updating ui for post action
 /// when new comment is added or like is changed
 /// this will be used with both post and comment
+/// this will also be used when refreshing post page
 class UserActionNodeActionState extends UserActionState {
   UserActionNodeActionState({
     required this.nodeId,
@@ -138,4 +139,17 @@ class UserActionUserRefreshState extends UserActionState {
 
   @override
   List<Object?> get props => [username, now];
+}
+
+// individual post related states
+class UserActionNewCommentState extends UserActionState {
+  UserActionNewCommentState({
+    required this.postId,
+  }) : now = DateTime.now();
+
+  final String postId;
+  final DateTime now;
+
+  @override
+  List<Object?> get props => [postId, now];
 }

@@ -1,10 +1,10 @@
-class UserPostLikeActionInput {
-  const UserPostLikeActionInput({
-    required this.postId,
+class UserNodeLikeActionInput {
+  const UserNodeLikeActionInput({
+    required this.nodeId,
     required this.username,
   });
 
-  final String postId;
+  final String nodeId;
   final String username;
 }
 

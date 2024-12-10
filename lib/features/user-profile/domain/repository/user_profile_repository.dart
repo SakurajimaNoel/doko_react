@@ -13,4 +13,8 @@ abstract class UserProfileRepository {
 
   Future<bool> userRemoveFriendRelation(
       UserToUserRelationDetails relationDetails);
+
+  Future<bool> userAddCommentLike(String commentId, String username);
+
+  Future<bool> userRemoveCommentLike(String commentId, String username);
 }

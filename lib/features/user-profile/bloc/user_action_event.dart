@@ -101,3 +101,16 @@ final class UserActionUserRefreshEvent extends UserActionEvent {
 
   final String username;
 }
+
+// comment
+final class UserActionCommentLikeActionEvent extends UserActionEvent {
+  UserActionCommentLikeActionEvent({
+    required this.commentId,
+    required this.userLike,
+    required this.username,
+  });
+
+  final String commentId;
+  final bool userLike;
+  final String username;
+}

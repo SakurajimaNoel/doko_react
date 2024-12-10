@@ -1110,81 +1110,59 @@ class UserQueries {
   // post by id
   static String getPostById() {
     return """
-     query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$first: Int, \$likedByWhere3: UserWhere, \$commentsWhere2: CommentWhere, \$limit: Int, \$likedByWhere4: UserWhere, \$sort: [CommentSort!]) {
-      posts(where: \$where) {
-        id
-        createdOn
-        content
-        caption
-        createdBy {
+     query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$first: Int, \$likedByWhere3: UserWhere) {
+        posts(where: \$where) {
           id
-          username
-          name
-          profilePicture
-        }
-        likedBy(where: \$likedByWhere2) {
-          username
-        }
-       
-        likedByConnection {
-          totalCount
-        }
-        commentsConnection(first: \$first) {
-          totalCount
-          pageInfo {
-            endCursor
-            hasNextPage
+          createdOn
+          content
+          caption
+          createdBy {
+            id
+            username
+            name
+            profilePicture
           }
-          edges {
-            node {
-              id
-              createdOn
-              media
-              content
-              mentions {
-                username
-              }
-              likedBy(where: \$likedByWhere3) {
-                username
-              }
-              likedByConnection {
-                totalCount
-              }
-              commentsConnection {
-                totalCount
-              }
-              commentBy {
+          likedBy(where: \$likedByWhere2) {
+            username
+          }   
+          likedByConnection {
+            totalCount
+          }
+          commentsConnection(first: \$first) {
+            totalCount
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+            edges {
+              node {
                 id
-                username
-                profilePicture
-                name
-              }
-              comments(where: \$commentsWhere2, limit: \$limit, sort: \$sort) {
-                id
+                createdOn
                 media
                 content
-                createdOn
-                likedByConnection {
-                  totalCount
-                }
                 mentions {
                   username
                 }
-                likedBy(where: \$likedByWhere4) {
+                likedBy(where: \$likedByWhere3) {
                   username
+                }
+                likedByConnection {
+                  totalCount
+                }
+                commentsConnection {
+                  totalCount
                 }
                 commentBy {
                   id
                   username
-                  name
                   profilePicture
+                  name
                 }
               }
             }
           }
         }
       }
-    }
     """;
   }
 
@@ -1203,20 +1181,6 @@ class UserQueries {
       "likedByWhere3": {
         "username_EQ": username,
       },
-      "commentsWhere2": {
-        "commentBy": {
-          "username_EQ": username,
-        }
-      },
-      "limit": 1, // user own comment reply first
-      "likedByWhere4": {
-        "username_EQ": username,
-      },
-      "sort": [
-        {
-          "createdOn": "DESC",
-        }
-      ]
     };
   }
 
@@ -1343,7 +1307,7 @@ class UserQueries {
   }) {
     if (cursor == null || cursor.isEmpty) {
       return '''
-      query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$likedByWhere3: UserWhere, \$commentsWhere2: CommentWhere) {
+      query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere) {
         commentsConnection(first: \$first, where: \$where) {
           pageInfo {
             endCursor
@@ -1373,27 +1337,6 @@ class UserQueries {
                 profilePicture
                 name
               }
-              comments(where: \$commentsWhere2) {
-                id
-                createdOn
-                media
-                content
-                mentions {
-                  username
-                }
-                likedByConnection {
-                  totalCount
-                }
-                likedBy(where: \$likedByWhere3) {
-                  username
-                }
-                commentBy {
-                  id
-                  name
-                  username
-                  profilePicture
-                }
-              }
             }
           }
         }
@@ -1402,7 +1345,7 @@ class UserQueries {
     }
 
     return '''
-      query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$likedByWhere3: UserWhere, \$commentsWhere2: CommentWhere, \$after: String) {
+      query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$after: String) {
         commentsConnection(first: \$first, where: \$where, after: \$after) {
           pageInfo {
             endCursor
@@ -1432,27 +1375,6 @@ class UserQueries {
                 profilePicture
                 name
               }
-              comments(where: \$commentsWhere2) {
-                id
-                createdOn
-                media
-                content
-                mentions {
-                  username
-                }
-                likedByConnection {
-                  totalCount
-                }
-                likedBy(where: \$likedByWhere3) {
-                  username
-                }
-                commentBy {
-                  id
-                  name
-                  username
-                  profilePicture
-                }
-              }
             }
           }
         }
@@ -1481,14 +1403,6 @@ class UserQueries {
         "likedByWhere2": {
           "username_EQ": username,
         },
-        "likedByWhere3": {
-          "username_EQ": username,
-        },
-        "commentsWhere2": {
-          "commentBy": {
-            "username_EQ": username,
-          }
-        },
       };
     }
 
@@ -1504,15 +1418,7 @@ class UserQueries {
       "likedByWhere2": {
         "username_EQ": username,
       },
-      "likedByWhere3": {
-        "username_EQ": username,
-      },
-      "commentsWhere2": {
-        "commentBy": {
-          "username_EQ": username,
-        }
-      },
-      "after": cursor
+      "after": cursor,
     };
   }
 }

@@ -2,6 +2,7 @@ import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
+import 'package:doko_react/features/user-profile/data/models/comments/comment_action_model.dart';
 import 'package:doko_react/features/user-profile/data/models/post/post_action_model.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -208,6 +209,90 @@ class UserProfileRemoteDataSource {
 
       return true;
     } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<bool> userAddCommentLike(String commentId, String username) async {
+    try {
+      QueryResult result = await _client.mutate(
+        MutationOptions(
+          document: gql(GraphqlQueries.userAddLikeComment()),
+          variables: GraphqlQueries.userAddCommentLikeVariables(
+            commentId,
+            username: username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+          reason: result.exception?.graphqlErrors.toString() ??
+              "Problem adding user like",
+        );
+      }
+
+      List? res = result.data?["updateComments"]["comments"];
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
+        );
+      }
+
+      CommentActionModel model = CommentActionModel.createModel(res[0]);
+      UserGraph graph = UserGraph();
+
+      graph.handleUserLikeActionForCommentEntity(
+        commentId,
+        userLike: model.userLike,
+        likesCount: model.likesCount,
+        commentsCount: model.commentsCount,
+      );
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> userRemoveCommentLike(String commentId, String username) async {
+    try {
+      QueryResult result = await _client.mutate(
+        MutationOptions(
+          document: gql(GraphqlQueries.userRemoveCommentLike()),
+          variables: GraphqlQueries.userRemoveCommentLikeVariables(
+            commentId,
+            username: username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+          reason: result.exception?.graphqlErrors.toString() ??
+              "Problem removing user like",
+        );
+      }
+
+      List? res = result.data?["updateComments"]["comments"];
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
+        );
+      }
+
+      CommentActionModel model = CommentActionModel.createModel(res[0]);
+      UserGraph graph = UserGraph();
+
+      graph.handleUserLikeActionForCommentEntity(
+        commentId,
+        userLike: model.userLike,
+        likesCount: model.likesCount,
+        commentsCount: model.commentsCount,
+      );
+
+      return true;
+    } catch (e) {
       rethrow;
     }
   }
