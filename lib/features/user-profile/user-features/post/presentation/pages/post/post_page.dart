@@ -2,7 +2,6 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
-import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
 import 'package:doko_react/features/user-profile/user-features/post/presentation/bloc/post_bloc.dart';
@@ -81,8 +80,6 @@ class _PostPageState extends State<PostPage> {
                 child: StyledText.error(state.message),
               );
             }
-
-            final PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
 
             return Column(
               children: [

@@ -5,8 +5,8 @@ import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/comments-use-case.dart';
-import 'package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/replies-use-case.dart';
+import 'package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/comments_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/replies_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/post/domain/use-case/post-use-case/post_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
 import 'package:equatable/equatable.dart';
@@ -101,6 +101,14 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       String postKey = generatePostNodeKey(event.details.nodeId);
       final PostEntity entity = graph.getValueByKey(postKey)! as PostEntity;
 
+      if (event.details.cursor.isEmpty && entity.comments.items.isNotEmpty) {
+        emit(CommentLoadSuccess(
+          loadedCommentCount: entity.comments.items.length,
+        ));
+
+        return;
+      }
+
       await _commentsUseCase(event.details);
       emit(CommentLoadSuccess(
         loadedCommentCount: entity.comments.items.length,
@@ -108,10 +116,12 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     } on ApplicationException catch (e) {
       emit(LoadErrorState(
         message: e.reason,
+        nodeId: event.details.nodeId,
       ));
     } catch (e) {
       emit(LoadErrorState(
         message: Constants.errorMessage,
+        nodeId: event.details.nodeId,
       ));
     }
   }
@@ -119,9 +129,21 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   FutureOr<void> _handleCommentReplyEvent(
       LoadCommentReplyEvent event, Emitter<PostState> emit) async {
     try {
+      emit(CommentReplyLoadingState(
+        commentId: event.details.nodeId,
+      ));
       String commentKey = generateCommentNodeKey(event.details.nodeId);
       final CommentEntity entity =
           graph.getValueByKey(commentKey)! as CommentEntity;
+
+      if (event.details.cursor.isEmpty && entity.comments.items.isNotEmpty) {
+        emit(CommentReplyLoadSuccess(
+          loadedReplyCount: entity.comments.items.length,
+          commentId: event.details.nodeId,
+        ));
+
+        return;
+      }
 
       await _repliesUseCase(event.details);
       emit(CommentReplyLoadSuccess(
@@ -131,10 +153,12 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     } on ApplicationException catch (e) {
       emit(LoadErrorState(
         message: e.reason,
+        nodeId: event.details.nodeId,
       ));
     } catch (e) {
       emit(LoadErrorState(
         message: Constants.errorMessage,
+        nodeId: event.details.nodeId,
       ));
     }
   }

@@ -353,12 +353,8 @@ class _PostActionState extends State<_PostAction>
                       "${displayNumberFormat(post.commentsCount)} Comment${post.commentsCount > 1 ? "s" : ""}"),
                 ],
               ),
-              const SizedBox(
-                height: Constants.gap * 0.5,
-              ),
-              Container(
-                height: Constants.height * 0.125,
-                color: currTheme.surfaceContainerHighest,
+              Divider(
+                thickness: Constants.height * 0.125,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -388,6 +384,11 @@ class _PostActionState extends State<_PostAction>
                                   username: username,
                                 ));
                           },
+                          style: IconButton.styleFrom(
+                            minimumSize: Size.zero,
+                            padding: EdgeInsets.all(Constants.padding * 0.5),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                           icon: post.userLike
                               ? Icon(
                                   Icons.thumb_up,
@@ -424,6 +425,12 @@ class _PostActionState extends State<_PostAction>
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: currTheme.secondary,
+                          minimumSize: Size.zero,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: Constants.padding,
+                            vertical: Constants.padding * 0.5,
+                          ),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: const Text("Comment"),
                       ),
@@ -442,6 +449,12 @@ class _PostActionState extends State<_PostAction>
                     },
                     style: TextButton.styleFrom(
                       foregroundColor: currTheme.secondary,
+                      minimumSize: Size.zero,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: Constants.padding,
+                        vertical: Constants.padding * 0.5,
+                      ),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     child: const Text("Share"),
                   ),

@@ -44,17 +44,36 @@ final class CommentLoadSuccess extends PostState {
   List<Object?> get props => [loadedCommentCount];
 }
 
-final class CommentReplyLoadSuccess extends PostState {
-  CommentReplyLoadSuccess({
+final class CommentReplyState extends PostState {
+  CommentReplyState({
     required this.commentId,
-    required this.loadedReplyCount,
   });
 
   final String commentId;
+
+  @override
+  List<Object?> get props => [commentId];
+}
+
+final class CommentReplyLoadingState extends CommentReplyState {
+  CommentReplyLoadingState({
+    required super.commentId,
+  });
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class CommentReplyLoadSuccess extends CommentReplyState {
+  CommentReplyLoadSuccess({
+    required super.commentId,
+    required this.loadedReplyCount,
+  });
+
   final int loadedReplyCount;
 
   @override
-  List<Object?> get props => [commentId, loadedReplyCount];
+  List<Object?> get props => [loadedReplyCount];
 }
 
 final class PostErrorState extends PostState {
@@ -83,10 +102,12 @@ final class CommentErrorState extends PostState {
 final class LoadErrorState extends PostState {
   LoadErrorState({
     required this.message,
+    required this.nodeId,
   });
 
   final String message;
+  final String nodeId;
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, nodeId];
 }
