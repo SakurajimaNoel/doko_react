@@ -1,10 +1,10 @@
 class GraphqlQueryConstants {
-  static const int postLimit = 10;
-  static const int friendLimit = 10;
-  static const int generalSearchLimit = 10;
-  static const int friendSearchLimit = 10;
-  static const int friendSearchCommentLimit = 6;
-  static const int commentLimit = 10;
+  static const int postLimit = 8;
+  static const int friendLimit = 8;
+  static const int generalSearchLimit = 8;
+  static const int friendSearchLimit = 8;
+  static const int friendSearchCommentLimit = 4;
+  static const int commentLimit = 8;
 }
 
 class FriendStatus {
