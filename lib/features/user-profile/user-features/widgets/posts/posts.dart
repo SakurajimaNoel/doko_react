@@ -413,10 +413,9 @@ class _PostActionState extends State<_PostAction>
                               currentRoute == RouterConstants.userPost;
 
                           if (isPostPage) {
-                            context
-                                .read<PostCommentProvider>()
-                                .focusNode
-                                .requestFocus();
+                            context.read<PostCommentProvider>()
+                              ..focusNode.requestFocus()
+                              ..resetCommentTarget();
                             return;
                           }
 

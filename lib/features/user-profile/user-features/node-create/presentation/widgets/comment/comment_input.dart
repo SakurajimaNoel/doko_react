@@ -1,5 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doko_react/archive/core/widgets/heading/heading.dart';
 import 'package:doko_react/archive/secret/secrets.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.d
 import 'package:doko_react/core/helpers/text-controller/mention_text_controller.dart';
 import 'package:doko_react/core/helpers/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
@@ -16,7 +18,10 @@ import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.da
 import 'package:doko_react/features/user-profile/user-features/node-create/domain/entity/comment/comment_media.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/bloc/node_create_bloc.dart';
+import 'package:doko_react/features/user-profile/user-features/post/presentation/bloc/post_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/post/presentation/provider/post_provider.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/user/user.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,9 +45,14 @@ class _CommentInputState extends State<CommentInput> {
   late final PostCommentProvider commentProvider;
   final controller = MentionTextController();
 
+  late final username =
+      (context.read<UserBloc>().state as UserCompleteState).username;
+
   final OverlayPortalController overlayPortalController =
       OverlayPortalController(debugLabel: "user suggestions");
   final link = LayerLink();
+
+  List<String> tempResults = [];
 
   @override
   void initState() {
@@ -106,12 +116,13 @@ class _CommentInputState extends State<CommentInput> {
 
       if (mentionString.contains(Constants.zeroWidthSpace)) return;
 
-      // if (!loading) {
-      //   setState(() {
-      //     loading = true;
-      //   });
-      // }
-      // usernameDebounce(() => searchUser(mentionString));
+      UserSearchInput searchDetails = UserSearchInput(
+        username: username,
+        query: mentionString,
+      );
+      context.read<PostBloc>().add(CommentMentionSearchEvent(
+            searchDetails: searchDetails,
+          ));
 
       if (!overlayPortalController.isShowing) {
         overlayPortalController.show();
@@ -135,35 +146,10 @@ class _CommentInputState extends State<CommentInput> {
     }
   }
 
-  List<Widget> generateOverlayContent() {
+  Widget generateOverlayContent() {
     final height = MediaQuery.sizeOf(context).height / 5;
     final currTheme = Theme.of(context).colorScheme;
 
-    bool loading = true;
-
-    if (loading) {
-      return [
-        SizedBox(
-          height: height,
-          child: Center(
-            child: const SmallLoadingIndicator(),
-          ),
-        ),
-      ];
-    }
-
-    // if (users.isEmpty) {
-    //   return [
-    //     SizedBox(
-    //       height: height,
-    //       child: const Center(
-    //         child: Text("No user found"),
-    //       ),
-    //     ),
-    //   ];
-    // }
-
-    // for ink splash
     final WidgetStateProperty<Color?> effectiveOverlayColor =
         WidgetStateProperty.resolveWith((Set<WidgetState> states) {
       if (states.contains(WidgetState.pressed)) {
@@ -177,6 +163,142 @@ class _CommentInputState extends State<CommentInput> {
       }
       return null;
     });
+
+    return BlocBuilder<PostBloc, PostState>(
+      buildWhen: (previousState, state) {
+        return state is CommentSearchState;
+      },
+      builder: (context, state) {
+        bool initial = state is PostInitial;
+        bool loading = state is CommentSearchLoading && tempResults.isEmpty;
+        bool error = state is CommentSearchErrorState;
+        bool searchResult = state is CommentSearchSuccessState;
+
+        if (initial) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: height,
+                child: const Center(
+                  child: Heading(
+                    "Type to search users",
+                    size: Constants.fontSize,
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+
+        if (loading) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: height,
+                child: const Center(
+                  child: SmallLoadingIndicator(),
+                ),
+              ),
+            ],
+          );
+        }
+
+        if (error) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: height,
+                child: Center(
+                  child: StyledText.error(state.message),
+                ),
+              ),
+            ],
+          );
+        }
+
+        if (searchResult) {
+          tempResults = state.searchResults;
+        }
+
+        if (tempResults.isEmpty) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: height,
+                child: const Center(
+                  child: Heading(
+                    "No user found.",
+                    size: Constants.fontSize,
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ...List.generate(
+              tempResults.length * 2 - 1,
+              (index) {
+                if (index.isEven) {
+                  int itemIndex = index ~/ 2;
+
+                  String userKey = tempResults[itemIndex];
+                  String username = generateUsernameFromKey(userKey);
+                  return SizedBox(
+                    height: 50,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      fit: StackFit.expand,
+                      children: [
+                        Padding(
+                          padding:
+                              const EdgeInsets.all(Constants.padding * 0.25),
+                          child: User(
+                            userKey: userKey,
+                          ),
+                        ),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              controller.addMention(username);
+                            },
+                            overlayColor: effectiveOverlayColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox(
+                    height: Constants.gap,
+                  );
+                }
+              },
+            ),
+            if (state is CommentSearchLoading) ...[
+              const SizedBox(
+                height: Constants.gap,
+              ),
+              SizedBox(
+                height: Constants.height,
+                child: Center(
+                  child: SmallLoadingIndicator.appBar(),
+                ),
+              ),
+            ]
+          ],
+        );
+      },
+    );
 
     // final userList = users
     //     .map<Widget>(
@@ -447,10 +569,7 @@ class _CommentInputState extends State<CommentInput> {
                                         padding: const EdgeInsets.all(
                                             Constants.padding * 0.75),
                                         scrollDirection: Axis.vertical,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: generateOverlayContent(),
-                                        ),
+                                        child: generateOverlayContent(),
                                       ),
                                     ),
                                   ),
@@ -604,8 +723,6 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
           onPressed: widget.adding
               ? null
               : () async {
-                  showMessage(Constants.errorMessage);
-                  return;
                   GiphyGif? gif = await GiphyGet.getGif(
                     context: context,
                     apiKey: Secrets.giphy,
@@ -654,7 +771,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                     ? const Icon(Icons.reply)
                     : const Icon(Icons.add),
             label: widget.adding
-                ? SmallLoadingIndicator()
+                ? SmallLoadingIndicator.appBar()
                 : commentProvider.isReply
                     ? const Text("Reply")
                     : const Text("Add"),

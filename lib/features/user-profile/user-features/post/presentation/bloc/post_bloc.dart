@@ -2,13 +2,16 @@ import 'dart:async';
 
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
+import 'package:doko_react/core/global/bloc/event_transformer.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/comments_mention_search_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/comments_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/replies_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/post/domain/use-case/post-use-case/post_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
@@ -22,19 +25,30 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   final PostUseCase _postUseCase;
   final CommentsUseCase _commentsUseCase;
   final RepliesUseCase _repliesUseCase;
+  final CommentsMentionSearchUseCase _commentsMentionSearchUseCase;
 
   PostBloc({
     required PostUseCase postUseCase,
     required CommentsUseCase commentsUseCase,
     required RepliesUseCase repliesUseCase,
+    required CommentsMentionSearchUseCase commentMentionSearchUseCase,
   })  : _postUseCase = postUseCase,
         _commentsUseCase = commentsUseCase,
         _repliesUseCase = repliesUseCase,
+        _commentsMentionSearchUseCase = commentMentionSearchUseCase,
         super(PostLoadingState()) {
     on<PostLoadEvent>(_handlePostLoadEvent);
     on<CommentLoadEvent>(_handleCommentLoadEvent);
     on<LoadMoreCommentEvent>(_handleLoadMoreCommentEvent);
     on<LoadCommentReplyEvent>(_handleCommentReplyEvent);
+    on<CommentMentionSearchEvent>(
+      _handleCommentMentionSearchEvent,
+      transformer: debounce(
+        const Duration(
+          milliseconds: 500,
+        ),
+      ),
+    );
   }
 
   FutureOr<void> _handlePostLoadEvent(
@@ -160,6 +174,34 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       emit(LoadErrorState(
         message: Constants.errorMessage,
         nodeId: event.details.nodeId,
+      ));
+    }
+  }
+
+  FutureOr<void> _handleCommentMentionSearchEvent(
+      CommentMentionSearchEvent event, Emitter<PostState> emit) async {
+    try {
+      if (event.searchDetails.query.isEmpty) {
+        emit(CommentSearchSuccessState(
+          searchResults: [],
+        ));
+        return;
+      }
+
+      emit(CommentSearchLoading());
+      final searchResults =
+          await _commentsMentionSearchUseCase(event.searchDetails);
+
+      emit(CommentSearchSuccessState(
+        searchResults: searchResults,
+      ));
+    } on ApplicationException catch (e) {
+      emit(CommentSearchErrorState(
+        message: e.reason,
+      ));
+    } catch (_) {
+      emit(CommentSearchErrorState(
+        message: Constants.errorMessage,
       ));
     }
   }

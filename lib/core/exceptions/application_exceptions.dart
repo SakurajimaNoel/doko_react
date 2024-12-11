@@ -5,4 +5,9 @@ class ApplicationException implements Exception {
   const ApplicationException({required this.reason});
 
   final String reason;
+
+  @override
+  String toString() {
+    return reason;
+  }
 }

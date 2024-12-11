@@ -111,3 +111,36 @@ final class LoadErrorState extends PostState {
   @override
   List<Object?> get props => [message, nodeId];
 }
+
+// comment search
+final class CommentSearchState extends PostState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class CommentSearchLoading extends CommentSearchState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class CommentSearchSuccessState extends CommentSearchState {
+  CommentSearchSuccessState({
+    required this.searchResults,
+  });
+
+  final List<String> searchResults;
+
+  @override
+  List<Object?> get props => [searchResults];
+}
+
+final class CommentSearchErrorState extends PostState {
+  CommentSearchErrorState({
+    required this.message,
+  });
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
+}

@@ -127,7 +127,7 @@ class CommentCreateInput extends Input {
   List<Map<String, String>> generateMentions() {
     var mentionMap = content.mentions.map((String username) {
       return {
-        "username": username,
+        "username_EQ": username,
       };
     }).toList();
 

@@ -34,3 +34,11 @@ class LoadCommentReplyEvent extends PostEvent {
 
   final GetCommentsInput details;
 }
+
+class CommentMentionSearchEvent extends PostEvent {
+  CommentMentionSearchEvent({
+    required this.searchDetails,
+  });
+
+  final UserSearchInput searchDetails;
+}

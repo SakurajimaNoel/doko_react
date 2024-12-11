@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
@@ -138,6 +139,8 @@ class NodeCreateRemoteDataSource {
 
       return newComment.id;
     } catch (e) {
+      safePrint("error message");
+      safePrint(e.toString());
       rethrow;
     }
   }

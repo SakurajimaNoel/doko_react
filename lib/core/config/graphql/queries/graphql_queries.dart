@@ -1084,17 +1084,20 @@ class GraphqlQueries {
   }
 
   // search user friends by username for comment mention
-  static String searchUserFriendsByUsername() {
+  static String searchUsersByUsername() {
     return '''
-      query Users(\$where: UserWhere, \$first: Int, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
-        users(where: \$where) {
-          friendsConnection(first: \$first, where: \$friendsConnectionWhere2) {
+      query Users(\$where: UserWhere, \$limit: Int, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+        users(where: \$where, limit: \$limit) {
+          id
+          name
+          profilePicture
+          username
+          friendsConnection(where: \$friendsConnectionWhere2) {
             edges {
-              node {
-                id
-                name
-                username
-                profilePicture
+              properties {
+                requestedBy
+                status
+                addedOn
               }
             }
           }
@@ -1103,21 +1106,18 @@ class GraphqlQueries {
     ''';
   }
 
-  static Map<String, dynamic> searchUserFriendsByUsernameVariables(
+  static Map<String, dynamic> searchUsersByUsernameVariables(
     String username, {
     required String query,
   }) {
     return {
       "where": {
-        "username_EQ": username,
+        "username_CONTAINS": query,
       },
-      "first": GraphqlQueryConstants.friendSearchCommentLimit,
+      "limit": GraphqlQueryConstants.friendSearchCommentLimit,
       "friendsConnectionWhere2": {
         "node": {
-          "username_CONTAINS": query,
-        },
-        "edge": {
-          "status_EQ": FriendStatus.accepted,
+          "username_EQ": username,
         }
       }
     };
@@ -1332,6 +1332,8 @@ class GraphqlQueries {
               }
             }
           },
+          "content": commentInput.content.content,
+          "media": commentInput.bucketPath ?? "",
           "mentions": {
             "connect": [
               {
@@ -1341,10 +1343,8 @@ class GraphqlQueries {
                   }
                 }
               }
-            ],
-          },
-          "content": commentInput.content.content,
-          "media": commentInput.media ?? "",
+            ]
+          }
         }
       ],
       "where": {

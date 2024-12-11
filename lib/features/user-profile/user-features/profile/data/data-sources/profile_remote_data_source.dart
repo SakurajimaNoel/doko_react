@@ -291,8 +291,6 @@ class ProfileRemoteDataSource {
 
       return graph.addUserSearchEntry(users);
     } catch (e) {
-      safePrint("error searching");
-      safePrint(e.toString());
       rethrow;
     }
   }

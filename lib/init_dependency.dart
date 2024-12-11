@@ -42,6 +42,7 @@ import "package:doko_react/features/user-profile/user-features/node-create/prese
 import "package:doko_react/features/user-profile/user-features/post/data/data-source/post_remote_data_source.dart";
 import "package:doko_react/features/user-profile/user-features/post/data/repository/post_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/post/domain/repository/post_repository.dart";
+import "package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/comments_mention_search_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/comments_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/replies_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/post/domain/use-case/post-use-case/post_use_case.dart";
@@ -124,11 +125,18 @@ void _initPost() {
     ),
   );
 
+  serviceLocator.registerFactory<CommentsMentionSearchUseCase>(
+    () => CommentsMentionSearchUseCase(
+      postRepository: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerFactory<PostBloc>(
     () => PostBloc(
       postUseCase: serviceLocator(),
       commentsUseCase: serviceLocator(),
       repliesUseCase: serviceLocator(),
+      commentMentionSearchUseCase: serviceLocator(),
     ),
   );
 }
