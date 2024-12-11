@@ -114,3 +114,19 @@ final class UserActionCommentLikeActionEvent extends UserActionEvent {
   final bool userLike;
   final String username;
 }
+
+final class UserActionNewCommentEvent extends UserActionEvent {
+  UserActionNewCommentEvent({
+    required this.commentId,
+    required this.userLike,
+    required this.commentsCount,
+    required this.likesCount,
+    required this.targetId,
+  });
+
+  final String commentId;
+  final bool userLike;
+  final int likesCount;
+  final int commentsCount;
+  final String targetId;
+}

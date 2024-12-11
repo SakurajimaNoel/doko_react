@@ -10,7 +10,12 @@ class NodeCreateRepositoryImpl implements NodeCreateRepository {
   final NodeCreateRemoteDataSource _remoteDataSource;
 
   @override
-  Future<bool> createNewPost(PostCreateInput postDetails) {
+  Future<String> createNewPost(PostCreateInput postDetails) {
     return _remoteDataSource.createNewPost(postDetails);
+  }
+
+  @override
+  Future<String> createNewComment(CommentCreateInput commentDetails) {
+    return _remoteDataSource.createComment(commentDetails);
   }
 }

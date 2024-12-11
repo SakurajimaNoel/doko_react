@@ -1,4 +1,7 @@
 import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
+import 'package:doko_react/core/helpers/text-controller/mention_text_controller.dart';
+import 'package:doko_react/core/validation/input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/domain/entity/comment/comment_media.dart';
 
 class PostContent {
   const PostContent({
@@ -46,39 +49,88 @@ class PostCreateInput {
 }
 
 // comment create input
-class CommentCreateInput {
-  // if no media empty string
-  final String media;
+// class CommentCreateInput {
+//   // if no media empty string
+//   final String media;
+//
+//   // if no mentions empty list;
+//   final List<String> mentions;
+//
+//   final List<String> content;
+//
+//   // username
+//   final String commentBy;
+//
+//   // post or comment id
+//   final String commentOn;
+//
+//   // comment on post or reply to comment
+//   final bool isReply;
+//
+//   const CommentCreateInput({
+//     required this.media,
+//     required this.mentions,
+//     required this.content,
+//     required this.commentBy,
+//     required this.commentOn,
+//     required this.isReply,
+//   });
+//
+//   List<Map<String, String>> generateMentions() {
+//     var mentionMap = mentions.map((String username) {
+//       return {
+//         "username": username,
+//       };
+//     }).toList();
+//     return mentionMap;
+//   }
+// }
+enum CommentTarget {
+  post,
+  comment,
+}
 
-  // if no mentions empty list;
-  final List<String> mentions;
-
-  final List<String> content;
-
-  // username
-  final String commentBy;
-
-  // post or comment id
-  final String commentOn;
-
-  // comment on post or reply to comment
-  final bool isReply;
-
-  const CommentCreateInput({
-    required this.media,
-    required this.mentions,
+class CommentCreateInput extends Input {
+  CommentCreateInput({
     required this.content,
-    required this.commentBy,
-    required this.commentOn,
-    required this.isReply,
+    this.media,
+    this.bucketPath,
+    required this.targetNodeId,
+    required this.targetNode,
+    required this.username,
   });
 
+  final CommentContentInput content;
+  final CommentMedia? media;
+
+  // when uri bucket path = uri
+  final String? bucketPath;
+
+  final String targetNodeId;
+  final CommentTarget targetNode;
+  final String username;
+
+  @override
+  String invalidateReason() {
+    return validate() ? "" : "Can't add empty comment.";
+  }
+
+  @override
+  bool validate() {
+    if (media != null) {
+      return bucketPath == null ? false : bucketPath!.isNotEmpty;
+    }
+
+    return content.content.isNotEmpty;
+  }
+
   List<Map<String, String>> generateMentions() {
-    var mentionMap = mentions.map((String username) {
+    var mentionMap = content.mentions.map((String username) {
       return {
         "username": username,
       };
     }).toList();
+
     return mentionMap;
   }
 }

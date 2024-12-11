@@ -14,8 +14,14 @@ final class NodeCreateLoading extends NodeCreateState {
 }
 
 final class NodeCreateSuccess extends NodeCreateState {
+  NodeCreateSuccess({
+    required this.nodeId,
+  });
+
+  final String nodeId;
+
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [nodeId];
 }
 
 final class NodeCreateError extends NodeCreateState {

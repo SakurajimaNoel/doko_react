@@ -136,7 +136,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       final CommentEntity entity =
           graph.getValueByKey(commentKey)! as CommentEntity;
 
-      if (event.details.cursor.isEmpty && entity.comments.items.isNotEmpty) {
+      if (event.details.cursor.isEmpty &&
+          entity.comments.items.length == entity.commentsCount) {
         emit(CommentReplyLoadSuccess(
           loadedReplyCount: entity.comments.items.length,
           commentId: event.details.nodeId,

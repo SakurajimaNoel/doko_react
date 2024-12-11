@@ -1,4 +1,3 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
@@ -12,40 +11,49 @@ import 'package:doko_react/features/user-profile/domain/entity/comment/comment_e
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
 import 'package:doko_react/features/user-profile/user-features/post/presentation/bloc/post_bloc.dart';
+import 'package:doko_react/features/user-profile/user-features/post/presentation/provider/post_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class CommentWidget extends StatelessWidget {
+class CommentWidget extends StatefulWidget {
   const CommentWidget({
     super.key,
     required this.commentKey,
+    required this.parentNodeId,
   }) : isReply = false;
 
   const CommentWidget.reply({
     super.key,
     required this.commentKey,
+    required this.parentNodeId,
   }) : isReply = true;
 
   final String commentKey;
   final bool isReply;
+  final String parentNodeId;
 
+  @override
+  State<CommentWidget> createState() => _CommentWidgetState();
+}
+
+class _CommentWidgetState extends State<CommentWidget> {
   @override
   Widget build(BuildContext context) {
     final UserGraph graph = UserGraph();
 
-    final commentId = generateCommentIdFromCommentKey(commentKey);
+    final commentId = generateCommentIdFromCommentKey(widget.commentKey);
 
     final CommentEntity comment =
-        graph.getValueByKey(commentKey)! as CommentEntity;
+        graph.getValueByKey(widget.commentKey)! as CommentEntity;
 
     final width = MediaQuery.sizeOf(context).width - Constants.padding * 3;
     final height = width / Constants.commentContainer;
 
     return _CommentWrapper(
-      isReply: isReply,
+      isReply: widget.isReply,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -99,7 +107,8 @@ class CommentWidget extends StatelessWidget {
           ),
           _CommentActions(
             commentId: commentId,
-            isReply: isReply,
+            isReply: widget.isReply,
+            parentNodeId: widget.parentNodeId,
           ),
         ],
       ),
@@ -181,10 +190,12 @@ class _CommentContentState extends State<_CommentContent> {
       String item = content[i];
       len += item.length;
 
+      bool usernameCandidate =
+          item.startsWith("@") && item.endsWith(Constants.zeroWidthSpace);
       String itemAsUsername =
-          item.length > 1 ? getUsernameFromCommentInput(item) : item;
+          usernameCandidate ? getUsernameFromCommentInput(item) : item;
 
-      if (validateUsername(itemAsUsername)) {
+      if (usernameCandidate && validateUsername(itemAsUsername)) {
         // valid mention
         children.add(
           TextSpan(
@@ -252,10 +263,12 @@ class _CommentActions extends StatefulWidget {
   const _CommentActions({
     required this.commentId,
     required this.isReply,
+    required this.parentNodeId,
   });
 
   final String commentId;
   final bool isReply;
+  final String parentNodeId;
 
   @override
   State<_CommentActions> createState() => _CommentActionsState();
@@ -360,7 +373,28 @@ class _CommentActionsState extends State<_CommentActions>
                       width: Constants.gap,
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        String targetId =
+                            widget.isReply ? widget.parentNodeId : commentId;
+
+                        String targetUsername =
+                            generateUsernameFromKey(comment.commentBy);
+
+                        if (widget.isReply) {
+                          CommentEntity entity = graph.getValueByKey(
+                                  generateCommentNodeKey(targetId))!
+                              as CommentEntity;
+                          targetUsername =
+                              generateUsernameFromKey(entity.commentBy);
+                        }
+
+                        context.read<PostCommentProvider>()
+                          ..updateCommentTarget(
+                            targetId,
+                            targetUsername,
+                          )
+                          ..focusNode.requestFocus();
+                      },
                       style: TextButton.styleFrom(
                         minimumSize: Size.zero,
                         padding: EdgeInsets.symmetric(
@@ -395,7 +429,8 @@ class _CommentActionsState extends State<_CommentActions>
         const Divider(
           height: Constants.gap * 0.5,
         ),
-        if (comment.commentsCount > 0)
+        // if (comment.commentsCount > 0)
+        if (!widget.isReply)
           _CommentReplies(
             commentId: comment.id,
           ),
@@ -423,8 +458,6 @@ class _CommentRepliesState extends State<_CommentReplies> {
   late final String username =
       (context.read<UserBloc>().state as UserCompleteState).username;
 
-  bool showReplies = false;
-
   @override
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
@@ -451,7 +484,8 @@ class _CommentRepliesState extends State<_CommentReplies> {
                 const SizedBox(
                   height: Constants.gap * 0.5,
                 ),
-                if (showReplies && comment.comments.items.isNotEmpty) ...[
+                if (comment.showReplies &&
+                    comment.comments.items.isNotEmpty) ...[
                   ...[
                     ...List.generate((comment.comments.items.length) * 2 - 1,
                         (index) {
@@ -459,6 +493,8 @@ class _CommentRepliesState extends State<_CommentReplies> {
                         int itemIndex = index ~/ 2;
                         return CommentWidget.reply(
                           commentKey: comment.comments.items[itemIndex],
+                          parentNodeId: commentId,
+                          key: ValueKey(comment.comments.items[itemIndex]),
                         );
                       } else {
                         return const SizedBox(
@@ -468,8 +504,7 @@ class _CommentRepliesState extends State<_CommentReplies> {
                     })
                   ],
                 ],
-                if (!showReplies ||
-                    comment.commentsCount > comment.comments.items.length)
+                if (comment.commentsCount > comment.comments.items.length)
                   Center(
                     child: loadError
                         ? StyledText.error(state.message)
@@ -479,9 +514,9 @@ class _CommentRepliesState extends State<_CommentReplies> {
                                 : () {
                                     if (comment.commentsCount < 1) return;
 
-                                    if (!showReplies) {
+                                    if (!comment.showReplies) {
                                       setState(() {
-                                        showReplies = true;
+                                        comment.showReplies = true;
                                       });
                                     }
 
@@ -489,7 +524,6 @@ class _CommentRepliesState extends State<_CommentReplies> {
                                     bool nextPage =
                                         comment.comments.pageInfo.hasNextPage;
                                     if (nextPage || comment.comments.isEmpty) {
-                                      safePrint("fetching replies");
                                       context
                                           .read<PostBloc>()
                                           .add(LoadCommentReplyEvent(
@@ -520,7 +554,7 @@ class _CommentRepliesState extends State<_CommentReplies> {
                             ),
                             child: loading
                                 ? SmallLoadingIndicator.appBar()
-                                : showReplies
+                                : comment.showReplies
                                     ? Text("View more replies")
                                     : Text("View replies"),
                           ),

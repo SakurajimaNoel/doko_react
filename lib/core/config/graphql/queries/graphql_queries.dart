@@ -1,8 +1,8 @@
-import 'package:doko_react/archive/features/User/data/model/comment_model.dart';
 import 'package:doko_react/core/config/graphql/queries/graphql_query_constants.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
 
 class CompleteUserProfileVariables {
   final String id;
@@ -1271,10 +1271,11 @@ class GraphqlQueries {
   }
 
   static Map<String, dynamic> addCommentVariables(
-      CommentInputModel commentInput) {
-    String commentOnNode = commentInput.isReply ? "Comment" : "Post";
+      CommentCreateInput commentInput) {
+    String commentOnNode =
+        commentInput.targetNode == CommentTarget.comment ? "Comment" : "Post";
 
-    if (commentInput.mentions.isEmpty) {
+    if (commentInput.content.mentions.isEmpty) {
       return {
         "input": [
           {
@@ -1282,7 +1283,7 @@ class GraphqlQueries {
               "connect": {
                 "where": {
                   "node": {
-                    "username_EQ": commentInput.commentBy,
+                    "username_EQ": commentInput.username,
                   }
                 }
               }
@@ -1292,18 +1293,18 @@ class GraphqlQueries {
                 "connect": {
                   "where": {
                     "node": {
-                      "id_EQ": commentInput.commentOn,
+                      "id_EQ": commentInput.targetNodeId,
                     }
                   }
                 }
               }
             },
-            "content": commentInput.content,
-            "media": commentInput.media,
+            "content": commentInput.content.content,
+            "media": commentInput.bucketPath ?? "",
           }
         ],
         "where": {
-          "username_EQ": commentInput.commentBy,
+          "username_EQ": commentInput.username,
         }
       };
     }
@@ -1315,7 +1316,7 @@ class GraphqlQueries {
             "connect": {
               "where": {
                 "node": {
-                  "username_EQ": commentInput.commentBy,
+                  "username_EQ": commentInput.username,
                 }
               }
             }
@@ -1325,7 +1326,7 @@ class GraphqlQueries {
               "connect": {
                 "where": {
                   "node": {
-                    "id_EQ": commentInput.commentOn,
+                    "id_EQ": commentInput.targetNodeId,
                   }
                 }
               }
@@ -1342,12 +1343,12 @@ class GraphqlQueries {
               }
             ],
           },
-          "content": commentInput.content,
-          "media": commentInput.media,
+          "content": commentInput.content.content,
+          "media": commentInput.media ?? "",
         }
       ],
       "where": {
-        "username_EQ": commentInput.commentBy,
+        "username_EQ": commentInput.username,
       }
     };
   }
@@ -1359,37 +1360,14 @@ class GraphqlQueries {
   }) {
     if (cursor == null || cursor.isEmpty) {
       return '''
-      query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$likedByWhere3: UserWhere, \$commentsWhere2: CommentWhere) {
-        commentsConnection(first: \$first, where: \$where) {
-          pageInfo {
-            endCursor
-            hasNextPage
-          }
-          edges {
-            node {
-              id
-              createdOn
-              media
-              content
-              mentions {
-                username
-              }
-              commentsConnection {
-                totalCount
-              }
-              likedByConnection {
-                totalCount
-              }
-              likedBy(where: \$likedByWhere2) {
-                username
-              }
-              commentBy {
-                id
-                username
-                profilePicture
-                name
-              }
-              comments(where: \$commentsWhere2) {
+        query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$sort: [CommentSort!]) {
+          commentsConnection(first: \$first, where: \$where, sort: \$sort) {
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+            edges {
+              node {
                 id
                 createdOn
                 media
@@ -1397,29 +1375,31 @@ class GraphqlQueries {
                 mentions {
                   username
                 }
+                commentsConnection {
+                  totalCount
+                }
                 likedByConnection {
                   totalCount
                 }
-                likedBy(where: \$likedByWhere3) {
+                likedBy(where: \$likedByWhere2) {
                   username
                 }
                 commentBy {
                   id
-                  name
                   username
                   profilePicture
+                  name
                 }
               }
             }
           }
         }
-      }
     ''';
     }
 
     return '''
-      query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$likedByWhere3: UserWhere, \$commentsWhere2: CommentWhere, \$after: String) {
-        commentsConnection(first: \$first, where: \$where, after: \$after) {
+      query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$sort: [CommentSort!], \$after: String) {
+        commentsConnection(first: \$first, where: \$where, sort: \$sort, after: \$after) {
           pageInfo {
             endCursor
             hasNextPage
@@ -1447,27 +1427,6 @@ class GraphqlQueries {
                 username
                 profilePicture
                 name
-              }
-              comments(where: \$commentsWhere2) {
-                id
-                createdOn
-                media
-                content
-                mentions {
-                  username
-                }
-                likedByConnection {
-                  totalCount
-                }
-                likedBy(where: \$likedByWhere3) {
-                  username
-                }
-                commentBy {
-                  id
-                  name
-                  username
-                  profilePicture
-                }
               }
             }
           }
@@ -1483,6 +1442,7 @@ class GraphqlQueries {
     required String username,
   }) {
     String connectionNode = post ? "Post" : "Comment";
+    String sort = post ? "DESC" : "ASC";
 
     if (cursor == null || cursor.isEmpty) {
       return {
@@ -1497,14 +1457,11 @@ class GraphqlQueries {
         "likedByWhere2": {
           "username_EQ": username,
         },
-        "likedByWhere3": {
-          "username_EQ": username,
-        },
-        "commentsWhere2": {
-          "commentBy": {
-            "username_EQ": username,
+        "sort": [
+          {
+            "createdOn": sort,
           }
-        },
+        ],
       };
     }
 
@@ -1520,15 +1477,12 @@ class GraphqlQueries {
       "likedByWhere2": {
         "username_EQ": username,
       },
-      "likedByWhere3": {
-        "username_EQ": username,
-      },
-      "commentsWhere2": {
-        "commentBy": {
-          "username_EQ": username,
+      "after": cursor,
+      "sort": [
+        {
+          "createdOn": sort,
         }
-      },
-      "after": cursor
+      ],
     };
   }
 

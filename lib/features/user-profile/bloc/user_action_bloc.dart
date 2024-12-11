@@ -82,15 +82,29 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     );
     on<UserActionCommentLikeActionEvent>(
         _handleUserActionCommentLikeActionEvent);
+    on<UserActionNewCommentEvent>((event, emit) {
+      emit(UserActionNodeActionState(
+        nodeId: event.targetId,
+        userLike: event.userLike,
+        likesCount: event.likesCount,
+        commentsCount: event.commentsCount,
+      ));
+
+      emit(UserActionNewCommentState(
+        nodeId: event.targetId,
+      ));
+    });
   }
 
   FutureOr<void> _handleUserActionUpdateEvent(
       UserActionUpdateEvent event, Emitter<UserActionState> emit) {
-    emit(UserActionUpdateProfile(
-      name: event.name,
-      bio: event.bio,
-      profilePicture: event.profilePicture,
-    ));
+    emit(
+      UserActionUpdateProfile(
+        name: event.name,
+        bio: event.bio,
+        profilePicture: event.profilePicture,
+      ),
+    );
   }
 
   FutureOr<void> _handleUserActionPostLikeActionEvent(

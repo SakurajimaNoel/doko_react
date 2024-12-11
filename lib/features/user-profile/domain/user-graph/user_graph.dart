@@ -358,7 +358,6 @@ class UserGraph {
   void addCommentToPostEntity(
     String postId, {
     required CommentEntity comment,
-    required int commentCount,
   }) {
     String key = generatePostNodeKey(postId);
     String commentKey = generateCommentNodeKey(comment.id);
@@ -369,7 +368,7 @@ class UserGraph {
 
     final PostEntity post = getValueByKey(key) as PostEntity;
     post.comments.addItem(commentKey);
-    post.updateCommentsCount(commentCount);
+    post.updateCommentsCount(post.commentsCount + 1);
   }
 
   void addCommentListToReply(
@@ -399,7 +398,6 @@ class UserGraph {
   void addReplyToCommentEntity(
     String commentId, {
     required CommentEntity comment,
-    required int commentCount,
   }) {
     String key = generateCommentNodeKey(commentId);
     String commentKey = generateCommentNodeKey(comment.id);
@@ -409,10 +407,11 @@ class UserGraph {
     if (!containsKey(key)) return;
 
     final CommentEntity existingComment = getValueByKey(key) as CommentEntity;
+    existingComment.showReplies = true;
 
     // adding at the end of visible replies
     existingComment.comments.addEntityItems([commentKey]);
-    existingComment.updateCommentsCount(commentCount);
+    existingComment.updateCommentsCount(existingComment.commentsCount + 1);
   }
 
   void handleUserLikeActionForPostEntity(

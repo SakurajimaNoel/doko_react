@@ -17,6 +17,7 @@ class CommentEntity extends GraphEntity {
     required this.likesCount,
     required this.commentsCount,
     required this.userLike,
+    required this.showReplies,
   });
 
   final String id;
@@ -29,6 +30,8 @@ class CommentEntity extends GraphEntity {
   int commentsCount;
   bool userLike;
   Nodes comments;
+
+  bool showReplies;
 
   void updateUserLikes(bool userLike, int likesCount) {
     this.likesCount = likesCount;
@@ -90,6 +93,7 @@ class CommentEntity extends GraphEntity {
       userLike: userLike,
       commentsCount: map["commentsConnection"]["totalCount"],
       comments: Nodes.empty(),
+      showReplies: false,
     );
   }
 }

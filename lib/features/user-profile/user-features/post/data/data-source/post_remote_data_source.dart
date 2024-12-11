@@ -133,7 +133,10 @@ class PostRemoteDataSource {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(GraphqlQueries.getComments(true)),
+          document: gql(GraphqlQueries.getComments(
+            false,
+            cursor: details.cursor,
+          )),
           variables: GraphqlQueries.getCommentsVariable(
             details.nodeId,
             post: false,
@@ -169,6 +172,7 @@ class PostRemoteDataSource {
           .toList();
 
       List<CommentEntity> comments = await Future.wait(commentFutures);
+
       graph.addCommentListToReply(
         details.nodeId,
         comments: comments,

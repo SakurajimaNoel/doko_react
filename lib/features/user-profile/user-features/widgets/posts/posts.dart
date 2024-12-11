@@ -13,6 +13,7 @@ import 'package:doko_react/core/widgets/video-player/video_player.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/post/presentation/provider/post_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -412,7 +413,10 @@ class _PostActionState extends State<_PostAction>
                               currentRoute == RouterConstants.userPost;
 
                           if (isPostPage) {
-                            // todo: think of a way to add focus to comment input if it is there
+                            context
+                                .read<PostCommentProvider>()
+                                .focusNode
+                                .requestFocus();
                             return;
                           }
 

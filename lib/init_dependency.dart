@@ -36,6 +36,7 @@ import "package:doko_react/features/user-profile/domain/use-case/user-to-user-re
 import "package:doko_react/features/user-profile/user-features/node-create/data/data-source/node_create_remote_data_source.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/data/repository/node_create_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/domain/repository/node_create_repository.dart";
+import "package:doko_react/features/user-profile/user-features/node-create/domain/use-case/comment-use-case/create_comment_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/domain/use-case/post-create-use-case/post_create_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/presentation/bloc/node_create_bloc.dart";
 import "package:doko_react/features/user-profile/user-features/post/data/data-source/post_remote_data_source.dart";
@@ -77,11 +78,11 @@ Future<void> initDependency() async {
   );
 
   serviceLocator.registerLazySingleton<GraphQLClient>(
-        () => GraphqlConfig.getGraphQLClient(),
+    () => GraphqlConfig.getGraphQLClient(),
   );
 
   serviceLocator.registerLazySingleton<AuthCategory>(
-        () => Amplify.Auth,
+    () => Amplify.Auth,
   );
 
   _initAuth();
@@ -94,395 +95,353 @@ Future<void> initDependency() async {
 
 void _initPost() {
   serviceLocator.registerFactory<PostRemoteDataSource>(
-        () =>
-        PostRemoteDataSource(
-          client: serviceLocator<GraphQLClient>(),
-        ),
+    () => PostRemoteDataSource(
+      client: serviceLocator<GraphQLClient>(),
+    ),
   );
 
   serviceLocator.registerFactory<PostRepository>(
-        () =>
-        PostRepositoryImpl(
-          remoteDataSource: serviceLocator<PostRemoteDataSource>(),
-        ),
+    () => PostRepositoryImpl(
+      remoteDataSource: serviceLocator<PostRemoteDataSource>(),
+    ),
   );
 
   serviceLocator.registerFactory<PostUseCase>(
-        () =>
-        PostUseCase(
-          postRepository: serviceLocator(),
-        ),
+    () => PostUseCase(
+      postRepository: serviceLocator(),
+    ),
   );
 
   serviceLocator.registerFactory<CommentsUseCase>(
-        () =>
-        CommentsUseCase(
-          postRepository: serviceLocator(),
-        ),
+    () => CommentsUseCase(
+      postRepository: serviceLocator(),
+    ),
   );
 
   serviceLocator.registerFactory<RepliesUseCase>(
-        () =>
-        RepliesUseCase(
-          postRepository: serviceLocator(),
-        ),
+    () => RepliesUseCase(
+      postRepository: serviceLocator(),
+    ),
   );
 
   serviceLocator.registerFactory<PostBloc>(
-        () =>
-        PostBloc(
-          postUseCase: serviceLocator(),
-          commentsUseCase: serviceLocator(),
-          repliesUseCase: serviceLocator(),
-        ),
+    () => PostBloc(
+      postUseCase: serviceLocator(),
+      commentsUseCase: serviceLocator(),
+      repliesUseCase: serviceLocator(),
+    ),
   );
 }
 
 void _initNodeCreate() {
   serviceLocator.registerFactory<NodeCreateRemoteDataSource>(
-        () =>
-        NodeCreateRemoteDataSource(
-          client: serviceLocator<GraphQLClient>(),
-        ),
+    () => NodeCreateRemoteDataSource(
+      client: serviceLocator<GraphQLClient>(),
+    ),
   );
 
   serviceLocator.registerFactory<NodeCreateRepository>(
-        () =>
-        NodeCreateRepositoryImpl(
-          remoteDataSource: serviceLocator<NodeCreateRemoteDataSource>(),
-        ),
+    () => NodeCreateRepositoryImpl(
+      remoteDataSource: serviceLocator<NodeCreateRemoteDataSource>(),
+    ),
   );
 
   serviceLocator.registerFactory<PostCreateUseCase>(
-        () =>
-        PostCreateUseCase(
-          nodeCreateRepository: serviceLocator(),
-        ),
+    () => PostCreateUseCase(
+      nodeCreateRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<CreateCommentUseCase>(
+    () => CreateCommentUseCase(
+      nodeCreateRepository: serviceLocator(),
+    ),
   );
 
   serviceLocator.registerFactory<NodeCreateBloc>(
-        () =>
-        NodeCreateBloc(
-          postCreateUseCase: serviceLocator(),
-        ),
+    () => NodeCreateBloc(
+      postCreateUseCase: serviceLocator(),
+      createCommentUseCase: serviceLocator(),
+    ),
   );
 }
 
 void _initUserAction() {
   serviceLocator.registerFactory<UserProfileRemoteDataSource>(
-        () =>
-        UserProfileRemoteDataSource(
-          client: serviceLocator<GraphQLClient>(),
-        ),
+    () => UserProfileRemoteDataSource(
+      client: serviceLocator<GraphQLClient>(),
+    ),
   );
 
   serviceLocator.registerFactory<UserProfileRepository>(
-        () =>
-        UserProfileRepositoryImpl(
-          remoteDataSource: serviceLocator<UserProfileRemoteDataSource>(),
-        ),
+    () => UserProfileRepositoryImpl(
+      remoteDataSource: serviceLocator<UserProfileRemoteDataSource>(),
+    ),
   );
 
   serviceLocator.registerFactory<PostAddLikeUseCase>(
-        () =>
-        PostAddLikeUseCase(
-          profileRepository: serviceLocator(),
-        ),
+    () => PostAddLikeUseCase(
+      profileRepository: serviceLocator(),
+    ),
   );
 
   serviceLocator.registerFactory<PostRemoveLikeUseCase>(
-        () =>
-        PostRemoveLikeUseCase(
-          profileRepository: serviceLocator(),
-        ),
+    () => PostRemoveLikeUseCase(
+      profileRepository: serviceLocator(),
+    ),
   );
 
   serviceLocator.registerFactory<UserCreateFriendRelationUseCase>(
-        () =>
-        UserCreateFriendRelationUseCase(
-          profileRepository: serviceLocator(),
-        ),
+    () => UserCreateFriendRelationUseCase(
+      profileRepository: serviceLocator(),
+    ),
   );
 
   serviceLocator.registerFactory<UserAcceptFriendRelationUseCase>(
-        () =>
-        UserAcceptFriendRelationUseCase(
-          profileRepository: serviceLocator(),
-        ),
+    () => UserAcceptFriendRelationUseCase(
+      profileRepository: serviceLocator(),
+    ),
   );
 
   serviceLocator.registerFactory<UserRemoveFriendRelationUseCase>(
-        () =>
-        UserRemoveFriendRelationUseCase(
-          profileRepository: serviceLocator(),
-        ),
+    () => UserRemoveFriendRelationUseCase(
+      profileRepository: serviceLocator(),
+    ),
   );
 
   serviceLocator.registerFactory<CommentAddLikeUseCase>(
-        () =>
-        CommentAddLikeUseCase(
-          profileRepository: serviceLocator(),
-        ),
+    () => CommentAddLikeUseCase(
+      profileRepository: serviceLocator(),
+    ),
   );
 
   serviceLocator.registerFactory<CommentRemoveLikeUseCase>(
-        () =>
-        CommentRemoveLikeUseCase(
-          profileRepository: serviceLocator(),
-        ),
+    () => CommentRemoveLikeUseCase(
+      profileRepository: serviceLocator(),
+    ),
   );
 
   serviceLocator.registerFactory<UserActionBloc>(
-        () =>
-        UserActionBloc(
-          postAddLikeUseCase: serviceLocator(),
-          postRemoveLikeUseCase: serviceLocator(),
-          userCreateFriendRelationUseCase: serviceLocator(),
-          userRemoveFriendRelationUseCase: serviceLocator(),
-          userAcceptFriendRelationUseCase: serviceLocator(),
-          commentAddLikeUseCase: serviceLocator(),
-          commentRemoveLikeUseCase: serviceLocator(),
-        ),
+    () => UserActionBloc(
+      postAddLikeUseCase: serviceLocator(),
+      postRemoveLikeUseCase: serviceLocator(),
+      userCreateFriendRelationUseCase: serviceLocator(),
+      userRemoveFriendRelationUseCase: serviceLocator(),
+      userAcceptFriendRelationUseCase: serviceLocator(),
+      commentAddLikeUseCase: serviceLocator(),
+      commentRemoveLikeUseCase: serviceLocator(),
+    ),
   );
 }
 
 void _initProfile() {
   serviceLocator.registerFactory<ProfileRemoteDataSource>(
-        () =>
-        ProfileRemoteDataSource(
-          client: serviceLocator<GraphQLClient>(),
-        ),
+    () => ProfileRemoteDataSource(
+      client: serviceLocator<GraphQLClient>(),
+    ),
   );
 
   serviceLocator.registerFactory<ProfileRepository>(
-        () =>
-        ProfileRepositoryImpl(
-          remoteDataSource: serviceLocator<ProfileRemoteDataSource>(),
-        ),
+    () => ProfileRepositoryImpl(
+      remoteDataSource: serviceLocator<ProfileRemoteDataSource>(),
+    ),
   );
 
   serviceLocator.registerFactory<ProfileUseCase>(
-        () =>
-        ProfileUseCase(
-          profileRepository: serviceLocator<ProfileRepository>(),
-        ),
+    () => ProfileUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
   );
 
   serviceLocator.registerFactory<EditProfileUseCase>(
-        () =>
-        EditProfileUseCase(
-          profileRepository: serviceLocator<ProfileRepository>(),
-        ),
+    () => EditProfileUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
   );
 
   serviceLocator.registerFactory<UserPostUseCase>(
-        () =>
-        UserPostUseCase(
-          profileRepository: serviceLocator<ProfileRepository>(),
-        ),
+    () => UserPostUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
   );
 
   serviceLocator.registerFactory<UserFriendsUseCase>(
-        () =>
-        UserFriendsUseCase(
-          profileRepository: serviceLocator<ProfileRepository>(),
-        ),
+    () => UserFriendsUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
   );
 
   serviceLocator.registerFactory<UserSearchUseCase>(
-        () =>
-        UserSearchUseCase(
-          profileRepository: serviceLocator<ProfileRepository>(),
-        ),
+    () => UserSearchUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
   );
 
   serviceLocator.registerFactory<UserFriendsSearchUseCase>(
-        () =>
-        UserFriendsSearchUseCase(
-          profileRepository: serviceLocator<ProfileRepository>(),
-        ),
+    () => UserFriendsSearchUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
   );
 
   serviceLocator.registerFactory<PendingOutgoingRequestUseCase>(
-        () =>
-        PendingOutgoingRequestUseCase(
-          profileRepository: serviceLocator<ProfileRepository>(),
-        ),
+    () => PendingOutgoingRequestUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
   );
 
   serviceLocator.registerFactory<PendingIncomingRequestUseCase>(
-        () =>
-        PendingIncomingRequestUseCase(
-          profileRepository: serviceLocator<ProfileRepository>(),
-        ),
+    () => PendingIncomingRequestUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
   );
 
   serviceLocator.registerFactory<ProfileBloc>(
-        () =>
-        ProfileBloc(
-          profileUseCase: serviceLocator(),
-          editProfileUseCase: serviceLocator(),
-          userPostUseCase: serviceLocator(),
-          userFriendsUseCase: serviceLocator(),
-          userSearchUseCase: serviceLocator(),
-          userFriendsSearchUseCase: serviceLocator(),
-          pendingIncomingRequestUseCase: serviceLocator(),
-          pendingOutgoingRequestUseCase: serviceLocator(),
-        ),
+    () => ProfileBloc(
+      profileUseCase: serviceLocator(),
+      editProfileUseCase: serviceLocator(),
+      userPostUseCase: serviceLocator(),
+      userFriendsUseCase: serviceLocator(),
+      userSearchUseCase: serviceLocator(),
+      userFriendsSearchUseCase: serviceLocator(),
+      pendingIncomingRequestUseCase: serviceLocator(),
+      pendingOutgoingRequestUseCase: serviceLocator(),
+    ),
   );
 }
 
 void _initAuth() {
   serviceLocator.registerFactory<AuthenticationRemoteDataSource>(
-        () =>
-        AuthenticationRemoteDataSource(
-          auth: serviceLocator<AuthCategory>(),
-        ),
+    () => AuthenticationRemoteDataSource(
+      auth: serviceLocator<AuthCategory>(),
+    ),
   );
 
   serviceLocator.registerFactory<AuthenticationRepository>(
-        () =>
-        AuthenticationRepositoryImpl(
-          authenticationRemoteDataSource:
+    () => AuthenticationRepositoryImpl(
+      authenticationRemoteDataSource:
           serviceLocator<AuthenticationRemoteDataSource>(),
-        ),
+    ),
   );
 
   // for login use case
   serviceLocator.registerFactory<LoginUseCase>(
-        () =>
-        LoginUseCase(
-          auth: serviceLocator(),
-        ),
+    () => LoginUseCase(
+      auth: serviceLocator(),
+    ),
   );
 
   // for confirm login use case
   serviceLocator.registerFactory<ConfirmLoginUseCase>(
-        () =>
-        ConfirmLoginUseCase(
-          auth: serviceLocator(),
-        ),
+    () => ConfirmLoginUseCase(
+      auth: serviceLocator(),
+    ),
   );
 
   // for sign up use case
   serviceLocator.registerFactory<SignUpUseCase>(
-        () =>
-        SignUpUseCase(
-          auth: serviceLocator(),
-        ),
+    () => SignUpUseCase(
+      auth: serviceLocator(),
+    ),
   );
 
   // for reset password use case
   serviceLocator.registerFactory<ResetPasswordUseCase>(
-        () =>
-        ResetPasswordUseCase(
-          auth: serviceLocator(),
-        ),
+    () => ResetPasswordUseCase(
+      auth: serviceLocator(),
+    ),
   );
 
   // for confirm reset password use case
   serviceLocator.registerFactory<ConfirmResetPasswordUseCase>(
-        () =>
-        ConfirmResetPasswordUseCase(
-          auth: serviceLocator(),
-        ),
+    () => ConfirmResetPasswordUseCase(
+      auth: serviceLocator(),
+    ),
   );
 
   // for update password use case
   serviceLocator.registerFactory<UpdatePasswordUseCase>(
-        () =>
-        UpdatePasswordUseCase(
-          auth: serviceLocator(),
-        ),
+    () => UpdatePasswordUseCase(
+      auth: serviceLocator(),
+    ),
   );
 
   // for logout use case
   serviceLocator.registerFactory<LogoutUseCase>(
-        () =>
-        LogoutUseCase(
-          auth: serviceLocator(),
-        ),
+    () => LogoutUseCase(
+      auth: serviceLocator(),
+    ),
   );
 
   // for remove mfa use case
   serviceLocator.registerFactory<RemoveMFAUseCase>(
-        () =>
-        RemoveMFAUseCase(
-          auth: serviceLocator(),
-        ),
+    () => RemoveMFAUseCase(
+      auth: serviceLocator(),
+    ),
   );
 
   // for mfa setup use case
   serviceLocator.registerFactory<SetupMFAUseCase>(
-        () =>
-        SetupMFAUseCase(
-          auth: serviceLocator(),
-        ),
+    () => SetupMFAUseCase(
+      auth: serviceLocator(),
+    ),
   );
 
   // for mfa verify use case
   serviceLocator.registerFactory<VerifyMFAUseCase>(
-        () =>
-        VerifyMFAUseCase(
-          auth: serviceLocator(),
-        ),
+    () => VerifyMFAUseCase(
+      auth: serviceLocator(),
+    ),
   );
 
   serviceLocator.registerFactory<AuthenticationBloc>(
-        () =>
-        AuthenticationBloc(
-          loginUseCase: serviceLocator<LoginUseCase>(),
-          confirmLoginUseCase: serviceLocator<ConfirmLoginUseCase>(),
-          signUpUseCase: serviceLocator<SignUpUseCase>(),
-          resetPasswordUseCase: serviceLocator<ResetPasswordUseCase>(),
-          confirmResetPasswordUseCase:
+    () => AuthenticationBloc(
+      loginUseCase: serviceLocator<LoginUseCase>(),
+      confirmLoginUseCase: serviceLocator<ConfirmLoginUseCase>(),
+      signUpUseCase: serviceLocator<SignUpUseCase>(),
+      resetPasswordUseCase: serviceLocator<ResetPasswordUseCase>(),
+      confirmResetPasswordUseCase:
           serviceLocator<ConfirmResetPasswordUseCase>(),
-          updatePasswordUseCase: serviceLocator<UpdatePasswordUseCase>(),
-          logoutUseCase: serviceLocator<LogoutUseCase>(),
-          removeMFAUseCase: serviceLocator<RemoveMFAUseCase>(),
-          setupMFAUseCase: serviceLocator<SetupMFAUseCase>(),
-          verifyMFAUseCase: serviceLocator<VerifyMFAUseCase>(),
-        ),
+      updatePasswordUseCase: serviceLocator<UpdatePasswordUseCase>(),
+      logoutUseCase: serviceLocator<LogoutUseCase>(),
+      removeMFAUseCase: serviceLocator<RemoveMFAUseCase>(),
+      setupMFAUseCase: serviceLocator<SetupMFAUseCase>(),
+      verifyMFAUseCase: serviceLocator<VerifyMFAUseCase>(),
+    ),
   );
 }
 
 void _initCompleteProfile() {
   serviceLocator.registerFactory<CompleteProfileRemoteDataSource>(
-        () =>
-        CompleteProfileRemoteDataSource(
-          client: serviceLocator<GraphQLClient>(),
-        ),
+    () => CompleteProfileRemoteDataSource(
+      client: serviceLocator<GraphQLClient>(),
+    ),
   );
 
   serviceLocator.registerFactory<CompleteProfileRepository>(
-        () =>
-        CompleteProfileRepositoryImpl(
-          remoteDataSource: serviceLocator<CompleteProfileRemoteDataSource>(),
-        ),
+    () => CompleteProfileRepositoryImpl(
+      remoteDataSource: serviceLocator<CompleteProfileRemoteDataSource>(),
+    ),
   );
 
   // username check use case
   serviceLocator.registerFactory<UsernameUseCase>(
-        () =>
-        UsernameUseCase(
-          completeProfile: serviceLocator<CompleteProfileRepository>(),
-        ),
+    () => UsernameUseCase(
+      completeProfile: serviceLocator<CompleteProfileRepository>(),
+    ),
   );
 
   // complete profile details use case
   serviceLocator.registerFactory<CompleteProfileUseCase>(
-        () =>
-        CompleteProfileUseCase(
-          completeProfile: serviceLocator<CompleteProfileRepository>(),
-        ),
+    () => CompleteProfileUseCase(
+      completeProfile: serviceLocator<CompleteProfileRepository>(),
+    ),
   );
 
   serviceLocator.registerFactory<CompleteProfileBloc>(
-        () =>
-        CompleteProfileBloc(
-          usernameUseCase: serviceLocator<UsernameUseCase>(),
-          completeProfileUseCase: serviceLocator<CompleteProfileUseCase>(),
-        ),
+    () => CompleteProfileBloc(
+      usernameUseCase: serviceLocator<UsernameUseCase>(),
+      completeProfileUseCase: serviceLocator<CompleteProfileUseCase>(),
+    ),
   );
 }
 

@@ -2,14 +2,18 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
+import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/presentation/widgets/comment/comment_input.dart';
 import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
 import 'package:doko_react/features/user-profile/user-features/post/presentation/bloc/post_bloc.dart';
+import 'package:doko_react/features/user-profile/user-features/post/presentation/provider/post_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/post/presentation/widgets/comment/comment_list.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/posts.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({
@@ -81,51 +85,65 @@ class _PostPageState extends State<PostPage> {
               );
             }
 
-            return Column(
-              children: [
-                Expanded(
-                  child: CustomScrollView(
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: Posts(
-                          postKey: postKey,
-                        ),
-                      ),
-                      const SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: Constants.gap * 2,
-                        ),
-                      ),
-                      if (commentError) ...[
+            final PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
+
+            return ChangeNotifierProvider(
+              create: (BuildContext context) {
+                return PostCommentProvider(
+                  focusNode: FocusNode(),
+                  postId: post.id,
+                  postCreatedBy: generateUsernameFromKey(post.createdBy),
+                  targetByUser: generateUsernameFromKey(post.createdBy),
+                  commentTargetId: post.id,
+                );
+              },
+              child: Column(
+                children: [
+                  Expanded(
+                    child: CustomScrollView(
+                      slivers: [
                         SliverToBoxAdapter(
-                          child: SizedBox(
-                            height: Constants.height * 5,
-                            child: StyledText.error(state.message),
+                          child: Posts(
+                            postKey: postKey,
                           ),
                         ),
-                      ] else
-                        commentsLoading
-                            ? SliverToBoxAdapter(
-                                child: SizedBox(
-                                  height: Constants.height * 5,
-                                  child: Center(
-                                    child: SmallLoadingIndicator(),
-                                  ),
-                                ),
-                              )
-                            : CommentList(
-                                postId: widget.postId,
-                                key: ValueKey(widget.postId),
-                              ),
-                      const SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: Constants.gap * 2,
+                        const SliverToBoxAdapter(
+                          child: SizedBox(
+                            height: Constants.gap * 2,
+                          ),
                         ),
-                      ),
-                    ],
+                        if (commentError) ...[
+                          SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: Constants.height * 5,
+                              child: StyledText.error(state.message),
+                            ),
+                          ),
+                        ] else
+                          commentsLoading
+                              ? SliverToBoxAdapter(
+                                  child: SizedBox(
+                                    height: Constants.height * 5,
+                                    child: Center(
+                                      child: SmallLoadingIndicator(),
+                                    ),
+                                  ),
+                                )
+                              : CommentList(
+                                  postId: widget.postId,
+                                  key: ValueKey(widget.postId),
+                                ),
+                        const SliverToBoxAdapter(
+                          child: SizedBox(
+                            height: Constants.gap * 2,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const CommentInput(),
+                ],
+              ),
             );
           },
         ),

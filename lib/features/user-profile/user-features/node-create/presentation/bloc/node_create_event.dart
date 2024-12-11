@@ -10,3 +10,11 @@ class PostCreateEvent extends NodeCreateEvent {
 
   final PostCreateInput postDetails;
 }
+
+class CreateCommentEvent extends NodeCreateEvent {
+  CreateCommentEvent({
+    required this.commentDetails,
+  });
+
+  final CommentCreateInput commentDetails;
+}
