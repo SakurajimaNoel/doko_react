@@ -1,7 +1,7 @@
 import "package:amplify_auth_cognito/amplify_auth_cognito.dart";
 import "package:amplify_flutter/amplify_flutter.dart";
 import "package:amplify_storage_s3/amplify_storage_s3.dart";
-import "package:doko_react/archive/core/configs/graphql/graphql_config.dart";
+import "package:doko_react/core/config/graphql/graphql_config.dart";
 import "package:doko_react/features/authentication/data/data-sources/authentication_remote_data_source.dart";
 import "package:doko_react/features/authentication/data/repository/authentication_repository_impl.dart";
 import "package:doko_react/features/authentication/domain/repository/authentication_repository.dart";
@@ -61,7 +61,7 @@ import "package:doko_react/features/user-profile/user-features/profile/domain/us
 import "package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart";
 import "package:flutter/foundation.dart";
 import "package:get_it/get_it.dart";
-import "package:graphql_flutter/graphql_flutter.dart";
+import "package:graphql/client.dart";
 import "package:hydrated_bloc/hydrated_bloc.dart";
 import "package:path_provider/path_provider.dart";
 
@@ -71,7 +71,7 @@ final serviceLocator = GetIt.instance;
 
 Future<void> initDependency() async {
   await _configureAmplify();
-  await initHiveForFlutter();
+  // await initHiveForFlutter();
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
         ? HydratedStorage.webStorageDirectory

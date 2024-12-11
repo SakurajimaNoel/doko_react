@@ -1,4 +1,4 @@
-import 'package:doko_react/archive/core/helpers/constants.dart';
+import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';

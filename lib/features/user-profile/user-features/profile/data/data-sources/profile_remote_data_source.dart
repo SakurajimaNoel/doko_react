@@ -9,7 +9,7 @@ import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:graphql/client.dart';
 
 class ProfileRemoteDataSource {
   const ProfileRemoteDataSource({

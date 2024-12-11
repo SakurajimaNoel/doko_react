@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:doko_react/archive/core/data/video.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/preferences/preferences_bloc.dart';
+import 'package:doko_react/core/helpers/media/video/video.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';

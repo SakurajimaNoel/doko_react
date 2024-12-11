@@ -1,7 +1,7 @@
-import 'package:doko_react/archive/secret/secrets.dart';
 import 'package:doko_react/core/global/auth/auth.dart';
+import 'package:doko_react/secret/secrets.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:graphql/client.dart';
 
 class GraphqlConfig {
   static final _httpLink = HttpLink(Secrets.endpoint);
@@ -13,7 +13,6 @@ class GraphqlConfig {
 
   static GraphQLClient? _client;
 
-  // todo: replace flutter_graphql package with graphql package
   static GraphQLClient getGraphQLClient() {
     if (_client == null) {
       Link link = _authLink.concat(_httpLink);

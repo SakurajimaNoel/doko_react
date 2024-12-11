@@ -1,10 +1,10 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:doko_react/archive/core/widgets/error/error_text.dart';
 import 'package:doko_react/core/config/router/app_router_config.dart';
 import 'package:doko_react/core/config/theme/theme_data.dart';
 import 'package:doko_react/core/global/bloc/preferences/preferences_bloc.dart';
 import 'package:doko_react/core/global/bloc/theme/theme_bloc.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +52,7 @@ void main() async {
     runApp(
       MaterialApp(
         home: Center(
-          child: ErrorText("Error configuring Amplify: ${e.message}"),
+          child: StyledText.error("Error configuring Amplify: ${e.message}"),
         ),
       ),
     );

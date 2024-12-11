@@ -1,7 +1,5 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doko_react/archive/core/widgets/heading/heading.dart';
-import 'package:doko_react/archive/secret/secrets.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/media/giphy/giphy_uri.dart';
@@ -9,6 +7,7 @@ import 'package:doko_react/core/helpers/media/image-cropper/image_cropper_helper
 import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/helpers/text-controller/mention_text_controller.dart';
 import 'package:doko_react/core/helpers/uuid/uuid_helper.dart';
+import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
@@ -23,6 +22,7 @@ import 'package:doko_react/features/user-profile/user-features/post/presentation
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user.dart';
 import 'package:doko_react/init_dependency.dart';
+import 'package:doko_react/secret/secrets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

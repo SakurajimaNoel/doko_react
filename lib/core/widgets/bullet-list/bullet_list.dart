@@ -1,4 +1,4 @@
-import 'package:doko_react/archive/core/helpers/constants.dart';
+import 'package:doko_react/core/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class BulletList extends StatelessWidget {
