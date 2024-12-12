@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 
@@ -8,12 +10,14 @@ class Nodes extends GraphEntity {
     required PageInfo pageInfo,
     required this.items,
   })  : _pageInfo = pageInfo,
-        _empty = false;
+        _empty = false,
+        _newInserts = HashSet();
 
   Nodes.empty()
       : _pageInfo = PageInfo.empty(),
         items = [],
-        _empty = true;
+        _empty = true,
+        _newInserts = HashSet();
 
   void updatePageInfo(PageInfo pageInfo) {
     _pageInfo = pageInfo;
@@ -21,11 +25,22 @@ class Nodes extends GraphEntity {
   }
 
   void addEntityItems(List<String> newItems) {
+    newItems.removeWhere((item) => _newInserts.contains(item));
     items.addAll(newItems);
   }
 
   void addItem(String newItem) {
+    if (_newInserts.contains(newItem)) return;
+
+    _newInserts.add(newItem);
     items.insert(0, newItem);
+  }
+
+  void addItemAtLast(String newItem) {
+    if (_newInserts.contains(newItem)) return;
+
+    _newInserts.add(newItem);
+    items.add(newItem);
   }
 
   void removeItem(String key) {
@@ -38,6 +53,8 @@ class Nodes extends GraphEntity {
 
   PageInfo _pageInfo;
   final List<String> items;
+
+  final Set<String> _newInserts;
 
   // used to identify if Nodes are fetched or is just empty
   bool _empty;

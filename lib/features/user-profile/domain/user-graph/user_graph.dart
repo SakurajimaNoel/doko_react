@@ -410,7 +410,7 @@ class UserGraph {
     existingComment.showReplies = true;
 
     // adding at the end of visible replies
-    existingComment.comments.addEntityItems([commentKey]);
+    existingComment.comments.addItemAtLast(commentKey);
     existingComment.updateCommentsCount(existingComment.commentsCount + 1);
   }
 
