@@ -10,6 +10,7 @@ import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:graphql/client.dart';
 import 'package:image_picker_android/image_picker_android.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:media_kit/media_kit.dart';
@@ -19,6 +20,7 @@ void main() async {
     WidgetsFlutterBinding.ensureInitialized();
     await initDependency();
     MediaKit.ensureInitialized();
+    final store = await HiveStore.open();
 
     final ImagePickerPlatform imagePickerImplementation =
         ImagePickerPlatform.instance;

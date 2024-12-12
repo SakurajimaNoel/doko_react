@@ -62,6 +62,7 @@ import "package:doko_react/features/user-profile/user-features/profile/presentat
 import "package:flutter/foundation.dart";
 import "package:get_it/get_it.dart";
 import "package:graphql/client.dart";
+import "package:hive_flutter/adapters.dart";
 import "package:hydrated_bloc/hydrated_bloc.dart";
 import "package:path_provider/path_provider.dart";
 
@@ -71,7 +72,8 @@ final serviceLocator = GetIt.instance;
 
 Future<void> initDependency() async {
   await _configureAmplify();
-  // await initHiveForFlutter();
+  await Hive.initFlutter();
+
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
         ? HydratedStorage.webStorageDirectory
