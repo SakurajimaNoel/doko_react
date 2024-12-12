@@ -246,6 +246,8 @@ class _CommentContentState extends State<_CommentContent> {
     return TextSpan(
       style: TextStyle(
         color: currTheme.onSurface,
+        height: 1.5,
+        wordSpacing: 1.5,
       ),
       children: children,
     );
