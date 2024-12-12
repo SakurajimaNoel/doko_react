@@ -172,6 +172,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     final width = MediaQuery.sizeOf(context).width;
     final height = width * (1 / Constants.profile);
 
+    final scrollCacheHeight = MediaQuery.sizeOf(context).height;
+
     return Scaffold(
       body: BlocProvider(
         create: (context) => serviceLocator<ProfileBloc>()
@@ -232,6 +234,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               },
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
+                cacheExtent: scrollCacheHeight,
                 slivers: [
                   SliverAppBar(
                     pinned: true,

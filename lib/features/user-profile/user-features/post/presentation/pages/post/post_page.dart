@@ -44,6 +44,8 @@ class _PostPageState extends State<PostPage> {
 
   @override
   Widget build(BuildContext context) {
+    final scrollCacheHeight = MediaQuery.sizeOf(context).height;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Post"),
@@ -101,6 +103,7 @@ class _PostPageState extends State<PostPage> {
                 children: [
                   Expanded(
                     child: CustomScrollView(
+                      cacheExtent: scrollCacheHeight,
                       slivers: [
                         SliverToBoxAdapter(
                           child: Posts(
