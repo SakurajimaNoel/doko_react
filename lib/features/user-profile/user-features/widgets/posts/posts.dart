@@ -1,4 +1,3 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
@@ -200,7 +199,6 @@ class _PostContentIndicatorState extends State<_PostContentIndicator> {
     controller.addListener(() {
       int active = getActiveItem();
       if (active != activeItem) {
-        safePrint("setting state");
         setState(() {
           activeItem = active;
         });
@@ -334,7 +332,9 @@ class _PostActionState extends State<_PostAction>
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
         return (state is UserActionNodeActionState &&
-            state.nodeId == widget.postId);
+                state.nodeId == widget.postId) ||
+            (state is UserActionPostRefreshState &&
+                state.nodeId == widget.postId);
       },
       builder: (context, state) {
         PostEntity post = graph.getValueByKey(widget.graphKey)! as PostEntity;

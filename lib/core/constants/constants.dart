@@ -65,8 +65,8 @@ class Constants {
   static const double sliverBorder = 1.5;
 
   // comment
-  static const double commentWidth = 2;
-  static const double commentHeight = 1;
+  static const double commentWidth = 3;
+  static const double commentHeight = 2;
   static const double commentContainer = (commentWidth / commentHeight);
   static const String zeroWidthSpace = "\u200B";
   static const double commentOverlayHeight = _root * 5;

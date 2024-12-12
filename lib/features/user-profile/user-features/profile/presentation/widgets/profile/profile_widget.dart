@@ -100,8 +100,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       buildWhen: (previousState, state) {
         return (state is UserActionUpdateUserAcceptedFriendsListState &&
                 (self || state.username == username)) ||
-            (self && state is UserActionNewPostState) ||
-            (state is UserActionUserRefreshState && state.username == username);
+            (self && state is UserActionNewPostState);
       },
       builder: (context, state) {
         final user = graph.getValueByKey(key)! as CompleteUserEntity;
@@ -174,6 +173,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     final scrollCacheHeight = MediaQuery.sizeOf(context).height;
 
+    DateTime latestFetch = DateTime.now();
+
     return Scaffold(
       body: BlocProvider(
         create: (context) => serviceLocator<ProfileBloc>()
@@ -182,165 +183,181 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               userDetails: details,
             ),
           ),
-        child: BlocBuilder<ProfileBloc, ProfileState>(
+        child: BlocConsumer<UserActionBloc, UserActionState>(
+          listenWhen: (previousState, state) {
+            return state is UserActionUserRefreshState &&
+                state.username == username;
+          },
+          listener: (context, state) {
+            latestFetch = DateTime.now();
+          },
+          buildWhen: (previousState, state) {
+            return state is UserActionUserRefreshState &&
+                state.username == username;
+          },
           builder: (context, state) {
-            if (state is ProfileLoading || state is ProfileInitial) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-
-            if (state is ProfileError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    StyledText.error(state.message),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<ProfileBloc>().add(GetUserProfileEvent(
-                              userDetails: details,
-                            ));
-                      },
-                      child: const Text("Retry"),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            return RefreshIndicator(
-              onRefresh: () async {
-                Future profileBloc = context.read<ProfileBloc>().stream.first;
-
-                context.read<ProfileBloc>().add(GetUserProfileRefreshEvent(
-                      userDetails: details,
-                    ));
-
-                final ProfileState state = await profileBloc;
-
-                if (state is ProfileRefreshError) {
-                  showMessage(state.message);
-                } else {
-                  // trigger ui rebuilds
-                  if (mounted) {
-                    context
-                        .read<UserActionBloc>()
-                        .add(UserActionUserRefreshEvent(
-                          username: username,
-                        ));
-                  }
+            return BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, state) {
+                if (state is ProfileLoading || state is ProfileInitial) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
                 }
-              },
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                cacheExtent: scrollCacheHeight,
-                slivers: [
-                  SliverAppBar(
-                    pinned: true,
-                    expandedHeight: height,
-                    title: Text(username),
-                    actions: appBarActions(),
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: BlocBuilder<UserActionBloc, UserActionState>(
-                        buildWhen: (previousState, state) {
-                          return (self && state is UserActionUpdateProfile) ||
-                              (state is UserActionUserRefreshState &&
-                                  state.username == username);
-                        },
-                        builder: (context, state) {
-                          final user =
-                              graph.getValueByKey(key)! as CompleteUserEntity;
-                          return Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              user.profilePicture.bucketPath.isNotEmpty
-                                  ? CachedNetworkImage(
-                                      memCacheHeight:
-                                          Constants.profileCacheHeight,
-                                      cacheKey: user.profilePicture.bucketPath,
-                                      imageUrl: user.profilePicture.accessURI,
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) =>
-                                          const Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
-                                      height: height,
-                                    )
-                                  : Container(
-                                      color: currTheme.onSecondary,
-                                      child: Icon(
-                                        Icons.person,
-                                        size: height,
+
+                if (state is ProfileError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        StyledText.error(state.message),
+                        ElevatedButton(
+                          onPressed: () {
+                            context.read<ProfileBloc>().add(GetUserProfileEvent(
+                                  userDetails: details,
+                                ));
+                          },
+                          child: const Text("Retry"),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    Future profileBloc =
+                        context.read<ProfileBloc>().stream.first;
+
+                    context.read<ProfileBloc>().add(GetUserProfileRefreshEvent(
+                          userDetails: details,
+                        ));
+
+                    final ProfileState state = await profileBloc;
+
+                    if (state is ProfileRefreshError) {
+                      showMessage(state.message);
+                    } else {
+                      // trigger ui rebuilds
+                      if (mounted) {
+                        context
+                            .read<UserActionBloc>()
+                            .add(UserActionUserRefreshEvent(
+                              username: username,
+                            ));
+                      }
+                    }
+                  },
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    cacheExtent: scrollCacheHeight,
+                    slivers: [
+                      SliverAppBar(
+                        pinned: true,
+                        expandedHeight: height,
+                        title: Text(username),
+                        actions: appBarActions(),
+                        flexibleSpace: FlexibleSpaceBar(
+                          background:
+                              BlocBuilder<UserActionBloc, UserActionState>(
+                            buildWhen: (previousState, state) {
+                              return (self && state is UserActionUpdateProfile);
+                            },
+                            builder: (context, state) {
+                              final user = graph.getValueByKey(key)!
+                                  as CompleteUserEntity;
+                              return Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  user.profilePicture.bucketPath.isNotEmpty
+                                      ? CachedNetworkImage(
+                                          memCacheHeight:
+                                              Constants.profileCacheHeight,
+                                          cacheKey:
+                                              user.profilePicture.bucketPath,
+                                          imageUrl:
+                                              user.profilePicture.accessURI,
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) =>
+                                              const Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.error),
+                                          height: height,
+                                        )
+                                      : Container(
+                                          color: currTheme.onSecondary,
+                                          child: Icon(
+                                            Icons.person,
+                                            size: height,
+                                          ),
+                                        ),
+                                  ProfilePictureFilter(
+                                    child: Text(
+                                      user.name,
+                                      style: TextStyle(
+                                        color: currTheme.onSurface,
+                                        fontSize: Constants.heading2,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                              ProfilePictureFilter(
-                                child: Text(
-                                  user.name,
-                                  style: TextStyle(
-                                    color: currTheme.onSurface,
-                                    fontSize: Constants.heading2,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              )
-                            ],
-                          );
-                        },
+                                  )
+                                ],
+                              );
+                            },
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(Constants.padding),
-                      child: BlocBuilder<UserActionBloc, UserActionState>(
-                        buildWhen: (previousState, state) {
-                          return (self && state is UserActionUpdateProfile) ||
-                              (state is UserActionUserRefreshState &&
-                                  state.username == username);
-                        },
-                        builder: (context, state) {
-                          final user =
-                              graph.getValueByKey(key)! as CompleteUserEntity;
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (user.bio.isNotEmpty) ...[
-                                Text(user.bio),
-                                const SizedBox(
-                                  height: Constants.gap,
-                                ),
-                              ],
-                              userProfileAction(user),
-                            ],
-                          );
-                        },
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(Constants.padding),
+                          child: BlocBuilder<UserActionBloc, UserActionState>(
+                            buildWhen: (previousState, state) {
+                              return (self && state is UserActionUpdateProfile);
+                            },
+                            builder: (context, state) {
+                              final user = graph.getValueByKey(key)!
+                                  as CompleteUserEntity;
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (user.bio.isNotEmpty) ...[
+                                    Text(user.bio),
+                                    const SizedBox(
+                                      height: Constants.gap,
+                                    ),
+                                  ],
+                                  userProfileAction(user),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
                       ),
-                    ),
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: _SliverAppBarDelegate(
+                          userProfileInfo(key),
+                        ),
+                      ),
+                      const SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: Constants.gap * 2,
+                        ),
+                      ),
+                      ProfilePost(
+                        username: username,
+                        key: ObjectKey(latestFetch),
+                      ),
+                      const SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: Constants.gap * 2,
+                        ),
+                      ),
+                    ],
                   ),
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _SliverAppBarDelegate(
-                      userProfileInfo(key),
-                    ),
-                  ),
-                  const SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: Constants.gap * 2,
-                    ),
-                  ),
-                  ProfilePost(
-                    username: username,
-                  ),
-                  const SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: Constants.gap * 2,
-                    ),
-                  ),
-                ],
-              ),
+                );
+              },
             );
           },
         ),

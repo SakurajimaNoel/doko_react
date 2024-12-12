@@ -70,7 +70,6 @@ class _CommentInputState extends State<CommentInput> {
     controller.removeListener(handleTrigger);
     controller.dispose();
     commentProvider.focusNode.removeListener(_onFocusChange);
-    commentProvider.focusNode.dispose();
 
     super.dispose();
   }

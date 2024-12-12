@@ -94,6 +94,13 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         nodeId: event.targetId,
       ));
     });
+    on<UserActionPostRefreshEvent>(
+      (event, emit) => emit(
+        UserActionPostRefreshState(
+          nodeId: event.postId,
+        ),
+      ),
+    );
   }
 
   FutureOr<void> _handleUserActionUpdateEvent(

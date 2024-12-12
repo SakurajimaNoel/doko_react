@@ -144,3 +144,30 @@ final class CommentSearchErrorState extends PostState {
   @override
   List<Object?> get props => [message];
 }
+
+// post refresh
+final class PostRefreshState extends PostState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class PostRefreshSuccessState extends PostInitial {
+  PostRefreshSuccessState() : now = DateTime.now();
+
+  final DateTime now;
+
+  @override
+  List<Object?> get props => [now];
+}
+
+final class PostRefreshErrorState extends PostInitial {
+  PostRefreshErrorState({
+    required this.message,
+  }) : now = DateTime.now();
+
+  final String message;
+  final DateTime now;
+
+  @override
+  List<Object?> get props => [message, now];
+}

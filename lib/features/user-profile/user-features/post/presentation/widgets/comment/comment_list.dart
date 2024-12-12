@@ -57,12 +57,13 @@ class _CommentListState extends State<CommentList> {
       if (!loading) {
         loading = true;
         context.read<PostBloc>().add(LoadMoreCommentEvent(
-                details: GetCommentsInput(
-              nodeId: postId,
-              username: username,
-              isPost: true,
-              cursor: comments.pageInfo.endCursor!,
-            )));
+              details: GetCommentsInput(
+                nodeId: postId,
+                username: username,
+                isPost: true,
+                cursor: comments.pageInfo.endCursor!,
+              ),
+            ));
       }
       return const Center(
         child: SmallLoadingIndicator(),
@@ -72,7 +73,6 @@ class _CommentListState extends State<CommentList> {
     return CommentWidget(
       commentKey: comments.items[index],
       parentNodeId: postId,
-      key: ValueKey(comments.items[index]),
     );
   }
 

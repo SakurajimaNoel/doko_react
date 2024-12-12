@@ -130,3 +130,12 @@ final class UserActionNewCommentEvent extends UserActionEvent {
   final int commentsCount;
   final String targetId;
 }
+
+// post refresh
+final class UserActionPostRefreshEvent extends UserActionEvent {
+  UserActionPostRefreshEvent({
+    required this.postId,
+  });
+
+  final String postId;
+}

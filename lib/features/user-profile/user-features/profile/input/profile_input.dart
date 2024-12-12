@@ -59,6 +59,11 @@ class UserProfileNodesInput {
   final String username;
   final String currentUsername;
   final String cursor;
+
+  @override
+  String toString() {
+    return "Username: $username\n Current user: $currentUsername \n Cursor: $cursor";
+  }
 }
 
 class UserSearchInput {

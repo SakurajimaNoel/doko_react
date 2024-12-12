@@ -2,6 +2,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
+import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/widgets/comment/comment_input.dart';
@@ -99,53 +100,100 @@ class _PostPageState extends State<PostPage> {
                   commentTargetId: post.id,
                 );
               },
-              child: Column(
-                children: [
-                  Expanded(
-                    child: CustomScrollView(
-                      cacheExtent: scrollCacheHeight,
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: Posts(
-                            postKey: postKey,
-                          ),
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  Future postBloc = context.read<PostBloc>().stream.first;
+
+                  context.read<PostBloc>().add(PostRefreshEvent(
+                        details: GetPostInput(
+                          postId: widget.postId,
+                          username: username,
                         ),
-                        const SliverToBoxAdapter(
-                          child: SizedBox(
-                            height: Constants.gap * 2,
-                          ),
-                        ),
-                        if (commentError) ...[
+                      ));
+
+                  final PostState state = await postBloc;
+
+                  if (state is PostRefreshErrorState) {
+                    showMessage(state.message);
+                    return;
+                  }
+
+                  if (mounted) {
+                    context
+                        .read<UserActionBloc>()
+                        .add(UserActionPostRefreshEvent(
+                          postId: widget.postId,
+                        ));
+                  }
+                },
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: CustomScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        cacheExtent: scrollCacheHeight,
+                        slivers: [
                           SliverToBoxAdapter(
-                            child: SizedBox(
-                              height: Constants.height * 5,
-                              child: StyledText.error(state.message),
+                            child: Posts(
+                              postKey: postKey,
                             ),
                           ),
-                        ] else
-                          commentsLoading
-                              ? SliverToBoxAdapter(
-                                  child: SizedBox(
-                                    height: Constants.height * 5,
-                                    child: Center(
-                                      child: SmallLoadingIndicator(),
-                                    ),
-                                  ),
-                                )
-                              : CommentList(
-                                  postId: widget.postId,
-                                  key: ValueKey(widget.postId),
-                                ),
-                        const SliverToBoxAdapter(
-                          child: SizedBox(
-                            height: Constants.gap * 2,
+                          const SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: Constants.gap * 2,
+                            ),
                           ),
-                        ),
-                      ],
+                          if (commentError) ...[
+                            SliverToBoxAdapter(
+                              child: SizedBox(
+                                height: Constants.height * 5,
+                                child: StyledText.error(state.message),
+                              ),
+                            ),
+                          ] else
+                            commentsLoading
+                                ? SliverToBoxAdapter(
+                                    child: SizedBox(
+                                      height: Constants.height * 5,
+                                      child: Center(
+                                        child: SmallLoadingIndicator(),
+                                      ),
+                                    ),
+                                  )
+                                : BlocBuilder<UserActionBloc, UserActionState>(
+                                    buildWhen: (previousState, state) {
+                                      return state
+                                              is UserActionPostRefreshState &&
+                                          state.nodeId == post.id;
+                                    },
+                                    builder: (context, state) {
+                                      DateTime now;
+                                      if (state is UserActionPostRefreshState) {
+                                        now = state.now;
+                                      } else {
+                                        now = DateTime.now();
+                                      }
+
+                                      return CommentList(
+                                        postId: widget.postId,
+                                        key: ObjectKey({
+                                          "postId": post.id,
+                                          "lastFetch": now,
+                                        }),
+                                      );
+                                    },
+                                  ),
+                          const SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: Constants.gap * 2,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const CommentInput(),
-                ],
+                    const CommentInput(),
+                  ],
+                ),
               ),
             );
           },

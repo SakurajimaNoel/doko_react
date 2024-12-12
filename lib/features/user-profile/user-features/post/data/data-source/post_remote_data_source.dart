@@ -36,7 +36,7 @@ class PostRemoteDataSource {
             reason: result.exception?.graphqlErrors.toString() ??
                 "Problem loading post.");
       }
-      List? res = result.data?["post"];
+      List? res = result.data?["posts"];
 
       if (res == null || res.isEmpty) {
         throw const ApplicationException(

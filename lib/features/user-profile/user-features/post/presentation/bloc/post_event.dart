@@ -42,3 +42,9 @@ class CommentMentionSearchEvent extends PostEvent {
 
   final UserSearchInput searchDetails;
 }
+
+class PostRefreshEvent extends PostEvent {
+  PostRefreshEvent({required this.details});
+
+  final GetPostInput details;
+}

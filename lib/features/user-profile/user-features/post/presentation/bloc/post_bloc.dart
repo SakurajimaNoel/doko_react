@@ -49,6 +49,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         ),
       ),
     );
+    on<PostRefreshEvent>(_handlePostRefreshEvent);
   }
 
   FutureOr<void> _handlePostLoadEvent(
@@ -201,6 +202,22 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       ));
     } catch (_) {
       emit(CommentSearchErrorState(
+        message: Constants.errorMessage,
+      ));
+    }
+  }
+
+  FutureOr<void> _handlePostRefreshEvent(
+      PostRefreshEvent event, Emitter<PostState> emit) async {
+    try {
+      await _postUseCase(event.details);
+      emit(PostRefreshSuccessState());
+    } on ApplicationException catch (e) {
+      emit(PostRefreshErrorState(
+        message: e.reason,
+      ));
+    } catch (e) {
+      emit(PostRefreshErrorState(
         message: Constants.errorMessage,
       ));
     }

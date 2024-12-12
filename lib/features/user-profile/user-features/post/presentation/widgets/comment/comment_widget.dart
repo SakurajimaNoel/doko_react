@@ -79,7 +79,7 @@ class _CommentWidgetState extends State<CommentWidget> {
             ),
             Container(
               alignment: AlignmentDirectional.topStart,
-              height: height,
+              // height: height,
               child: CachedNetworkImage(
                 cacheKey: comment.media.bucketPath,
                 fit: BoxFit.contain,
@@ -90,7 +90,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                 errorWidget: (context, url, error) => const Icon(Icons.error),
                 filterQuality: FilterQuality.high,
                 memCacheHeight: height.toInt(),
-                height: height,
+                // height: height,
               ),
             )
           ],
