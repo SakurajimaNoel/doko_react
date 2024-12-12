@@ -47,7 +47,11 @@ class _CommentListState extends State<CommentList> {
 
     if (index >= comments.items.length) {
       if (!comments.pageInfo.hasNextPage) {
-        return const SizedBox.shrink();
+        return const Center(
+          child: Text(
+            "No more comments.",
+          ),
+        );
       }
 
       if (!loading) {
@@ -92,7 +96,14 @@ class _CommentListState extends State<CommentList> {
           );
         }
 
-        return BlocBuilder<PostBloc, PostState>(
+        return BlocConsumer<PostBloc, PostState>(
+          listenWhen: (previousState, state) {
+            return state is CommentLoadSuccess ||
+                (state is LoadErrorState && state.nodeId == postId);
+          },
+          listener: (context, state) {
+            if (loading) loading = false;
+          },
           buildWhen: (previousState, state) {
             return state is CommentLoadSuccess;
           },
