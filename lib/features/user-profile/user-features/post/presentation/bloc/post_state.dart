@@ -44,6 +44,7 @@ final class CommentLoadSuccess extends PostState {
   List<Object?> get props => [loadedCommentCount];
 }
 
+// base class for comment replies loading
 final class CommentReplyState extends PostState {
   CommentReplyState({
     required this.commentId,

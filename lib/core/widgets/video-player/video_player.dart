@@ -130,7 +130,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
           seekBarPositionColor: currTheme.primary,
           seekBarThumbColor: currTheme.primary,
           seekBarColor: currTheme.onPrimary,
-          seekBarBufferColor: currTheme.onSecondaryContainer.withOpacity(0.25),
+          seekBarBufferColor:
+              currTheme.onSecondaryContainer.withValues(alpha: 0.25),
           seekBarThumbSize: 0,
           seekBarHeight: seekBarHeight,
         ),

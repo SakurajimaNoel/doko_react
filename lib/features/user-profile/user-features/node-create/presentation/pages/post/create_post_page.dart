@@ -8,8 +8,6 @@ import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.d
 import 'package:doko_react/core/helpers/media/video/video.dart';
 import 'package:doko_react/core/helpers/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/bullet-list/bullet_list.dart';
-import 'package:doko_react/core/widgets/carousel/custom_carousel_view.dart'
-    as custom;
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/video-player/video_player.dart';
@@ -76,8 +74,7 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
   final List<PostContent> content = [];
 
   bool compressingVideo = false;
-  final custom.CarouselController carouselController =
-      custom.CarouselController();
+  final CarouselController carouselController = CarouselController();
 
   @override
   void initState() {
@@ -340,8 +337,8 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          currTheme.surface.withOpacity(opacity),
-                          currTheme.surface.withOpacity(opacity),
+                          currTheme.surface.withValues(alpha: opacity),
+                          currTheme.surface.withValues(alpha: opacity),
                         ],
                       ),
                     ),
@@ -399,7 +396,8 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
             children: [
               SizedBox(
                 height: height,
-                child: custom.CustomCarouselView(
+                child: CarouselView(
+                  enableSplash: false,
                   controller: carouselController,
                   itemExtent: width,
                   shrinkExtent: width * 0.5,

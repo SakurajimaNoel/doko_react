@@ -40,7 +40,7 @@ Future<CroppedFile?> getCroppedImage(
         toolbarWidgetColor: currScheme.onSurface,
         statusBarColor: currScheme.surface,
         backgroundColor: currScheme.surface,
-        dimmedLayerColor: currScheme.surface.withOpacity(0.75),
+        dimmedLayerColor: currScheme.surface.withValues(alpha: 0.75),
         cropFrameColor: currScheme.onSurface,
         cropGridColor: currScheme.onSurface,
         cropFrameStrokeWidth: 6,

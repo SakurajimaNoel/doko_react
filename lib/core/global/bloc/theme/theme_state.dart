@@ -22,10 +22,21 @@ class ThemeState extends Equatable {
     );
   }
 
+  static int _floatToInt8(double x) {
+    return (x * 255.0).round() & 0xff;
+  }
+
+  int getAccentValue() {
+    return _floatToInt8(accent.a) << 24 |
+        _floatToInt8(accent.r) << 16 |
+        _floatToInt8(accent.g) << 8 |
+        _floatToInt8(accent.b) << 0;
+  }
+
   Map<String, dynamic>? toJson() {
     return {
       "mode": mode.toString(),
-      "accent": accent.value,
+      "accent": getAccentValue(),
     };
   }
 

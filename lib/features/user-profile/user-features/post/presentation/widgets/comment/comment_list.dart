@@ -73,6 +73,7 @@ class _CommentListState extends State<CommentList> {
     return CommentWidget(
       commentKey: comments.items[index],
       parentNodeId: postId,
+      key: ValueKey(comments.items[index]),
     );
   }
 

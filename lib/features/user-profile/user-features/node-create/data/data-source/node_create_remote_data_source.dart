@@ -24,7 +24,9 @@ class NodeCreateRemoteDataSource {
       List<Future<String>> fileUploadFuture = [];
       for (final item in postDetails.content) {
         if (item.type == MediaTypeValue.thumbnail ||
-            item.type == MediaTypeValue.unknown) continue;
+            item.type == MediaTypeValue.unknown) {
+          continue;
+        }
 
         fileUploadFuture.add(uploadFileToAWSByPath(
           item.file!,

@@ -32,7 +32,9 @@ class _PostPageState extends State<PostPage> {
   final UserGraph graph = UserGraph();
   late final postKey = generatePostNodeKey(widget.postId);
   late final username =
-      (context.read<UserBloc>().state as UserCompleteState).username;
+      (context
+          .read<UserBloc>()
+          .state as UserCompleteState).username;
 
   void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -45,14 +47,17 @@ class _PostPageState extends State<PostPage> {
 
   @override
   Widget build(BuildContext context) {
-    final scrollCacheHeight = MediaQuery.sizeOf(context).height;
+    final scrollCacheHeight = MediaQuery
+        .sizeOf(context)
+        .height;
 
     return Scaffold(
       appBar: AppBar(
         title: Text("Post"),
       ),
       body: BlocProvider(
-        create: (context) => serviceLocator<PostBloc>()
+        create: (context) =>
+        serviceLocator<PostBloc>()
           ..add(PostLoadEvent(
             details: GetPostInput(
               postId: widget.postId,
@@ -102,14 +107,17 @@ class _PostPageState extends State<PostPage> {
               },
               child: RefreshIndicator(
                 onRefresh: () async {
-                  Future postBloc = context.read<PostBloc>().stream.first;
+                  Future postBloc = context
+                      .read<PostBloc>()
+                      .stream
+                      .first;
 
                   context.read<PostBloc>().add(PostRefreshEvent(
-                        details: GetPostInput(
-                          postId: widget.postId,
-                          username: username,
-                        ),
-                      ));
+                    details: GetPostInput(
+                      postId: widget.postId,
+                      username: username,
+                    ),
+                  ));
 
                   final PostState state = await postBloc;
 
@@ -122,8 +130,8 @@ class _PostPageState extends State<PostPage> {
                     context
                         .read<UserActionBloc>()
                         .add(UserActionPostRefreshEvent(
-                          postId: widget.postId,
-                        ));
+                      postId: widget.postId,
+                    ));
                   }
                 },
                 child: Column(
@@ -153,36 +161,36 @@ class _PostPageState extends State<PostPage> {
                           ] else
                             commentsLoading
                                 ? SliverToBoxAdapter(
-                                    child: SizedBox(
-                                      height: Constants.height * 5,
-                                      child: Center(
-                                        child: SmallLoadingIndicator(),
-                                      ),
-                                    ),
-                                  )
+                              child: SizedBox(
+                                height: Constants.height * 5,
+                                child: Center(
+                                  child: SmallLoadingIndicator(),
+                                ),
+                              ),
+                            )
                                 : BlocBuilder<UserActionBloc, UserActionState>(
-                                    buildWhen: (previousState, state) {
-                                      return state
-                                              is UserActionPostRefreshState &&
-                                          state.nodeId == post.id;
-                                    },
-                                    builder: (context, state) {
-                                      DateTime now;
-                                      if (state is UserActionPostRefreshState) {
-                                        now = state.now;
-                                      } else {
-                                        now = DateTime.now();
-                                      }
+                              buildWhen: (previousState, state) {
+                                return state
+                                is UserActionPostRefreshState &&
+                                    state.nodeId == post.id;
+                              },
+                              builder: (context, state) {
+                                DateTime now;
+                                if (state is UserActionPostRefreshState) {
+                                  now = state.now;
+                                } else {
+                                  now = DateTime.now();
+                                }
 
-                                      return CommentList(
-                                        postId: widget.postId,
-                                        key: ObjectKey({
-                                          "postId": post.id,
-                                          "lastFetch": now,
-                                        }),
-                                      );
-                                    },
-                                  ),
+                                return CommentList(
+                                  postId: widget.postId,
+                                  key: ObjectKey({
+                                    "postId": post.id,
+                                    "lastFetch": now,
+                                  }),
+                                );
+                              },
+                            ),
                           const SliverToBoxAdapter(
                             child: SizedBox(
                               height: Constants.gap * 2,

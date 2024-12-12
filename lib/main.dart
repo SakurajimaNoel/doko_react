@@ -20,7 +20,7 @@ void main() async {
     WidgetsFlutterBinding.ensureInitialized();
     await initDependency();
     MediaKit.ensureInitialized();
-    final store = await HiveStore.open();
+    await HiveStore.open();
 
     final ImagePickerPlatform imagePickerImplementation =
         ImagePickerPlatform.instance;

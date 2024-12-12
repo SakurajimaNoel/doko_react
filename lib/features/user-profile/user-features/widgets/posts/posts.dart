@@ -5,8 +5,6 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/helpers/extension/go_router_extension.dart';
 import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
-import 'package:doko_react/core/widgets/carousel/custom_carousel_view.dart'
-    as custom;
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/core/widgets/video-player/video_player.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
@@ -99,7 +97,7 @@ class _PostContent extends StatelessWidget {
   });
 
   final List<PostContentEntity> content;
-  final custom.CarouselController controller = custom.CarouselController();
+  final CarouselController controller = CarouselController();
 
   Widget imageContent(PostContentEntity image) {
     return CachedNetworkImage(
@@ -137,7 +135,8 @@ class _PostContent extends StatelessWidget {
       children: [
         SizedBox(
           height: height,
-          child: custom.CustomCarouselView(
+          child: CarouselView(
+            enableSplash: false,
             controller: controller,
             itemExtent: width,
             shrinkExtent: width * 0.5,

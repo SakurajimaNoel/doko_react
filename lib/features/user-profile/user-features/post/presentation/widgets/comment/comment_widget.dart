@@ -431,7 +431,6 @@ class _CommentActionsState extends State<_CommentActions>
         const Divider(
           height: Constants.gap * 0.5,
         ),
-        // if (comment.commentsCount > 0)
         if (!widget.isReply)
           _CommentReplies(
             commentId: comment.id,
