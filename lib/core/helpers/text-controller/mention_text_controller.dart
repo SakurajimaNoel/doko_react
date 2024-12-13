@@ -107,6 +107,17 @@ class MentionTextController extends TextEditingController {
     if (isExisting) {
       // remove the part from afterSelection string
       afterSelection = afterSelection.replaceRange(0, mentionEndIndex + 1, "");
+    } else {
+      /// for non existing mention remove till next space
+      /// in existing only removing till the mention because
+      /// input can be @rohan[zws]string (without space) than
+      /// it will also replace string portion (which is not intended for user
+      final int textEndIndex = afterSelection.indexOf(" ");
+      if (textEndIndex != -1) {
+        afterSelection = afterSelection.replaceRange(0, textEndIndex + 1, "");
+      } else {
+        afterSelection = afterSelection.replaceRange(0, null, "");
+      }
     }
 
     // to handle space between mention and rest
