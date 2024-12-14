@@ -20,6 +20,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
 part 'user_action_event.dart';
+
 part 'user_action_state.dart';
 
 class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
@@ -40,7 +41,8 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     required UserRemoveFriendRelationUseCase userRemoveFriendRelationUseCase,
     required CommentAddLikeUseCase commentAddLikeUseCase,
     required CommentRemoveLikeUseCase commentRemoveLikeUseCase,
-  })  : _postAddLikeUseCase = postAddLikeUseCase,
+  })
+      : _postAddLikeUseCase = postAddLikeUseCase,
         _postRemoveLikeUseCase = postRemoveLikeUseCase,
         _userCreateFriendRelationUseCase = userCreateFriendRelationUseCase,
         _userAcceptFriendRelationUseCase = userAcceptFriendRelationUseCase,
@@ -74,11 +76,12 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
     });
     on<UserActionNewPostEvent>(
-      (event, emit) => emit(
-        UserActionNewPostState(
-          postId: event.postId,
-        ),
-      ),
+          (event, emit) =>
+          emit(
+            UserActionNewPostState(
+              postId: event.postId,
+            ),
+          ),
     );
     on<UserActionCommentLikeActionEvent>(
         _handleUserActionCommentLikeActionEvent);
@@ -95,16 +98,17 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
     });
     on<UserActionPostRefreshEvent>(
-      (event, emit) => emit(
-        UserActionPostRefreshState(
-          nodeId: event.postId,
-        ),
-      ),
+          (event, emit) =>
+          emit(
+            UserActionPostRefreshState(
+              nodeId: event.postId,
+            ),
+          ),
     );
   }
 
-  FutureOr<void> _handleUserActionUpdateEvent(
-      UserActionUpdateEvent event, Emitter<UserActionState> emit) {
+  FutureOr<void> _handleUserActionUpdateEvent(UserActionUpdateEvent event,
+      Emitter<UserActionState> emit) {
     emit(
       UserActionUpdateProfile(
         name: event.name,
@@ -266,6 +270,11 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
 
       // update current user friends list and involved user friends list
+      emit(UserActionUpdateUserPendingFriendsListState(
+        currentUsername: details.currentUsername,
+        username: details.username,
+      ));
+
       emit(UserActionUpdateUserAcceptedFriendsListState(
         currentUsername: details.currentUsername,
         username: details.username,
