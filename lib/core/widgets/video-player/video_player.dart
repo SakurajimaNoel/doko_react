@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/preferences/preferences_bloc.dart';
+import 'package:doko_react/core/helpers/extension/go_router_extension.dart';
 import 'package:doko_react/core/helpers/media/video/video.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:provider/provider.dart';
@@ -11,10 +13,12 @@ import 'package:visibility_detector/visibility_detector.dart';
 
 class VideoPlayer extends StatefulWidget {
   final String path;
+  final String bucketPath;
 
   const VideoPlayer({
-    required super.key,
+    super.key,
     required this.path,
+    required this.bucketPath,
   });
 
   @override
@@ -22,8 +26,8 @@ class VideoPlayer extends StatefulWidget {
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
-  late final String path;
-  late final Key key;
+  late final String path = widget.path;
+  late final String bucketPath = widget.bucketPath;
   late final PreferencesBloc preferences;
 
   double ratio = Constants.landscape;
@@ -36,9 +40,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   void initState() {
     super.initState();
-
-    path = widget.path;
-    key = widget.key!;
 
     preferences = context.read<PreferencesBloc>();
 
@@ -102,9 +103,13 @@ class _VideoPlayerState extends State<VideoPlayer> {
     var currTheme = Theme.of(context).colorScheme;
     Color primary = currTheme.primary;
     const double seekBarHeight = Constants.height * 0.2;
+    final String routeName = GoRouter.of(context).currentRouteName ?? "";
 
     return VisibilityDetector(
-      key: key,
+      key: ObjectKey({
+        "route-name": routeName,
+        "bucket-path": bucketPath,
+      }),
       onVisibilityChanged: (VisibilityInfo visibilityInfo) {
         var visiblePercentage = visibilityInfo.visibleFraction * 100;
         if (!mounted) return;

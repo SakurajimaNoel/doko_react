@@ -122,7 +122,8 @@ class _PostContent extends StatelessWidget {
   Widget videoContent(PostContentEntity video) {
     return VideoPlayer(
       path: video.resource.accessURI,
-      key: Key(video.resource.bucketPath),
+      bucketPath: video.resource.bucketPath,
+      // key: Key(video.resource.bucketPath),
     );
   }
 

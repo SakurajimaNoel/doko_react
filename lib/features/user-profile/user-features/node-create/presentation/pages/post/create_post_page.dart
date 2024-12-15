@@ -310,7 +310,8 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
             postItemWrapper(
               child: VideoPlayer(
                 path: item.file!,
-                key: Key(item.bucketPath),
+                bucketPath: item.bucketPath,
+                // key: Key(item.bucketPath),
               ),
               index: index,
               path: item.file!,
