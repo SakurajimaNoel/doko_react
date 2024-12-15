@@ -44,6 +44,10 @@ class Nodes extends GraphEntity {
   }
 
   void removeItem(String key) {
+    if (_newInserts.contains(key)) {
+      _newInserts.remove(key);
+    }
+
     items.remove(key);
   }
 
