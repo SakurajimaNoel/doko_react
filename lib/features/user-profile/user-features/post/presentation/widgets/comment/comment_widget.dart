@@ -416,6 +416,7 @@ class _CommentActionsState extends State<_CommentActions>
                     ),
                   ],
                 ),
+                // todo: for hierarchy show this
                 if (!widget.isReply)
                   Text(
                     "${displayNumberFormat(comment.commentsCount)} Repl${comment.commentsCount > 1 ? "ies" : "y"}",
@@ -431,6 +432,7 @@ class _CommentActionsState extends State<_CommentActions>
         const Divider(
           height: Constants.gap * 0.5,
         ),
+        // todo: for hierarchy show this
         if (!widget.isReply)
           _CommentReplies(
             commentId: comment.id,

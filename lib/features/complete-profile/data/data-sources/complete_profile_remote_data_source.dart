@@ -1,5 +1,6 @@
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
+import 'package:doko_react/core/global/auth/auth.dart';
 import 'package:doko_react/core/global/storage/storage.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -73,6 +74,9 @@ class CompleteProfileRemoteDataSource {
       String key = generateUserNodeKey(currentUser.username);
 
       graph.addEntity(key, currentUser);
+
+      // add to cognito
+      addUsername(userDetails.username);
 
       // if all done return true
       return true;

@@ -77,7 +77,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       String username = res[0]["username"];
       bool mfaStatus = await getUserMFAStatus();
 
-      // adding user in graph
       final UserEntity currentUser = await UserEntity.createEntity(map: res[0]);
 
       final UserGraph graph = UserGraph();
@@ -90,6 +89,13 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         username: username,
         userMfa: mfaStatus,
       ));
+
+      String preferredUsername = await getUsername();
+      // add preferred username to user attributes if not present
+      if (preferredUsername.isEmpty) {
+        // add to username to user
+        await addUsername(username);
+      }
     } on ApplicationException catch (_) {
       emit(UserAuthErrorState());
     } catch (e) {

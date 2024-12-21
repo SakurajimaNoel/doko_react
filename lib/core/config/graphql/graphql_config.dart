@@ -7,7 +7,8 @@ class GraphqlConfig {
   static final _httpLink = HttpLink(Secrets.endpoint);
 
   static final _authLink = AuthLink(getToken: () async {
-    String token = await getAccessToken();
+    final tokenEntity = await getUserToken();
+    String token = tokenEntity.accessToken;
     return "Bearer $token";
   });
 
