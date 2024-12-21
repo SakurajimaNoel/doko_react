@@ -11,15 +11,18 @@ class UserToUserRelationWidget extends StatefulWidget {
   const UserToUserRelationWidget({
     super.key,
     required this.username,
+    this.disabled = false,
   }) : label = false;
 
   const UserToUserRelationWidget.label({
     super.key,
     required this.username,
+    this.disabled = false,
   }) : label = true;
 
   final String username;
   final bool label;
+  final bool disabled;
 
   @override
   State<UserToUserRelationWidget> createState() =>
@@ -34,6 +37,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
   late final String username;
   late final String graphKey;
   late final bool label;
+  late final bool disabled = widget.disabled;
 
   @override
   void initState() {
@@ -48,7 +52,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
 
   // create
   void createFriendRelation() {
-    if (updating) return;
+    if (updating || disabled) return;
     updating = true;
 
     final userActionBloc = context.read<UserActionBloc>();
@@ -61,7 +65,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
 
   // update
   void acceptFriendRelation(UserEntity user) {
-    if (updating) return;
+    if (updating || disabled) return;
     updating = true;
 
     final userActionBloc = context.read<UserActionBloc>();
@@ -74,7 +78,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
 
   // delete
   void removeFriendRelation(UserEntity user) {
-    if (updating) return;
+    if (updating || disabled) return;
     updating = true;
 
     final userActionBloc = context.read<UserActionBloc>();

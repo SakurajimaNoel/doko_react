@@ -3,6 +3,7 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
+import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/public/sign-out-button/sign_out_button.dart';
@@ -198,6 +199,120 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           builder: (context, state) {
             return BlocBuilder<ProfileBloc, ProfileState>(
               builder: (context, state) {
+                bool isUserEntity = graph.containsKey(key) &&
+                    graph.getValueByKey(key)! is! CompleteUserEntity;
+
+                if (isUserEntity) {
+                  var initUser = graph.getValueByKey(key)! as UserEntity;
+
+                  return Stack(
+                    children: [
+                      Column(
+                        children: [
+                          SizedBox(
+                            height: height,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                initUser.profilePicture.bucketPath.isNotEmpty
+                                    ? CachedNetworkImage(
+                                        memCacheHeight:
+                                            Constants.profileCacheHeight,
+                                        cacheKey:
+                                            initUser.profilePicture.bucketPath,
+                                        imageUrl:
+                                            initUser.profilePicture.accessURI,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) =>
+                                            const Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons.error),
+                                        height: height,
+                                      )
+                                    : Container(
+                                        color: currTheme.onSecondary,
+                                        child: Icon(
+                                          Icons.person,
+                                          size: height,
+                                        ),
+                                      ),
+                                Container(
+                                  padding: EdgeInsets.only(
+                                    top: Constants.padding * 2,
+                                    bottom: Constants.padding,
+                                    left: Constants.padding,
+                                    right: Constants.padding,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        currTheme.surface
+                                            .withValues(alpha: 0.75),
+                                        currTheme.surface
+                                            .withValues(alpha: 0.75),
+                                      ],
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Heading(
+                                            initUser.username,
+                                            size: Constants.heading4,
+                                          ),
+                                          Row(
+                                            children: appBarActions(),
+                                          ),
+                                        ],
+                                      ),
+                                      Heading(
+                                        initUser.name,
+                                        size: Constants.heading3,
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(Constants.padding),
+                            child: Stack(
+                              fit: StackFit.loose,
+                              children: [
+                                UserToUserRelationWidget.label(
+                                  username: username,
+                                  disabled: true,
+                                ),
+                                Container(
+                                  color: currTheme.surface.withValues(
+                                    alpha: 0.75,
+                                  ),
+                                  height: Constants.height * 3,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ],
+                  );
+                }
+
                 if (state is ProfileLoading || state is ProfileInitial) {
                   return const Center(
                     child: CircularProgressIndicator(),
