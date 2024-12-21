@@ -1,5 +1,6 @@
 import 'package:doko_react/core/config/graphql/queries/graphql_query_constants.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
+import 'package:doko_react/core/helpers/query/query_helper.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
@@ -1004,10 +1005,10 @@ class GraphqlQueries {
       "where": {
         "OR": [
           {
-            "username_CONTAINS": query,
+            "username_MATCHES": caseInsensitiveQuery(query),
           },
           {
-            "name_CONTAINS": query,
+            "name_MATCHES": caseInsensitiveQuery(query),
           }
         ]
       },
@@ -1066,10 +1067,10 @@ class GraphqlQueries {
         "node": {
           "OR": [
             {
-              "name_CONTAINS": query,
+              "name_MATCHES": caseInsensitiveQuery(query),
             },
             {
-              "username_CONTAINS": query,
+              "username_MATCHES": caseInsensitiveQuery(query),
             },
           ],
         }
@@ -1111,7 +1112,7 @@ class GraphqlQueries {
   }) {
     return {
       "where": {
-        "username_CONTAINS": query,
+        "username_MATCHES": caseInsensitiveQuery(query),
       },
       "limit": GraphqlQueryConstants.friendSearchCommentLimit,
       "friendsConnectionWhere2": {
