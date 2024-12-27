@@ -77,15 +77,28 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
   Widget userProfileAction(CompleteUserEntity user) {
     if (self) {
-      return FilledButton.tonalIcon(
-        onPressed: () {
-          // go to edit page
-          context.pushNamed<String>(
-            RouterConstants.editProfile,
-          );
-        },
-        label: const Text("Edit"),
-        icon: const Icon(Icons.edit_note),
+      return Row(
+        spacing: Constants.gap * 3,
+        children: [
+          FilledButton.tonalIcon(
+            onPressed: () {
+              // go to edit page
+              context.pushNamed<String>(
+                RouterConstants.editProfile,
+              );
+            },
+            label: const Text("Edit"),
+            icon: const Icon(Icons.edit_note),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.pushNamed<String>(
+                RouterConstants.token,
+              );
+            },
+            child: Text("Token"),
+          ),
+        ],
       );
     }
 
@@ -202,6 +215,25 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 bool isUserEntity = graph.containsKey(key) &&
                     graph.getValueByKey(key)! is! CompleteUserEntity;
 
+                if (state is ProfileError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        StyledText.error(state.message),
+                        ElevatedButton(
+                          onPressed: () {
+                            context.read<ProfileBloc>().add(GetUserProfileEvent(
+                                  userDetails: details,
+                                ));
+                          },
+                          child: const Text("Retry"),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
                 if (isUserEntity) {
                   var initUser = graph.getValueByKey(key)! as UserEntity;
 
@@ -316,25 +348,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 if (state is ProfileLoading || state is ProfileInitial) {
                   return const Center(
                     child: CircularProgressIndicator(),
-                  );
-                }
-
-                if (state is ProfileError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        StyledText.error(state.message),
-                        ElevatedButton(
-                          onPressed: () {
-                            context.read<ProfileBloc>().add(GetUserProfileEvent(
-                                  userDetails: details,
-                                ));
-                          },
-                          child: const Text("Retry"),
-                        ),
-                      ],
-                    ),
                   );
                 }
 

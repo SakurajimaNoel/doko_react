@@ -2,7 +2,6 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/token/token_entity.dart';
-import 'package:flutter/services.dart';
 
 Future<AuthUser> getUser() async {
   try {
@@ -57,7 +56,6 @@ Future<TokenEntity> getUserToken() async {
     String accessToken = (result.userPoolTokensResult.value.accessToken.raw);
     String idToken = (result.userPoolTokensResult.value.idToken.raw);
 
-    Clipboard.setData(ClipboardData(text: accessToken)).then((value) {});
     return TokenEntity(
       accessToken: accessToken,
       idToken: idToken,

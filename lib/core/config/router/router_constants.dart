@@ -22,6 +22,7 @@ class RouterConstants {
   static const String profileFriends = "profile-friends";
   static const String userSearch = "user-search";
   static const String userPost = "user-post";
+  static const String token = "tokens";
 
   // settings page
   static const String settings = "settings";
