@@ -125,8 +125,6 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
           )),
         child: Padding(
           padding: const EdgeInsets.only(
-            left: Constants.padding,
-            right: Constants.padding,
             bottom: Constants.padding,
           ),
           child: BlocConsumer<ProfileBloc, ProfileState>(
@@ -241,37 +239,42 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Stack(
-                          alignment: AlignmentDirectional.centerEnd,
-                          children: [
-                            TextField(
-                              controller: queryController,
-                              onChanged: (String value) {
-                                UserFriendsSearchInput searchDetails =
-                                    UserFriendsSearchInput(
-                                  username: username,
-                                  query: value,
-                                  currentUsername: currentUsername,
-                                );
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: Constants.padding,
+                          ),
+                          child: Stack(
+                            alignment: AlignmentDirectional.centerEnd,
+                            children: [
+                              TextField(
+                                controller: queryController,
+                                onChanged: (String value) {
+                                  UserFriendsSearchInput searchDetails =
+                                      UserFriendsSearchInput(
+                                    username: username,
+                                    query: value,
+                                    currentUsername: currentUsername,
+                                  );
 
-                                context
-                                    .read<ProfileBloc>()
-                                    .add(UserFriendsSearchEvent(
-                                      searchDetails: searchDetails,
-                                    ));
-                              },
-                              decoration: const InputDecoration(
-                                labelText: "Search",
-                                hintText: "Search user by username or name.",
+                                  context
+                                      .read<ProfileBloc>()
+                                      .add(UserFriendsSearchEvent(
+                                        searchDetails: searchDetails,
+                                      ));
+                                },
+                                decoration: const InputDecoration(
+                                  labelText: "Search",
+                                  hintText: "Search user by username or name.",
+                                ),
                               ),
-                            ),
-                            if (searching) const SmallLoadingIndicator(),
-                            if (!searching && state is! ProfileInitial)
-                              Icon(
-                                Icons.check,
-                                color: currTheme.primary,
-                              ),
-                          ],
+                              if (searching) const SmallLoadingIndicator(),
+                              if (!searching && state is! ProfileInitial)
+                                Icon(
+                                  Icons.check,
+                                  color: currTheme.primary,
+                                ),
+                            ],
+                          ),
                         ),
                         const SizedBox(
                           height: Constants.gap * 2,
@@ -294,7 +297,7 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
                                       separatorBuilder:
                                           (BuildContext context, int index) {
                                         return const SizedBox(
-                                          height: Constants.gap,
+                                          height: Constants.gap * 0.5,
                                         );
                                       },
                                     )
@@ -304,7 +307,7 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
                                   separatorBuilder:
                                       (BuildContext context, int index) {
                                     return const SizedBox(
-                                      height: Constants.gap,
+                                      height: Constants.gap * 0.5,
                                     );
                                   },
                                 ),
