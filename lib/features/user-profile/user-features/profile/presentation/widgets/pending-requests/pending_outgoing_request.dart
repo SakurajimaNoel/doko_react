@@ -81,7 +81,9 @@ class _PendingOutgoingRequestState extends State<PendingOutgoingRequest>
           username: username,
         )),
       child: Padding(
-        padding: const EdgeInsets.all(Constants.padding),
+        padding: const EdgeInsets.symmetric(
+          vertical: Constants.padding,
+        ),
         child: BlocConsumer<ProfileBloc, ProfileState>(
           listenWhen: (previousState, state) {
             return state is PendingRequestLoadResponse;
@@ -101,23 +103,28 @@ class _PendingOutgoingRequestState extends State<PendingOutgoingRequest>
             }
 
             if (state is ProfileError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    StyledText.error(state.message),
-                    ElevatedButton(
-                      onPressed: () {
-                        context
-                            .read<ProfileBloc>()
-                            .add(PendingOutgoingRequestInitial(
-                              username: username,
-                              refresh: true,
-                            ));
-                      },
-                      child: const Text("Retry"),
-                    ),
-                  ],
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Constants.padding,
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      StyledText.error(state.message),
+                      ElevatedButton(
+                        onPressed: () {
+                          context
+                              .read<ProfileBloc>()
+                              .add(PendingOutgoingRequestInitial(
+                                username: username,
+                                refresh: true,
+                              ));
+                        },
+                        child: const Text("Retry"),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
@@ -138,19 +145,24 @@ class _PendingOutgoingRequestState extends State<PendingOutgoingRequest>
                       graph.getValueByKey(graphKey)! as Nodes;
 
                   if (pendingRequest.items.isEmpty) {
-                    return const CustomScrollView(
-                      slivers: [
-                        SliverFillRemaining(
-                          child: Center(
-                            child: Text(
-                              "You have no pending incoming requests",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: Constants.padding,
+                      ),
+                      child: const CustomScrollView(
+                        slivers: [
+                          SliverFillRemaining(
+                            child: Center(
+                              child: Text(
+                                "You have no pending incoming requests",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     );
                   }
 
@@ -159,7 +171,7 @@ class _PendingOutgoingRequestState extends State<PendingOutgoingRequest>
                     itemBuilder: buildRequestItems,
                     separatorBuilder: (BuildContext context, int index) {
                       return const SizedBox(
-                        height: Constants.gap,
+                        height: Constants.gap * 0.5,
                       );
                     },
                   );
