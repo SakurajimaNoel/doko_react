@@ -93,6 +93,11 @@ class SearchPage extends StatelessWidget {
                                     Icons.check,
                                     color: currTheme.primary,
                                   ),
+                                if (error)
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: currTheme.error,
+                                  )
                               ],
                             ),
                           ),
@@ -112,7 +117,7 @@ class SearchPage extends StatelessWidget {
                                   child: Text(
                                       "Type to search users by username or name."),
                                 )
-                              : tempResults.isEmpty
+                              : (tempResults.isEmpty && !loading)
                                   ? Center(
                                       child:
                                           Text("No user found with \"$query\""),
