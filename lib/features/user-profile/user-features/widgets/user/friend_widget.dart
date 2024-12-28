@@ -1,7 +1,10 @@
+import 'package:doko_react/core/config/router/router_constants.dart';
+import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_to_user_relation_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class FriendWidget extends StatelessWidget {
   const FriendWidget({
@@ -13,19 +16,32 @@ class FriendWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        User(
-          userKey: userKey,
-          key: ValueKey("${userKey}_user"),
-        ),
-        UserToUserRelationWidget(
-          username: generateUsernameFromKey(userKey),
-          key: ValueKey("${userKey}_relation"),
-        ),
-      ],
+    return ListTile(
+      onTap: () {
+        context.pushNamed(
+          RouterConstants.userProfile,
+          pathParameters: {
+            "username": generateUsernameFromKey(userKey),
+          },
+        );
+      },
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: Constants.padding,
+      ),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          User(
+            userKey: userKey,
+            key: ValueKey("${userKey}_user"),
+          ),
+          UserToUserRelationWidget(
+            username: generateUsernameFromKey(userKey),
+            key: ValueKey("${userKey}_relation"),
+          ),
+        ],
+      ),
     );
   }
 }
