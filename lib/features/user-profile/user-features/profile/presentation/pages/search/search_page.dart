@@ -35,61 +35,72 @@ class SearchPage extends StatelessWidget {
               }
 
               return Padding(
-                padding: const EdgeInsets.all(Constants.padding),
+                padding: const EdgeInsets.symmetric(
+                  vertical: Constants.padding,
+                ),
                 child: Flex(
                   direction: Axis.vertical,
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
+                      spacing: Constants.gap,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            context.pop();
-                          },
-                          child: const Icon(Icons.arrow_back_outlined),
-                        ),
-                        const SizedBox(
-                          width: Constants.gap,
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: Constants.padding,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              context.pop();
+                            },
+                            child: const Icon(Icons.arrow_back_outlined),
+                          ),
                         ),
                         Expanded(
-                          child: Stack(
-                            alignment: AlignmentDirectional.centerEnd,
-                            children: [
-                              TextField(
-                                onChanged: (String value) {
-                                  UserSearchInput searchDetails =
-                                      UserSearchInput(
-                                    username: username,
-                                    query: value,
-                                  );
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              right: Constants.padding,
+                            ),
+                            child: Stack(
+                              alignment: AlignmentDirectional.centerEnd,
+                              children: [
+                                TextField(
+                                  onChanged: (String value) {
+                                    UserSearchInput searchDetails =
+                                        UserSearchInput(
+                                      username: username,
+                                      query: value,
+                                    );
 
-                                  query = value;
+                                    query = value;
 
-                                  context
-                                      .read<ProfileBloc>()
-                                      .add(UserSearchEvent(
-                                        searchDetails: searchDetails,
-                                      ));
-                                },
-                                decoration: const InputDecoration(
-                                  labelText: "Search",
-                                  hintText: "Search user by username or name.",
+                                    context
+                                        .read<ProfileBloc>()
+                                        .add(UserSearchEvent(
+                                          searchDetails: searchDetails,
+                                        ));
+                                  },
+                                  decoration: const InputDecoration(
+                                    labelText: "Search",
+                                    hintText:
+                                        "Search user by username or name.",
+                                  ),
                                 ),
-                              ),
-                              if (loading) const SmallLoadingIndicator(),
-                              if (!loading && state is! ProfileInitial)
-                                Icon(
-                                  Icons.check,
-                                  color: currTheme.primary,
-                                ),
-                            ],
+                                if (loading) const SmallLoadingIndicator(),
+                                if (!loading && state is! ProfileInitial)
+                                  Icon(
+                                    Icons.check,
+                                    color: currTheme.primary,
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(
-                      height: Constants.gap * 2,
+                      height: Constants.gap * 1.5,
                     ),
                     Flexible(
                       child: error
@@ -117,7 +128,7 @@ class SearchPage extends StatelessWidget {
                                       separatorBuilder:
                                           (BuildContext context, int index) {
                                         return const SizedBox(
-                                          height: Constants.gap,
+                                          height: Constants.gap * 0.5,
                                         );
                                       },
                                     ),
