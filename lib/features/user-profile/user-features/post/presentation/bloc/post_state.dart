@@ -127,12 +127,14 @@ final class CommentSearchLoading extends CommentSearchState {
 final class CommentSearchSuccessState extends CommentSearchState {
   CommentSearchSuccessState({
     required this.searchResults,
+    required this.query,
   });
 
+  final String query;
   final List<String> searchResults;
 
   @override
-  List<Object?> get props => [searchResults];
+  List<Object?> get props => [searchResults, query];
 }
 
 final class CommentSearchErrorState extends PostState {

@@ -183,9 +183,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       CommentMentionSearchEvent event, Emitter<PostState> emit) async {
     try {
       if (event.searchDetails.query.isEmpty) {
-        emit(CommentSearchSuccessState(
-          searchResults: [],
-        ));
+        emit(PostInitial());
         return;
       }
 
@@ -194,6 +192,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           await _commentsMentionSearchUseCase(event.searchDetails);
 
       emit(CommentSearchSuccessState(
+        query: event.searchDetails.query,
         searchResults: searchResults,
       ));
     } on ApplicationException catch (e) {
