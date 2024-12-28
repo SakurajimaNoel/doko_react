@@ -180,14 +180,13 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
         if (status == UserToUserRelation.incomingReq) {
           if (label) {
             return Row(
+              spacing: Constants.gap,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 FilledButton.tonalIcon(
                   onPressed: () => acceptFriendRelation(user),
                   icon: const Icon(Icons.check),
                   label: const Text("Accept"),
-                ),
-                const SizedBox(
-                  width: Constants.gap,
                 ),
                 FilledButton.tonalIcon(
                   onPressed: () => removeFriendRelation(user),
@@ -210,6 +209,8 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
           }
 
           return Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: Constants.gap * 0.5,
             children: [
               IconButton(
                 onPressed: () => acceptFriendRelation(user),
@@ -222,9 +223,6 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
                     color: currTheme.primary,
                   ),
                 ),
-              ),
-              const SizedBox(
-                width: Constants.gap * 0.5,
               ),
               IconButton(
                 onPressed: () => removeFriendRelation(user),
@@ -244,37 +242,75 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
 
         // friends
         if (label) {
-          return OutlinedButton.icon(
-            onPressed: () => removeFriendRelation(user),
-            icon: Icon(
-              Icons.close,
-              color: currTheme.error,
-            ),
-            label: Text(
-              "Unfriend",
-              style: TextStyle(
-                color: currTheme.error,
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: Constants.gap,
+            children: [
+              OutlinedButton.icon(
+                onPressed: () => removeFriendRelation(user),
+                icon: Icon(
+                  Icons.person_remove_alt_1,
+                  color: currTheme.error,
+                ),
+                label: Text(
+                  "Unfriend",
+                  style: TextStyle(
+                    color: currTheme.error,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: currTheme.error,
+                  ),
+                ),
               ),
-            ),
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(
-                color: currTheme.error,
+              OutlinedButton.icon(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.chat_outlined,
+                ),
+                label: Text(
+                  "Message",
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: currTheme.primary,
+                  ),
+                ),
               ),
-            ),
+            ],
           );
         }
 
-        return IconButton(
-          onPressed: () => removeFriendRelation(user),
-          icon: Icon(
-            Icons.person_remove_alt_1,
-            color: currTheme.error,
-          ),
-          style: IconButton.styleFrom(
-            side: BorderSide(
-              color: currTheme.error,
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: Constants.gap * 0.5,
+          children: [
+            IconButton(
+              onPressed: () => removeFriendRelation(user),
+              icon: Icon(
+                Icons.person_remove_alt_1,
+                color: currTheme.error,
+              ),
+              style: IconButton.styleFrom(
+                side: BorderSide(
+                  color: currTheme.error,
+                ),
+              ),
             ),
-          ),
+            IconButton(
+              onPressed: () {},
+              icon: Icon(
+                Icons.chat_outlined,
+                color: currTheme.primary,
+              ),
+              style: IconButton.styleFrom(
+                side: BorderSide(
+                  color: currTheme.primary,
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
