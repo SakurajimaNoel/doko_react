@@ -46,9 +46,7 @@ class CommentInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currTheme = Theme
-        .of(context)
-        .colorScheme;
+    final currTheme = Theme.of(context).colorScheme;
 
     return ChangeNotifierProvider(
       create: (BuildContext context) {
@@ -97,8 +95,8 @@ class CommentInput extends StatelessWidget {
               commentsCount = post.commentsCount;
             } else {
               final CommentEntity comment =
-              graph.getValueByKey(generateCommentNodeKey(targetId))!
-              as CommentEntity;
+                  graph.getValueByKey(generateCommentNodeKey(targetId))!
+                      as CommentEntity;
               userLike = comment.userLike;
               likesCount = comment.likesCount;
               commentsCount = comment.commentsCount;
@@ -112,14 +110,14 @@ class CommentInput extends StatelessWidget {
 
             // emit user action
             context.read<UserActionBloc>().add(
-              UserActionNewCommentEvent(
-                commentId: commentId,
-                userLike: userLike,
-                commentsCount: commentsCount,
-                likesCount: likesCount,
-                targetId: targetId,
-              ),
-            );
+                  UserActionNewCommentEvent(
+                    commentId: commentId,
+                    userLike: userLike,
+                    commentsCount: commentsCount,
+                    likesCount: likesCount,
+                    targetId: targetId,
+                  ),
+                );
           },
           child: Column(
             children: [
@@ -141,8 +139,7 @@ class CommentInput extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            "Replying to ${commentProvider
-                                .targetByUser}'s comment.",
+                            "Replying to ${commentProvider.targetByUser}'s comment.",
                             style: TextStyle(
                               color: currTheme.onPrimaryContainer,
                             ),
@@ -156,12 +153,12 @@ class CommentInput extends StatelessWidget {
                               onPressed: adding
                                   ? null
                                   : () {
-                                commentProvider.resetCommentTarget();
-                              },
+                                      commentProvider.resetCommentTarget();
+                                    },
                               style: IconButton.styleFrom(
                                 minimumSize: Size.zero,
                                 padding:
-                                EdgeInsets.all(Constants.padding * 0.5),
+                                    EdgeInsets.all(Constants.padding * 0.5),
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
                               iconSize: Constants.width * 1.25,
@@ -222,19 +219,13 @@ class _CommentMentionOverlay extends StatefulWidget {
 class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
   final link = LayerLink();
   final OverlayPortalController overlayPortalController =
-  OverlayPortalController();
+      OverlayPortalController();
   late final username =
-      (context
-          .read<UserBloc>()
-          .state as UserCompleteState).username;
+      (context.read<UserBloc>().state as UserCompleteState).username;
 
   late final commentController =
-      context
-          .read<CommentInputProvider>()
-          .commentController;
-  late final focusNode = context
-      .read<PostCommentProvider>()
-      .focusNode;
+      context.read<CommentInputProvider>().commentController;
+  late final focusNode = context.read<PostCommentProvider>().focusNode;
 
   List<String> userSearchResults = [];
 
@@ -292,9 +283,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
       return;
     }
 
-    String beforeSelectionLast = beforeSelection
-        .split(" ")
-        .last;
+    String beforeSelectionLast = beforeSelection.split(" ").last;
 
     if (beforeSelectionLast.contains("@")) {
       // use this string to fetch user based on the conditions
@@ -308,8 +297,8 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
         query: mentionString,
       );
       context.read<PostBloc>().add(CommentMentionSearchEvent(
-        searchDetails: searchDetails,
-      ));
+            searchDetails: searchDetails,
+          ));
 
       if (!overlayPortalController.isShowing) {
         overlayPortalController.show();
@@ -329,168 +318,139 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
   }
 
   Widget generateOverlayContent() {
-    final height = MediaQuery
-        .sizeOf(context)
-        .height / 5;
-    final currTheme = Theme
-        .of(context)
-        .colorScheme;
+    final height = MediaQuery.sizeOf(context).height / 5;
+    final currTheme = Theme.of(context).colorScheme;
 
-    final WidgetStateProperty<Color?> effectiveOverlayColor =
-    WidgetStateProperty.resolveWith((Set<WidgetState> states) {
-      if (states.contains(WidgetState.pressed)) {
-        return currTheme.onSurface.withValues(alpha: 0.1);
-      }
-      if (states.contains(WidgetState.hovered)) {
-        return currTheme.onSurface.withValues(alpha: 0.08);
-      }
-      if (states.contains(WidgetState.focused)) {
-        return currTheme.onSurface.withValues(alpha: 0.1);
-      }
-      return null;
-    });
+    return Material(
+      color: currTheme.surfaceContainer,
+      child: BlocBuilder<PostBloc, PostState>(
+        buildWhen: (previousState, state) {
+          return state is CommentSearchState;
+        },
+        builder: (context, state) {
+          bool initial = state is PostInitial;
+          bool loading =
+              state is CommentSearchLoading && userSearchResults.isEmpty;
+          bool error = state is CommentSearchErrorState;
+          bool searchResult = state is CommentSearchSuccessState;
 
-    return BlocBuilder<PostBloc, PostState>(
-      buildWhen: (previousState, state) {
-        return state is CommentSearchState;
-      },
-      builder: (context, state) {
-        bool initial = state is PostInitial;
-        bool loading =
-            state is CommentSearchLoading && userSearchResults.isEmpty;
-        bool error = state is CommentSearchErrorState;
-        bool searchResult = state is CommentSearchSuccessState;
-
-        if (initial) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: height,
-                child: const Center(
-                  child: Heading(
-                    "Type to search users",
-                    size: Constants.fontSize,
+          if (initial) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: height,
+                  child: const Center(
+                    child: Heading(
+                      "Type to search users",
+                      size: Constants.fontSize,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          );
-        }
+              ],
+            );
+          }
 
-        if (loading) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: height,
-                child: const Center(
-                  child: SmallLoadingIndicator(),
-                ),
-              ),
-            ],
-          );
-        }
-
-        if (error) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: height,
-                child: Center(
-                  child: StyledText.error(state.message),
-                ),
-              ),
-            ],
-          );
-        }
-
-        if (searchResult) {
-          userSearchResults = state.searchResults;
-        }
-
-        if (userSearchResults.isEmpty) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: height,
-                child: const Center(
-                  child: Heading(
-                    "No user found.",
-                    size: Constants.fontSize,
+          if (loading) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: height,
+                  child: const Center(
+                    child: SmallLoadingIndicator(),
                   ),
                 ),
-              ),
-            ],
-          );
-        }
+              ],
+            );
+          }
 
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: Constants.gap,
-          children: [
-            ...List.generate(
-              userSearchResults.length,
-                  (index) {
-                String userKey = userSearchResults[index];
-                String username = generateUsernameFromKey(userKey);
-                return SizedBox(
-                  height: 50,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    fit: StackFit.expand,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(Constants.padding * 0.25),
-                        child: User(
-                          userKey: userKey,
-                        ),
+          if (error) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: height,
+                  child: Center(
+                    child: StyledText.error(state.message),
+                  ),
+                ),
+              ],
+            );
+          }
+
+          if (searchResult) {
+            userSearchResults = state.searchResults;
+          }
+
+          if (searchResult && userSearchResults.isEmpty) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: height,
+                  child: Center(
+                    child: Text(
+                      "No user found with username '${state.query}'.",
+                      style: TextStyle(
+                        fontSize: Constants.fontSize,
                       ),
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            commentController.addMention(username);
-                          },
-                          overlayColor: effectiveOverlayColor,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                );
-              },
-            ),
-            if (state is CommentSearchLoading) ...[
-              const SizedBox(
-                height: Constants.gap,
-              ),
-              SizedBox(
-                height: Constants.height,
-                child: Center(
-                  child: SmallLoadingIndicator.appBar(),
                 ),
+              ],
+            );
+          }
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: Constants.gap,
+            children: [
+              ...List.generate(
+                userSearchResults.length,
+                (index) {
+                  String userKey = userSearchResults[index];
+                  String username = generateUsernameFromKey(userKey);
+
+                  return ListTile(
+                    minTileHeight: Constants.height * 3,
+                    // tileColor: currTheme.surfaceContainer,
+                    leading: User.avtar(
+                      userKey: userKey,
+                    ),
+                    title: User.info(
+                      userKey: userKey,
+                    ),
+                    onTap: () {
+                      commentController.addMention(username);
+                    },
+                  );
+                },
               ),
-            ]
-          ],
-        );
-      },
+              if (state is CommentSearchLoading) ...[
+                const SizedBox(
+                  height: Constants.gap,
+                ),
+                SizedBox(
+                  height: Constants.height,
+                  child: Center(
+                    child: SmallLoadingIndicator.appBar(),
+                  ),
+                ),
+              ]
+            ],
+          );
+        },
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final currTheme = Theme
-        .of(context)
-        .colorScheme;
-    final width = MediaQuery
-        .sizeOf(context)
-        .width;
-    final height = MediaQuery
-        .sizeOf(context)
-        .height;
+    final currTheme = Theme.of(context).colorScheme;
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
 
     bool adding = false;
 
@@ -527,7 +487,9 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                   ),
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(Constants.padding * 0.75),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: Constants.padding * 0.5,
+                    ),
                     scrollDirection: Axis.vertical,
                     child: generateOverlayContent(),
                   ),
@@ -576,7 +538,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
 
                     if (data.hasData) {
                       String? extension =
-                      getFileExtensionFromMimeType(data.mimeType);
+                          getFileExtensionFromMimeType(data.mimeType);
 
                       if (extension == null) {
                         showMessage(Constants.errorMessage);
@@ -584,11 +546,11 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                       }
 
                       context.read<CommentInputProvider>().addMedia(
-                        CommentMedia(
-                          extension: extension,
-                          data: data.data,
-                        ),
-                      );
+                            CommentMedia(
+                              extension: extension,
+                              data: data.data,
+                            ),
+                          );
                     }
                   },
                 ),
@@ -606,13 +568,9 @@ class _CommentMedia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery
-        .sizeOf(context)
-        .width - Constants.padding * 2;
+    final width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
     final commentMediaHeight = width / Constants.commentContainer;
-    final currTheme = Theme
-        .of(context)
-        .colorScheme;
+    final currTheme = Theme.of(context).colorScheme;
 
     return Builder(builder: (context) {
       final commentInputProvider = context.watch<CommentInputProvider>();
@@ -632,18 +590,17 @@ class _CommentMedia extends StatelessWidget {
             media.extension != "uri"
                 ? Image.memory(media.data!)
                 : CachedNetworkImage(
-              cacheKey: media.uri!,
-              fit: BoxFit.cover,
-              imageUrl: media.uri!,
-              placeholder: (context, url) =>
-              const Center(
-                child: CircularProgressIndicator(),
-              ),
-              errorWidget: (context, url, error) =>
-              const Icon(Icons.error),
-              filterQuality: FilterQuality.high,
-              memCacheHeight: Constants.postCacheHeight,
-            ),
+                    cacheKey: media.uri!,
+                    fit: BoxFit.cover,
+                    imageUrl: media.uri!,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                    filterQuality: FilterQuality.high,
+                    memCacheHeight: Constants.postCacheHeight,
+                  ),
             BlocBuilder<NodeCreateBloc, NodeCreateState>(
               builder: (context, state) {
                 bool adding = state is NodeCreateLoading;
@@ -655,8 +612,8 @@ class _CommentMedia extends StatelessWidget {
                   onPressed: adding
                       ? null
                       : () {
-                    commentInputProvider.removeMedia();
-                  },
+                          commentInputProvider.removeMedia();
+                        },
                   icon: Icon(
                     Icons.delete,
                     color: currTheme.onError,
@@ -698,7 +655,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
     final commentProvider = context.read<PostCommentProvider>();
 
     CommentContentInput content =
-    commentInputProvider.commentController.getCommentInput();
+        commentInputProvider.commentController.getCommentInput();
     String? bucketPath;
 
     final media = commentInputProvider.media;
@@ -707,8 +664,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
       if (media.extension != "uri") {
         // generate bucket path
         bucketPath =
-        "${commentProvider.postCreatedBy}/posts/${commentProvider
-            .postId}/comment/${generateUniqueString()}${media.extension}";
+            "${commentProvider.postCreatedBy}/posts/${commentProvider.postId}/comment/${generateUniqueString()}${media.extension}";
       } else {
         bucketPath = media.uri;
       }
@@ -720,26 +676,22 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
       bucketPath: bucketPath,
       targetNodeId: commentProvider.commentTargetId,
       targetNode:
-      commentProvider.isReply ? CommentTarget.comment : CommentTarget.post,
-      username: (context
-          .read<UserBloc>()
-          .state as UserCompleteState).username,
+          commentProvider.isReply ? CommentTarget.comment : CommentTarget.post,
+      username: (context.read<UserBloc>().state as UserCompleteState).username,
     );
 
     context.read<NodeCreateBloc>().add(CreateCommentEvent(
-      commentDetails: commentDetails,
-    ));
+          commentDetails: commentDetails,
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
-    final currTheme = Theme
-        .of(context)
-        .colorScheme;
+    final currTheme = Theme.of(context).colorScheme;
 
     return Builder(builder: (context) {
       bool showMore =
-      context.select((CommentInputProvider cip) => cip.showMore);
+          context.select((CommentInputProvider cip) => cip.showMore);
 
       return BlocBuilder<NodeCreateBloc, NodeCreateState>(
         builder: (context, state) {
@@ -755,51 +707,51 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                 onPressed: adding
                     ? null
                     : () async {
-                  final ImagePicker picker = ImagePicker();
-                  final XFile? selectedMedia = await picker.pickImage(
-                    source: ImageSource.gallery,
-                  );
+                        final ImagePicker picker = ImagePicker();
+                        final XFile? selectedMedia = await picker.pickImage(
+                          source: ImageSource.gallery,
+                        );
 
-                  if (selectedMedia == null) return;
+                        if (selectedMedia == null) return;
 
-                  String? extension =
-                  getFileExtensionFromFileName(selectedMedia.path);
+                        String? extension =
+                            getFileExtensionFromFileName(selectedMedia.path);
 
-                  if (extension == null) {
-                    showMessage("Invalid media file selected.");
-                    return;
-                  }
+                        if (extension == null) {
+                          showMessage("Invalid media file selected.");
+                          return;
+                        }
 
-                  if (extension == ".gif" ||
-                      (extension == ".webp" &&
-                          await isWebpAnimated(selectedMedia.path))) {
-                    final animatedData =
-                    await selectedMedia.readAsBytes();
-                    CommentMedia media = CommentMedia(
-                      extension: extension,
-                      data: animatedData,
-                    );
+                        if (extension == ".gif" ||
+                            (extension == ".webp" &&
+                                await isWebpAnimated(selectedMedia.path))) {
+                          final animatedData =
+                              await selectedMedia.readAsBytes();
+                          CommentMedia media = CommentMedia(
+                            extension: extension,
+                            data: animatedData,
+                          );
 
-                    addMedia(media);
-                    return;
-                  }
+                          addMedia(media);
+                          return;
+                        }
 
-                  if (!mounted) return;
+                        if (!mounted) return;
 
-                  CroppedFile? croppedMedia = await getCroppedImage(
-                    selectedMedia.path,
-                    context: context,
-                    location: ImageLocation.comment,
-                  );
-                  if (croppedMedia == null) return;
-                  final mediaData = await croppedMedia.readAsBytes();
-                  CommentMedia media = CommentMedia(
-                    extension: extension,
-                    data: mediaData,
-                  );
+                        CroppedFile? croppedMedia = await getCroppedImage(
+                          selectedMedia.path,
+                          context: context,
+                          location: ImageLocation.comment,
+                        );
+                        if (croppedMedia == null) return;
+                        final mediaData = await croppedMedia.readAsBytes();
+                        CommentMedia media = CommentMedia(
+                          extension: extension,
+                          data: mediaData,
+                        );
 
-                  addMedia(media);
-                },
+                        addMedia(media);
+                      },
                 style: IconButton.styleFrom(
                   minimumSize: Size.zero,
                   padding: EdgeInsets.all(Constants.padding * 0.5),
@@ -817,31 +769,29 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                 onPressed: adding
                     ? null
                     : () async {
-                  GiphyGif? gif = await GiphyGet.getGif(
-                    context: context,
-                    apiKey: Secrets.giphy,
-                    randomID: (context
-                        .read<UserBloc>()
-                        .state
-                    as UserCompleteState)
-                        .username,
-                    tabColor: currTheme.primary,
-                    debounceTimeInMilliseconds: 500,
-                  );
+                        GiphyGif? gif = await GiphyGet.getGif(
+                          context: context,
+                          apiKey: Secrets.giphy,
+                          randomID: (context.read<UserBloc>().state
+                                  as UserCompleteState)
+                              .username,
+                          tabColor: currTheme.primary,
+                          debounceTimeInMilliseconds: 500,
+                        );
 
-                  String? uri = getValidGiphyURI(gif);
-                  if (uri == null || uri.isEmpty) {
-                    showMessage(Constants.errorMessage);
-                    return;
-                  }
+                        String? uri = getValidGiphyURI(gif);
+                        if (uri == null || uri.isEmpty) {
+                          showMessage(Constants.errorMessage);
+                          return;
+                        }
 
-                  CommentMedia giphyMedia = CommentMedia(
-                    extension: "uri",
-                    uri: uri,
-                  );
+                        CommentMedia giphyMedia = CommentMedia(
+                          extension: "uri",
+                          uri: uri,
+                        );
 
-                  addMedia(giphyMedia);
-                },
+                        addMedia(giphyMedia);
+                      },
                 style: IconButton.styleFrom(
                   minimumSize: Size.zero,
                   padding: EdgeInsets.all(Constants.padding * 0.5),
@@ -860,18 +810,18 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                   onPressed: adding
                       ? null
                       : () {
-                    handleAddComment();
-                  },
+                          handleAddComment();
+                        },
                   icon: adding
                       ? null
                       : commentProvider.isReply
-                      ? const Icon(Icons.reply)
-                      : const Icon(Icons.add),
+                          ? const Icon(Icons.reply)
+                          : const Icon(Icons.add),
                   label: adding
                       ? SmallLoadingIndicator.appBar()
                       : commentProvider.isReply
-                      ? const Text("Reply")
-                      : const Text("Add"),
+                          ? const Text("Reply")
+                          : const Text("Add"),
                   style: FilledButton.styleFrom(),
                 );
               }),
