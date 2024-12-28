@@ -14,23 +14,54 @@ class User extends StatelessWidget {
   const User({
     super.key,
     required this.userKey,
-  }) : small = false;
+  })  : small = false,
+        profileOnly = false,
+        textOnly = false;
+
+  const User.avtar({
+    super.key,
+    required this.userKey,
+  })  : small = false,
+        profileOnly = true,
+        textOnly = false;
+
+  const User.info({
+    super.key,
+    required this.userKey,
+  })  : small = false,
+        profileOnly = false,
+        textOnly = true;
 
   const User.small({
     super.key,
     required this.userKey,
-  }) : small = true;
+  })  : small = true,
+        profileOnly = false,
+        textOnly = false;
+
+  const User.avtarSmall({
+    super.key,
+    required this.userKey,
+  })  : small = true,
+        profileOnly = true,
+        textOnly = false;
+
+  const User.infoSmall({
+    super.key,
+    required this.userKey,
+  })  : small = true,
+        profileOnly = false,
+        textOnly = true;
 
   final String userKey;
   final bool small;
+  final bool profileOnly;
+  final bool textOnly;
 
   @override
   Widget build(BuildContext context) {
     final currentUserKey = generateUserNodeKey(
         (context.read<UserBloc>().state as UserCompleteState).username);
-
-    double usernameScale = small ? 0.9 : 1;
-    double nameScale = small ? 1.1 : 1.2;
 
     double gapScale = small ? 0.75 : 1;
 
@@ -45,6 +76,14 @@ class User extends StatelessWidget {
         final UserGraph graph = UserGraph();
         final UserEntity user = graph.getValueByKey(userKey)! as UserEntity;
 
+        if (profileOnly) {
+          return userAvtar(user.profilePicture);
+        }
+
+        if (textOnly) {
+          return userInfo(user);
+        }
+
         return GestureDetector(
           onTap: () {
             context.pushNamed(
@@ -55,33 +94,38 @@ class User extends StatelessWidget {
             );
           },
           child: Row(
+            spacing: Constants.gap * gapScale,
             children: [
               userAvtar(user.profilePicture),
-              SizedBox(
-                width: Constants.gap * gapScale,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    user.name,
-                    style: TextStyle(
-                      fontSize: Constants.smallFontSize * nameScale,
-                    ),
-                  ),
-                  Text(
-                    "@${user.username}",
-                    style: TextStyle(
-                      fontSize: Constants.smallFontSize * usernameScale,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+              userInfo(user),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget userInfo(UserEntity user) {
+    double usernameScale = small ? 0.9 : 1;
+    double nameScale = small ? 1.1 : 1.2;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          user.name,
+          style: TextStyle(
+            fontSize: Constants.smallFontSize * nameScale,
+          ),
+        ),
+        Text(
+          "@${user.username}",
+          style: TextStyle(
+            fontSize: Constants.smallFontSize * usernameScale,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 
