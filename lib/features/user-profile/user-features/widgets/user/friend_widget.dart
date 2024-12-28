@@ -25,22 +25,19 @@ class FriendWidget extends StatelessWidget {
           },
         );
       },
+      minVerticalPadding: Constants.padding * 0.75,
       contentPadding: EdgeInsets.symmetric(
         horizontal: Constants.padding,
       ),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          User(
-            userKey: userKey,
-            key: ValueKey("${userKey}_user"),
-          ),
-          UserToUserRelationWidget(
-            username: generateUsernameFromKey(userKey),
-            key: ValueKey("${userKey}_relation"),
-          ),
-        ],
+      leading: User.avtar(
+        userKey: userKey,
+      ),
+      trailing: UserToUserRelationWidget(
+        username: generateUsernameFromKey(userKey),
+        key: ValueKey("${userKey}_relation"),
+      ),
+      title: User.info(
+        userKey: userKey,
       ),
     );
   }
