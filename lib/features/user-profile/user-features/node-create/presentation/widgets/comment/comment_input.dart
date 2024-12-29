@@ -435,7 +435,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                 SizedBox(
                   height: Constants.height,
                   child: Center(
-                    child: SmallLoadingIndicator.appBar(),
+                    child: SmallLoadingIndicator.small(),
                   ),
                 ),
               ]
@@ -594,7 +594,7 @@ class _CommentMedia extends StatelessWidget {
                     fit: BoxFit.cover,
                     imageUrl: media.uri!,
                     placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
+                      child: SmallLoadingIndicator.small(),
                     ),
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.error),
@@ -818,7 +818,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                           ? const Icon(Icons.reply)
                           : const Icon(Icons.add),
                   label: adding
-                      ? SmallLoadingIndicator.appBar()
+                      ? SmallLoadingIndicator.small()
                       : commentProvider.isReply
                           ? const Text("Reply")
                           : const Text("Add"),

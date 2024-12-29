@@ -159,7 +159,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 TextButton(
                   onPressed: updating ? null : () => handleEditProfile(context),
                   child: updating
-                      ? const SmallLoadingIndicator.appBar()
+                      ? const SmallLoadingIndicator.small()
                       : const Text("Save"),
                 ),
               ],
@@ -367,7 +367,7 @@ class _ProfileSelectionState extends State<_ProfileSelection> {
       imageUrl: widget.currentProfile.accessURI,
       fit: BoxFit.cover,
       placeholder: (context, url) => const Center(
-        child: CircularProgressIndicator(),
+        child: SmallLoadingIndicator.small(),
       ),
       errorWidget: (context, url, error) => const Icon(Icons.error),
       height: height,

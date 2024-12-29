@@ -5,7 +5,7 @@ class SmallLoadingIndicator extends StatelessWidget {
   const SmallLoadingIndicator({super.key, this.color})
       : diameter = Constants.height * 1.5;
 
-  const SmallLoadingIndicator.appBar({super.key, this.color})
+  const SmallLoadingIndicator.small({super.key, this.color})
       : diameter = Constants.height;
 
   final Color? color;

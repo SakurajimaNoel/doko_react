@@ -5,6 +5,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/helpers/extension/go_router_extension.dart';
 import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
+import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/core/widgets/video-player/video_player.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
@@ -105,7 +106,7 @@ class _PostContent extends StatelessWidget {
       fit: BoxFit.cover,
       imageUrl: image.resource.accessURI,
       placeholder: (context, url) => const Center(
-        child: CircularProgressIndicator(),
+        child: SmallLoadingIndicator.small(),
       ),
       errorWidget: (context, url, error) => const Icon(Icons.error),
       filterQuality: FilterQuality.high,

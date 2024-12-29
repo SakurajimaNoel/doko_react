@@ -4,6 +4,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
+import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/public/sign-out-button/sign_out_button.dart';
@@ -257,7 +258,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                         fit: BoxFit.cover,
                                         placeholder: (context, url) =>
                                             const Center(
-                                          child: CircularProgressIndicator(),
+                                          child: SmallLoadingIndicator.small(),
                                         ),
                                         errorWidget: (context, url, error) =>
                                             const Icon(Icons.error),
@@ -407,7 +408,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                           fit: BoxFit.cover,
                                           placeholder: (context, url) =>
                                               const Center(
-                                            child: CircularProgressIndicator(),
+                                            child:
+                                                SmallLoadingIndicator.small(),
                                           ),
                                           errorWidget: (context, url, error) =>
                                               const Icon(Icons.error),

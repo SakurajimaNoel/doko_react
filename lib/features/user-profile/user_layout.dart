@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
+import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -64,7 +65,7 @@ class _UserLayoutState extends State<UserLayout> {
                       cacheKey: user.profilePicture.bucketPath,
                       imageUrl: user.profilePicture.accessURI,
                       placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(),
+                        child: SmallLoadingIndicator.small(),
                       ),
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),
@@ -88,7 +89,7 @@ class _UserLayoutState extends State<UserLayout> {
                       cacheKey: user.profilePicture.bucketPath,
                       imageUrl: user.profilePicture.accessURI,
                       placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(),
+                        child: SmallLoadingIndicator.small(),
                       ),
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),

@@ -85,7 +85,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                 fit: BoxFit.contain,
                 imageUrl: comment.media.accessURI,
                 placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
+                  child: SmallLoadingIndicator.small(),
                 ),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
                 filterQuality: FilterQuality.high,
@@ -556,7 +556,7 @@ class _CommentRepliesState extends State<_CommentReplies> {
                               ),
                             ),
                             child: loading
-                                ? SmallLoadingIndicator.appBar()
+                                ? SmallLoadingIndicator.small()
                                 : comment.showReplies
                                     ? Text("View more replies")
                                     : Text("View replies"),
