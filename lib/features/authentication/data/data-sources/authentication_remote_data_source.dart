@@ -4,6 +4,7 @@ import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/features/authentication/data/models/setup_mfa/setup_mfa_model.dart';
 import 'package:doko_react/features/authentication/domain/entities/login/login_entity.dart';
 import 'package:doko_react/features/authentication/input/authentication_input.dart';
+import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 
 class AuthenticationRemoteDataSource {
   const AuthenticationRemoteDataSource({
@@ -76,9 +77,15 @@ class AuthenticationRemoteDataSource {
 
   Future<void> logoutUser() async {
     final result = await _auth.signOut();
+    final UserGraph graph = UserGraph();
 
     if (result is CognitoFailedSignOut) {
       throw (result.exception.message);
+    } else {
+      // reset all the resources here
+      graph.reset();
+
+      // todo: handle xmpp connection too
     }
   }
 

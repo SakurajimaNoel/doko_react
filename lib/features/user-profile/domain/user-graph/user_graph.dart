@@ -27,6 +27,10 @@ class UserGraph {
     return _graph.containsKey(key);
   }
 
+  void reset() {
+    _graph.clear();
+  }
+
   /// this will be used to get the instance in widgets
   /// to display information
   /// keys are user:username, post:post_id, comment:comment_id
