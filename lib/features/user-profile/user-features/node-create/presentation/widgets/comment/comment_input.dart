@@ -38,6 +38,7 @@ class CommentInput extends StatelessWidget {
   void showMessage(String message, BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         content: Text(message),
         duration: Constants.snackBarDuration,
       ),
@@ -311,6 +312,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
   void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         content: Text(message),
         duration: Constants.snackBarDuration,
       ),
@@ -640,6 +642,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
   void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         content: Text(message),
         duration: Constants.snackBarDuration,
       ),

@@ -26,6 +26,7 @@ class _SignUpPageState extends State<SignUpPage> {
   void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         content: Text(message),
         duration: Constants.snackBarDuration,
       ),

@@ -17,6 +17,7 @@ class _RemoveMfaButtonState extends State<RemoveMfaButton> {
   void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         content: Text(message),
         duration: Constants.snackBarDuration,
       ),

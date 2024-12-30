@@ -67,6 +67,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         content: Text(message),
         duration: Constants.snackBarDuration,
       ),

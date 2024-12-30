@@ -27,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         content: Text(message),
         duration: Constants.snackBarDuration,
       ),

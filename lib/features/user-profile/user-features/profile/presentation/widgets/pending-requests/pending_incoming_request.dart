@@ -36,6 +36,7 @@ class _PendingIncomingRequestState extends State<PendingIncomingRequest>
   void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         content: Text(message),
         duration: Constants.snackBarDuration,
       ),
