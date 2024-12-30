@@ -71,8 +71,8 @@ class _UserLayoutState extends State<UserLayout> {
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),
                       fit: BoxFit.cover,
-                      width: 34,
-                      height: 34,
+                      width: 40,
+                      height: 40,
                       memCacheHeight: Constants.thumbnailCacheHeight,
                     ),
                   ),
@@ -102,7 +102,11 @@ class _UserLayoutState extends State<UserLayout> {
                   ),
                 ),
               ),
-        label: trimText(user.name, len: 10),
+        label: trimText(
+          user.name,
+          len: 16,
+        ),
+        tooltip: user.name,
       ),
     ];
   }
