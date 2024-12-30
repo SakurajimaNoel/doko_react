@@ -20,7 +20,7 @@ import 'package:doko_react/features/user-profile/user-features/node-create/prese
 import 'package:doko_react/features/user-profile/user-features/post/presentation/bloc/post_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/post/presentation/provider/post_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
-import 'package:doko_react/features/user-profile/user-features/widgets/user/user.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:doko_react/secret/secrets.dart';
 import 'package:flutter/material.dart';
@@ -416,10 +416,10 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                   return ListTile(
                     minTileHeight: Constants.height * 3,
                     // tileColor: currTheme.surfaceContainer,
-                    leading: User.avtar(
+                    leading: UserWidget.avtar(
                       userKey: userKey,
                     ),
-                    title: User.info(
+                    title: UserWidget.info(
                       userKey: userKey,
                     ),
                     onTap: () {

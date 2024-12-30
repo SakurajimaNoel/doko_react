@@ -12,7 +12,7 @@ import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.da
 import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
 import 'package:doko_react/features/user-profile/user-features/post/presentation/bloc/post_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/post/presentation/provider/post_provider.dart';
-import 'package:doko_react/features/user-profile/user-features/widgets/user/user.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -61,7 +61,7 @@ class _CommentWidgetState extends State<CommentWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              User.small(
+              UserWidget.small(
                 userKey: comment.commentBy,
                 key: ValueKey(comment.id),
               ),

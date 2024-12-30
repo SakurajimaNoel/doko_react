@@ -1,8 +1,8 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/widgets/user/user.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_to_user_relation_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -29,14 +29,14 @@ class FriendWidget extends StatelessWidget {
       contentPadding: EdgeInsets.symmetric(
         horizontal: Constants.padding,
       ),
-      leading: User.avtar(
+      leading: UserWidget.avtar(
         userKey: userKey,
       ),
       trailing: UserToUserRelationWidget(
         username: generateUsernameFromKey(userKey),
         key: ValueKey("${userKey}_relation"),
       ),
-      title: User.info(
+      title: UserWidget.info(
         userKey: userKey,
       ),
     );

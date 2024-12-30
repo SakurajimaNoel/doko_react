@@ -11,43 +11,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class User extends StatelessWidget {
-  const User({
+class UserWidget extends StatelessWidget {
+  const UserWidget({
     super.key,
     required this.userKey,
   })  : small = false,
         profileOnly = false,
         textOnly = false;
 
-  const User.avtar({
+  const UserWidget.avtar({
     super.key,
     required this.userKey,
   })  : small = false,
         profileOnly = true,
         textOnly = false;
 
-  const User.info({
+  const UserWidget.info({
     super.key,
     required this.userKey,
   })  : small = false,
         profileOnly = false,
         textOnly = true;
 
-  const User.small({
+  const UserWidget.small({
     super.key,
     required this.userKey,
   })  : small = true,
         profileOnly = false,
         textOnly = false;
 
-  const User.avtarSmall({
+  const UserWidget.avtarSmall({
     super.key,
     required this.userKey,
   })  : small = true,
         profileOnly = true,
         textOnly = false;
 
-  const User.infoSmall({
+  const UserWidget.infoSmall({
     super.key,
     required this.userKey,
   })  : small = true,
