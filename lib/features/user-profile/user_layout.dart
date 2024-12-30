@@ -7,6 +7,7 @@ import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -123,16 +124,32 @@ class _UserLayoutState extends State<UserLayout> {
         UserEntity user = graph.getValueByKey(key)! as UserEntity;
         bool profileEmpty = user.profilePicture.bucketPath.isEmpty;
 
-        return Scaffold(
-          body: widget.navigationShell,
-          bottomNavigationBar: NavigationBar(
-            indicatorColor: (activeIndex != 2 || profileEmpty)
-                ? currTheme.primary
-                : Colors.transparent,
-            selectedIndex: widget.navigationShell.currentIndex,
-            destinations: getDestinations(user),
-            onDestinationSelected: (index) =>
-                onDestinationSelected(index, profileEmpty),
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (bool didPop, _) {
+            /// this handles going to user feed page
+            /// when in one of the other pages of
+            /// stateful shell route
+            if (didPop) return;
+
+            if (activeIndex == 0) {
+              // todo: disconnect xmpp client here
+              SystemNavigator.pop();
+              return;
+            }
+            onDestinationSelected(0, profileEmpty);
+          },
+          child: Scaffold(
+            body: widget.navigationShell,
+            bottomNavigationBar: NavigationBar(
+              indicatorColor: (activeIndex != 2 || profileEmpty)
+                  ? currTheme.primary
+                  : Colors.transparent,
+              selectedIndex: widget.navigationShell.currentIndex,
+              destinations: getDestinations(user),
+              onDestinationSelected: (index) =>
+                  onDestinationSelected(index, profileEmpty),
+            ),
           ),
         );
       },
