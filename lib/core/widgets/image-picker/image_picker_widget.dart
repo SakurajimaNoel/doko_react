@@ -12,6 +12,7 @@ class ImagePickerWidget extends StatelessWidget {
     this.multipleLimit = 10,
     this.disabled = false,
     this.video = false,
+    this.recordLimit = Constants.videoDuration,
   })  : assert(text != null || icon != null,
             "Need either text or an Icon to create media selection trigger."),
         picker = ImagePicker();
@@ -46,8 +47,16 @@ class ImagePickerWidget extends StatelessWidget {
   /// Image picker initialization
   final ImagePicker picker;
 
+  /// Video capture duration
+  final Duration recordLimit;
+
   void handleVideo(BuildContext context) {
     if (multipleLimit > 0) selectVideoFromGallery();
+    Navigator.pop(context);
+  }
+
+  void handleVideoCapture(BuildContext context) {
+    if (multipleLimit > 0) selectVideoFromCamera();
     Navigator.pop(context);
   }
 
@@ -74,9 +83,9 @@ class ImagePickerWidget extends StatelessWidget {
       builder: (BuildContext context) {
         return SizedBox(
           height: Constants.height * 15,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          width: double.infinity,
+          child: GridView.count(
+            crossAxisCount: 2,
             children: [
               FilledButton.tonalIcon(
                 onPressed: () {
@@ -85,7 +94,14 @@ class ImagePickerWidget extends StatelessWidget {
                 icon: const Icon(Icons.photo),
                 label: const Text("Gallery"),
               ),
-              if (video)
+              FilledButton.tonalIcon(
+                onPressed: () {
+                  handleCamera(context);
+                },
+                icon: const Icon(Icons.photo_camera),
+                label: const Text("Take picture"),
+              ),
+              if (video) ...[
                 FilledButton.tonalIcon(
                   onPressed: () {
                     handleVideo(context);
@@ -93,20 +109,14 @@ class ImagePickerWidget extends StatelessWidget {
                   icon: const Icon(Icons.video_collection),
                   label: const Text("Video"),
                 ),
-              showLabel
-                  ? FilledButton.tonalIcon(
-                      onPressed: () {
-                        handleCamera(context);
-                      },
-                      icon: const Icon(Icons.photo_camera),
-                      label: const Text("Camera"),
-                    )
-                  : IconButton.filledTonal(
-                      onPressed: () {
-                        handleCamera(context);
-                      },
-                      icon: const Icon(Icons.photo_camera),
-                    ),
+                FilledButton.tonalIcon(
+                  onPressed: () {
+                    handleVideoCapture(context);
+                  },
+                  icon: const Icon(Icons.videocam),
+                  label: const Text("Record video"),
+                ),
+              ],
             ],
           ),
         );
@@ -136,6 +146,16 @@ class ImagePickerWidget extends StatelessWidget {
 
     if (selectedVideo == null) return;
     onSelection([selectedVideo]);
+  }
+
+  Future<void> selectVideoFromCamera() async {
+    final XFile? capturedVideo = await picker.pickVideo(
+      source: ImageSource.camera,
+      maxDuration: recordLimit,
+    );
+
+    if (capturedVideo == null) return;
+    onSelection([capturedVideo]);
   }
 
   Future<void> selectMultipleImagesFromGallery() async {
