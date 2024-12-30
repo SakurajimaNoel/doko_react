@@ -11,11 +11,29 @@ class ImagePickerWidget extends StatelessWidget {
     this.multiple = false,
     this.multipleLimit = 10,
     this.disabled = false,
+    this.image = true,
     this.video = false,
     this.recordLimit = Constants.videoDuration,
   })  : assert(text != null || icon != null,
             "Need either text or an Icon to create media selection trigger."),
-        picker = ImagePicker();
+        picker = ImagePicker(),
+        mediaOnly = false;
+
+  ImagePickerWidget.media({
+    this.text,
+    this.icon,
+    super.key,
+    required this.onSelection,
+    this.multiple = false,
+    this.multipleLimit = 10,
+    this.disabled = false,
+  })  : assert(text != null || icon != null,
+            "Need either text or an Icon to create media selection trigger."),
+        picker = ImagePicker(),
+        image = false,
+        video = false,
+        recordLimit = Duration(seconds: 0),
+        mediaOnly = true;
 
   /// text used to trigger media selection
   /// either text or icon should be given
@@ -43,6 +61,11 @@ class ImagePickerWidget extends StatelessWidget {
   /// to allow selecting video files
   /// default is false
   final bool video;
+  final bool image;
+
+  /// to allow selecting both video and image
+  /// from user gallery
+  final bool mediaOnly;
 
   /// Image picker initialization
   final ImagePicker picker;
@@ -52,12 +75,10 @@ class ImagePickerWidget extends StatelessWidget {
 
   void handleVideo(BuildContext context) {
     if (multipleLimit > 0) selectVideoFromGallery();
-    Navigator.pop(context);
   }
 
   void handleVideoCapture(BuildContext context) {
     if (multipleLimit > 0) selectVideoFromCamera();
-    Navigator.pop(context);
   }
 
   void handleGallery(BuildContext context) {
@@ -66,52 +87,71 @@ class ImagePickerWidget extends StatelessWidget {
     } else if (multipleLimit > 0) {
       selectImageFromGallery();
     }
-    Navigator.pop(context);
   }
 
   void handleCamera(BuildContext context) {
     if (multipleLimit > 0) selectImageFromCamera();
-    Navigator.pop(context);
+  }
+
+  /// this will be only used for real time communication
+  /// when using this in post and selecting multiple video file
+  /// this causes issue because only 1 video can be processed
+  /// at a time
+  void handleMedia(BuildContext context) {
+    if (multiple && multipleLimit > 1) {
+      selectMultipleMediaFilesFromGallery();
+    } else if (multipleLimit > 0) {
+      selectMediaFileFromGallery();
+    }
   }
 
   void selectOptions(BuildContext context) {
-    bool showLabel = !video;
-
     showModalBottomSheet(
       context: context,
       showDragHandle: true,
       builder: (BuildContext context) {
-        return SizedBox(
+        return Container(
           height: Constants.height * 15,
-          width: double.infinity,
+          padding: EdgeInsets.all(Constants.padding),
           child: GridView.count(
+            mainAxisSpacing: Constants.gap,
+            crossAxisSpacing: Constants.gap,
+            childAspectRatio: 4 / 1,
             crossAxisCount: 2,
             children: [
-              FilledButton.tonalIcon(
-                onPressed: () {
-                  handleGallery(context);
-                },
-                icon: const Icon(Icons.photo),
-                label: const Text("Gallery"),
-              ),
-              FilledButton.tonalIcon(
-                onPressed: () {
-                  handleCamera(context);
-                },
-                icon: const Icon(Icons.photo_camera),
-                label: const Text("Take picture"),
-              ),
+              if (image) ...[
+                SizedBox(
+                  child: FilledButton.tonalIcon(
+                    onPressed: () {
+                      handleGallery(context);
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.photo),
+                    label: const Text("Select image"),
+                  ),
+                ),
+                FilledButton.tonalIcon(
+                  onPressed: () {
+                    handleCamera(context);
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.photo_camera),
+                  label: const Text("Take picture"),
+                )
+              ],
               if (video) ...[
                 FilledButton.tonalIcon(
                   onPressed: () {
                     handleVideo(context);
+                    Navigator.pop(context);
                   },
                   icon: const Icon(Icons.video_collection),
-                  label: const Text("Video"),
+                  label: const Text("Select video"),
                 ),
                 FilledButton.tonalIcon(
                   onPressed: () {
                     handleVideoCapture(context);
+                    Navigator.pop(context);
                   },
                   icon: const Icon(Icons.videocam),
                   label: const Text("Record video"),
@@ -126,15 +166,17 @@ class ImagePickerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final VoidCallback action =
+        mediaOnly ? () => handleMedia(context) : () => selectOptions(context);
     if (icon == null) {
       return TextButton(
-        onPressed: disabled ? null : () => selectOptions(context),
+        onPressed: disabled ? null : action,
         child: Text(text!),
       );
     }
 
     return IconButton.filled(
-      onPressed: disabled ? null : () => selectOptions(context),
+      onPressed: disabled ? null : action,
       icon: icon!,
     );
   }
@@ -183,5 +225,21 @@ class ImagePickerWidget extends StatelessWidget {
 
     if (capturedImage == null) return;
     onSelection([capturedImage]);
+  }
+
+  Future<void> selectMultipleMediaFilesFromGallery() async {
+    final List<XFile> selectedMediaFiles = await picker.pickMultipleMedia(
+      limit: multipleLimit,
+    );
+
+    if (selectedMediaFiles.isEmpty) return;
+    onSelection(selectedMediaFiles);
+  }
+
+  Future<void> selectMediaFileFromGallery() async {
+    final XFile? selectedMedia = await picker.pickMedia();
+
+    if (selectedMedia == null) return;
+    onSelection([selectedMedia]);
   }
 }
