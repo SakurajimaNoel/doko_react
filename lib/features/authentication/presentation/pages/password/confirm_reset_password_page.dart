@@ -29,6 +29,13 @@ class _ConfirmResetPasswordPageState extends State<ConfirmResetPasswordPage> {
   final TextEditingController codeController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  @override
+  void dispose() {
+    codeController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

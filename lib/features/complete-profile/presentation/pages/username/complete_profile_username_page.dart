@@ -26,6 +26,12 @@ class _CompleteProfileUsernamePageState
   final formKey = GlobalKey<FormState>();
   final TextEditingController usernameController = TextEditingController();
 
+  @override
+  void dispose() {
+    usernameController.dispose();
+    super.dispose();
+  }
+
   final List<String> usernamePattern = [
     "Be between 3 and ${Constants.usernameLimit} characters long.",
     "Start with a letter (a-z or A-Z).",

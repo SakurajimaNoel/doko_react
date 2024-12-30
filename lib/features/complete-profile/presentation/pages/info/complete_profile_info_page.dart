@@ -30,6 +30,14 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
   DateTime? date;
 
   @override
+  void dispose() {
+    usernameController.dispose();
+    nameController.dispose();
+    dobController.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
 

@@ -20,6 +20,12 @@ class _VerifyMfaPageState extends State<VerifyMfaPage> {
   final formKey = GlobalKey<FormState>();
   final TextEditingController controller = TextEditingController();
 
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   void showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

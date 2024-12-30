@@ -27,7 +27,6 @@ void main() async {
     if (imagePickerImplementation is ImagePickerAndroid) {
       imagePickerImplementation.useAndroidPhotoPicker = true;
     }
-    // todo: try to dispose all the text editing controller
 
     runApp(
       MultiBlocProvider(
