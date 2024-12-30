@@ -356,7 +356,7 @@ class _PostActionState extends State<_PostAction>
                 ],
               ),
               Divider(
-                thickness: Constants.height * 0.1,
+                thickness: Constants.dividerThickness * 0.75,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

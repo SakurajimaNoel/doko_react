@@ -21,12 +21,22 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.all(Constants.padding),
         children: const [
           ThemeSettings(),
-          SizedBox(
-            height: Constants.gap * 2,
-          ),
+          _SettingsDivider(),
           AccountSettings(),
+          _SettingsDivider(),
         ],
       ),
+    );
+  }
+}
+
+class _SettingsDivider extends StatelessWidget {
+  const _SettingsDivider({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: Constants.gap * 2,
     );
   }
 }
