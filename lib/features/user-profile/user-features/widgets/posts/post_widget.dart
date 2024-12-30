@@ -20,8 +20,8 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class Posts extends StatelessWidget {
-  Posts({
+class PostWidget extends StatelessWidget {
+  PostWidget({
     super.key,
     required this.postKey,
   });

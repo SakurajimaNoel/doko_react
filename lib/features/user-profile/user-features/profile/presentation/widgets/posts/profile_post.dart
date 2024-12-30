@@ -7,7 +7,7 @@ import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
-import 'package:doko_react/features/user-profile/user-features/widgets/posts/posts.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/posts/post_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -86,7 +86,7 @@ class _ProfilePostState extends State<ProfilePost> {
     }
 
     // show user post
-    return Posts(
+    return PostWidget(
       postKey: userPost.items[index],
     );
   }

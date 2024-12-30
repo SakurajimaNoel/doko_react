@@ -31,7 +31,7 @@ class _SettingsPageState extends State<SettingsPage> {
 }
 
 class _SettingsDivider extends StatelessWidget {
-  const _SettingsDivider({super.key});
+  const _SettingsDivider();
 
   @override
   Widget build(BuildContext context) {
