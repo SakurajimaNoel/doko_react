@@ -12,6 +12,7 @@ import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/domain/entity/comment/comment_media.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
@@ -666,8 +667,11 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
     if (media != null) {
       if (media.extension != "uri") {
         // generate bucket path
+        UserGraph graph = UserGraph();
+        String key = generateUserNodeKey(commentProvider.postCreatedBy);
+        final postCreatedBy = graph.getValueByKey(key)! as UserEntity;
         bucketPath =
-            "${commentProvider.postCreatedBy}/posts/${commentProvider.postId}/comment/${generateUniqueString()}${media.extension}";
+            "${postCreatedBy.userId}/posts/${commentProvider.postId}/comment/${generateUniqueString()}${media.extension}";
       } else {
         bucketPath = media.uri;
       }
