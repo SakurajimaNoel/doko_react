@@ -26,7 +26,7 @@ class CreatePostPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<String> postContentInfo = [
       "You can add up to ${Constants.postLimit} media items per post.",
-      "Keep your videos under ${Constants.videoDuration.inSeconds} seconds. Longer videos will be automatically trimmed.",
+      "Keep your videos under ${Constants.videoDurationPost.inSeconds} seconds. Longer videos will be automatically trimmed.",
       "GIFs are typically designed to loop seamlessly, so cropping them might disrupt their intended animation.",
     ];
 
@@ -301,7 +301,7 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
               ),
               index: index,
               path: item.originalImage!,
-              animated: extension == "gif",
+              animated: extension == ".gif",
             ),
           );
 

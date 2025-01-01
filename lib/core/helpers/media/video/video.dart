@@ -5,28 +5,37 @@ enum VideoOrientation { landscape, portrait }
 
 class VideoActions {
   static final double _videoLimit =
-      Constants.videoDuration.inMilliseconds.toDouble();
+      Constants.videoDurationPost.inMilliseconds.toDouble();
   static const VideoQuality _quality = VideoQuality.DefaultQuality;
 
-  static Future<String?> compressVideo(String videoPath) async {
+  static Future<String?> compressVideo(
+    String videoPath, {
+    bool trim = false,
+    bool includeAudio = true,
+    Duration limit = Constants.videoDurationPost,
+  }) async {
+    final double videoLimit = limit.inMilliseconds.toDouble();
+
     MediaInfo videoInfo = await VideoCompress.getMediaInfo(videoPath);
     double? videoDuration = videoInfo.duration;
 
     MediaInfo? compressedVideo;
 
-    if (videoDuration != null && videoDuration > _videoLimit) {
+    if (trim && videoDuration != null && videoDuration > videoLimit) {
       compressedVideo = await VideoCompress.compressVideo(
         videoPath,
         quality: _quality,
         deleteOrigin: true,
         startTime: 0,
-        duration: ((videoDuration - _videoLimit) / 1000).toInt(),
+        includeAudio: includeAudio,
+        duration: ((videoDuration - videoLimit) / 1000).toInt(),
       );
     } else {
       compressedVideo = await VideoCompress.compressVideo(
         videoPath,
         quality: _quality,
         deleteOrigin: true,
+        includeAudio: includeAudio,
       );
     }
 
