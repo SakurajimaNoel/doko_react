@@ -75,92 +75,102 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
     return Scaffold(
       appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(Constants.padding),
-        child: BlocProvider(
-          create: (context) => serviceLocator<AuthenticationBloc>(),
-          child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
-            listenWhen: (previousState, state) {
-              return (state is AuthenticationResetPasswordSuccess ||
-                      state is AuthenticationError) &&
-                  previousState != state;
-            },
-            listener: stateActions,
-            builder: (context, state) {
-              bool loading = state is AuthenticationLoading;
+      body: BlocProvider(
+        create: (context) => serviceLocator<AuthenticationBloc>(),
+        child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
+          listenWhen: (previousState, state) {
+            return (state is AuthenticationResetPasswordSuccess ||
+                    state is AuthenticationError) &&
+                previousState != state;
+          },
+          listener: stateActions,
+          builder: (context, state) {
+            bool loading = state is AuthenticationLoading;
 
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Heading(
-                          "Password Reset",
-                          size: Constants.heading2,
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: Container(
+                        padding: const EdgeInsets.all(Constants.padding),
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
                         ),
-                        const SizedBox(
-                          height: Constants.gap * 1.5,
-                        ),
-                        Form(
-                          key: formKey,
-                          child: Column(
-                            children: [
-                              TextFormField(
-                                controller: emailController,
-                                enabled: !loading,
-                                validator: (value) {
-                                  return validateEmail(value)
-                                      ? null
-                                      : "Invalid email";
-                                },
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: "Email",
-                                  hintText: "Email...",
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Heading(
+                              "Password Reset",
+                              size: Constants.heading2,
+                            ),
+                            const SizedBox(
+                              height: Constants.gap * 1.5,
+                            ),
+                            Form(
+                              key: formKey,
+                              child: Column(
+                                children: [
+                                  TextFormField(
+                                    controller: emailController,
+                                    enabled: !loading,
+                                    validator: (value) {
+                                      return validateEmail(value)
+                                          ? null
+                                          : "Invalid email";
+                                    },
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: "Email",
+                                      hintText: "Email...",
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: Constants.gap * 0.5,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: Constants.gap * 1.5,
+                            ),
+                            FilledButton(
+                              onPressed: loading
+                                  ? null
+                                  : () => handleResetPassword(context),
+                              style: FilledButton.styleFrom(
+                                minimumSize: const Size(
+                                  Constants.buttonWidth,
+                                  Constants.buttonHeight,
                                 ),
                               ),
-                              const SizedBox(
-                                height: Constants.gap * 0.5,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: Constants.gap * 1.5,
-                        ),
-                        FilledButton(
-                          onPressed: loading
-                              ? null
-                              : () => handleResetPassword(context),
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size(
-                              Constants.buttonWidth,
-                              Constants.buttonHeight,
+                              child: loading
+                                  ? const SmallLoadingIndicator()
+                                  : const Text("Continue"),
                             ),
-                          ),
-                          child: loading
-                              ? const SmallLoadingIndicator()
-                              : const Text("Continue"),
+                            const SizedBox(
+                              height: Constants.gap,
+                            ),
+                            const Text(
+                              "We'll send you a verification code to your email to reset your password.",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                fontSize: Constants.smallFontSize,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(
-                          height: Constants.gap,
-                        ),
-                        const Text(
-                          "We'll send you a verification code to your email to reset your password.",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: Constants.smallFontSize,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Center(
+                      ),
+                    );
+                  }),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(Constants.padding),
+                  child: Center(
                     child: RichText(
                       text: TextSpan(
                         text: "Need to log in? Visit ",
@@ -188,10 +198,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       ),
                     ),
                   ),
-                ],
-              );
-            },
-          ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

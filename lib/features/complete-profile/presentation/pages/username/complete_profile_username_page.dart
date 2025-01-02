@@ -62,101 +62,112 @@ class _CompleteProfileUsernamePageState
           SignOutButton(),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(Constants.padding),
-        child: BlocProvider(
-          create: (context) => serviceLocator<CompleteProfileBloc>(),
-          child: BlocConsumer<CompleteProfileBloc, CompleteProfileState>(
-            listenWhen: (previousState, state) {
-              return state is CompleteProfileErrorState &&
-                  previousState != state;
-            },
-            listener: stateActions,
-            builder: (context, state) {
-              bool loading = state is CompleteProfileLoadingState;
-              bool valid = false;
-              if (state is CompleteProfileUsernameStatusState) {
-                valid = state.available &&
-                    usernameController.text.trim() == state.username;
-              }
+      body: BlocProvider(
+        create: (context) => serviceLocator<CompleteProfileBloc>(),
+        child: BlocConsumer<CompleteProfileBloc, CompleteProfileState>(
+          listenWhen: (previousState, state) {
+            return state is CompleteProfileErrorState && previousState != state;
+          },
+          listener: stateActions,
+          builder: (context, state) {
+            bool loading = state is CompleteProfileLoadingState;
+            bool valid = false;
+            if (state is CompleteProfileUsernameStatusState) {
+              valid = state.available &&
+                  usernameController.text.trim() == state.username;
+            }
 
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Heading.left(
-                          "Create Username",
-                          size: Constants.largeFontSize,
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: Container(
+                        padding: const EdgeInsets.all(Constants.padding),
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
                         ),
-                        const Text(
-                            "Your username, is a unique identifier that allows others to find and connect with your profile. Once created, your username cannot be changed."),
-                        const SizedBox(
-                          height: Constants.gap * 0.5,
-                        ),
-                        const Heading.left(
-                          "Your username must:",
-                          size: Constants.fontSize,
-                        ),
-                        BulletList(usernamePattern),
-                        const SizedBox(
-                          height: Constants.gap * 1.5,
-                        ),
-                        Form(
-                          key: formKey,
-                          child: Stack(
-                            alignment: AlignmentDirectional.centerEnd,
-                            children: [
-                              TextFormField(
-                                controller: usernameController,
-                                validator: (value) {
-                                  return validateUsername(value)
-                                      ? null
-                                      : "Invalid username.";
-                                },
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                onChanged: (value) {
-                                  if (!validateUsername(value)) return;
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Heading.left(
+                              "Create Username",
+                              size: Constants.largeFontSize,
+                            ),
+                            const Text(
+                                "Your username, is a unique identifier that allows others to find and connect with your profile. Once created, your username cannot be changed."),
+                            const SizedBox(
+                              height: Constants.gap * 0.5,
+                            ),
+                            const Heading.left(
+                              "Your username must:",
+                              size: Constants.fontSize,
+                            ),
+                            BulletList(usernamePattern),
+                            const SizedBox(
+                              height: Constants.gap * 1.5,
+                            ),
+                            Form(
+                              key: formKey,
+                              child: Stack(
+                                alignment: AlignmentDirectional.centerEnd,
+                                children: [
+                                  TextFormField(
+                                    controller: usernameController,
+                                    validator: (value) {
+                                      return validateUsername(value)
+                                          ? null
+                                          : "Invalid username.";
+                                    },
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    onChanged: (value) {
+                                      if (!validateUsername(value)) return;
 
-                                  // emit username events
-                                  UsernameInput input =
-                                      UsernameInput(username: value);
-                                  context.read<CompleteProfileBloc>().add(
-                                        CompleteProfileUsernameEvent(
-                                          usernameInput: input,
-                                        ),
-                                      );
-                                },
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: "Username",
-                                  hintText: "Username...",
-                                ),
-                              ),
-                              if (loading)
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                    right: Constants.gap,
+                                      // emit username events
+                                      UsernameInput input =
+                                          UsernameInput(username: value);
+                                      context.read<CompleteProfileBloc>().add(
+                                            CompleteProfileUsernameEvent(
+                                              usernameInput: input,
+                                            ),
+                                          );
+                                    },
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: "Username",
+                                      hintText: "Username...",
+                                    ),
                                   ),
-                                  child: const SmallLoadingIndicator(),
-                                ),
-                            ],
-                          ),
+                                  if (loading)
+                                    Container(
+                                      margin: const EdgeInsets.only(
+                                        right: Constants.gap,
+                                      ),
+                                      child: const SmallLoadingIndicator(),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: Constants.gap * 0.5,
+                            ),
+                            if (state is CompleteProfileUsernameStatusState)
+                              state.available
+                                  ? StyledText.success(
+                                      state.createDisplayMessage())
+                                  : StyledText.error(
+                                      state.createDisplayMessage()),
+                          ],
                         ),
-                        const SizedBox(
-                          height: Constants.gap * 0.5,
-                        ),
-                        if (state is CompleteProfileUsernameStatusState)
-                          state.available
-                              ? StyledText.success(state.createDisplayMessage())
-                              : StyledText.error(state.createDisplayMessage()),
-                      ],
-                    ),
-                  ),
-                  FilledButton(
+                      ),
+                    );
+                  }),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(Constants.padding),
+                  child: FilledButton(
                     onPressed: (loading || !valid)
                         ? null
                         : () {
@@ -182,10 +193,10 @@ class _CompleteProfileUsernamePageState
                     ),
                     child: const Text("Continue"),
                   ),
-                ],
-              );
-            },
-          ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

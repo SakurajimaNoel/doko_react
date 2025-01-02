@@ -87,8 +87,7 @@ class _LoginPageState extends State<LoginPage> {
     final currTheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(Constants.padding),
+      body: SafeArea(
         child: BlocProvider(
           create: (context) => serviceLocator<AuthenticationBloc>(),
           child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
@@ -105,113 +104,128 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Heading("Login"),
-                        const SizedBox(
-                          height: Constants.gap * 1.5,
-                        ),
-                        Form(
-                          key: formKey,
+                    child: LayoutBuilder(builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        child: Container(
+                          padding: const EdgeInsets.all(Constants.padding),
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              TextFormField(
-                                controller: emailController,
-                                enabled: !loading,
-                                validator: (value) {
-                                  return validateEmail(value)
-                                      ? null
-                                      : "Invalid email address.";
-                                },
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: "Email",
-                                  hintText: "Email...",
-                                ),
-                              ),
+                              const Heading("Login"),
                               const SizedBox(
                                 height: Constants.gap * 1.5,
                               ),
-                              TextFormField(
-                                controller: passwordController,
-                                enabled: !loading,
-                                obscureText: true,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return "Password can't be empty";
-                                  }
-                                  return null;
-                                },
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: "Password",
-                                  hintText: "Password...",
+                              Form(
+                                key: formKey,
+                                child: Column(
+                                  children: [
+                                    TextFormField(
+                                      controller: emailController,
+                                      enabled: !loading,
+                                      validator: (value) {
+                                        return validateEmail(value)
+                                            ? null
+                                            : "Invalid email address.";
+                                      },
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: "Email",
+                                        hintText: "Email...",
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: Constants.gap * 1.5,
+                                    ),
+                                    TextFormField(
+                                      controller: passwordController,
+                                      enabled: !loading,
+                                      obscureText: true,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "Password can't be empty";
+                                        }
+                                        return null;
+                                      },
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: "Password",
+                                        hintText: "Password...",
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: Constants.gap * 1.5,
+                                    ),
+                                    FilledButton(
+                                      onPressed: loading
+                                          ? null
+                                          : () => handleLogin(context),
+                                      style: FilledButton.styleFrom(
+                                        minimumSize: const Size(
+                                          Constants.buttonWidth,
+                                          Constants.buttonHeight,
+                                        ),
+                                      ),
+                                      child: loading
+                                          ? const SmallLoadingIndicator()
+                                          : const Text("Login"),
+                                    ),
+                                  ],
                                 ),
                               ),
                               const SizedBox(
-                                height: Constants.gap * 1.5,
+                                height: Constants.gap * 0.75,
                               ),
-                              FilledButton(
-                                onPressed:
-                                    loading ? null : () => handleLogin(context),
-                                style: FilledButton.styleFrom(
-                                  minimumSize: const Size(
-                                    Constants.buttonWidth,
-                                    Constants.buttonHeight,
-                                  ),
+                              TextButton(
+                                onPressed: loading
+                                    ? null
+                                    : () {
+                                        context.pushNamed(
+                                            RouterConstants.passwordReset);
+                                      },
+                                style: TextButton.styleFrom(
+                                  foregroundColor: currTheme.secondary,
                                 ),
-                                child: loading
-                                    ? const SmallLoadingIndicator()
-                                    : const Text("Login"),
+                                child: const Text("Forgot Password?"),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(
-                          height: Constants.gap * 0.75,
-                        ),
-                        TextButton(
-                          onPressed: loading
-                              ? null
-                              : () {
-                                  context
-                                      .pushNamed(RouterConstants.passwordReset);
-                                },
-                          style: TextButton.styleFrom(
-                            foregroundColor: currTheme.secondary,
-                          ),
-                          child: const Text("Forgot Password?"),
-                        ),
-                      ],
-                    ),
+                      );
+                    }),
                   ),
-                  Center(
-                    child: RichText(
-                      text: TextSpan(
-                        text: "Don't have the account? ",
-                        style: TextStyle(
-                          color: currTheme.onSurface,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: "Sign Up.",
-                            style: TextStyle(
-                              color: currTheme.primary,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = loading
-                                  ? null
-                                  : () {
-                                      context.pushNamed(RouterConstants.signUp);
-                                    },
+                  Padding(
+                    padding: const EdgeInsets.all(Constants.padding),
+                    child: Center(
+                      child: RichText(
+                        text: TextSpan(
+                          text: "Don't have the account? ",
+                          style: TextStyle(
+                            color: currTheme.onSurface,
                           ),
-                        ],
+                          children: [
+                            TextSpan(
+                              text: "Sign Up.",
+                              style: TextStyle(
+                                color: currTheme.primary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = loading
+                                    ? null
+                                    : () {
+                                        context
+                                            .pushNamed(RouterConstants.signUp);
+                                      },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

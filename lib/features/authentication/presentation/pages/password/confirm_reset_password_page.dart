@@ -80,135 +80,145 @@ class _ConfirmResetPasswordPageState extends State<ConfirmResetPasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(Constants.padding),
-        child: BlocProvider(
-          create: (context) => serviceLocator<AuthenticationBloc>(),
-          child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
-            listenWhen: (previousState, state) {
-              return (state is AuthenticationConfirmResetPasswordSuccess ||
-                      state is AuthenticationError) &&
-                  previousState != state;
-            },
-            listener: stateActions,
-            builder: (context, state) {
-              bool loading = state is AuthenticationLoading;
+      body: BlocProvider(
+        create: (context) => serviceLocator<AuthenticationBloc>(),
+        child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
+          listenWhen: (previousState, state) {
+            return (state is AuthenticationConfirmResetPasswordSuccess ||
+                    state is AuthenticationError) &&
+                previousState != state;
+          },
+          listener: stateActions,
+          builder: (context, state) {
+            bool loading = state is AuthenticationLoading;
 
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Heading(
-                    "Password Reset",
-                    size: Constants.heading2,
+            return LayoutBuilder(builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.all(Constants.padding),
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
                   ),
-                  const SizedBox(
-                    height: Constants.gap * 1.5,
-                  ),
-                  Form(
-                    key: formKey,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          controller: codeController,
-                          enabled: !loading,
-                          keyboardType: TextInputType.number,
-                          maxLength: 6,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(6),
-                          ],
-                          validator: (value) {
-                            if (value == null ||
-                                value.isEmpty ||
-                                value.length > 6) {
-                              return "Invalid code.";
-                            }
-
-                            return null;
-                          },
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "Code",
-                            hintText: "Code...",
-                            counterText: '',
-                          ),
-                        ),
-                        const SizedBox(
-                          height: Constants.gap * 1.5,
-                        ),
-                        TextFormField(
-                          controller: passwordController,
-                          enabled: !loading,
-                          obscureText: true,
-                          validator: (value) {
-                            return validatePassword(value)
-                                ? null
-                                : passwordInvalidateReason(value);
-                          },
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "New Password",
-                            hintText: "New Password...",
-                          ),
-                        ),
-                        const SizedBox(
-                          height: Constants.gap * 1.5,
-                        ),
-                        TextFormField(
-                          enabled: !loading,
-                          obscureText: true,
-                          validator: (value) {
-                            if (value == null) return "Invalid value.";
-
-                            return compareString(
-                                    passwordController.text.trim(), value)
-                                ? null
-                                : "Both password should match.";
-                          },
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "Confirm Password",
-                            hintText: "Confirm Password...",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: Constants.gap * 1.5,
-                  ),
-                  FilledButton(
-                    onPressed: loading
-                        ? null
-                        : () => handleConfirmResetPassword(context),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(
-                        Constants.buttonWidth,
-                        Constants.buttonHeight,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Heading(
+                        "Password Reset",
+                        size: Constants.heading2,
                       ),
-                    ),
-                    child: loading
-                        ? const SmallLoadingIndicator()
-                        : const Text("Reset"),
+                      const SizedBox(
+                        height: Constants.gap * 1.5,
+                      ),
+                      Form(
+                        key: formKey,
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              controller: codeController,
+                              enabled: !loading,
+                              keyboardType: TextInputType.number,
+                              maxLength: 6,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(6),
+                              ],
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value.length > 6) {
+                                  return "Invalid code.";
+                                }
+
+                                return null;
+                              },
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: "Code",
+                                hintText: "Code...",
+                                counterText: '',
+                              ),
+                            ),
+                            const SizedBox(
+                              height: Constants.gap * 1.5,
+                            ),
+                            TextFormField(
+                              controller: passwordController,
+                              enabled: !loading,
+                              obscureText: true,
+                              validator: (value) {
+                                return validatePassword(value)
+                                    ? null
+                                    : passwordInvalidateReason(value);
+                              },
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: "New Password",
+                                hintText: "New Password...",
+                              ),
+                            ),
+                            const SizedBox(
+                              height: Constants.gap * 1.5,
+                            ),
+                            TextFormField(
+                              enabled: !loading,
+                              obscureText: true,
+                              validator: (value) {
+                                if (value == null) return "Invalid value.";
+
+                                return compareString(
+                                        passwordController.text.trim(), value)
+                                    ? null
+                                    : "Both password should match.";
+                              },
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: "Confirm Password",
+                                hintText: "Confirm Password...",
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: Constants.gap * 1.5,
+                      ),
+                      FilledButton(
+                        onPressed: loading
+                            ? null
+                            : () => handleConfirmResetPassword(context),
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size(
+                            Constants.buttonWidth,
+                            Constants.buttonHeight,
+                          ),
+                        ),
+                        child: loading
+                            ? const SmallLoadingIndicator()
+                            : const Text("Reset"),
+                      ),
+                      const SizedBox(
+                        height: Constants.gap,
+                      ),
+                      const Text(
+                        "We've sent a password reset code to your email. Please check your inbox (and spam folder) for the code.",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontSize: Constants.smallFontSize,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(
-                    height: Constants.gap,
-                  ),
-                  const Text(
-                    "We've sent a password reset code to your email. Please check your inbox (and spam folder) for the code.",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontSize: Constants.smallFontSize,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
+                ),
               );
-            },
-          ),
+            });
+          },
         ),
       ),
     );

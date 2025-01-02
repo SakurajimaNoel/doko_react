@@ -71,112 +71,123 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
           SignOutButton(),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(Constants.padding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Heading.left(
-                    "Profile Information",
-                    size: Constants.largeFontSize,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: LayoutBuilder(builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.all(Constants.padding),
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
                   ),
-                  const Text(
-                      "Let's get started! Please fill in the information below to complete your profile. We're excited to have you join Doki."),
-                  const SizedBox(
-                    height: Constants.gap * 1.5,
-                  ),
-                  Form(
-                    key: formKey,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          enabled: false,
-                          controller: usernameController,
-                          decoration: InputDecoration(
-                            border: const OutlineInputBorder(),
-                            labelText: "Username*",
-                            hintText: "Username...",
-                            disabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: currTheme.outline,
-                              ),
-                            ),
-                            labelStyle: TextStyle(
-                              color: currTheme.onSurface,
-                            ),
-                          ),
-                          style: TextStyle(
-                            color: currTheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: Constants.gap * 1.25,
-                        ),
-                        TextFormField(
-                          controller: nameController,
-                          validator: (value) {
-                            return value == null || value.isEmpty
-                                ? "Name can't be empty."
-                                : null;
-                          },
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          onChanged: (value) {},
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "Name*",
-                            hintText: "Name...",
-                          ),
-                        ),
-                        const SizedBox(
-                          height: Constants.gap * 1.25,
-                        ),
-                        GestureDetector(
-                          onTap: selectDate,
-                          child: TextFormField(
-                            enabled: false,
-                            controller: dobController,
-                            validator: (value) {
-                              if (date == null) {
-                                return "Date of Birth is required.";
-                              }
-
-                              return null;
-                            },
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            decoration: InputDecoration(
-                              border: const OutlineInputBorder(),
-                              labelText: "Date of Birth*",
-                              hintText: "DOB...",
-                              suffixIcon: Icon(
-                                Icons.calendar_month,
-                                color: currTheme.onSurface,
-                              ),
-                              disabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: currTheme.outline,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Heading.left(
+                        "Profile Information",
+                        size: Constants.largeFontSize,
+                      ),
+                      const Text(
+                          "Let's get started! Please fill in the information below to complete your profile. We're excited to have you join Doki."),
+                      const SizedBox(
+                        height: Constants.gap * 1.5,
+                      ),
+                      Form(
+                        key: formKey,
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              enabled: false,
+                              controller: usernameController,
+                              decoration: InputDecoration(
+                                border: const OutlineInputBorder(),
+                                labelText: "Username*",
+                                hintText: "Username...",
+                                disabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: currTheme.outline,
+                                  ),
+                                ),
+                                labelStyle: TextStyle(
+                                  color: currTheme.onSurface,
                                 ),
                               ),
-                              labelStyle: TextStyle(
+                              style: TextStyle(
                                 color: currTheme.onSurface,
                               ),
                             ),
-                            style: TextStyle(
-                              color: currTheme.onSurface,
+                            const SizedBox(
+                              height: Constants.gap * 1.25,
                             ),
-                          ),
+                            TextFormField(
+                              controller: nameController,
+                              validator: (value) {
+                                return value == null || value.isEmpty
+                                    ? "Name can't be empty."
+                                    : null;
+                              },
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              onChanged: (value) {},
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: "Name*",
+                                hintText: "Name...",
+                              ),
+                            ),
+                            const SizedBox(
+                              height: Constants.gap * 1.25,
+                            ),
+                            GestureDetector(
+                              onTap: selectDate,
+                              child: TextFormField(
+                                enabled: false,
+                                controller: dobController,
+                                validator: (value) {
+                                  if (date == null) {
+                                    return "Date of Birth is required.";
+                                  }
+
+                                  return null;
+                                },
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                decoration: InputDecoration(
+                                  border: const OutlineInputBorder(),
+                                  labelText: "Date of Birth*",
+                                  hintText: "DOB...",
+                                  suffixIcon: Icon(
+                                    Icons.calendar_month,
+                                    color: currTheme.onSurface,
+                                  ),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: currTheme.outline,
+                                    ),
+                                  ),
+                                  labelStyle: TextStyle(
+                                    color: currTheme.onSurface,
+                                  ),
+                                ),
+                                style: TextStyle(
+                                  color: currTheme.onSurface,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-            FilledButton(
+                      )
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(Constants.padding),
+            child: FilledButton(
               onPressed: handleProfileInfo,
               style: FilledButton.styleFrom(
                 minimumSize: const Size(
@@ -186,8 +197,8 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
               ),
               child: const Text("Next"),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

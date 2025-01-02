@@ -112,33 +112,43 @@ class _CompleteProfilePicturePageState
                 if (!loading) const SignOutButton(),
               ],
             ),
-            body: Padding(
-              padding: const EdgeInsets.all(Constants.padding),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Heading.left(
-                          "Profile Information",
-                          size: Constants.largeFontSize,
+            body: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: Container(
+                        padding: const EdgeInsets.all(Constants.padding),
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
                         ),
-                        const Text(
-                            "Almost there! Select an image to add as your profile picture."),
-                        const SizedBox(
-                          height: Constants.gap,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Heading.left(
+                              "Profile Information",
+                              size: Constants.largeFontSize,
+                            ),
+                            const Text(
+                                "Almost there! Select an image to add as your profile picture."),
+                            const SizedBox(
+                              height: Constants.gap,
+                            ),
+                            _ImageSelection(
+                              key: const ValueKey("profile-image-selection"),
+                              setProfile: selectProfilePicture,
+                              loading: loading,
+                            ),
+                          ],
                         ),
-                        _ImageSelection(
-                          key: const ValueKey("profile-image-selection"),
-                          setProfile: selectProfilePicture,
-                          loading: loading,
-                        ),
-                      ],
-                    ),
-                  ),
-                  FilledButton(
+                      ),
+                    );
+                  }),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(Constants.padding),
+                  child: FilledButton(
                     onPressed: profilePicture == null || loading
                         ? null
                         : () => handleCompleteProfile(context),
@@ -152,8 +162,8 @@ class _CompleteProfilePicturePageState
                         ? const SmallLoadingIndicator()
                         : const Text("Complete"),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         },
