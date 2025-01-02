@@ -469,33 +469,31 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
             followerAnchor: Alignment.bottomCenter,
             child: Align(
               alignment: Alignment.bottomCenter,
-              child: ConstrainedBox(
+              child: Container(
                 constraints: BoxConstraints(
                   maxHeight: height / 2.5,
                   minHeight: Constants.commentOverlayHeight,
                   minWidth: width - Constants.padding,
                   maxWidth: width - Constants.padding,
                 ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: currTheme.surfaceContainer,
-                    borderRadius: BorderRadius.circular(3),
-                    boxShadow: [
-                      BoxShadow(
-                        offset: const Offset(0, 2),
-                        blurRadius: 16,
-                        color: currTheme.shadow,
-                      ),
-                    ],
-                  ),
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: Constants.padding * 0.5,
+                decoration: BoxDecoration(
+                  color: currTheme.surfaceContainer,
+                  borderRadius: BorderRadius.circular(3),
+                  boxShadow: [
+                    BoxShadow(
+                      offset: const Offset(0, 2),
+                      blurRadius: 16,
+                      color: currTheme.shadow,
                     ),
-                    scrollDirection: Axis.vertical,
-                    child: generateOverlayContent(),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: Constants.padding * 0.5,
                   ),
+                  scrollDirection: Axis.vertical,
+                  child: generateOverlayContent(),
                 ),
               ),
             ),

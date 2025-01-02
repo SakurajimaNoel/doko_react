@@ -101,35 +101,36 @@ class _PostPageState extends State<PostPage> {
                   commentTargetId: post.id,
                 );
               },
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  Future postBloc = context.read<PostBloc>().stream.first;
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        Future postBloc = context.read<PostBloc>().stream.first;
 
-                  context.read<PostBloc>().add(PostRefreshEvent(
-                        details: GetPostInput(
-                          postId: widget.postId,
-                          username: username,
-                        ),
-                      ));
+                        context.read<PostBloc>().add(PostRefreshEvent(
+                              details: GetPostInput(
+                                postId: widget.postId,
+                                username: username,
+                              ),
+                            ));
 
-                  final PostState state = await postBloc;
+                        final PostState state = await postBloc;
 
-                  if (state is PostRefreshErrorState) {
-                    showMessage(state.message);
-                    return;
-                  }
+                        if (state is PostRefreshErrorState) {
+                          showMessage(state.message);
+                          return;
+                        }
 
-                  if (mounted) {
-                    context
-                        .read<UserActionBloc>()
-                        .add(UserActionPostRefreshEvent(
-                          postId: widget.postId,
-                        ));
-                  }
-                },
-                child: Column(
-                  children: [
-                    Expanded(
+                        if (mounted) {
+                          context
+                              .read<UserActionBloc>()
+                              .add(UserActionPostRefreshEvent(
+                                postId: widget.postId,
+                              ));
+                        }
+                      },
                       child: CustomScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         cacheExtent: scrollCacheHeight,
@@ -192,9 +193,9 @@ class _PostPageState extends State<PostPage> {
                         ],
                       ),
                     ),
-                    const CommentInput(),
-                  ],
-                ),
+                  ),
+                  const CommentInput(),
+                ],
               ),
             );
           },
