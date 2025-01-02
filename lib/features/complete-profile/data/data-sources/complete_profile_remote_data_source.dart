@@ -76,7 +76,8 @@ class CompleteProfileRemoteDataSource {
       graph.addEntity(key, currentUser);
 
       // add to cognito
-      addUsername(userDetails.username);
+      await addUsername(userDetails.username);
+      await refreshAuthSession();
 
       // if all done return true
       return true;

@@ -95,6 +95,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       if (preferredUsername.isEmpty) {
         // add to username to user
         await addUsername(username);
+        await refreshAuthSession();
       }
     } on ApplicationException catch (_) {
       emit(UserAuthErrorState());

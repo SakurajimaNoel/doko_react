@@ -48,6 +48,20 @@ Future<bool> addUsername(String username) async {
   }
 }
 
+Future<void> refreshAuthSession() async {
+  try {
+    await Amplify.Auth.fetchAuthSession(
+      options: FetchAuthSessionOptions(
+        forceRefresh: true,
+      ),
+    );
+  } on AuthException catch (_) {
+    return;
+  } catch (_) {
+    return;
+  }
+}
+
 Future<TokenEntity> getUserToken() async {
   try {
     final cognitoPlugin = Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
