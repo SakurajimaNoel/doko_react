@@ -49,6 +49,7 @@ class CommentInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
+    final height = MediaQuery.sizeOf(context).height;
 
     return ChangeNotifierProvider(
       create: (BuildContext context) {
@@ -175,7 +176,11 @@ class CommentInput extends StatelessWidget {
                   );
                 },
               ),
-              DecoratedBox(
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: Constants.padding * 0.125,
+                  horizontal: Constants.padding,
+                ),
                 decoration: BoxDecoration(
                   color: currTheme.surfaceContainerLow,
                   border: Border(
@@ -185,12 +190,12 @@ class CommentInput extends StatelessWidget {
                     ),
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: Constants.padding * 0.125,
-                    horizontal: Constants.padding,
-                  ),
+                constraints: BoxConstraints(
+                  maxHeight: height / 3.5,
+                ),
+                child: SingleChildScrollView(
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const _CommentMedia(),
                       const _CommentMentionOverlay(),
@@ -471,7 +476,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
               alignment: Alignment.bottomCenter,
               child: Container(
                 constraints: BoxConstraints(
-                  maxHeight: height / 2.5,
+                  maxHeight: height / 3,
                   minHeight: Constants.commentOverlayHeight,
                   minWidth: width - Constants.padding,
                   maxWidth: width - Constants.padding,
