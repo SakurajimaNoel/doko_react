@@ -6,17 +6,20 @@ class Heading extends StatelessWidget {
     this.text, {
     super.key,
     this.size,
+    this.color,
   }) : centred = true;
 
   const Heading.left(
     this.text, {
     super.key,
     this.size,
+    this.color,
   }) : centred = false;
 
   final String text;
   final double? size;
   final bool centred;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +29,7 @@ class Heading extends StatelessWidget {
       style: TextStyle(
         fontSize: size ?? Constants.heading1,
         fontWeight: FontWeight.w600,
+        color: color,
       ),
     );
   }

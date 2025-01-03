@@ -73,7 +73,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         icon: const Icon(Icons.settings),
         tooltip: "Settings",
       ),
-      const SignOutButton()
+      const SignOutButton(),
+      const SizedBox(
+        width: Constants.padding,
+      ),
     ];
   }
 
@@ -187,7 +190,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     final width = MediaQuery.sizeOf(context).width;
     final height = width * (1 / Constants.profile);
 
-    final scrollCacheHeight = MediaQuery.sizeOf(context).height;
+    final scrollCacheHeight = MediaQuery.sizeOf(context).height * 2;
 
     DateTime latestFetch = DateTime.now();
 
@@ -277,7 +280,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                     top: Constants.padding * 2,
                                     bottom: Constants.padding,
                                     left: Constants.padding,
-                                    right: Constants.padding,
+                                    right: 0,
                                   ),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
@@ -310,7 +313,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                           ),
                                         ],
                                       ),
-                                      Heading(
+                                      Heading.left(
                                         initUser.name,
                                         size: Constants.heading3,
                                       ),
@@ -384,7 +387,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                       SliverAppBar(
                         pinned: true,
                         expandedHeight: height,
-                        title: Text(username),
+                        title: Heading(
+                          username,
+                          size: Constants.heading4,
+                        ),
                         actions: appBarActions(),
                         flexibleSpace: FlexibleSpaceBar(
                           background:
@@ -424,15 +430,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                           ),
                                         ),
                                   ProfilePictureFilter(
-                                    child: Text(
+                                    child: Heading.left(
                                       user.name,
-                                      style: TextStyle(
-                                        color: currTheme.onSurface,
-                                        fontSize: Constants.heading2,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                      color: currTheme.onSurface,
+                                      size: Constants.heading2,
                                     ),
-                                  )
+                                  ),
                                 ],
                               );
                             },
