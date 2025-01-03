@@ -528,7 +528,6 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
               adding = state is NodeCreateLoading;
 
               return TextField(
-                autofocus: true,
                 enabled: !adding,
                 controller: commentController,
                 focusNode: focusNode,
