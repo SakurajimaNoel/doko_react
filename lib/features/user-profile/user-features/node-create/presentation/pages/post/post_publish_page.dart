@@ -86,26 +86,38 @@ class _PostPublishPageState extends State<PostPublishPage> {
 
                 context.pop();
               },
-              child: Padding(
-                padding: const EdgeInsets.all(Constants.padding),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextFormField(
-                      enabled: !uploading,
-                      controller: captionController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Caption",
-                        hintText: "Caption here...",
-                      ),
-                      autofocus: true,
-                      keyboardType: TextInputType.multiline,
-                      maxLines: 12,
-                      minLines: 5,
-                      maxLength: Constants.postCaptionLimit,
-                    ),
-                    FilledButton(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: LayoutBuilder(builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        child: Container(
+                          padding: const EdgeInsets.all(Constants.padding),
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
+                          child: TextFormField(
+                            enabled: !uploading,
+                            controller: captionController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: "Caption",
+                              hintText: "Caption here...",
+                            ),
+                            autofocus: true,
+                            keyboardType: TextInputType.multiline,
+                            maxLines: 12,
+                            minLines: 5,
+                            maxLength: Constants.postCaptionLimit,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(Constants.padding),
+                    child: FilledButton(
                       onPressed: uploading
                           ? null
                           : () {
@@ -147,8 +159,8 @@ class _PostPublishPageState extends State<PostPublishPage> {
                           ? const SmallLoadingIndicator()
                           : const Text("Upload"),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },

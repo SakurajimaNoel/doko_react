@@ -19,55 +19,22 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class CreatePostPage extends StatelessWidget {
-  const CreatePostPage({super.key});
+class CreatePostPage extends StatefulWidget {
+  const CreatePostPage({
+    super.key,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    final List<String> postContentInfo = [
-      "You can add up to ${Constants.postLimit} media items per post.",
-      "Keep your videos under ${Constants.videoDurationPost.inSeconds} seconds. Longer videos will be automatically trimmed.",
-      "GIFs are typically designed to loop seamlessly, so cropping them might disrupt their intended animation.",
-    ];
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Create new post"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(Constants.padding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Heading.left(
-              "Just a heads up:",
-              size: Constants.fontSize,
-            ),
-            const SizedBox(
-              height: Constants.gap * 0.5,
-            ),
-            BulletList(postContentInfo),
-            const SizedBox(
-              height: Constants.gap,
-            ),
-            const Expanded(
-              child: _PostContentWidget(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  State<CreatePostPage> createState() => CreatePostPageState();
 }
 
-class _PostContentWidget extends StatefulWidget {
-  const _PostContentWidget();
+class CreatePostPageState extends State<CreatePostPage> {
+  final List<String> postContentInfo = [
+    "You can add up to ${Constants.postLimit} media items per post.",
+    "Keep your videos under ${Constants.videoDurationPost.inSeconds} seconds. Longer videos will be automatically trimmed.",
+    "GIFs are typically designed to loop seamlessly, so cropping them might disrupt their intended animation.",
+  ];
 
-  @override
-  State<_PostContentWidget> createState() => _PostContentWidgetState();
-}
-
-class _PostContentWidgetState extends State<_PostContentWidget> {
   late final String postId;
   late final String userId;
 
@@ -381,84 +348,115 @@ class _PostContentWidgetState extends State<_PostContentWidget> {
 
     var currTheme = Theme.of(context).colorScheme;
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (bool didPop, var result) {
-        VideoActions.cancelCurrentlyActiveVideoCompression();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Create new post"),
+      ),
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (bool didPop, var result) {
+          VideoActions.cancelCurrentlyActiveVideoCompression();
 
-        if (!didPop) {
-          context.pop();
-        }
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: height,
-                child: CarouselView(
-                  enableSplash: false,
-                  controller: carouselController,
-                  itemExtent: width,
-                  shrinkExtent: width * 0.5,
-                  itemSnapping: true,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: Constants.padding * 0.5,
-                  ),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(Constants.radius * 0.5),
+          if (!didPop) {
+            context.pop();
+          }
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: LayoutBuilder(builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: Container(
+                    padding: const EdgeInsets.all(Constants.padding),
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: Constants.gap * 0.5,
+                      children: [
+                        const Heading.left(
+                          "Just a heads up:",
+                          size: Constants.fontSize,
+                        ),
+                        BulletList(postContentInfo),
+                        const SizedBox(
+                          height: Constants.gap * 0.5,
+                        ),
+                        SizedBox(
+                          height: height,
+                          child: CarouselView(
+                            enableSplash: false,
+                            controller: carouselController,
+                            itemExtent: width,
+                            shrinkExtent: width * 0.5,
+                            itemSnapping: true,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: Constants.padding * 0.5,
+                            ),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(Constants.radius * 0.5),
+                              ),
+                            ),
+                            children: [
+                              if (content.isNotEmpty)
+                                ...handleDisplaySelectedMedia(),
+                              if (content.length < Constants.postLimit)
+                                Container(
+                                  width: width,
+                                  color: currTheme.outlineVariant,
+                                  child: Center(
+                                    child: mediaSelect(),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        if (content.isNotEmpty) ...[
+                          const SizedBox(
+                            height: Constants.gap * 0.5,
+                          ),
+                          _PostContentIndicator(
+                            length:
+                                content.length == 10 ? 10 : content.length + 1,
+                            controller: carouselController,
+                          )
+                        ]
+                      ],
                     ),
                   ),
-                  children: [
-                    if (content.isNotEmpty) ...handleDisplaySelectedMedia(),
-                    if (content.length < Constants.postLimit)
-                      Container(
-                        width: width,
-                        color: currTheme.outlineVariant,
-                        child: Center(
-                          child: mediaSelect(),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              if (content.isNotEmpty) ...[
-                const SizedBox(
-                  height: Constants.gap * 0.5,
-                ),
-                _PostContentIndicator(
-                  length: content.length == 10 ? 10 : content.length + 1,
-                  controller: carouselController,
-                )
-              ]
-            ],
-          ),
-          FilledButton(
-            onPressed: () {
-              Map<String, dynamic> data = {
-                "postDetails": PostPublishPageData(
-                  content: content,
-                  postId: postId,
-                ),
-              };
+                );
+              }),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(Constants.padding),
+              child: FilledButton(
+                onPressed: () {
+                  Map<String, dynamic> data = {
+                    "postDetails": PostPublishPageData(
+                      content: content,
+                      postId: postId,
+                    ),
+                  };
 
-              context.pushNamed(
-                RouterConstants.postPublish,
-                extra: data,
-              );
-            },
-            style: FilledButton.styleFrom(
-              minimumSize: const Size(
-                Constants.buttonWidth,
-                Constants.buttonHeight,
+                  context.pushNamed(
+                    RouterConstants.postPublish,
+                    extra: data,
+                  );
+                },
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(
+                    Constants.buttonWidth,
+                    Constants.buttonHeight,
+                  ),
+                ),
+                child: const Text("Continue"),
               ),
             ),
-            child: const Text("Continue"),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
