@@ -177,6 +177,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     );
   }
 
+  Future<void> handleUserRefreshEvent() async {
+    context.read<UserActionBloc>().add(UserActionUserRefreshEvent(
+          username: username,
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     GetProfileInput details = GetProfileInput(
@@ -372,11 +378,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     } else {
                       // trigger ui rebuilds
                       if (mounted) {
-                        context
-                            .read<UserActionBloc>()
-                            .add(UserActionUserRefreshEvent(
-                              username: username,
-                            ));
+                        handleUserRefreshEvent();
                       }
                     }
                   },

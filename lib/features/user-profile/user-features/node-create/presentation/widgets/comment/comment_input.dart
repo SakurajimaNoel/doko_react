@@ -694,6 +694,25 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
         ));
   }
 
+  Future<void> handleCropImage({
+    required String path,
+    required String extension,
+  }) async {
+    CroppedFile? croppedMedia = await getCroppedImage(
+      path,
+      context: context,
+      location: ImageLocation.comment,
+    );
+    if (croppedMedia == null) return;
+    final mediaData = await croppedMedia.readAsBytes();
+    CommentMedia media = CommentMedia(
+      extension: extension,
+      data: mediaData,
+    );
+
+    addMedia(media);
+  }
+
   @override
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
@@ -747,19 +766,10 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
 
                         if (!mounted) return;
 
-                        CroppedFile? croppedMedia = await getCroppedImage(
-                          selectedMedia.path,
-                          context: context,
-                          location: ImageLocation.comment,
-                        );
-                        if (croppedMedia == null) return;
-                        final mediaData = await croppedMedia.readAsBytes();
-                        CommentMedia media = CommentMedia(
+                        handleCropImage(
+                          path: selectedMedia.path,
                           extension: extension,
-                          data: mediaData,
                         );
-
-                        addMedia(media);
                       },
                 style: IconButton.styleFrom(
                   minimumSize: Size.zero,

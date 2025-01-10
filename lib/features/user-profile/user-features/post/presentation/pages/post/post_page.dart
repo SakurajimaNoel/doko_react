@@ -44,6 +44,12 @@ class _PostPageState extends State<PostPage> {
     );
   }
 
+  Future<void> handlePostRefreshEvent() async {
+    context.read<UserActionBloc>().add(UserActionPostRefreshEvent(
+          postId: widget.postId,
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     final scrollCacheHeight = MediaQuery.sizeOf(context).height;
@@ -123,13 +129,9 @@ class _PostPageState extends State<PostPage> {
                           return;
                         }
 
-                        if (mounted) {
-                          context
-                              .read<UserActionBloc>()
-                              .add(UserActionPostRefreshEvent(
-                                postId: widget.postId,
-                              ));
-                        }
+                        if (!mounted) return;
+
+                        handlePostRefreshEvent();
                       },
                       child: CustomScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
