@@ -19,7 +19,6 @@ class _UserFeedPageState extends State<UserFeedPage> {
         actions: [
           TextButton(
             onPressed: () {
-              // context.pushNamed(RouterConstants.createPost);
               createOptions();
             },
             child: const Text("Create"),
