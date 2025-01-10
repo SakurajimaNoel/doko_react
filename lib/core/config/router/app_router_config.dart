@@ -13,6 +13,7 @@ import 'package:doko_react/features/authentication/presentation/pages/sign-up/si
 import 'package:doko_react/features/complete-profile/presentation/pages/info/complete_profile_info_page.dart';
 import 'package:doko_react/features/complete-profile/presentation/pages/profile-picture/complete_profile_picture_page.dart';
 import 'package:doko_react/features/complete-profile/presentation/pages/username/complete_profile_username_page.dart';
+import 'package:doko_react/features/error-pages/auth_error_page.dart';
 import 'package:doko_react/features/settings/presentation/pages/settings_page.dart';
 import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
@@ -87,16 +88,7 @@ class AppRouterConfig {
       GoRoute(
         path: "/error",
         name: RouterConstants.error,
-        builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("dokii"),
-            ),
-            body: const Center(
-              child: Text("generic error page"),
-            ),
-          );
-        },
+        builder: (context, state) => AuthErrorPage(),
       ),
       GoRoute(
         path: "/error/graph",
