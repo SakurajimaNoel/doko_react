@@ -790,7 +790,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
 
                         String? uri = getValidGiphyURI(gif);
                         if (uri == null || uri.isEmpty) {
-                          showMessage(Constants.errorMessage);
+                          // showMessage(Constants.errorMessage);
                           return;
                         }
 
