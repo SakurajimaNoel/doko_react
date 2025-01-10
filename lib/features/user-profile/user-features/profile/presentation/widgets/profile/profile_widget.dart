@@ -2,7 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
+import 'package:doko_react/core/helpers/extension/go_router_extension.dart';
+import 'package:doko_react/core/helpers/throttle/throttle.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
@@ -17,6 +20,7 @@ import 'package:doko_react/features/user-profile/user-features/profile/presentat
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_to_user_relation_widget.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -38,6 +42,13 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   late final String currentUsername;
 
   final UserGraph graph = UserGraph();
+  late final ScrollController controller;
+
+  final bottomNavThrottle = Throttle(
+    Duration(
+      milliseconds: 250,
+    ),
+  );
 
   @override
   void initState() {
@@ -48,6 +59,33 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         (context.read<UserBloc>().state as UserCompleteState).username;
 
     self = username == currentUsername;
+
+    controller = ScrollController();
+    controller.addListener(handleScroll);
+  }
+
+  void handleScroll() {
+    String currentRoute = GoRouter.of(context).currentRouteName ?? "";
+
+    if (currentRoute != RouterConstants.profile) return;
+
+    // handle bottom nav hide
+    if (controller.position.userScrollDirection == ScrollDirection.forward) {
+      bottomNavThrottle(() {
+        context.read<BottomNavProvider>().showBottomNav();
+      });
+    } else {
+      bottomNavThrottle(() {
+        context.read<BottomNavProvider>().hideBottomNav();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    controller.removeListener(handleScroll);
+    bottomNavThrottle.dispose();
+    super.dispose();
   }
 
   void showMessage(String message) {
@@ -384,6 +422,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                   },
                   child: CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
+                    controller: controller,
                     cacheExtent: scrollCacheHeight,
                     slivers: [
                       SliverAppBar(

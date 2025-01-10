@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
@@ -137,23 +138,30 @@ class _UserLayoutState extends State<UserLayout> {
             if (didPop) return;
 
             if (activeIndex == 0) {
-              // todo: disconnect xmpp client here
               SystemNavigator.pop();
               return;
             }
+
+            context.read<BottomNavProvider>().showBottomNav();
             onDestinationSelected(0, profileEmpty);
           },
           child: Scaffold(
             body: widget.navigationShell,
-            bottomNavigationBar: NavigationBar(
-              indicatorColor: (activeIndex != 2 || profileEmpty)
-                  ? currTheme.primary
-                  : Colors.transparent,
-              selectedIndex: widget.navigationShell.currentIndex,
-              destinations: getDestinations(user),
-              onDestinationSelected: (index) =>
-                  onDestinationSelected(index, profileEmpty),
-            ),
+            bottomNavigationBar: Builder(builder: (context) {
+              bool show = context.watch<BottomNavProvider>().show;
+
+              return show
+                  ? NavigationBar(
+                      indicatorColor: (activeIndex != 2 || profileEmpty)
+                          ? currTheme.primary
+                          : Colors.transparent,
+                      selectedIndex: widget.navigationShell.currentIndex,
+                      destinations: getDestinations(user),
+                      onDestinationSelected: (index) =>
+                          onDestinationSelected(index, profileEmpty),
+                    )
+                  : SizedBox.shrink();
+            }),
           ),
         );
       },

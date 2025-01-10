@@ -4,6 +4,7 @@ import 'package:doko_react/core/config/theme/theme_data.dart';
 import 'package:doko_react/core/global/bloc/preferences/preferences_bloc.dart';
 import 'package:doko_react/core/global/bloc/theme/theme_bloc.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
@@ -15,6 +16,7 @@ import 'package:graphql/client.dart';
 import 'package:image_picker_android/image_picker_android.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:media_kit/media_kit.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   try {
@@ -48,7 +50,14 @@ void main() async {
             create: (BuildContext context) => serviceLocator<UserActionBloc>(),
           ),
         ],
-        child: const Doki(),
+        child: MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+              create: (_) => BottomNavProvider(),
+            ),
+          ],
+          child: const Doki(),
+        ),
       ),
     );
   } on AmplifyException catch (e) {
