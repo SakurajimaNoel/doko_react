@@ -9,6 +9,7 @@ import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql/client.dart';
 import 'package:image_picker_android/image_picker_android.dart';
@@ -18,6 +19,7 @@ import 'package:media_kit/media_kit.dart';
 void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
+    await dotenv.load();
     await initDependency();
     MediaKit.ensureInitialized();
     await HiveStore.open();

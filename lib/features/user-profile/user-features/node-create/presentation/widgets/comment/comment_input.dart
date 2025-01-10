@@ -23,10 +23,10 @@ import 'package:doko_react/features/user-profile/user-features/post/presentation
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:doko_react/init_dependency.dart';
-import 'package:doko_react/secret/secrets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:giphy_get/giphy_get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -780,7 +780,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                     : () async {
                         GiphyGif? gif = await GiphyGet.getGif(
                           context: context,
-                          apiKey: Secrets.giphy,
+                          apiKey: dotenv.env["GIPHY_API_KEY"]!,
                           randomID: (context.read<UserBloc>().state
                                   as UserCompleteState)
                               .username,

@@ -1,10 +1,10 @@
 import 'package:doko_react/core/global/auth/auth.dart';
-import 'package:doko_react/secret/secrets.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:graphql/client.dart';
 
 class GraphqlConfig {
-  static final _httpLink = HttpLink(Secrets.endpoint);
+  static final _httpLink = HttpLink(dotenv.env["GRAPHQL_ENDPOINT"]!);
 
   static final _authLink = AuthLink(getToken: () async {
     final tokenEntity = await getUserToken();

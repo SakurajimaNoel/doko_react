@@ -4,8 +4,8 @@ import 'package:video_compress/video_compress.dart';
 enum VideoOrientation { landscape, portrait }
 
 class VideoActions {
-  static final double _videoLimit =
-      Constants.videoDurationPost.inMilliseconds.toDouble();
+  // static final double _videoLimit =
+  //     Constants.videoDurationPost.inMilliseconds.toDouble();
   static const VideoQuality _quality = VideoQuality.DefaultQuality;
 
   static Future<String?> compressVideo(

@@ -154,8 +154,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                     enabled: !loading,
                                     obscureText: true,
                                     validator: (value) {
-                                      if (value == null)
+                                      if (value == null) {
                                         return "Invalid value.";
+                                      }
 
                                       return compareString(
                                               passwordController.text.trim(),
