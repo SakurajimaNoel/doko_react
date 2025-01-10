@@ -1,5 +1,6 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,6 +9,8 @@ class AuthErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Doki"),
@@ -24,7 +27,11 @@ class AuthErrorPage extends StatelessWidget {
               spacing: Constants.gap,
               children: [
                 Center(
-                  child: Text(Constants.errorMessage),
+                  child: Heading(
+                    Constants.errorMessage,
+                    size: Constants.heading4,
+                    color: currScheme.error,
+                  ),
                 ),
                 TextButton(
                     onPressed: () {
