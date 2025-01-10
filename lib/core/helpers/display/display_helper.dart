@@ -1,8 +1,10 @@
+import 'package:characters/characters.dart';
+
 part 'display_helper_lib.dart';
 
 String trimText(String text, {int len = 50}) {
-  if (text.length > len) {
-    return '${text.substring(0, len)}...';
+  if (text.characters.length > len) {
+    return '${text.characters.take(len)}...';
   }
   return text;
 }
