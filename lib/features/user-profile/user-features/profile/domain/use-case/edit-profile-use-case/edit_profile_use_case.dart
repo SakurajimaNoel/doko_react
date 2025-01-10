@@ -32,7 +32,7 @@ class EditProfileUseCase extends UseCases<bool, EditProfileInput> {
         throw const ApplicationException(reason: "Invalid image selected.");
       }
       String imageString = generateUniqueString();
-      bucketPath = "${params.userId}/profile/$imageString$imageExtension}";
+      bucketPath = "${params.userId}/profile/$imageString$imageExtension";
     }
 
     return profileRepository.editUserProfile(params, bucketPath);
