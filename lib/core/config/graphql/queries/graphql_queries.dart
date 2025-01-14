@@ -1,4 +1,4 @@
-import 'package:doko_react/core/config/graphql/queries/graphql_query_constants.dart';
+import 'package:doko_react/core/config/graphql/graphql_constants.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/helpers/query/query_helper.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
@@ -175,7 +175,7 @@ class GraphqlQueries {
           "username_EQ": currentUsername,
         }
       },
-      "first": GraphqlQueryConstants.postLimit,
+      "first": GraphqlConstants.postLimit,
       "postsConnectionWhere2": {
         "createdBy": {
           "username_EQ": username,
@@ -267,7 +267,7 @@ class GraphqlQueries {
         "where": {
           "username_EQ": username,
         },
-        "first": GraphqlQueryConstants.friendLimit,
+        "first": GraphqlConstants.friendLimit,
         "sort": [
           {
             "edge": {
@@ -293,7 +293,7 @@ class GraphqlQueries {
         "username_EQ": username,
       },
       "after": cursor,
-      "first": GraphqlQueryConstants.friendLimit,
+      "first": GraphqlConstants.friendLimit,
       "sort": [
         {
           "edge": {
@@ -359,7 +359,7 @@ class GraphqlQueries {
           "username_EQ": username,
         }
       },
-      "first": GraphqlQueryConstants.postLimit,
+      "first": GraphqlConstants.postLimit,
       "after": cursor,
       "sort": [
         {
@@ -457,7 +457,7 @@ class GraphqlQueries {
             "username_EQ": username,
           }
         },
-        "first": GraphqlQueryConstants.friendLimit,
+        "first": GraphqlConstants.friendLimit,
         "sort": [
           {
             "edge": {
@@ -484,7 +484,7 @@ class GraphqlQueries {
         }
       },
       "after": cursor,
-      "first": GraphqlQueryConstants.friendLimit,
+      "first": GraphqlConstants.friendLimit,
       "sort": [
         {
           "edge": {
@@ -582,7 +582,7 @@ class GraphqlQueries {
             "username_EQ": username,
           }
         },
-        "first": GraphqlQueryConstants.friendLimit,
+        "first": GraphqlConstants.friendLimit,
         "sort": [
           {
             "edge": {
@@ -611,7 +611,7 @@ class GraphqlQueries {
         }
       },
       "after": cursor,
-      "first": GraphqlQueryConstants.friendLimit,
+      "first": GraphqlConstants.friendLimit,
       "sort": [
         {
           "edge": {
@@ -1012,7 +1012,7 @@ class GraphqlQueries {
           }
         ]
       },
-      "limit": GraphqlQueryConstants.generalSearchLimit,
+      "limit": GraphqlConstants.generalSearchLimit,
       "friendsConnectionWhere2": {
         "node": {
           "username_EQ": username,
@@ -1059,7 +1059,7 @@ class GraphqlQueries {
       "where": {
         "username_EQ": username,
       },
-      "first": GraphqlQueryConstants.friendSearchLimit,
+      "first": GraphqlConstants.friendSearchLimit,
       "friendsConnectionWhere2": {
         "edge": {
           "status_EQ": FriendStatus.accepted,
@@ -1114,7 +1114,7 @@ class GraphqlQueries {
       "where": {
         "username_MATCHES": caseInsensitiveQuery(query),
       },
-      "limit": GraphqlQueryConstants.friendSearchCommentLimit,
+      "limit": GraphqlConstants.friendSearchCommentLimit,
       "friendsConnectionWhere2": {
         "node": {
           "username_EQ": username,
@@ -1215,7 +1215,7 @@ class GraphqlQueries {
       "likedByWhere2": {
         "username_EQ": username,
       },
-      "first": GraphqlQueryConstants.commentLimit,
+      "first": GraphqlConstants.commentLimit,
       "likedByWhere3": {
         "username_EQ": username,
       },
@@ -1446,7 +1446,7 @@ class GraphqlQueries {
 
     if (cursor == null || cursor.isEmpty) {
       return {
-        "first": GraphqlQueryConstants.commentLimit,
+        "first": GraphqlConstants.commentLimit,
         "where": {
           "commentOn": {
             connectionNode: {
@@ -1466,7 +1466,7 @@ class GraphqlQueries {
     }
 
     return {
-      "first": GraphqlQueryConstants.commentLimit,
+      "first": GraphqlConstants.commentLimit,
       "where": {
         "commentOn": {
           connectionNode: {

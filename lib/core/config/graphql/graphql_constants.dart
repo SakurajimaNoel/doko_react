@@ -1,4 +1,4 @@
-class GraphqlQueryConstants {
+class GraphqlConstants {
   static const int postLimit = 8;
   static const int friendLimit = 8;
   static const int generalSearchLimit = 8;

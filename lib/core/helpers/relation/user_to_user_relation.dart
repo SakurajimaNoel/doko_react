@@ -1,4 +1,4 @@
-import 'package:doko_react/core/config/graphql/queries/graphql_query_constants.dart';
+import 'package:doko_react/core/config/graphql/graphql_constants.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 
 enum UserToUserRelation {

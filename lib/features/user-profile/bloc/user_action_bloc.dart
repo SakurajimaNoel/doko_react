@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:doko_react/core/config/graphql/queries/graphql_query_constants.dart';
+import 'package:doko_react/core/config/graphql/graphql_constants.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/core/helpers/relation/user_to_user_relation.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
@@ -20,7 +20,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
 part 'user_action_event.dart';
-
 part 'user_action_state.dart';
 
 class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
@@ -41,8 +40,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     required UserRemoveFriendRelationUseCase userRemoveFriendRelationUseCase,
     required CommentAddLikeUseCase commentAddLikeUseCase,
     required CommentRemoveLikeUseCase commentRemoveLikeUseCase,
-  })
-      : _postAddLikeUseCase = postAddLikeUseCase,
+  })  : _postAddLikeUseCase = postAddLikeUseCase,
         _postRemoveLikeUseCase = postRemoveLikeUseCase,
         _userCreateFriendRelationUseCase = userCreateFriendRelationUseCase,
         _userAcceptFriendRelationUseCase = userAcceptFriendRelationUseCase,
@@ -76,12 +74,11 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
     });
     on<UserActionNewPostEvent>(
-          (event, emit) =>
-          emit(
-            UserActionNewPostState(
-              postId: event.postId,
-            ),
-          ),
+      (event, emit) => emit(
+        UserActionNewPostState(
+          postId: event.postId,
+        ),
+      ),
     );
     on<UserActionCommentLikeActionEvent>(
         _handleUserActionCommentLikeActionEvent);
@@ -98,17 +95,16 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
     });
     on<UserActionPostRefreshEvent>(
-          (event, emit) =>
-          emit(
-            UserActionPostRefreshState(
-              nodeId: event.postId,
-            ),
-          ),
+      (event, emit) => emit(
+        UserActionPostRefreshState(
+          nodeId: event.postId,
+        ),
+      ),
     );
   }
 
-  FutureOr<void> _handleUserActionUpdateEvent(UserActionUpdateEvent event,
-      Emitter<UserActionState> emit) {
+  FutureOr<void> _handleUserActionUpdateEvent(
+      UserActionUpdateEvent event, Emitter<UserActionState> emit) {
     emit(
       UserActionUpdateProfile(
         name: event.name,
