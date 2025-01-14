@@ -1,4 +1,4 @@
-import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
+import 'package:doko_react/core/config/graphql/mutations/graphql_mutations.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
@@ -20,8 +20,8 @@ class UserProfileRemoteDataSource {
     try {
       QueryResult result = await _client.mutate(
         MutationOptions(
-          document: gql(GraphqlQueries.userAddLikePost()),
-          variables: GraphqlQueries.userAddLikePostVariables(
+          document: gql(GraphqlMutations.userAddLikePost()),
+          variables: GraphqlMutations.userAddLikePostVariables(
             postId,
             username: username,
           ),
@@ -62,8 +62,8 @@ class UserProfileRemoteDataSource {
     try {
       QueryResult result = await _client.mutate(
         MutationOptions(
-          document: gql(GraphqlQueries.userRemoveLikePost()),
-          variables: GraphqlQueries.userRemoveLikePostVariables(
+          document: gql(GraphqlMutations.userRemoveLikePost()),
+          variables: GraphqlMutations.userRemoveLikePostVariables(
             postId,
             username: username,
           ),
@@ -105,9 +105,9 @@ class UserProfileRemoteDataSource {
     try {
       QueryResult result = await _client.mutate(
         MutationOptions(
-          document: gql(GraphqlQueries.userCreateFriendRelation()),
-          variables:
-              GraphqlQueries.userCreateFriendRelationVariables(relationDetails),
+          document: gql(GraphqlMutations.userCreateFriendRelation()),
+          variables: GraphqlMutations.userCreateFriendRelationVariables(
+              relationDetails),
         ),
       );
 
@@ -141,9 +141,9 @@ class UserProfileRemoteDataSource {
     try {
       QueryResult result = await _client.mutate(
         MutationOptions(
-          document: gql(GraphqlQueries.userAcceptFriendRelation()),
-          variables:
-              GraphqlQueries.userAcceptFriendRelationVariables(relationDetails),
+          document: gql(GraphqlMutations.userAcceptFriendRelation()),
+          variables: GraphqlMutations.userAcceptFriendRelationVariables(
+              relationDetails),
         ),
       );
 
@@ -181,9 +181,9 @@ class UserProfileRemoteDataSource {
     try {
       QueryResult result = await _client.mutate(
         MutationOptions(
-          document: gql(GraphqlQueries.userRemoveFriendRelation()),
-          variables:
-              GraphqlQueries.userRemoveFriendRelationVariables(relationDetails),
+          document: gql(GraphqlMutations.userRemoveFriendRelation()),
+          variables: GraphqlMutations.userRemoveFriendRelationVariables(
+              relationDetails),
         ),
       );
 
@@ -217,8 +217,8 @@ class UserProfileRemoteDataSource {
     try {
       QueryResult result = await _client.mutate(
         MutationOptions(
-          document: gql(GraphqlQueries.userAddLikeComment()),
-          variables: GraphqlQueries.userAddCommentLikeVariables(
+          document: gql(GraphqlMutations.userAddLikeComment()),
+          variables: GraphqlMutations.userAddCommentLikeVariables(
             commentId,
             username: username,
           ),
@@ -259,8 +259,8 @@ class UserProfileRemoteDataSource {
     try {
       QueryResult result = await _client.mutate(
         MutationOptions(
-          document: gql(GraphqlQueries.userRemoveCommentLike()),
-          variables: GraphqlQueries.userRemoveCommentLikeVariables(
+          document: gql(GraphqlMutations.userRemoveCommentLike()),
+          variables: GraphqlMutations.userRemoveCommentLikeVariables(
             commentId,
             username: username,
           ),

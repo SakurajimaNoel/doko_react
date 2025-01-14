@@ -1,4 +1,5 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:doko_react/core/config/graphql/mutations/graphql_mutations.dart';
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
@@ -96,8 +97,8 @@ class ProfileRemoteDataSource {
 
       QueryResult result = await _client.mutate(
         MutationOptions(
-          document: gql(GraphqlQueries.updateUserProfile()),
-          variables: GraphqlQueries.updateUserProfileVariables(
+          document: gql(GraphqlMutations.updateUserProfile()),
+          variables: GraphqlMutations.updateUserProfileVariables(
             username: editDetails.username,
             name: editDetails.name,
             bio: editDetails.bio,

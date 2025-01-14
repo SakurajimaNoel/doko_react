@@ -1,3 +1,4 @@
+import 'package:doko_react/core/config/graphql/mutations/graphql_mutations.dart';
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/auth/auth.dart';
@@ -50,9 +51,11 @@ class CompleteProfileRemoteDataSource {
       // create node in graph
       QueryResult result = await _client.mutate(
         MutationOptions(
-          document: gql(GraphqlQueries.completeUserProfile()),
-          variables: GraphqlQueries.completeUserProfileVariables(
-              userDetails, bucketPath),
+          document: gql(GraphqlMutations.completeUserProfile()),
+          variables: GraphqlMutations.completeUserProfileVariables(
+            userDetails,
+            bucketPath,
+          ),
         ),
       );
 

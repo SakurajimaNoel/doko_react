@@ -1,5 +1,5 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
+import 'package:doko_react/core/config/graphql/mutations/graphql_mutations.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/cache/cache.dart';
@@ -46,8 +46,8 @@ class NodeCreateRemoteDataSource {
       // update graph
       QueryResult result = await _client.mutate(
         MutationOptions(
-          document: gql(GraphqlQueries.userCreatePost()),
-          variables: GraphqlQueries.userCreatePostVariables(
+          document: gql(GraphqlMutations.userCreatePost()),
+          variables: GraphqlMutations.userCreatePostVariables(
             postDetails.postId,
             username: postDetails.username,
             caption: postDetails.caption,
@@ -98,8 +98,8 @@ class NodeCreateRemoteDataSource {
 
       QueryResult result = await _client.mutate(
         MutationOptions(
-          document: gql(GraphqlQueries.addComment()),
-          variables: GraphqlQueries.addCommentVariables(commentDetails),
+          document: gql(GraphqlMutations.addComment()),
+          variables: GraphqlMutations.addCommentVariables(commentDetails),
         ),
       );
 
