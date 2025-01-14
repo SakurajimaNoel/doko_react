@@ -7,15 +7,17 @@ class BottomNavProvider extends ChangeNotifier {
 
   bool get show => _show;
 
+  bool get hide => !_show;
+
   void showBottomNav() {
-    if (_show) return;
+    if (show) return;
 
     _show = true;
     notifyListeners();
   }
 
   void hideBottomNav() {
-    if (!_show) return;
+    if (hide) return;
 
     _show = false;
     notifyListeners();

@@ -5,7 +5,6 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/helpers/extension/go_router_extension.dart';
-import 'package:doko_react/core/helpers/throttle/throttle.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
@@ -41,14 +40,11 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   late final String username;
   late final String currentUsername;
 
+  double forwardOffset = 0;
+  double backwardOffset = 0;
+
   final UserGraph graph = UserGraph();
   late final ScrollController controller;
-
-  final bottomNavThrottle = Throttle(
-    Duration(
-      milliseconds: 250,
-    ),
-  );
 
   @override
   void initState() {
@@ -69,22 +65,31 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     if (currentRoute != RouterConstants.profile) return;
 
+    final currentOffset = controller.offset;
+    final forwardDiff = (currentOffset - forwardOffset).abs();
+    final backwardDiff = (currentOffset - backwardOffset).abs();
+
     // handle bottom nav hide
     if (controller.position.userScrollDirection == ScrollDirection.forward) {
-      bottomNavThrottle(() {
+      backwardOffset = currentOffset;
+      if (forwardDiff > Constants.scrollOffset &&
+          context.read<BottomNavProvider>().hide) {
         context.read<BottomNavProvider>().showBottomNav();
-      });
+        forwardOffset = currentOffset;
+      }
     } else {
-      bottomNavThrottle(() {
+      forwardOffset = currentOffset;
+      if (backwardDiff > Constants.scrollOffset &&
+          context.read<BottomNavProvider>().show) {
         context.read<BottomNavProvider>().hideBottomNav();
-      });
+        backwardOffset = currentOffset;
+      }
     }
   }
 
   @override
   void dispose() {
     controller.removeListener(handleScroll);
-    bottomNavThrottle.dispose();
     super.dispose();
   }
 
