@@ -5,24 +5,6 @@ import 'package:doko_react/features/complete-profile/input/complete_profile_inpu
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
 
-class CompleteUserProfileVariables {
-  final String id;
-  final String username;
-  final String email;
-  final DateTime dob;
-  final String name;
-  final String profilePicture;
-
-  const CompleteUserProfileVariables({
-    required this.id,
-    required this.username,
-    required this.email,
-    required this.dob,
-    required this.name,
-    required this.profilePicture,
-  });
-}
-
 class GraphqlQueries {
   // get user query and variables
   static String getUser() {
