@@ -1,6 +1,14 @@
+import 'dart:io';
+import 'dart:isolate';
+
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/global/bloc/preferences/preferences_bloc.dart';
+import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
+import 'package:doko_react/core/helpers/uuid/uuid_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ImagePickerWidget extends StatelessWidget {
   ImagePickerWidget({
@@ -78,7 +86,10 @@ class ImagePickerWidget extends StatelessWidget {
   }
 
   void handleVideoCapture(BuildContext context) {
-    if (multipleLimit > 0) selectVideoFromCamera();
+    if (multipleLimit > 0) {
+      selectVideoFromCamera(
+          context.read<PreferencesBloc>().state.saveCapturedMedia);
+    }
   }
 
   void handleGallery(BuildContext context) {
@@ -90,7 +101,10 @@ class ImagePickerWidget extends StatelessWidget {
   }
 
   void handleCamera(BuildContext context) {
-    if (multipleLimit > 0) selectImageFromCamera();
+    if (multipleLimit > 0) {
+      selectImageFromCamera(
+          context.read<PreferencesBloc>().state.saveCapturedMedia);
+    }
   }
 
   /// this will be only used for real time communication
@@ -199,6 +213,10 @@ class ImagePickerWidget extends StatelessWidget {
     );
   }
 
+  Future<void> handleSaveOnCapture(String path) async {
+    Isolate.spawn<String>(addFileToUserDevice, path);
+  }
+
   Future<void> selectVideoFromGallery() async {
     final XFile? selectedVideo = await picker.pickVideo(
       source: ImageSource.gallery,
@@ -208,13 +226,17 @@ class ImagePickerWidget extends StatelessWidget {
     onSelection([selectedVideo]);
   }
 
-  Future<void> selectVideoFromCamera() async {
+  Future<void> selectVideoFromCamera(bool saveOnCapture) async {
     final XFile? capturedVideo = await picker.pickVideo(
       source: ImageSource.camera,
       maxDuration: recordLimit,
     );
 
     if (capturedVideo == null) return;
+    if (saveOnCapture) {
+      handleSaveOnCapture(capturedVideo.path);
+    }
+
     onSelection([capturedVideo]);
   }
 
@@ -236,12 +258,16 @@ class ImagePickerWidget extends StatelessWidget {
     onSelection([selectedImage]);
   }
 
-  Future<void> selectImageFromCamera() async {
+  Future<void> selectImageFromCamera(bool saveOnCapture) async {
     final XFile? capturedImage = await picker.pickImage(
       source: ImageSource.camera,
     );
 
     if (capturedImage == null) return;
+    if (saveOnCapture) {
+      handleSaveOnCapture(capturedImage.path);
+    }
+
     onSelection([capturedImage]);
   }
 
@@ -304,4 +330,29 @@ class _IconLabel extends StatelessWidget {
       textAlign: TextAlign.center,
     );
   }
+}
+
+Future<void> addFileToUserDevice(String path) async {
+  String dirPath;
+  if (Platform.isAndroid) {
+    dirPath = "/storage/emulated/0/Download";
+  } else {
+    final applicationPath = await getDownloadsDirectory();
+
+    if (applicationPath == null) return;
+    dirPath = applicationPath.path;
+  }
+
+  final extension = getFileExtensionFromFileName(path);
+  if (extension == null || extension.isEmpty) return;
+
+  final directoryPath = "$dirPath/Doki";
+  Directory newDir = Directory(directoryPath);
+  await newDir.create(
+    recursive: true,
+  );
+
+  final pathToSave = "$directoryPath/${generateUniqueString()}$extension";
+  File tempFile = File(path);
+  await tempFile.copy(pathToSave);
 }
