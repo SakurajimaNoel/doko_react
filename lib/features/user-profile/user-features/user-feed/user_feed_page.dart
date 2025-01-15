@@ -41,16 +41,20 @@ class _UserFeedPageState extends State<UserFeedPage> {
   }
 
   void createOptions() {
+    final width = MediaQuery.sizeOf(context).width;
     showModalBottomSheet(
       useRootNavigator: true,
       context: context,
       showDragHandle: true,
       builder: (BuildContext context) {
-        return SizedBox(
+        return Container(
           height: Constants.height * 12.5,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          width: width,
+          padding: EdgeInsets.all(Constants.padding),
+          child: Wrap(
+            alignment: WrapAlignment.spaceEvenly,
+            spacing: Constants.gap,
+            runSpacing: Constants.gap,
             children: [
               FilledButton.tonalIcon(
                 onPressed: () {},
