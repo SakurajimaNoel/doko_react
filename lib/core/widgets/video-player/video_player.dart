@@ -175,25 +175,23 @@ class _VideoPlayerState extends State<VideoPlayer> {
                         ),
                         IconButton(
                           onPressed: () {
-                            preferences.add(PreferencesAudioToggleEvent());
-
-                            if (player.state.volume == 0) {
-                              player.setVolume(100);
-                            } else {
+                            if (preferences.state.audio) {
                               player.setVolume(0);
+                            } else {
+                              player.setVolume(100);
                             }
+                            preferences.add(PreferencesAudioToggleEvent());
                           },
-                          icon: StreamBuilder(
-                            stream:
-                                state.widget.controller.player.stream.volume,
-                            builder: (context, volume) => Icon(
-                              volume.data == 0
-                                  ? Icons.volume_off
-                                  : Icons.volume_up,
+                          icon: Builder(builder: (BuildContext context) {
+                            bool audio = context.select(
+                                (PreferencesBloc bloc) => bloc.state.audio);
+
+                            return Icon(
+                              audio ? Icons.volume_up : Icons.volume_off,
                               size: Constants.width,
                               color: primary,
-                            ),
-                          ),
+                            );
+                          }),
                         ),
                       ],
                     ),
