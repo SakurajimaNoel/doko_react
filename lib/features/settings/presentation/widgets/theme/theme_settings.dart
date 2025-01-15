@@ -91,15 +91,6 @@ class _AccentWidget extends StatefulWidget {
 }
 
 class _AccentWidgetState extends State<_AccentWidget> {
-  late Color currentAccentColor;
-
-  @override
-  void initState() {
-    super.initState();
-
-    currentAccentColor = context.read<ThemeBloc>().state.accent;
-  }
-
   void updateGlobalAccent(Color accent) {
     context.read<ThemeBloc>().add(ThemeChangeAccentEvent(
           selectedAccent: accent,
@@ -110,14 +101,18 @@ class _AccentWidgetState extends State<_AccentWidget> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: currentAccentColor,
-          ),
-        ),
+        Builder(builder: (context) {
+          final currentAccentColor =
+              context.select((ThemeBloc bloc) => bloc.state.accent);
+          return Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: currentAccentColor,
+            ),
+          );
+        }),
         TextButton(
           onPressed: openColorPicker,
           child: const Text('Change Accent'),
@@ -127,6 +122,7 @@ class _AccentWidgetState extends State<_AccentWidget> {
   }
 
   Future<void> openColorPicker() async {
+    final currentAccentColor = context.read<ThemeBloc>().state.accent;
     Color previousSelection = currentAccentColor;
 
     final selectedColor = await showDialog<Color>(
@@ -140,9 +136,6 @@ class _AccentWidgetState extends State<_AccentWidget> {
             child: ColorPicker(
               color: currentAccentColor,
               onColorChanged: (Color newColor) {
-                setState(() {
-                  currentAccentColor = newColor;
-                });
                 updateGlobalAccent(newColor);
               },
               borderRadius: 20,
@@ -177,11 +170,6 @@ class _AccentWidgetState extends State<_AccentWidget> {
     );
 
     if (selectedColor == null) {
-      // revert the changes
-      setState(() {
-        currentAccentColor = previousSelection;
-      });
-
       updateGlobalAccent(previousSelection);
     }
   }
