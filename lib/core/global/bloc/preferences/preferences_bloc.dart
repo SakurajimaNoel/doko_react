@@ -11,11 +11,17 @@ class PreferencesBloc extends HydratedBloc<PreferencesEvent, PreferencesState> {
           // default preferences
           const PreferencesState(
             audio: true,
+            saveCapturedMedia: true,
           ),
         ) {
     on<PreferencesAudioToggleEvent>((event, emit) {
       emit(state.copyWith(
         audio: !state.audio,
+      ));
+    });
+    on<PreferencesSaveMediaToggleEvent>((event, emit) {
+      emit(state.copyWith(
+        saveCapturedMedia: !state.saveCapturedMedia,
       ));
     });
   }
