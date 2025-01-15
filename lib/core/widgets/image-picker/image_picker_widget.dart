@@ -117,60 +117,62 @@ class ImagePickerWidget extends StatelessWidget {
           height: Constants.height * 15,
           width: width,
           padding: EdgeInsets.all(Constants.padding),
-          child: Wrap(
-            alignment: WrapAlignment.spaceEvenly,
-            spacing: Constants.gap * 2,
-            runSpacing: Constants.gap * 2,
-            children: [
-              if (image)
-                _IconButtonWithBottomLabel(
-                  label: "Select image",
-                  onPressed: () {
-                    handleGallery(context);
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.photo_library,
-                    color: currTheme.primary,
+          child: SingleChildScrollView(
+            child: Wrap(
+              alignment: WrapAlignment.spaceEvenly,
+              spacing: Constants.gap * 1.75,
+              runSpacing: Constants.gap * 1.75,
+              children: [
+                if (image)
+                  _IconButtonWithBottomLabel(
+                    label: "Select image",
+                    onPressed: () {
+                      handleGallery(context);
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.photo_library,
+                      color: currTheme.primary,
+                    ),
                   ),
-                ),
-              if (video)
-                _IconButtonWithBottomLabel(
-                  label: "Select video",
-                  onPressed: () {
-                    handleVideo(context);
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.video_collection,
-                    color: currTheme.primary,
+                if (video)
+                  _IconButtonWithBottomLabel(
+                    label: "Select video",
+                    onPressed: () {
+                      handleVideo(context);
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.video_collection,
+                      color: currTheme.primary,
+                    ),
                   ),
-                ),
-              if (image)
-                _IconButtonWithBottomLabel(
-                  label: "Take picture",
-                  onPressed: () {
-                    handleCamera(context);
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.photo_camera,
-                    color: currTheme.secondary,
+                if (image)
+                  _IconButtonWithBottomLabel(
+                    label: "Take picture",
+                    onPressed: () {
+                      handleCamera(context);
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.photo_camera,
+                      color: currTheme.secondary,
+                    ),
                   ),
-                ),
-              if (video)
-                _IconButtonWithBottomLabel(
-                  label: "Record video",
-                  onPressed: () {
-                    handleVideoCapture(context);
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.videocam,
-                    color: currTheme.secondary,
+                if (video)
+                  _IconButtonWithBottomLabel(
+                    label: "Record video",
+                    onPressed: () {
+                      handleVideoCapture(context);
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.videocam,
+                      color: currTheme.secondary,
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         );
       },

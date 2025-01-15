@@ -48,33 +48,35 @@ class _UserFeedPageState extends State<UserFeedPage> {
       showDragHandle: true,
       builder: (BuildContext context) {
         return Container(
-          height: Constants.height * 12.5,
+          height: Constants.height * 15,
           width: width,
           padding: EdgeInsets.all(Constants.padding),
-          child: Wrap(
-            alignment: WrapAlignment.spaceEvenly,
-            spacing: Constants.gap,
-            runSpacing: Constants.gap,
-            children: [
-              FilledButton.tonalIcon(
-                onPressed: () {},
-                label: const Text("Story"),
-                icon: const Icon(Icons.add_a_photo_outlined),
-              ),
-              FilledButton.tonalIcon(
-                onPressed: () {
-                  context.pop();
-                  context.pushNamed(RouterConstants.createPost);
-                },
-                label: const Text("Post"),
-                icon: const Icon(Icons.add_box_outlined),
-              ),
-              FilledButton.tonalIcon(
-                onPressed: () {},
-                label: const Text("Page"),
-                icon: const Icon(Icons.post_add),
-              ),
-            ],
+          child: SingleChildScrollView(
+            child: Wrap(
+              alignment: WrapAlignment.spaceEvenly,
+              spacing: Constants.gap,
+              runSpacing: Constants.gap,
+              children: [
+                FilledButton.tonalIcon(
+                  onPressed: () {},
+                  label: const Text("Story"),
+                  icon: const Icon(Icons.add_a_photo_outlined),
+                ),
+                FilledButton.tonalIcon(
+                  onPressed: () {
+                    context.pop();
+                    context.pushNamed(RouterConstants.createPost);
+                  },
+                  label: const Text("Post"),
+                  icon: const Icon(Icons.add_box_outlined),
+                ),
+                FilledButton.tonalIcon(
+                  onPressed: () {},
+                  label: const Text("Page"),
+                  icon: const Icon(Icons.post_add),
+                ),
+              ],
+            ),
           ),
         );
       },
