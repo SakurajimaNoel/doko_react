@@ -190,61 +190,7 @@ class AppRouterConfig {
           )
         ],
       ),
-      GoRoute(
-        path: "/settings",
-        name: RouterConstants.settings,
-        builder: (context, state) => const SettingsPage(),
-        routes: [
-          GoRoute(
-            name: RouterConstants.mfaSetup,
-            path: "mfa-setup",
-            builder: (context, state) => const SetupMfaPage(),
-            routes: [
-              GoRoute(
-                name: RouterConstants.verifyMfa,
-                path: "verify-mfa",
-                builder: (context, state) => const VerifyMfaPage(),
-              ),
-              GoRoute(
-                name: RouterConstants.updatePassword,
-                path: "change-password",
-                builder: (context, state) => const UpdatePasswordPage(),
-              ),
-            ],
-          ),
-        ],
-      ),
-      GoRoute(
-        name: RouterConstants.userSearch,
-        path: "/search",
-        builder: (context, state) => const SearchPage(),
-      ),
-      GoRoute(
-        name: RouterConstants.token,
-        path: "/tokens",
-        builder: (context, state) => const TokenPage(),
-      ),
-      GoRoute(
-        name: RouterConstants.createPost,
-        path: "/create-post",
-        builder: (context, state) => const CreatePostPage(),
-        routes: [
-          GoRoute(
-            parentNavigatorKey: _rootNavigatorKey,
-            name: RouterConstants.postPublish,
-            path: "publish",
-            builder: (context, state) {
-              final Map<String, dynamic> data =
-                  state.extra as Map<String, dynamic>;
-              final PostPublishPageData postDetails = data["postDetails"];
 
-              return PostPublishPage(
-                postDetails: postDetails,
-              );
-            },
-          ),
-        ],
-      ),
       // complete profile routes
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -255,10 +201,16 @@ class AppRouterConfig {
             navigatorKey: _sectionNavigatorKey,
             routes: [
               GoRoute(
-                name: RouterConstants.userFeed,
-                path: "/",
-                builder: (context, state) => const UserFeedPage(),
-              ),
+                  name: RouterConstants.userFeed,
+                  path: "/",
+                  builder: (context, state) => const UserFeedPage(),
+                  routes: [
+                    GoRoute(
+                      name: RouterConstants.userSearch,
+                      path: "search",
+                      builder: (context, state) => const SearchPage(),
+                    ),
+                  ]),
             ],
           ),
           StatefulShellBranch(
@@ -279,6 +231,59 @@ class AppRouterConfig {
                   return const ProfilePage();
                 },
                 routes: [
+                  GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
+                    path: "settings",
+                    name: RouterConstants.settings,
+                    builder: (context, state) => const SettingsPage(),
+                    routes: [
+                      GoRoute(
+                        name: RouterConstants.mfaSetup,
+                        path: "mfa-setup",
+                        builder: (context, state) => const SetupMfaPage(),
+                        routes: [
+                          GoRoute(
+                            name: RouterConstants.verifyMfa,
+                            path: "verify-mfa",
+                            builder: (context, state) => const VerifyMfaPage(),
+                          ),
+                          GoRoute(
+                            name: RouterConstants.updatePassword,
+                            path: "change-password",
+                            builder: (context, state) =>
+                                const UpdatePasswordPage(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    name: RouterConstants.token,
+                    path: "tokens",
+                    builder: (context, state) => const TokenPage(),
+                  ),
+                  GoRoute(
+                    name: RouterConstants.createPost,
+                    path: "/create-post",
+                    builder: (context, state) => const CreatePostPage(),
+                    routes: [
+                      GoRoute(
+                        parentNavigatorKey: _rootNavigatorKey,
+                        name: RouterConstants.postPublish,
+                        path: "publish",
+                        builder: (context, state) {
+                          final Map<String, dynamic> data =
+                              state.extra as Map<String, dynamic>;
+                          final PostPublishPageData postDetails =
+                              data["postDetails"];
+
+                          return PostPublishPage(
+                            postDetails: postDetails,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                   GoRoute(
                     parentNavigatorKey: _rootNavigatorKey,
                     name: RouterConstants.editProfile,
