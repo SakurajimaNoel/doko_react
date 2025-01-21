@@ -1,7 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/global/auth/auth.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
+import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
@@ -10,7 +13,9 @@ import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.da
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class UserLayout extends StatefulWidget {
   const UserLayout(this.navigationShell, {super.key});
@@ -23,12 +28,46 @@ class UserLayout extends StatefulWidget {
 
 class _UserLayoutState extends State<UserLayout> {
   late int activeIndex;
+  late final Client client;
 
   @override
   void initState() {
     super.initState();
 
     activeIndex = widget.navigationShell.currentIndex;
+
+    // create websocket client
+    client = Client(
+      url: Uri.parse(dotenv.env["WEBSOCKET_ENDPOINT"]!),
+      getToken: () async {
+        final token = await getUserToken();
+        return token.idToken;
+      },
+      onChatMessageReceived: (ChatMessage message) {
+        String displayMessage =
+            "${message.from}\t${message.to}\n${message.subject.value}\n${message.body}";
+        showMessage(displayMessage);
+      },
+    );
+
+    // todo: handle this in a better way try future builder?
+    client.connect();
+  }
+
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(message),
+        duration: Constants.messageDuration,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    client.disconnect();
+    super.dispose();
   }
 
   List<Widget> getDestinations(UserEntity user) {
@@ -116,55 +155,60 @@ class _UserLayoutState extends State<UserLayout> {
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
 
-    return BlocBuilder<UserActionBloc, UserActionState>(
-      buildWhen: (previousState, state) {
-        return state is UserActionUpdateProfile;
-      },
-      builder: (context, state) {
-        final username =
-            (context.read<UserBloc>().state as UserCompleteState).username;
-        String key = generateUserNodeKey(username);
+    return ChangeNotifierProvider<WebsocketClientProvider>(
+      create: (_) => WebsocketClientProvider(
+        client: client,
+      ),
+      child: BlocBuilder<UserActionBloc, UserActionState>(
+        buildWhen: (previousState, state) {
+          return state is UserActionUpdateProfile;
+        },
+        builder: (context, state) {
+          final username =
+              (context.read<UserBloc>().state as UserCompleteState).username;
+          String key = generateUserNodeKey(username);
 
-        final UserGraph graph = UserGraph();
-        UserEntity user = graph.getValueByKey(key)! as UserEntity;
-        bool profileEmpty = user.profilePicture.bucketPath.isEmpty;
+          final UserGraph graph = UserGraph();
+          UserEntity user = graph.getValueByKey(key)! as UserEntity;
+          bool profileEmpty = user.profilePicture.bucketPath.isEmpty;
 
-        return PopScope(
-          canPop: false,
-          onPopInvokedWithResult: (bool didPop, _) {
-            /// this handles going to user feed page
-            /// when in one of the other pages of
-            /// stateful shell route
-            if (didPop) return;
+          return PopScope(
+            canPop: false,
+            onPopInvokedWithResult: (bool didPop, _) {
+              /// this handles going to user feed page
+              /// when in one of the other pages of
+              /// stateful shell route
+              if (didPop) return;
 
-            if (activeIndex == 0) {
-              SystemNavigator.pop();
-              return;
-            }
+              if (activeIndex == 0) {
+                SystemNavigator.pop();
+                return;
+              }
 
-            context.read<BottomNavProvider>().showBottomNav();
-            onDestinationSelected(0, profileEmpty);
-          },
-          child: Scaffold(
-            body: widget.navigationShell,
-            bottomNavigationBar: Builder(builder: (context) {
-              bool show = context.watch<BottomNavProvider>().show;
+              context.read<BottomNavProvider>().showBottomNav();
+              onDestinationSelected(0, profileEmpty);
+            },
+            child: Scaffold(
+              body: widget.navigationShell,
+              bottomNavigationBar: Builder(builder: (context) {
+                bool show = context.watch<BottomNavProvider>().show;
 
-              return show
-                  ? NavigationBar(
-                      indicatorColor: (activeIndex != 2 || profileEmpty)
-                          ? currTheme.primary
-                          : Colors.transparent,
-                      selectedIndex: widget.navigationShell.currentIndex,
-                      destinations: getDestinations(user),
-                      onDestinationSelected: (index) =>
-                          onDestinationSelected(index, profileEmpty),
-                    )
-                  : SizedBox.shrink();
-            }),
-          ),
-        );
-      },
+                return show
+                    ? NavigationBar(
+                        indicatorColor: (activeIndex != 2 || profileEmpty)
+                            ? currTheme.primary
+                            : Colors.transparent,
+                        selectedIndex: widget.navigationShell.currentIndex,
+                        destinations: getDestinations(user),
+                        onDestinationSelected: (index) =>
+                            onDestinationSelected(index, profileEmpty),
+                      )
+                    : SizedBox.shrink();
+              }),
+            ),
+          );
+        },
+      ),
     );
   }
 

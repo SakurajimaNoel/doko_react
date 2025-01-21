@@ -11,6 +11,9 @@ class Constants {
   static const Duration snackBarDuration = Duration(
     milliseconds: 1500,
   );
+  static const Duration messageDuration = Duration(
+    seconds: 5,
+  );
 
   static const double padding = _root;
   static const double gap = _root;
