@@ -7,12 +7,28 @@ class MessageEntity extends GraphEntity {
   }) : _message = message;
 
   ChatMessage _message;
+  bool _edited = false;
+  bool _deleted = false;
 
   ChatMessage get message => _message;
+
+  bool get edited => _edited;
+
+  bool get deleted => _deleted;
 
   void editMessage(EditMessage message) {
     _message = _message.updateMessage(
       body: message.body,
     );
+
+    _setEdited();
+  }
+
+  void deleteMessage() {
+    _deleted = true;
+  }
+
+  void _setEdited() {
+    _edited = true;
   }
 }

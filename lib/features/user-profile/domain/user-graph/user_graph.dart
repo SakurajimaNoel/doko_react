@@ -529,4 +529,26 @@ class UserGraph {
 
     addEntity(inboxKey, inbox);
   }
+
+  void editMessage(EditMessage message) {
+    String messageKey = generateMessageKey(message.id);
+    if (!containsKey(messageKey)) return;
+
+    final messageEntity = getValueByKey(messageKey)! as MessageEntity;
+    messageEntity.editMessage(message);
+
+    addEntity(messageKey, messageEntity);
+  }
+
+  void deleteMessage(DeleteMessage message) {
+    for (String messageId in message.id) {
+      String messageKey = generateMessageKey(messageId);
+      if (!containsKey(messageKey)) continue;
+
+      final messageEntity = getValueByKey(messageKey)! as MessageEntity;
+      messageEntity.deleteMessage();
+
+      addEntity(messageKey, messageEntity);
+    }
+  }
 }

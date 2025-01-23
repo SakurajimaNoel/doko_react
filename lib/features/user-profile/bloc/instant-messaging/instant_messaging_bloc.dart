@@ -13,6 +13,12 @@ class InstantMessagingBloc
     extends Bloc<InstantMessagingEvent, InstantMessagingState> {
   InstantMessagingBloc() : super(InstantMessagingInitial()) {
     on<InstantMessagingNewMessageEvent>(_handleInstantMessagingNewMessageEvent);
+    on<InstantMessagingTypingStatusEvent>(
+        _handleInstantMessagingTypingStatusEvent);
+    on<InstantMessagingEditMessageEvent>(
+        _handleInstantMessagingEditMessageEvent);
+    on<InstantMessagingDeleteMessageEvent>(
+        _handleInstantMessagingDeleteMessageEvent);
   }
 
   FutureOr<void> _handleInstantMessagingNewMessageEvent(
@@ -38,6 +44,62 @@ class InstantMessagingBloc
 
     emit(InstantMessagingNewMessageState(
       id: message.id,
+      archiveUser: archiveUser,
+    ));
+  }
+
+  FutureOr<void> _handleInstantMessagingTypingStatusEvent(
+      InstantMessagingTypingStatusEvent event,
+      Emitter<InstantMessagingState> emit) async {
+    emit(InstantMessagingTypingStatusState(
+      archiveUser: event.status.from,
+      typing: true,
+    ));
+
+    await Future.delayed(
+      Duration(
+        seconds: 4,
+      ),
+    );
+
+    emit(InstantMessagingTypingStatusState(
+      archiveUser: event.status.from,
+      typing: false,
+    ));
+  }
+
+  FutureOr<void> _handleInstantMessagingEditMessageEvent(
+      InstantMessagingEditMessageEvent event,
+      Emitter<InstantMessagingState> emit) async {
+    UserGraph graph = UserGraph();
+    graph.editMessage(event.message);
+
+    String archiveUser =
+        getUsernameFromInboxItemKey(generateInboxKeyFromMessageParams(
+      event.username,
+      to: event.message.to,
+      from: event.message.from,
+    ));
+    emit(InstantMessagingEditMessageState(
+      id: event.message.id,
+      archiveUser: archiveUser,
+    ));
+  }
+
+  FutureOr<void> _handleInstantMessagingDeleteMessageEvent(
+      InstantMessagingDeleteMessageEvent event,
+      Emitter<InstantMessagingState> emit) async {
+    UserGraph graph = UserGraph();
+    graph.deleteMessage(event.message);
+
+    String archiveUser =
+        getUsernameFromInboxItemKey(generateInboxKeyFromMessageParams(
+      event.username,
+      to: event.message.to,
+      from: event.message.from,
+    ));
+    emit(InstantMessagingDeleteMessageState(
+      id: event.message.id,
       archiveUser: archiveUser,
     ));
   }

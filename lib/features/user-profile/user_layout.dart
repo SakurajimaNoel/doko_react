@@ -53,6 +53,8 @@ class _UserLayoutState extends State<UserLayout> {
       isForeground = event == FGBGType.foreground;
     });
 
+    final instantMessagingBloc = context.read<InstantMessagingBloc>();
+
     // create websocket client
     client = Client(
       url: Uri.parse(dotenv.env["WEBSOCKET_ENDPOINT"]!),
@@ -61,16 +63,28 @@ class _UserLayoutState extends State<UserLayout> {
         return token.idToken;
       },
       onChatMessageReceived: (ChatMessage message) {
-        context
-            .read<InstantMessagingBloc>()
-            .add(InstantMessagingNewMessageEvent(
-              message: message,
-              username: username,
-            ));
+        instantMessagingBloc.add(InstantMessagingNewMessageEvent(
+          message: message,
+          username: username,
+        ));
       },
-      onTypingStatusReceived: (TypingStatus status) {},
-      onEditMessageReceived: (EditMessage message) {},
-      onDeleteMessageReceived: (DeleteMessage message) {},
+      onTypingStatusReceived: (TypingStatus status) {
+        instantMessagingBloc.add(InstantMessagingTypingStatusEvent(
+          status: status,
+        ));
+      },
+      onEditMessageReceived: (EditMessage message) {
+        instantMessagingBloc.add(InstantMessagingEditMessageEvent(
+          message: message,
+          username: username,
+        ));
+      },
+      onDeleteMessageReceived: (DeleteMessage message) {
+        instantMessagingBloc.add(InstantMessagingDeleteMessageEvent(
+          message: message,
+          username: username,
+        ));
+      },
       onReconnectSuccess: () {
         /// find latest message from inbox and fetch based on that
       },
