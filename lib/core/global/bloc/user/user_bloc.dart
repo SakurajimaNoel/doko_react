@@ -54,8 +54,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       QueryResult result = await client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(GraphqlQueries.getUser()),
-          variables: GraphqlQueries.getUserVariables(userDetails.userId),
+          document: gql(GraphqlQueries.getUserById()),
+          variables: GraphqlQueries.getUserByIdVariables(userDetails.userId),
         ),
       );
 

@@ -2,8 +2,8 @@ import 'package:doko_react/core/config/graphql/graphql_constants.dart';
 import 'package:doko_react/core/helpers/query/query_helper.dart';
 
 class GraphqlQueries {
-  // get user query and variables
-  static String getUser() {
+  // get user query and variables for self
+  static String getUserById() {
     return """
       query Users(\$where: UserWhere) {
         users(where: \$where) {
@@ -11,17 +11,55 @@ class GraphqlQueries {
           username
           name
           profilePicture
-         
         }
       }
     """;
   }
 
-  static Map<String, dynamic> getUserVariables(String userId) {
+  static Map<String, dynamic> getUserByIdVariables(String userId) {
     return {
       "where": {
         "id_EQ": userId,
       },
+    };
+  }
+
+  // get user by username
+  static String getUserByUsername() {
+    return """
+      query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+        users(where: \$where) {
+          username
+          name
+          id
+          profilePicture
+          friendsConnection(where: \$friendsConnectionWhere2) {
+            edges {
+              properties {
+                requestedBy
+                addedOn
+                status
+              }
+            }
+          }
+        }
+      }
+    """;
+  }
+
+  static Map<String, dynamic> getUserByUsernameVariables(
+    String username, {
+    required String currentUser,
+  }) {
+    return {
+      "where": {
+        "username_EQ": username,
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": currentUser,
+        }
+      }
     };
   }
 
