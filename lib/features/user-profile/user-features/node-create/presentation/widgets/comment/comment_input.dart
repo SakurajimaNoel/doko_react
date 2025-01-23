@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
-import 'package:doko_react/core/helpers/media/giphy/giphy_uri.dart';
 import 'package:doko_react/core/helpers/media/image-cropper/image_cropper_helper.dart';
 import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/helpers/text-controller/mention_text_controller.dart';
 import 'package:doko_react/core/helpers/uuid/uuid_helper.dart';
+import 'package:doko_react/core/widgets/gif-picker/gif_picker.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
@@ -26,8 +26,6 @@ import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:giphy_get/giphy_get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -784,42 +782,16 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
               const SizedBox(
                 width: Constants.gap,
               ),
-              IconButton(
-                onPressed: adding
-                    ? null
-                    : () async {
-                        GiphyGif? gif = await GiphyGet.getGif(
-                          context: context,
-                          apiKey: dotenv.env["GIPHY_API_KEY"]!,
-                          randomID: (context.read<UserBloc>().state
-                                  as UserCompleteState)
-                              .username,
-                          tabColor: currTheme.primary,
-                          debounceTimeInMilliseconds: 500,
-                        );
+              GifPicker(
+                handleSelection: (String uri) {
+                  CommentMedia giphyMedia = CommentMedia(
+                    extension: "uri",
+                    uri: uri,
+                  );
 
-                        String? uri = getValidGiphyURI(gif);
-                        if (uri == null || uri.isEmpty) {
-                          // showMessage(Constants.errorMessage);
-                          return;
-                        }
-
-                        CommentMedia giphyMedia = CommentMedia(
-                          extension: "uri",
-                          uri: uri,
-                        );
-
-                        addMedia(giphyMedia);
-                      },
-                style: IconButton.styleFrom(
-                  minimumSize: Size.zero,
-                  padding: EdgeInsets.all(Constants.padding * 0.5),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                icon: Icon(
-                  Icons.gif_box_outlined,
-                  color: currTheme.primary,
-                ),
+                  addMedia(giphyMedia);
+                },
+                disabled: adding,
               ),
               const Spacer(),
               Builder(builder: (context) {
