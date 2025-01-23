@@ -6,6 +6,7 @@ import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/core/helpers/relation/user_to_user_relation.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
@@ -495,12 +496,30 @@ class UserGraph {
 
     addEntity(messageKey, messageEntity);
 
-    // update inbox item entity
-    String inboxItemKey = generateInboxKeyFromMessageParams(
+    String archiveUser = getUsernameFromMessageParams(
       username,
       to: message.to,
       from: message.from,
     );
+
+    // update archive
+    String archiveKey = generateArchiveKey(archiveUser);
+    ArchiveEntity archiveEntity;
+    if (!containsKey(archiveKey)) {
+      archiveEntity = ArchiveEntity(
+        archiveMessages: Nodes.empty(),
+        currentSessionMessages: {messageKey},
+      );
+    } else {
+      archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
+      archiveEntity.addCurrentSessionMessages(messageKey);
+    }
+
+    addEntity(archiveKey, archiveEntity);
+
+    // update inbox item entity
+
+    String inboxItemKey = generateInboxItemKey(archiveUser);
 
     InboxItemEntity inboxItem;
     if (!containsKey(inboxItemKey)) {
