@@ -1,10 +1,14 @@
 import 'dart:collection';
 
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/core/helpers/relation/user_to_user_relation.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -479,5 +483,50 @@ class UserGraph {
     _addEntityMap(tempMap);
 
     return userKeys;
+  }
+
+  /// instant messaging methods
+  void addNewMessage(ChatMessage message, String username) {
+    // add new message
+    String messageKey = generateMessageKey(message.id);
+    MessageEntity messageEntity = MessageEntity(
+      message: message,
+    );
+
+    addEntity(messageKey, messageEntity);
+
+    // update inbox item entity
+    String inboxItemKey = generateInboxKeyFromMessageParams(
+      username,
+      to: message.to,
+      from: message.from,
+    );
+
+    InboxItemEntity inboxItem;
+    if (!containsKey(inboxItemKey)) {
+      // create inbox item entity
+      inboxItem = InboxItemEntity(
+        messages: Queue<String>(),
+      );
+    } else {
+      inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
+    }
+
+    inboxItem.addNewMessage(messageKey);
+    addEntity(inboxItemKey, inboxItem);
+
+    // update user inbox
+    InboxEntity inbox;
+    String inboxKey = generateInboxKey();
+    if (containsKey(inboxKey)) {
+      inbox = getValueByKey(inboxKey)! as InboxEntity;
+      inbox.reorder(inboxItemKey);
+    } else {
+      // create inbox
+      inbox = InboxEntity.empty();
+      inbox.addItems([inboxItemKey]);
+    }
+
+    addEntity(inboxKey, inbox);
   }
 }

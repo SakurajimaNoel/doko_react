@@ -76,4 +76,9 @@ class InboxEntity extends GraphEntity {
   void addItems(List<String> inboxItems) {
     items.addAll(inboxItems);
   }
+
+  void reorder(String inboxItemKey) {
+    items.remove(inboxItemKey);
+    items.add(inboxItemKey);
+  }
 }

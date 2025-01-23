@@ -9,6 +9,7 @@ import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.d
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/features/user-profile/bloc/instant-messaging/instant_messaging_bloc.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -59,7 +60,14 @@ class _UserLayoutState extends State<UserLayout> {
         final token = await getUserToken();
         return token.idToken;
       },
-      onChatMessageReceived: (ChatMessage message) {},
+      onChatMessageReceived: (ChatMessage message) {
+        context
+            .read<InstantMessagingBloc>()
+            .add(InstantMessagingNewMessageEvent(
+              message: message,
+              username: username,
+            ));
+      },
       onTypingStatusReceived: (TypingStatus status) {},
       onEditMessageReceived: (EditMessage message) {},
       onDeleteMessageReceived: (DeleteMessage message) {},
