@@ -35,12 +35,11 @@ class InstantMessagingBloc
     /// 1) to update inbox ordering
     /// 2) to update archive
     /// 3) to update inbox individual item to show latest message
-    String archiveUser =
-        getUsernameFromInboxItemKey(generateInboxKeyFromMessageParams(
+    String archiveUser = getUsernameFromMessageParams(
       event.username,
       to: message.to,
       from: message.from,
-    ));
+    );
 
     emit(InstantMessagingNewMessageState(
       id: message.id,
@@ -74,12 +73,11 @@ class InstantMessagingBloc
     UserGraph graph = UserGraph();
     graph.editMessage(event.message);
 
-    String archiveUser =
-        getUsernameFromInboxItemKey(generateInboxKeyFromMessageParams(
+    String archiveUser = getUsernameFromMessageParams(
       event.username,
       to: event.message.to,
       from: event.message.from,
-    ));
+    );
     emit(InstantMessagingEditMessageState(
       id: event.message.id,
       archiveUser: archiveUser,
@@ -92,12 +90,11 @@ class InstantMessagingBloc
     UserGraph graph = UserGraph();
     graph.deleteMessage(event.message);
 
-    String archiveUser =
-        getUsernameFromInboxItemKey(generateInboxKeyFromMessageParams(
+    String archiveUser = getUsernameFromMessageParams(
       event.username,
       to: event.message.to,
       from: event.message.from,
-    ));
+    );
     emit(InstantMessagingDeleteMessageState(
       id: event.message.id,
       archiveUser: archiveUser,

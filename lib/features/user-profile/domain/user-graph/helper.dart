@@ -62,12 +62,10 @@ String getMessageIdFromMessageKey(String messageKey) {
 }
 
 /// function to get inbox item key from message
-String generateInboxKeyFromMessageParams(
+String getUsernameFromMessageParams(
   String username, {
   required String to,
   required String from,
 }) {
-  return username == from
-      ? generateInboxItemKey(to)
-      : generateInboxItemKey(from);
+  return username == from ? to : from;
 }
