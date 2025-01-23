@@ -44,6 +44,9 @@ class _UserLayoutState extends State<UserLayout> {
 
     activeIndex = widget.navigationShell.currentIndex;
 
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
     final connectionChecker = InternetConnectionChecker.instance;
     appState = FGBGEvents.instance.stream.listen((event) {
       isForeground = event == FGBGType.foreground;
@@ -82,7 +85,7 @@ class _UserLayoutState extends State<UserLayout> {
           } else {
             // Listen for internet connection changes
             internetSubscription = connectionChecker.onStatusChange.listen(
-                  (InternetConnectionStatus status) {
+              (InternetConnectionStatus status) {
                 if (status == InternetConnectionStatus.connected) {
                   showMessage("App has internet connection");
 
@@ -99,7 +102,7 @@ class _UserLayoutState extends State<UserLayout> {
           await handleReconnection();
         } else {
           fgBgSubscription = FGBGEvents.instance.stream.listen(
-                (event) async {
+            (event) async {
               if (event == FGBGType.foreground) {
                 showMessage("App is in foreground");
                 await handleReconnection();
@@ -134,9 +137,7 @@ class _UserLayoutState extends State<UserLayout> {
   }
 
   List<Widget> getDestinations(UserEntity user) {
-    final currTheme = Theme
-        .of(context)
-        .colorScheme;
+    final currTheme = Theme.of(context).colorScheme;
 
     return [
       NavigationDestination(
@@ -158,57 +159,55 @@ class _UserLayoutState extends State<UserLayout> {
       NavigationDestination(
         selectedIcon: user.profilePicture.bucketPath.isEmpty
             ? Icon(
-          Icons.account_circle,
-          color: currTheme.onPrimary,
-        )
+                Icons.account_circle,
+                color: currTheme.onPrimary,
+              )
             : CircleAvatar(
-          radius: 20,
-          backgroundColor: currTheme.primary,
-          child: CircleAvatar(
-            radius: 17,
-            child: ClipOval(
-              child: CachedNetworkImage(
-                cacheKey: user.profilePicture.bucketPath,
-                imageUrl: user.profilePicture.accessURI,
-                placeholder: (context, url) =>
-                const Center(
-                  child: SmallLoadingIndicator.small(),
+                radius: 20,
+                backgroundColor: currTheme.primary,
+                child: CircleAvatar(
+                  radius: 17,
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      cacheKey: user.profilePicture.bucketPath,
+                      imageUrl: user.profilePicture.accessURI,
+                      placeholder: (context, url) => const Center(
+                        child: SmallLoadingIndicator.small(),
+                      ),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                      fit: BoxFit.cover,
+                      width: 40,
+                      height: 40,
+                      memCacheHeight: Constants.thumbnailCacheHeight,
+                    ),
+                  ),
                 ),
-                errorWidget: (context, url, error) =>
-                const Icon(Icons.error),
-                fit: BoxFit.cover,
-                width: 40,
-                height: 40,
-                memCacheHeight: Constants.thumbnailCacheHeight,
               ),
-            ),
-          ),
-        ),
         icon: user.profilePicture.bucketPath.isEmpty
             ? const Icon(Icons.account_circle_outlined)
             : CircleAvatar(
-          radius: 20,
-          backgroundColor: currTheme.primary,
-          child: CircleAvatar(
-            radius: 20,
-            child: ClipOval(
-              child: CachedNetworkImage(
-                cacheKey: user.profilePicture.bucketPath,
-                imageUrl: user.profilePicture.accessURI,
-                placeholder: (context, url) =>
-                const Center(
-                  child: SmallLoadingIndicator.small(),
+                radius: 20,
+                backgroundColor: currTheme.primary,
+                child: CircleAvatar(
+                  radius: 20,
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      cacheKey: user.profilePicture.bucketPath,
+                      imageUrl: user.profilePicture.accessURI,
+                      placeholder: (context, url) => const Center(
+                        child: SmallLoadingIndicator.small(),
+                      ),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                      fit: BoxFit.cover,
+                      width: 40,
+                      height: 40,
+                      memCacheHeight: Constants.thumbnailCacheHeight,
+                    ),
+                  ),
                 ),
-                errorWidget: (context, url, error) =>
-                const Icon(Icons.error),
-                fit: BoxFit.cover,
-                width: 40,
-                height: 40,
-                memCacheHeight: Constants.thumbnailCacheHeight,
               ),
-            ),
-          ),
-        ),
         label: trimText(
           user.name,
           len: 16,
@@ -220,24 +219,19 @@ class _UserLayoutState extends State<UserLayout> {
 
   @override
   Widget build(BuildContext context) {
-    final currTheme = Theme
-        .of(context)
-        .colorScheme;
+    final currTheme = Theme.of(context).colorScheme;
 
     return ChangeNotifierProvider<WebsocketClientProvider>(
-      create: (_) =>
-          WebsocketClientProvider(
-            client: client,
-          ),
+      create: (_) => WebsocketClientProvider(
+        client: client,
+      ),
       child: BlocBuilder<UserActionBloc, UserActionState>(
         buildWhen: (previousState, state) {
           return state is UserActionUpdateProfile;
         },
         builder: (context, state) {
           final username =
-              (context
-                  .read<UserBloc>()
-                  .state as UserCompleteState).username;
+              (context.read<UserBloc>().state as UserCompleteState).username;
           String key = generateUserNodeKey(username);
 
           final UserGraph graph = UserGraph();
@@ -263,20 +257,18 @@ class _UserLayoutState extends State<UserLayout> {
             child: Scaffold(
               body: widget.navigationShell,
               bottomNavigationBar: Builder(builder: (context) {
-                bool show = context
-                    .watch<BottomNavProvider>()
-                    .show;
+                bool show = context.watch<BottomNavProvider>().show;
 
                 return show
                     ? NavigationBar(
-                  indicatorColor: (activeIndex != 2 || profileEmpty)
-                      ? currTheme.primary
-                      : Colors.transparent,
-                  selectedIndex: widget.navigationShell.currentIndex,
-                  destinations: getDestinations(user),
-                  onDestinationSelected: (index) =>
-                      onDestinationSelected(index, profileEmpty),
-                )
+                        indicatorColor: (activeIndex != 2 || profileEmpty)
+                            ? currTheme.primary
+                            : Colors.transparent,
+                        selectedIndex: widget.navigationShell.currentIndex,
+                        destinations: getDestinations(user),
+                        onDestinationSelected: (index) =>
+                            onDestinationSelected(index, profileEmpty),
+                      )
                     : SizedBox.shrink();
               }),
             ),
@@ -297,7 +289,7 @@ class _UserLayoutState extends State<UserLayout> {
     if (prevIndex == 2 && !profileEmpty) {
       Future.delayed(
         const Duration(milliseconds: 100),
-            () {
+        () {
           setState(() {
             activeIndex = index;
           });
