@@ -72,7 +72,9 @@ class UserWidget extends StatelessWidget {
         return (state is UserActionUpdateProfile &&
                 userKey == currentUserKey) ||
             (state is UserActionUserRefreshState &&
-                generateUserNodeKey(state.username) == userKey);
+                state.username == username) ||
+            (state is UserActionUserDataFetchedState &&
+                state.username == username);
       },
       builder: (context, state) {
         final UserGraph graph = UserGraph();
