@@ -44,7 +44,7 @@ class _CommentWidgetState extends State<CommentWidget> {
   Widget build(BuildContext context) {
     final UserGraph graph = UserGraph();
 
-    final commentId = generateCommentIdFromCommentKey(widget.commentKey);
+    final commentId = getCommentIdFromCommentKey(widget.commentKey);
 
     final CommentEntity comment =
         graph.getValueByKey(widget.commentKey)! as CommentEntity;
@@ -380,14 +380,14 @@ class _CommentActionsState extends State<_CommentActions>
                             widget.isReply ? widget.parentNodeId : commentId;
 
                         String targetUsername =
-                            generateUsernameFromKey(comment.commentBy);
+                            getUsernameFromUserKey(comment.commentBy);
 
                         if (widget.isReply) {
                           CommentEntity entity = graph.getValueByKey(
                                   generateCommentNodeKey(targetId))!
                               as CommentEntity;
                           targetUsername =
-                              generateUsernameFromKey(entity.commentBy);
+                              getUsernameFromUserKey(entity.commentBy);
                         }
 
                         context.read<PostCommentProvider>()

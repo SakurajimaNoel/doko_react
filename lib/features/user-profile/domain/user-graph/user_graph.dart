@@ -9,6 +9,8 @@ import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 
+part "helper.dart";
+
 /// single source of truth for any node information
 class UserGraph {
   final Map<String, GraphEntity> _graph;
@@ -478,37 +480,4 @@ class UserGraph {
 
     return userKeys;
   }
-}
-
-// functions to generate keys
-String generateUserNodeKey(String username) {
-  return "user:$username";
-}
-
-String generateUsernameFromKey(String userKey) {
-  return userKey.substring(5);
-}
-
-String generatePostNodeKey(String postId) {
-  return "post:$postId";
-}
-
-String generatePostIdFromPostKey(String postKey) {
-  return postKey.substring(8);
-}
-
-String generateCommentNodeKey(String commentId) {
-  return "comment:$commentId";
-}
-
-String generateCommentIdFromCommentKey(String commentKey) {
-  return commentKey.substring(8);
-}
-
-String generatePendingIncomingReqKey() {
-  return "pending-incoming-request";
-}
-
-String generatePendingOutgoingReqKey() {
-  return "pending-outgoing-request";
 }

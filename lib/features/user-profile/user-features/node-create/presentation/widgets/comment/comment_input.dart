@@ -419,7 +419,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                 userSearchResults.length,
                 (index) {
                   String userKey = userSearchResults[index];
-                  String username = generateUsernameFromKey(userKey);
+                  String username = getUsernameFromUserKey(userKey);
 
                   return ListTile(
                     minTileHeight: Constants.height * 3,

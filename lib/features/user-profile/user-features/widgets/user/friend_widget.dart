@@ -21,7 +21,7 @@ class FriendWidget extends StatelessWidget {
         context.pushNamed(
           RouterConstants.userProfile,
           pathParameters: {
-            "username": generateUsernameFromKey(userKey),
+            "username": getUsernameFromUserKey(userKey),
           },
         );
       },
@@ -33,7 +33,7 @@ class FriendWidget extends StatelessWidget {
         userKey: userKey,
       ),
       trailing: UserToUserRelationWidget(
-        username: generateUsernameFromKey(userKey),
+        username: getUsernameFromUserKey(userKey),
         key: ValueKey("${userKey}_relation"),
       ),
       title: UserWidget.info(

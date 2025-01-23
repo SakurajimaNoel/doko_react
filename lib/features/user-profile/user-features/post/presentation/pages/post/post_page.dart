@@ -102,8 +102,8 @@ class _PostPageState extends State<PostPage> {
                 return PostCommentProvider(
                   focusNode: FocusNode(),
                   postId: post.id,
-                  postCreatedBy: generateUsernameFromKey(post.createdBy),
-                  targetByUser: generateUsernameFromKey(post.createdBy),
+                  postCreatedBy: getUsernameFromUserKey(post.createdBy),
+                  targetByUser: getUsernameFromUserKey(post.createdBy),
                   commentTargetId: post.id,
                 );
               },
