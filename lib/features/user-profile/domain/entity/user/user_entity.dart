@@ -26,8 +26,6 @@ class UserEntity extends GraphEntity {
   String name;
   StorageResource profilePicture;
   UserRelationInfo? relationInfo;
-  bool typing = false;
-  Timer? timer;
 
   UserRelationInfo? prevRelationInfo;
 
@@ -35,23 +33,6 @@ class UserEntity extends GraphEntity {
   void updateRelationInfo(UserRelationInfo? currentRelationInfo) {
     prevRelationInfo = relationInfo;
     relationInfo = currentRelationInfo;
-  }
-
-  void addTypingStatus(bool status) {
-    typing = status;
-
-    if (timer != null) {
-      timer?.cancel();
-    }
-
-    timer = Timer(
-      Duration(
-        seconds: 5,
-      ),
-      () {
-        typing = false;
-      },
-    );
   }
 
   static Future<UserEntity> createEntity({required Map map}) async {
