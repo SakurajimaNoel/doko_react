@@ -45,10 +45,18 @@ String getUsernameFromInboxItemKey(String inboxKey) {
   return inboxKey.substring(6);
 }
 
-String generateArchiveItemKey(String username) {
+String generateArchiveKey(String username) {
   return "archive:$username";
 }
 
 String getUsernameFromArchiveKey(String archiveKey) {
   return archiveKey.substring(8);
+}
+
+String generateMessageKey(String messageId) {
+  return "message:$messageId";
+}
+
+String getMessageIdFromMessageKey(String messageKey) {
+  return messageKey.substring(8);
 }
