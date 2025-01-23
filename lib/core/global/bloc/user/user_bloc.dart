@@ -28,6 +28,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   FutureOr<void> _handleInit(
       UserInitEvent event, Emitter<UserState> emit) async {
     try {
+      // also reset graph
+      UserGraph().reset();
       final result = await Amplify.Auth.fetchAuthSession();
 
       if (result.isSignedIn) {

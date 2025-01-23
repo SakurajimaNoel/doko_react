@@ -36,6 +36,7 @@ class _UserLayoutState extends State<UserLayout> {
   late final Client client;
 
   bool isForeground = true;
+  DateTime? backgroundWhen;
 
   late StreamSubscription<FGBGType> appState;
 
@@ -51,6 +52,21 @@ class _UserLayoutState extends State<UserLayout> {
     final connectionChecker = InternetConnectionChecker.instance;
     appState = FGBGEvents.instance.stream.listen((event) {
       isForeground = event == FGBGType.foreground;
+
+      if (!isForeground) {
+        /// refresh whole app if user comes back after 30minutes
+        backgroundWhen = DateTime.now();
+      } else {
+        DateTime now = DateTime.now();
+        if (backgroundWhen == null) return;
+
+        Duration diff = now.difference(backgroundWhen!);
+        backgroundWhen = null;
+
+        if (diff.inMinutes > 30) {
+          refreshApp();
+        }
+      }
     });
 
     final instantMessagingBloc = context.read<InstantMessagingBloc>();
@@ -137,6 +153,11 @@ class _UserLayoutState extends State<UserLayout> {
     );
 
     connectWS();
+  }
+
+  void refreshApp() {
+    // refresh here
+    context.read<UserBloc>().add(UserInitEvent());
   }
 
   Future<void> connectWS() async {
