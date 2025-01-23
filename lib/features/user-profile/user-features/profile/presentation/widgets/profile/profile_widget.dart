@@ -103,9 +103,16 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     );
   }
 
+  void handleShare() {}
+
   List<Widget> appBarActions() {
     if (!self) {
-      return [];
+      return [
+        TextButton(
+          onPressed: handleShare,
+          child: Text("Share"),
+        ),
+      ];
     }
 
     return [
@@ -126,7 +133,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   Widget userProfileAction(CompleteUserEntity user) {
     if (self) {
       return Row(
-        spacing: Constants.gap * 3,
+        spacing: Constants.gap * 2,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           FilledButton.tonalIcon(
             onPressed: () {
@@ -137,6 +145,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             },
             label: const Text("Edit"),
             icon: const Icon(Icons.edit_note),
+          ),
+          TextButton(
+            onPressed: handleShare,
+            child: Text("Share"),
           ),
           ElevatedButton(
             onPressed: () {
