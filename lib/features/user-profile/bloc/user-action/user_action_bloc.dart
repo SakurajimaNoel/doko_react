@@ -22,6 +22,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
 part 'user_action_event.dart';
+
 part 'user_action_state.dart';
 
 class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
@@ -45,7 +46,8 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     required CommentAddLikeUseCase commentAddLikeUseCase,
     required CommentRemoveLikeUseCase commentRemoveLikeUseCase,
     required UserGetUseCase userGetUseCase,
-  })  : _postAddLikeUseCase = postAddLikeUseCase,
+  })
+      : _postAddLikeUseCase = postAddLikeUseCase,
         _postRemoveLikeUseCase = postRemoveLikeUseCase,
         _userCreateFriendRelationUseCase = userCreateFriendRelationUseCase,
         _userAcceptFriendRelationUseCase = userAcceptFriendRelationUseCase,
@@ -80,11 +82,12 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
     });
     on<UserActionNewPostEvent>(
-      (event, emit) => emit(
-        UserActionNewPostState(
-          postId: event.postId,
-        ),
-      ),
+          (event, emit) =>
+          emit(
+            UserActionNewPostState(
+              postId: event.postId,
+            ),
+          ),
     );
     on<UserActionCommentLikeActionEvent>(
         _handleUserActionCommentLikeActionEvent);
@@ -101,19 +104,20 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
     });
     on<UserActionPostRefreshEvent>(
-      (event, emit) => emit(
-        UserActionPostRefreshState(
-          nodeId: event.postId,
-        ),
-      ),
+          (event, emit) =>
+          emit(
+            UserActionPostRefreshState(
+              nodeId: event.postId,
+            ),
+          ),
     );
 
     on<UserActionGetUserByUsernameEvent>(
         _handleUserActionGetUserByUsernameEvent);
   }
 
-  FutureOr<void> _handleUserActionUpdateEvent(
-      UserActionUpdateEvent event, Emitter<UserActionState> emit) {
+  FutureOr<void> _handleUserActionUpdateEvent(UserActionUpdateEvent event,
+      Emitter<UserActionState> emit) {
     emit(
       UserActionUpdateProfile(
         name: event.name,
@@ -421,11 +425,11 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       Emitter<UserActionState> emit) async {
     try {
       if (getUserRequest.contains(event.username)) return;
-      getUserRequest.add(event.username);
 
       String key = generateUserNodeKey(event.username);
       if (graph.containsKey(key)) return;
 
+      getUserRequest.add(event.username);
       await _userGetUseCase(GetProfileInput(
         username: event.username,
         currentUsername: event.currentUser,
