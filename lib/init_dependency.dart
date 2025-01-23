@@ -22,7 +22,7 @@ import "package:doko_react/features/complete-profile/domain/repository/complete_
 import "package:doko_react/features/complete-profile/domain/use-case/complete-profile-use-case/complete_profile_use_case.dart";
 import "package:doko_react/features/complete-profile/domain/use-case/username-use-case/username_use_case.dart";
 import "package:doko_react/features/complete-profile/presentation/bloc/complete_profile_bloc.dart";
-import "package:doko_react/features/user-profile/bloc/user_action_bloc.dart";
+import "package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart";
 import "package:doko_react/features/user-profile/data/data-sources/user_profile_remote_data_source.dart";
 import "package:doko_react/features/user-profile/data/repository/user_profile_repository_impl.dart";
 import "package:doko_react/features/user-profile/domain/repository/user_profile_repository.dart";

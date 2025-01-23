@@ -6,7 +6,7 @@ import 'package:doko_react/core/global/bloc/theme/theme_bloc.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
-import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -8,7 +8,7 @@ import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.d
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/core/widgets/video-player/video_player.dart';
-import 'package:doko_react/features/user-profile/bloc/user_action_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/post/presentation/provider/post_provider.dart';
