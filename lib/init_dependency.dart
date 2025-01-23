@@ -33,6 +33,7 @@ import "package:doko_react/features/user-profile/domain/use-case/posts/post_remo
 import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_accepts_friend_relation_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_create_friend_relation_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_remove_friend_relation_use_case.dart";
+import "package:doko_react/features/user-profile/domain/use-case/user/user_get.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/data/data-source/node_create_remote_data_source.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/data/repository/node_create_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/domain/repository/node_create_repository.dart";
@@ -231,6 +232,12 @@ void _initUserAction() {
     ),
   );
 
+  serviceLocator.registerFactory<UserGetUseCase>(
+    () => UserGetUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerFactory<UserActionBloc>(
     () => UserActionBloc(
       postAddLikeUseCase: serviceLocator(),
@@ -240,6 +247,7 @@ void _initUserAction() {
       userAcceptFriendRelationUseCase: serviceLocator(),
       commentAddLikeUseCase: serviceLocator(),
       commentRemoveLikeUseCase: serviceLocator(),
+      userGetUseCase: serviceLocator(),
     ),
   );
 }

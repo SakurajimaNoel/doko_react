@@ -13,6 +13,7 @@ import 'package:doko_react/features/user-profile/bloc/instant-messaging/instant_
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -70,6 +71,7 @@ class _UserLayoutState extends State<UserLayout> {
     });
 
     final instantMessagingBloc = context.read<InstantMessagingBloc>();
+    final UserGraph graph = UserGraph();
 
     // create websocket client
     client = Client(
@@ -79,7 +81,21 @@ class _UserLayoutState extends State<UserLayout> {
         return token.idToken;
       },
       onChatMessageReceived: (ChatMessage message) {
-        showMessage(message.toJSON());
+        String remoteUser = getUsernameFromMessageParams(
+          username,
+          to: message.to,
+          from: message.from,
+        );
+
+        if (!graph.containsKey(generateUserNodeKey(remoteUser))) {
+          context.read<UserActionBloc>().add(UserActionGetUserByUsernameEvent(
+                username: remoteUser,
+                currentUser: username,
+              ));
+        }
+
+        // showMessage(message.toJSON());
+        showNewMessageNotification(message, generateUserNodeKey(remoteUser));
         instantMessagingBloc.add(InstantMessagingNewMessageEvent(
           message: message,
           username: username,
@@ -163,6 +179,37 @@ class _UserLayoutState extends State<UserLayout> {
   Future<void> connectWS() async {
     await client.connect();
     showMessage("connected to websocket server");
+  }
+
+  void showNewMessageNotification(ChatMessage message, String userKey) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        showCloseIcon: true,
+        behavior: SnackBarBehavior.floating,
+        content: Column(
+          spacing: Constants.gap * 0.5,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              spacing: Constants.gap,
+              children: [
+                UserWidget.avtarSmall(
+                  userKey: userKey,
+                ),
+                UserWidget.infoSmall(
+                  userKey: userKey,
+                ),
+              ],
+            ),
+            Text(message.body),
+          ],
+        ),
+        duration: Duration(
+          seconds: 30,
+        ),
+      ),
+    );
   }
 
   void showMessage(String message) {

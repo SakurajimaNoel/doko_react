@@ -139,3 +139,14 @@ final class UserActionPostRefreshEvent extends UserActionEvent {
 
   final String postId;
 }
+
+// fetch user by username for new messages
+final class UserActionGetUserByUsernameEvent extends UserActionEvent {
+  UserActionGetUserByUsernameEvent({
+    required this.username,
+    required this.currentUser,
+  });
+
+  final String username;
+  final String currentUser;
+}

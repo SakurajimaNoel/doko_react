@@ -1,4 +1,5 @@
 import 'package:doko_react/core/config/graphql/mutations/graphql_mutations.dart';
+import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
@@ -290,6 +291,43 @@ class UserProfileRemoteDataSource {
         likesCount: model.likesCount,
         commentsCount: model.commentsCount,
       );
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getUserByUsername(String username, String currentUser) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.getUserByUsername()),
+          variables: GraphqlQueries.getUserByUsernameVariables(
+            username,
+            currentUser: currentUser,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw Exception(result.exception);
+      }
+
+      List? res = result.data?["users"];
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(reason: "User doesn't exist.");
+      }
+
+      // add in graph
+      UserGraph graph = UserGraph();
+      UserEntity user = await UserEntity.createEntity(
+        map: res[0],
+      );
+
+      String key = generateUserNodeKey(user.username);
+      graph.addEntity(key, user);
 
       return true;
     } catch (e) {

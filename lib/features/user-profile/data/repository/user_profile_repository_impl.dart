@@ -45,4 +45,9 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
   Future<bool> userRemoveCommentLike(String commentId, String username) {
     return _remoteDataSource.userRemoveCommentLike(commentId, username);
   }
+
+  @override
+  Future<bool> getUserByUsername(String username, String currentUser) {
+    return _remoteDataSource.getUserByUsername(username, currentUser);
+  }
 }

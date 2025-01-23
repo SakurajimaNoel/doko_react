@@ -13,8 +13,10 @@ import 'package:doko_react/features/user-profile/domain/use-case/posts/post_remo
 import 'package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_accepts_friend_relation_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_create_friend_relation_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_remove_friend_relation_use_case.dart';
+import 'package:doko_react/features/user-profile/domain/use-case/user/user_get.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
@@ -24,6 +26,7 @@ part 'user_action_state.dart';
 
 class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final UserGraph graph = UserGraph();
+  final Set<String> getUserRequest = {};
   final PostAddLikeUseCase _postAddLikeUseCase;
   final PostRemoveLikeUseCase _postRemoveLikeUseCase;
   final UserCreateFriendRelationUseCase _userCreateFriendRelationUseCase;
@@ -31,6 +34,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final UserRemoveFriendRelationUseCase _userRemoveFriendRelationUseCase;
   final CommentAddLikeUseCase _commentAddLikeUseCase;
   final CommentRemoveLikeUseCase _commentRemoveLikeUseCase;
+  final UserGetUseCase _userGetUseCase;
 
   UserActionBloc({
     required PostAddLikeUseCase postAddLikeUseCase,
@@ -40,6 +44,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     required UserRemoveFriendRelationUseCase userRemoveFriendRelationUseCase,
     required CommentAddLikeUseCase commentAddLikeUseCase,
     required CommentRemoveLikeUseCase commentRemoveLikeUseCase,
+    required UserGetUseCase userGetUseCase,
   })  : _postAddLikeUseCase = postAddLikeUseCase,
         _postRemoveLikeUseCase = postRemoveLikeUseCase,
         _userCreateFriendRelationUseCase = userCreateFriendRelationUseCase,
@@ -47,6 +52,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         _userRemoveFriendRelationUseCase = userRemoveFriendRelationUseCase,
         _commentAddLikeUseCase = commentAddLikeUseCase,
         _commentRemoveLikeUseCase = commentRemoveLikeUseCase,
+        _userGetUseCase = userGetUseCase,
         super(UserActionInitial()) {
     on<UserActionUpdateEvent>(_handleUserActionUpdateEvent);
     on<UserActionPostLikeActionEvent>(_handleUserActionPostLikeActionEvent);
@@ -101,6 +107,9 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         ),
       ),
     );
+
+    on<UserActionGetUserByUsernameEvent>(
+        _handleUserActionGetUserByUsernameEvent);
   }
 
   FutureOr<void> _handleUserActionUpdateEvent(
@@ -405,5 +414,27 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         commentsCount: comment.commentsCount,
       ));
     }
+  }
+
+  FutureOr<void> _handleUserActionGetUserByUsernameEvent(
+      UserActionGetUserByUsernameEvent event,
+      Emitter<UserActionState> emit) async {
+    try {
+      if (getUserRequest.contains(event.username)) return;
+      getUserRequest.add(event.username);
+
+      String key = generateUserNodeKey(event.username);
+      if (graph.containsKey(key)) return;
+
+      await _userGetUseCase(GetProfileInput(
+        username: event.username,
+        currentUsername: event.currentUser,
+      ));
+
+      getUserRequest.remove(event.username);
+      emit(UserActionUserDataFetchedState(
+        username: event.username,
+      ));
+    } catch (_) {}
   }
 }

@@ -17,4 +17,6 @@ abstract class UserProfileRepository {
   Future<bool> userAddCommentLike(String commentId, String username);
 
   Future<bool> userRemoveCommentLike(String commentId, String username);
+
+  Future<bool> getUserByUsername(String username, String currentUser);
 }
