@@ -15,6 +15,8 @@ class InboxItemEntity extends GraphEntity {
   Queue<String> messages;
 
   void addNewMessage(String messageKey) {
+    if (messages.contains(messageKey)) return;
+
     messages.addFirst(messageKey);
 
     if (messages.length > _messageLimit) {

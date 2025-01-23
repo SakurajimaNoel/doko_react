@@ -21,6 +21,8 @@ ChatMessage? _getLatestMessage(InboxItemEntity inbox) {
 }
 
 int _compareInboxItems(String userA, String userB) {
+  if (userA == userB) return 0;
+
   UserGraph graph = UserGraph();
 
   String a = generateInboxItemKey(userA);

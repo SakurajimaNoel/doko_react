@@ -7,6 +7,11 @@ class ArchiveEntity extends GraphEntity {
     required this.currentSessionMessages,
   });
 
+  // todo: handle messages in better way try SplayTreeSet
   Nodes archiveMessages;
-  List<String> currentSessionMessages;
+  Set<String> currentSessionMessages;
+
+  void addCurrentSessionMessages(String message) {
+    currentSessionMessages.add(message);
+  }
 }

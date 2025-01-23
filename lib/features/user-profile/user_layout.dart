@@ -63,6 +63,7 @@ class _UserLayoutState extends State<UserLayout> {
         return token.idToken;
       },
       onChatMessageReceived: (ChatMessage message) {
+        showMessage(message.toJSON());
         instantMessagingBloc.add(InstantMessagingNewMessageEvent(
           message: message,
           username: username,
