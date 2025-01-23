@@ -14,6 +14,12 @@ class StorageResource {
     required this.accessURI,
   });
 
+  /// empty storage resource used inside [UserWidget]
+  /// to handle when user data is not present
+  const StorageResource.empty()
+      : bucketPath = "",
+        accessURI = "";
+
   final String bucketPath;
   final String accessURI;
 

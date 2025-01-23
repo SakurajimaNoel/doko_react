@@ -65,6 +65,7 @@ class UserWidget extends StatelessWidget {
         (context.read<UserBloc>().state as UserCompleteState).username);
 
     double gapScale = small ? 0.75 : 1;
+    final username = getUsernameFromUserKey(userKey);
 
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
@@ -75,33 +76,65 @@ class UserWidget extends StatelessWidget {
       },
       builder: (context, state) {
         final UserGraph graph = UserGraph();
-        final UserEntity user = graph.getValueByKey(userKey)! as UserEntity;
+        bool userDataExists = graph.containsKey(userKey);
 
-        if (profileOnly) {
-          return userAvtar(user.profilePicture);
+        if (userDataExists) {
+          final UserEntity user = graph.getValueByKey(userKey)! as UserEntity;
+
+          if (profileOnly) {
+            return userAvtar(user.profilePicture);
+          }
+
+          if (textOnly) {
+            return userInfo(user);
+          }
+
+          return GestureDetector(
+            onTap: () {
+              context.pushNamed(
+                RouterConstants.userProfile,
+                pathParameters: {
+                  "username": user.username,
+                },
+              );
+            },
+            child: Row(
+              spacing: Constants.gap * gapScale,
+              children: [
+                userAvtar(user.profilePicture),
+                userInfo(user),
+              ],
+            ),
+          );
+        } else {
+          final emptyResource = StorageResource.empty();
+
+          if (profileOnly) {
+            return userAvtar(emptyResource);
+          }
+
+          if (textOnly) {
+            return userInfoEmpty(username);
+          }
+
+          return GestureDetector(
+            onTap: () {
+              context.pushNamed(
+                RouterConstants.userProfile,
+                pathParameters: {
+                  "username": username,
+                },
+              );
+            },
+            child: Row(
+              spacing: Constants.gap * gapScale,
+              children: [
+                userAvtar(emptyResource),
+                userInfoEmpty(username),
+              ],
+            ),
+          );
         }
-
-        if (textOnly) {
-          return userInfo(user);
-        }
-
-        return GestureDetector(
-          onTap: () {
-            context.pushNamed(
-              RouterConstants.userProfile,
-              pathParameters: {
-                "username": user.username,
-              },
-            );
-          },
-          child: Row(
-            spacing: Constants.gap * gapScale,
-            children: [
-              userAvtar(user.profilePicture),
-              userInfo(user),
-            ],
-          ),
-        );
       },
     );
   }
@@ -127,6 +160,18 @@ class UserWidget extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget userInfoEmpty(String username) {
+    double usernameScale = small ? 1.1 : 1.2;
+
+    return Text(
+      "@$username",
+      style: TextStyle(
+        fontSize: Constants.smallFontSize * usernameScale,
+        fontWeight: FontWeight.w600,
+      ),
     );
   }
 
