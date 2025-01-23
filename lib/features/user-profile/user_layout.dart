@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
@@ -14,7 +16,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
 
 class UserLayout extends StatefulWidget {
@@ -30,11 +34,20 @@ class _UserLayoutState extends State<UserLayout> {
   late int activeIndex;
   late final Client client;
 
+  bool isForeground = true;
+
+  late StreamSubscription<FGBGType> appState;
+
   @override
   void initState() {
     super.initState();
 
     activeIndex = widget.navigationShell.currentIndex;
+
+    final connectionChecker = InternetConnectionChecker.instance;
+    appState = FGBGEvents.instance.stream.listen((event) {
+      isForeground = event == FGBGType.foreground;
+    });
 
     // create websocket client
     client = Client(
@@ -43,15 +56,64 @@ class _UserLayoutState extends State<UserLayout> {
         final token = await getUserToken();
         return token.idToken;
       },
-      onChatMessageReceived: (ChatMessage message) {
-        String displayMessage =
-            "${message.from}\t${message.to}\n${message.subject.value}\n${message.body}";
-        showMessage(displayMessage);
+      onChatMessageReceived: (ChatMessage message) {},
+      onTypingStatusReceived: (TypingStatus status) {},
+      onEditMessageReceived: (EditMessage message) {},
+      onDeleteMessageReceived: (DeleteMessage message) {},
+      onReconnectSuccess: () {
+        /// find latest message from inbox and fetch based on that
+      },
+      onConnectionClosure: (retry) async {
+        StreamSubscription<FGBGType>? fgBgSubscription;
+        StreamSubscription<InternetConnectionStatus>? internetSubscription;
+
+        void cancelSubscriptions() {
+          internetSubscription?.cancel();
+          fgBgSubscription?.cancel();
+        }
+
+        Future<void> handleReconnection() async {
+          bool isConnected = await connectionChecker.hasConnection;
+          if (isConnected) {
+            showMessage("App has internet connection");
+
+            retry();
+            cancelSubscriptions();
+          } else {
+            // Listen for internet connection changes
+            internetSubscription = connectionChecker.onStatusChange.listen(
+                  (InternetConnectionStatus status) {
+                if (status == InternetConnectionStatus.connected) {
+                  showMessage("App has internet connection");
+
+                  retry();
+                  cancelSubscriptions();
+                }
+              },
+            );
+          }
+        }
+
+        if (isForeground) {
+          showMessage("App is in foreground");
+          await handleReconnection();
+        } else {
+          fgBgSubscription = FGBGEvents.instance.stream.listen(
+                (event) async {
+              if (event == FGBGType.foreground) {
+                showMessage("App is in foreground");
+                await handleReconnection();
+              }
+            },
+          );
+        }
       },
     );
+  }
 
-    // todo: handle this in a better way try future builder?
-    client.connect();
+  Future<void> connectWS() async {
+    await client.connect();
+    showMessage("connected to websocket server");
   }
 
   void showMessage(String message) {
@@ -66,12 +128,15 @@ class _UserLayoutState extends State<UserLayout> {
 
   @override
   void dispose() {
+    appState.cancel();
     client.disconnect();
     super.dispose();
   }
 
   List<Widget> getDestinations(UserEntity user) {
-    final currTheme = Theme.of(context).colorScheme;
+    final currTheme = Theme
+        .of(context)
+        .colorScheme;
 
     return [
       NavigationDestination(
@@ -93,55 +158,57 @@ class _UserLayoutState extends State<UserLayout> {
       NavigationDestination(
         selectedIcon: user.profilePicture.bucketPath.isEmpty
             ? Icon(
-                Icons.account_circle,
-                color: currTheme.onPrimary,
-              )
+          Icons.account_circle,
+          color: currTheme.onPrimary,
+        )
             : CircleAvatar(
-                radius: 20,
-                backgroundColor: currTheme.primary,
-                child: CircleAvatar(
-                  radius: 17,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      cacheKey: user.profilePicture.bucketPath,
-                      imageUrl: user.profilePicture.accessURI,
-                      placeholder: (context, url) => const Center(
-                        child: SmallLoadingIndicator.small(),
-                      ),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
-                      fit: BoxFit.cover,
-                      width: 40,
-                      height: 40,
-                      memCacheHeight: Constants.thumbnailCacheHeight,
-                    ),
-                  ),
+          radius: 20,
+          backgroundColor: currTheme.primary,
+          child: CircleAvatar(
+            radius: 17,
+            child: ClipOval(
+              child: CachedNetworkImage(
+                cacheKey: user.profilePicture.bucketPath,
+                imageUrl: user.profilePicture.accessURI,
+                placeholder: (context, url) =>
+                const Center(
+                  child: SmallLoadingIndicator.small(),
                 ),
+                errorWidget: (context, url, error) =>
+                const Icon(Icons.error),
+                fit: BoxFit.cover,
+                width: 40,
+                height: 40,
+                memCacheHeight: Constants.thumbnailCacheHeight,
               ),
+            ),
+          ),
+        ),
         icon: user.profilePicture.bucketPath.isEmpty
             ? const Icon(Icons.account_circle_outlined)
             : CircleAvatar(
-                radius: 20,
-                backgroundColor: currTheme.primary,
-                child: CircleAvatar(
-                  radius: 20,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      cacheKey: user.profilePicture.bucketPath,
-                      imageUrl: user.profilePicture.accessURI,
-                      placeholder: (context, url) => const Center(
-                        child: SmallLoadingIndicator.small(),
-                      ),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
-                      fit: BoxFit.cover,
-                      width: 40,
-                      height: 40,
-                      memCacheHeight: Constants.thumbnailCacheHeight,
-                    ),
-                  ),
+          radius: 20,
+          backgroundColor: currTheme.primary,
+          child: CircleAvatar(
+            radius: 20,
+            child: ClipOval(
+              child: CachedNetworkImage(
+                cacheKey: user.profilePicture.bucketPath,
+                imageUrl: user.profilePicture.accessURI,
+                placeholder: (context, url) =>
+                const Center(
+                  child: SmallLoadingIndicator.small(),
                 ),
+                errorWidget: (context, url, error) =>
+                const Icon(Icons.error),
+                fit: BoxFit.cover,
+                width: 40,
+                height: 40,
+                memCacheHeight: Constants.thumbnailCacheHeight,
               ),
+            ),
+          ),
+        ),
         label: trimText(
           user.name,
           len: 16,
@@ -153,19 +220,24 @@ class _UserLayoutState extends State<UserLayout> {
 
   @override
   Widget build(BuildContext context) {
-    final currTheme = Theme.of(context).colorScheme;
+    final currTheme = Theme
+        .of(context)
+        .colorScheme;
 
     return ChangeNotifierProvider<WebsocketClientProvider>(
-      create: (_) => WebsocketClientProvider(
-        client: client,
-      ),
+      create: (_) =>
+          WebsocketClientProvider(
+            client: client,
+          ),
       child: BlocBuilder<UserActionBloc, UserActionState>(
         buildWhen: (previousState, state) {
           return state is UserActionUpdateProfile;
         },
         builder: (context, state) {
           final username =
-              (context.read<UserBloc>().state as UserCompleteState).username;
+              (context
+                  .read<UserBloc>()
+                  .state as UserCompleteState).username;
           String key = generateUserNodeKey(username);
 
           final UserGraph graph = UserGraph();
@@ -191,18 +263,20 @@ class _UserLayoutState extends State<UserLayout> {
             child: Scaffold(
               body: widget.navigationShell,
               bottomNavigationBar: Builder(builder: (context) {
-                bool show = context.watch<BottomNavProvider>().show;
+                bool show = context
+                    .watch<BottomNavProvider>()
+                    .show;
 
                 return show
                     ? NavigationBar(
-                        indicatorColor: (activeIndex != 2 || profileEmpty)
-                            ? currTheme.primary
-                            : Colors.transparent,
-                        selectedIndex: widget.navigationShell.currentIndex,
-                        destinations: getDestinations(user),
-                        onDestinationSelected: (index) =>
-                            onDestinationSelected(index, profileEmpty),
-                      )
+                  indicatorColor: (activeIndex != 2 || profileEmpty)
+                      ? currTheme.primary
+                      : Colors.transparent,
+                  selectedIndex: widget.navigationShell.currentIndex,
+                  destinations: getDestinations(user),
+                  onDestinationSelected: (index) =>
+                      onDestinationSelected(index, profileEmpty),
+                )
                     : SizedBox.shrink();
               }),
             ),
@@ -223,7 +297,7 @@ class _UserLayoutState extends State<UserLayout> {
     if (prevIndex == 2 && !profileEmpty) {
       Future.delayed(
         const Duration(milliseconds: 100),
-        () {
+            () {
           setState(() {
             activeIndex = index;
           });
