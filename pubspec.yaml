@@ -56,6 +56,7 @@ dependencies:
       url: https://github.com/rohan031/doki_websocket_client.git
   flutter_fgbg: ^0.6.0
   internet_connection_checker: ^3.0.1
+  nice_overlay: ^1.0.1
 
 dev_dependencies:
   flutter_test:

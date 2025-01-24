@@ -9,6 +9,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
+import 'package:doko_react/core/helpers/notifications/notifications_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -21,6 +22,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:nice_overlay/nice_overlay.dart';
 import 'package:provider/provider.dart';
 
 import 'bloc/real-time/real_time_bloc.dart';
@@ -174,7 +176,6 @@ class _UserLayoutState extends State<UserLayout> {
   }
 
   void refreshApp() {
-    // refresh here
     context.read<UserBloc>().add(UserInitEvent());
   }
 
@@ -184,51 +185,32 @@ class _UserLayoutState extends State<UserLayout> {
   }
 
   void showNewMessageNotification(ChatMessage message, String userKey) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        dismissDirection: DismissDirection.up,
-        action: SnackBarAction(
-          label: "Profile",
-          onPressed: () {
-            context.pushNamed(
-              RouterConstants.userProfile,
-              pathParameters: {
-                "username": getUsernameFromUserKey(userKey),
-              },
-            );
-          },
-        ),
-        showCloseIcon: true,
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.only(
-          left: Constants.padding,
-          right: Constants.padding,
-          bottom: MediaQuery.sizeOf(context).height - 200,
-        ),
-        content: Column(
-          spacing: Constants.gap * 0.5,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              spacing: Constants.gap,
-              children: [
-                UserWidget.avtarSmall(
-                  userKey: userKey,
-                ),
-                UserWidget.infoSmall(
-                  userKey: userKey,
-                ),
-              ],
-            ),
-            Text(message.body),
-          ],
-        ),
-        duration: Duration(
-          seconds: 2,
+    final inAppNotification = createNewNotification(
+      leading: UserWidget.avtar(
+        userKey: userKey,
+      ),
+      title: UserWidget.infoSmall(
+        userKey: userKey,
+      ),
+      body: Text(trimText(message.body)),
+      trailing: Text(
+        displayDateDifference(message.sendAt),
+        style: TextStyle(
+          fontSize: Constants.smallFontSize,
         ),
       ),
+      onTap: () {
+        context.pushNamed(
+          RouterConstants.userProfile,
+          pathParameters: {
+            "username": getUsernameFromUserKey(userKey),
+          },
+        );
+      },
+      context: context,
     );
+
+    NiceOverlay.showInAppNotification(inAppNotification);
   }
 
   void showMessage(String message) {
@@ -236,7 +218,7 @@ class _UserLayoutState extends State<UserLayout> {
       SnackBar(
         behavior: SnackBarBehavior.floating,
         content: Text(message),
-        duration: Constants.messageDuration,
+        duration: Constants.snackBarDuration,
       ),
     );
   }

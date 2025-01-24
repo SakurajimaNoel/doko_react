@@ -34,11 +34,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouterConfig {
-  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+  static final rootNavigatorKey = GlobalKey<NavigatorState>();
   static final _sectionNavigatorKey = GlobalKey<NavigatorState>();
 
   static final GoRouter router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
+    navigatorKey: rootNavigatorKey,
     initialLocation: "/loading",
     redirect: (BuildContext context, GoRouterState state) {
       String current = state.uri.toString();
@@ -232,7 +232,7 @@ class AppRouterConfig {
                 },
                 routes: [
                   GoRoute(
-                    parentNavigatorKey: _rootNavigatorKey,
+                    parentNavigatorKey: rootNavigatorKey,
                     path: "settings",
                     name: RouterConstants.settings,
                     builder: (context, state) => const SettingsPage(),
@@ -268,7 +268,7 @@ class AppRouterConfig {
                     builder: (context, state) => const CreatePostPage(),
                     routes: [
                       GoRoute(
-                        parentNavigatorKey: _rootNavigatorKey,
+                        parentNavigatorKey: rootNavigatorKey,
                         name: RouterConstants.postPublish,
                         path: "publish",
                         builder: (context, state) {
@@ -285,7 +285,7 @@ class AppRouterConfig {
                     ],
                   ),
                   GoRoute(
-                    parentNavigatorKey: _rootNavigatorKey,
+                    parentNavigatorKey: rootNavigatorKey,
                     name: RouterConstants.editProfile,
                     path: "edit-profile",
                     builder: (context, state) {
@@ -293,7 +293,7 @@ class AppRouterConfig {
                     },
                   ),
                   GoRoute(
-                    parentNavigatorKey: _rootNavigatorKey,
+                    parentNavigatorKey: rootNavigatorKey,
                     name: RouterConstants.userPost,
                     path: "post/:postId",
                     builder: (context, state) {
@@ -305,13 +305,13 @@ class AppRouterConfig {
                     },
                   ),
                   GoRoute(
-                    parentNavigatorKey: _rootNavigatorKey,
+                    parentNavigatorKey: rootNavigatorKey,
                     name: RouterConstants.pendingRequests,
                     path: "pending-requests",
                     builder: (context, state) => const PendingRequestPage(),
                   ),
                   GoRoute(
-                    parentNavigatorKey: _rootNavigatorKey,
+                    parentNavigatorKey: rootNavigatorKey,
                     name: RouterConstants.userProfile,
                     path: "user/:username",
                     builder: (context, state) {
@@ -322,7 +322,7 @@ class AppRouterConfig {
                     },
                     routes: [
                       GoRoute(
-                        parentNavigatorKey: _rootNavigatorKey,
+                        parentNavigatorKey: rootNavigatorKey,
                         name: RouterConstants.profileFriends,
                         path: "friends",
                         builder: (context, state) {

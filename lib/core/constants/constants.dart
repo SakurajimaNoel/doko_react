@@ -9,10 +9,10 @@ class Constants {
 
   static const String errorMessage = "Oops! Something went wrong.";
   static const Duration snackBarDuration = Duration(
-    milliseconds: 1500,
+    seconds: 3,
   );
-  static const Duration messageDuration = Duration(
-    seconds: 5,
+  static const Duration notificationDuration = Duration(
+    seconds: 3,
   );
 
   static const double padding = _root;

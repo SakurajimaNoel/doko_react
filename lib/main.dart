@@ -17,6 +17,7 @@ import 'package:graphql/client.dart';
 import 'package:image_picker_android/image_picker_android.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:media_kit/media_kit.dart';
+import 'package:nice_overlay/nice_overlay.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -26,6 +27,8 @@ void main() async {
     await initDependency();
     MediaKit.ensureInitialized();
     await HiveStore.open();
+
+    NiceOverlay.init(AppRouterConfig.rootNavigatorKey);
 
     final ImagePickerPlatform imagePickerImplementation =
         ImagePickerPlatform.instance;
