@@ -93,8 +93,6 @@ class _UserLayoutState extends State<UserLayout> {
           from: message.from,
         );
 
-        /// todo: fix this to show correct user when receiving a new message
-
         /// fetch remote user details user already exists is handled by bloc
         context.read<UserActionBloc>().add(UserActionGetUserByUsernameEvent(
               username: remoteUser,
@@ -108,6 +106,14 @@ class _UserLayoutState extends State<UserLayout> {
               ));
         }
 
+        if (message.subject == MessageSubject.dokiPost) {
+          context.read<UserActionBloc>().add(UserActionGetPostByIdEvent(
+                username: username,
+                postId: message.body,
+              ));
+        }
+
+        // todo replace remote user with from
         showNewMessageNotification(message, generateUserNodeKey(remoteUser));
         realTimeBloc.add(RealTimeNewMessageEvent(
           message: message,

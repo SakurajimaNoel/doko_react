@@ -150,3 +150,14 @@ final class UserActionGetUserByUsernameEvent extends UserActionEvent {
   final String username;
   final String currentUser;
 }
+
+// fetch post by postId for new messages
+final class UserActionGetPostByIdEvent extends UserActionEvent {
+  UserActionGetPostByIdEvent({
+    required this.username,
+    required this.postId,
+  });
+
+  final String username;
+  final String postId;
+}

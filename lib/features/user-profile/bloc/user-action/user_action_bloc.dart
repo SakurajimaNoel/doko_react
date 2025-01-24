@@ -9,6 +9,7 @@ import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.
 import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_add_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_remove_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_add_like_use_case.dart';
+import 'package:doko_react/features/user-profile/domain/use-case/posts/post_get.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_remove_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_accepts_friend_relation_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_create_friend_relation_use_case.dart';
@@ -16,18 +17,20 @@ import 'package:doko_react/features/user-profile/domain/use-case/user-to-user-re
 import 'package:doko_react/features/user-profile/domain/use-case/user/user_get.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
+import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
 part 'user_action_event.dart';
-
 part 'user_action_state.dart';
 
 class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final UserGraph graph = UserGraph();
   final Set<String> getUserRequest = {};
+  final Set<String> getPostRequest = {};
+
   final PostAddLikeUseCase _postAddLikeUseCase;
   final PostRemoveLikeUseCase _postRemoveLikeUseCase;
   final UserCreateFriendRelationUseCase _userCreateFriendRelationUseCase;
@@ -36,6 +39,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final CommentAddLikeUseCase _commentAddLikeUseCase;
   final CommentRemoveLikeUseCase _commentRemoveLikeUseCase;
   final UserGetUseCase _userGetUseCase;
+  final PostGetUseCase _postGetUseCase;
 
   UserActionBloc({
     required PostAddLikeUseCase postAddLikeUseCase,
@@ -46,8 +50,8 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     required CommentAddLikeUseCase commentAddLikeUseCase,
     required CommentRemoveLikeUseCase commentRemoveLikeUseCase,
     required UserGetUseCase userGetUseCase,
-  })
-      : _postAddLikeUseCase = postAddLikeUseCase,
+    required PostGetUseCase postGetUseCase,
+  })  : _postAddLikeUseCase = postAddLikeUseCase,
         _postRemoveLikeUseCase = postRemoveLikeUseCase,
         _userCreateFriendRelationUseCase = userCreateFriendRelationUseCase,
         _userAcceptFriendRelationUseCase = userAcceptFriendRelationUseCase,
@@ -55,6 +59,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         _commentAddLikeUseCase = commentAddLikeUseCase,
         _commentRemoveLikeUseCase = commentRemoveLikeUseCase,
         _userGetUseCase = userGetUseCase,
+        _postGetUseCase = postGetUseCase,
         super(UserActionInitial()) {
     on<UserActionUpdateEvent>(_handleUserActionUpdateEvent);
     on<UserActionPostLikeActionEvent>(_handleUserActionPostLikeActionEvent);
@@ -82,12 +87,11 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
     });
     on<UserActionNewPostEvent>(
-          (event, emit) =>
-          emit(
-            UserActionNewPostState(
-              postId: event.postId,
-            ),
-          ),
+      (event, emit) => emit(
+        UserActionNewPostState(
+          postId: event.postId,
+        ),
+      ),
     );
     on<UserActionCommentLikeActionEvent>(
         _handleUserActionCommentLikeActionEvent);
@@ -104,20 +108,20 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
     });
     on<UserActionPostRefreshEvent>(
-          (event, emit) =>
-          emit(
-            UserActionPostRefreshState(
-              nodeId: event.postId,
-            ),
-          ),
+      (event, emit) => emit(
+        UserActionPostRefreshState(
+          nodeId: event.postId,
+        ),
+      ),
     );
 
     on<UserActionGetUserByUsernameEvent>(
         _handleUserActionGetUserByUsernameEvent);
+    on<UserActionGetPostByIdEvent>(_handleUserActionGetPostByIdEvent);
   }
 
-  FutureOr<void> _handleUserActionUpdateEvent(UserActionUpdateEvent event,
-      Emitter<UserActionState> emit) {
+  FutureOr<void> _handleUserActionUpdateEvent(
+      UserActionUpdateEvent event, Emitter<UserActionState> emit) {
     emit(
       UserActionUpdateProfile(
         name: event.name,
@@ -438,6 +442,27 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       getUserRequest.remove(event.username);
       emit(UserActionUserDataFetchedState(
         username: event.username,
+      ));
+    } catch (_) {}
+  }
+
+  FutureOr<void> _handleUserActionGetPostByIdEvent(
+      UserActionGetPostByIdEvent event, Emitter<UserActionState> emit) async {
+    try {
+      if (getPostRequest.contains(event.postId)) return;
+
+      String key = generatePostNodeKey(event.postId);
+      if (graph.containsKey(key)) return;
+
+      getPostRequest.add(event.postId);
+      await _postGetUseCase(GetPostInput(
+        username: event.username,
+        postId: event.postId,
+      ));
+
+      getPostRequest.remove(event.username);
+      emit(UserActionPostDataFetchedState(
+        postId: event.postId,
       ));
     } catch (_) {}
   }

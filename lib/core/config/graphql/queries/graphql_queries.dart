@@ -1020,4 +1020,61 @@ class GraphqlQueries {
       },
     };
   }
+
+  // post for preview in chat
+  static String getPostById() {
+    return """
+      query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+        posts(where: \$where) {
+          id
+          createdOn
+          content
+          caption
+          createdBy {
+            id
+            name
+            username
+            profilePicture
+            friendsConnection(where: \$friendsConnectionWhere2) {
+              edges {
+                properties {
+                  addedOn
+                  requestedBy
+                  status
+                }
+              }
+            }
+          }
+          likedByConnection {
+            totalCount
+          }
+          commentsConnection {
+            totalCount
+          }
+          likedBy(where: \$likedByWhere2) {
+            username
+          }
+        }
+      }      
+    """;
+  }
+
+  static Map<String, dynamic> getPostByIdVariables(
+    String postId, {
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": postId,
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      }
+    };
+  }
 }

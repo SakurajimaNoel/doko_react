@@ -5,6 +5,7 @@ import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/features/user-profile/data/models/comments/comment_action_model.dart';
 import 'package:doko_react/features/user-profile/data/models/post/post_action_model.dart';
+import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
@@ -322,6 +323,61 @@ class UserProfileRemoteDataSource {
 
       // add in graph
       UserGraph graph = UserGraph();
+      UserEntity user = await UserEntity.createEntity(
+        map: res[0],
+      );
+
+      String key = generateUserNodeKey(user.username);
+      graph.addEntity(key, user);
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getPostById(String postId, String username) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.getPostById()),
+          variables: GraphqlQueries.getPostByIdVariables(
+            postId,
+            username: username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+            reason: result.exception?.graphqlErrors.toString() ??
+                "Problem loading post.");
+      }
+
+      List? res = result.data?["posts"];
+
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: "Post doesn't exist.",
+        );
+      }
+
+      // add in graph
+      UserGraph graph = UserGraph();
+      PostEntity post = await PostEntity.createEntity(map: res[0]);
+      String postKey = generatePostNodeKey(post.id);
+      if (graph.containsKey(postKey)) {
+        final existsPost = graph.getValueByKey(postKey)! as PostEntity;
+
+        existsPost.updateCommentsCount(post.commentsCount);
+        existsPost.updateUserLikes(post.userLike, post.likesCount);
+
+        graph.addEntity(postKey, existsPost);
+      } else {
+        graph.addEntity(postKey, post);
+      }
+
       UserEntity user = await UserEntity.createEntity(
         map: res[0],
       );

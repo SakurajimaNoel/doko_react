@@ -177,3 +177,16 @@ class UserActionUserDataFetchedState extends UserActionState {
   @override
   List<Object?> get props => [username, now];
 }
+
+// post data fetched for instant messaging
+class UserActionPostDataFetchedState extends UserActionState {
+  UserActionPostDataFetchedState({
+    required this.postId,
+  }) : now = DateTime.now();
+
+  final String postId;
+  final DateTime now;
+
+  @override
+  List<Object?> get props => [postId, now];
+}
