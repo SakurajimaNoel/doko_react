@@ -4,9 +4,11 @@ part of "archive_item.dart";
 class _ArchiveText extends StatefulWidget {
   const _ArchiveText({
     required this.messageKey,
+    required this.metaDataStyle,
   });
 
   final String messageKey;
+  final TextStyle metaDataStyle;
 
   @override
   State<_ArchiveText> createState() => _ArchiveTextState();
@@ -148,9 +150,7 @@ class _ArchiveTextState extends State<_ArchiveText> {
 
     return BlocBuilder<RealTimeBloc, RealTimeState>(
       buildWhen: (previousState, state) {
-        return (state is RealTimeEditMessageState && state.id == messageId) ||
-            (state is RealTimeDeleteMessageState &&
-                state.id.contains(messageId));
+        return (state is RealTimeEditMessageState && state.id == messageId);
       },
       builder: (context, state) {
         UserGraph graph = UserGraph();
@@ -158,8 +158,6 @@ class _ArchiveTextState extends State<_ArchiveText> {
             graph.getValueByKey(widget.messageKey)! as MessageEntity;
         ChatMessage message = entity.message;
         bool self = message.from == username;
-
-        if (entity.deleted) return SizedBox.shrink();
 
         /// full screen gradient color for chat message [https://docs.flutter.dev/cookbook/effects/gradient-bubbles]
         /// reference above cookbook for more info about gradient effect
@@ -176,18 +174,6 @@ class _ArchiveTextState extends State<_ArchiveText> {
                 ),
                 currTheme.surfaceContainerHighest,
               ];
-
-        TextStyle metaDataStyle = TextStyle(
-          fontSize: Constants.smallFontSize,
-          fontWeight: FontWeight.w600,
-          color: self
-              ? currTheme.onPrimaryContainer.withValues(
-                  alpha: 0.5,
-                )
-              : currTheme.onSurface.withValues(
-                  alpha: 0.5,
-                ),
-        );
 
         return ClipRRect(
           borderRadius: const BorderRadius.all(
@@ -222,12 +208,12 @@ class _ArchiveTextState extends State<_ArchiveText> {
                     children: [
                       Text(
                         formatDateTimeToTimeString(message.sendAt),
-                        style: metaDataStyle,
+                        style: widget.metaDataStyle,
                       ),
                       if (entity.edited)
                         Text(
                           "edited",
-                          style: metaDataStyle,
+                          style: widget.metaDataStyle,
                         ),
                     ],
                   ),

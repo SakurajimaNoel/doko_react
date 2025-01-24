@@ -10,6 +10,7 @@ import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.d
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/helpers/extension/go_router_extension.dart';
+import 'package:doko_react/core/helpers/instant-messaging/message_preview.dart';
 import 'package:doko_react/core/helpers/notifications/notifications_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -92,6 +93,7 @@ class _UserLayoutState extends State<UserLayout> {
           from: message.from,
         );
 
+        /// todo: fix this to show correct user when receiving a new message
         if (!graph.containsKey(generateUserNodeKey(remoteUser))) {
           context.read<UserActionBloc>().add(UserActionGetUserByUsernameEvent(
                 username: remoteUser,
@@ -195,7 +197,7 @@ class _UserLayoutState extends State<UserLayout> {
       title: UserWidget.infoSmall(
         userKey: userKey,
       ),
-      body: Text(trimText(message.body)),
+      body: Text(messagePreview(message)),
       trailing: Text(
         displayDateDifference(message.sendAt),
         style: TextStyle(

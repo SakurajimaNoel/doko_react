@@ -87,4 +87,7 @@ class Constants {
 
   // scroll offset
   static const double scrollOffset = _root * 25;
+
+  // instant messaging media
+  static int archiveMedia = (_root * 25).round();
 }

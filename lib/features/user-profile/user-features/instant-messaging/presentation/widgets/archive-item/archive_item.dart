@@ -1,10 +1,12 @@
 import 'dart:collection';
 import 'dart:ui' as ui;
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
+import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -14,6 +16,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+part "archive_external_resource.dart";
 part "archive_text.dart";
 
 class ArchiveItem extends StatelessWidget {
@@ -28,73 +31,104 @@ class ArchiveItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currTheme = Theme.of(context).colorScheme;
+    String messageId = getMessageIdFromMessageKey(messageKey);
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
 
-    final UserGraph graph = UserGraph();
-    if (!graph.containsKey(messageKey)) {
-      return SizedBox.shrink();
-    }
+    return BlocBuilder<RealTimeBloc, RealTimeState>(
+      buildWhen: (previousState, state) {
+        return (state is RealTimeDeleteMessageState &&
+            state.id.contains(messageId));
+      },
+      builder: (context, state) {
+        final UserGraph graph = UserGraph();
+        if (!graph.containsKey(messageKey)) {
+          return SizedBox.shrink();
+        }
 
-    MessageEntity messageEntity =
-        graph.getValueByKey(messageKey)! as MessageEntity;
-    final message = messageEntity.message;
-    bool self = message.from == username;
+        MessageEntity messageEntity =
+            graph.getValueByKey(messageKey)! as MessageEntity;
+        final message = messageEntity.message;
+        bool self = message.from == username;
 
-    final alignment = self ? Alignment.topRight : Alignment.topLeft;
+        final alignment = self ? Alignment.topRight : Alignment.topLeft;
 
-    Widget body;
-    switch (message.subject) {
-      case MessageSubject.text:
-        body = _ArchiveText(
-          messageKey: messageKey,
+        TextStyle metaDataStyle = TextStyle(
+          fontSize: Constants.smallFontSize,
+          fontWeight: FontWeight.w600,
+          color: self
+              ? currTheme.onPrimaryContainer.withValues(
+                  alpha: 0.5,
+                )
+              : currTheme.onSurface.withValues(
+                  alpha: 0.5,
+                ),
         );
-      case MessageSubject.mediaBucketResource:
-        body = _ArchiveText(
-          messageKey: messageKey,
-        );
-      case MessageSubject.mediaExternal:
-        body = _ArchiveText(
-          messageKey: messageKey,
-        );
-      case MessageSubject.userLocation:
-        body = _ArchiveText(
-          messageKey: messageKey,
-        );
-      case MessageSubject.dokiUser:
-        body = _ArchiveText(
-          messageKey: messageKey,
-        );
-      case MessageSubject.dokiPost:
-        body = _ArchiveText(
-          messageKey: messageKey,
-        );
-      case MessageSubject.dokiPage:
-        body = _ArchiveText(
-          messageKey: messageKey,
-        );
-      case MessageSubject.dokiDiscussion:
-        body = _ArchiveText(
-          messageKey: messageKey,
-        );
-      case MessageSubject.dokiPolls:
-        body = _ArchiveText(
-          messageKey: messageKey,
-        );
-    }
 
-    return _AddDayToast(
-      date: message.sendAt,
-      showDate: showDate,
-      self: self,
-      child: FractionallySizedBox(
-        alignment: alignment,
-        widthFactor: 0.8,
-        child: Align(
-          alignment: alignment,
-          child: body,
-        ),
-      ),
+        Widget body;
+        switch (message.subject) {
+          case MessageSubject.text:
+            body = _ArchiveText(
+              metaDataStyle: metaDataStyle,
+              messageKey: messageKey,
+            );
+          case MessageSubject.mediaBucketResource:
+            body = _ArchiveText(
+              metaDataStyle: metaDataStyle,
+              messageKey: messageKey,
+            );
+          case MessageSubject.mediaExternal:
+            body = _ArchiveExternalResource(
+              messageKey: messageKey,
+              metaDataStyle: metaDataStyle,
+            );
+          case MessageSubject.userLocation:
+            body = _ArchiveText(
+              metaDataStyle: metaDataStyle,
+              messageKey: messageKey,
+            );
+          case MessageSubject.dokiUser:
+            body = _ArchiveText(
+              metaDataStyle: metaDataStyle,
+              messageKey: messageKey,
+            );
+          case MessageSubject.dokiPost:
+            body = _ArchiveText(
+              metaDataStyle: metaDataStyle,
+              messageKey: messageKey,
+            );
+          case MessageSubject.dokiPage:
+            body = _ArchiveText(
+              metaDataStyle: metaDataStyle,
+              messageKey: messageKey,
+            );
+          case MessageSubject.dokiDiscussion:
+            body = _ArchiveText(
+              metaDataStyle: metaDataStyle,
+              messageKey: messageKey,
+            );
+          case MessageSubject.dokiPolls:
+            body = _ArchiveText(
+              metaDataStyle: metaDataStyle,
+              messageKey: messageKey,
+            );
+        }
+
+        return _AddDayToast(
+          date: message.sendAt,
+          showDate: showDate,
+          self: self,
+          child: FractionallySizedBox(
+            alignment: alignment,
+            widthFactor: 0.8,
+            child: Align(
+              alignment: alignment,
+              child: messageEntity.deleted ? null : body,
+            ),
+          ),
+        );
+      },
     );
   }
 }
