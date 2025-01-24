@@ -12,6 +12,7 @@ String trimText(String text, {int len = 50}) {
 String dateString(
   DateTime date, {
   bool full = true,
+  bool small = false,
 }) {
   /// format date to weekday, day month year
   /// eg: Thursday, 11 October 2001
@@ -25,6 +26,7 @@ String dateString(
   int day = date.day;
   int year = date.year;
 
+  if (small) return "$day $month $year";
   return "$weekDay, $day $month $year";
 }
 
@@ -34,7 +36,18 @@ String dateToIsoString(DateTime date) {
   return dateOnly;
 }
 
-String displayDateDifference(DateTime date) {
+String displayDateDifference(
+  DateTime date, {
+  bool small = false,
+}) {
+  if (small) {
+    return dateString(
+      date,
+      full: false,
+      small: small,
+    );
+  }
+
   Duration difference = DateTime.now().difference(date);
 
   if (difference.inSeconds < 60) {

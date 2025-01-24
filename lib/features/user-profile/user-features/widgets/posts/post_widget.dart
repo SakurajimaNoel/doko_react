@@ -41,21 +41,38 @@ class PostWidget extends StatelessWidget {
           padding: const EdgeInsets.symmetric(
             horizontal: Constants.padding,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              UserWidget(
-                userKey: post.createdBy,
-              ),
-              Text(
-                displayDateDifference(post.createdOn),
-                style: const TextStyle(
-                  fontSize: Constants.smallFontSize,
-                ),
-              ),
-            ],
-          ),
+          child: LayoutBuilder(builder: (context, constraints) {
+            bool fullSize = constraints.maxWidth >= Constants.postMetadataWidth;
+            double shrink = fullSize ? 1 : 0.85;
+
+            bool hideDate = constraints.maxWidth < 250;
+
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (fullSize)
+                  UserWidget(
+                    userKey: post.createdBy,
+                  )
+                else
+                  UserWidget.small(
+                    key: ValueKey("${post.createdBy}-with-small-size"),
+                    userKey: post.createdBy,
+                  ),
+                if (!hideDate)
+                  Text(
+                    displayDateDifference(
+                      post.createdOn,
+                      small: !fullSize,
+                    ),
+                    style: TextStyle(
+                      fontSize: Constants.smallFontSize * shrink,
+                    ),
+                  ),
+              ],
+            );
+          }),
         ),
         // post content
         if (post.content.isNotEmpty) ...[
@@ -340,132 +357,166 @@ class _PostActionState extends State<_PostAction>
       builder: (context, state) {
         PostEntity post = graph.getValueByKey(widget.graphKey)! as PostEntity;
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Constants.padding,
-          ),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                      "${displayNumberFormat(post.likesCount)} Like${post.likesCount > 1 ? "s" : ""}"),
-                  Text(
-                      "${displayNumberFormat(post.commentsCount)} Comment${post.commentsCount > 1 ? "s" : ""}"),
-                ],
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            bool shrink = constraints.maxWidth < 285;
+            bool superShrink = constraints.maxWidth < 235;
+
+            double shrinkFactor = shrink
+                ? 0.75
+                : superShrink
+                    ? 0.5
+                    : 1;
+
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: Constants.padding * shrinkFactor,
               ),
-              Divider(
-                thickness: Constants.dividerThickness * 0.75,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      ScaleTransition(
-                        scale: Tween(begin: 1.25, end: 1.0).animate(
-                          CurvedAnimation(
-                            parent: controller,
-                            curve: Curves.easeOut,
-                          ),
-                        ),
-                        child: IconButton(
-                          onPressed: () {
-                            if (!post.userLike) {
-                              controller
-                                  .reverse()
-                                  .then((value) => controller.forward());
-                            }
-
-                            context
-                                .read<UserActionBloc>()
-                                .add(UserActionPostLikeActionEvent(
-                                  postId: post.id,
-                                  userLike: !post.userLike,
-                                  username: username,
-                                ));
-                          },
-                          style: IconButton.styleFrom(
-                            minimumSize: Size.zero,
-                            padding: EdgeInsets.all(Constants.padding * 0.5),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          icon: post.userLike
-                              ? Icon(
-                                  Icons.thumb_up,
-                                  color: currTheme.primary,
-                                  size: Constants.iconButtonSize,
-                                )
-                              : const Icon(
-                                  Icons.thumb_up_outlined,
-                                  size: Constants.iconButtonSize,
-                                ),
+                      Text(
+                        "${displayNumberFormat(post.likesCount)} Like${post.likesCount > 1 ? "s" : ""}",
+                        style: TextStyle(
+                          fontSize:
+                              superShrink ? Constants.smallFontSize : null,
                         ),
                       ),
-                      const SizedBox(
-                        width: Constants.gap,
+                      Text(
+                        "${displayNumberFormat(post.commentsCount)} Comment${post.commentsCount > 1 ? "s" : ""}",
+                        style: TextStyle(
+                          fontSize:
+                              superShrink ? Constants.smallFontSize : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Divider(
+                    thickness: Constants.dividerThickness * 0.75,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    spacing: Constants.gap * shrinkFactor,
+                    children: [
+                      Row(
+                        children: [
+                          ScaleTransition(
+                            scale: Tween(begin: 1.25, end: 1.0).animate(
+                              CurvedAnimation(
+                                parent: controller,
+                                curve: Curves.easeOut,
+                              ),
+                            ),
+                            child: IconButton(
+                              onPressed: () {
+                                if (!post.userLike) {
+                                  controller
+                                      .reverse()
+                                      .then((value) => controller.forward());
+                                }
+
+                                context
+                                    .read<UserActionBloc>()
+                                    .add(UserActionPostLikeActionEvent(
+                                      postId: post.id,
+                                      userLike: !post.userLike,
+                                      username: username,
+                                    ));
+                              },
+                              style: IconButton.styleFrom(
+                                minimumSize: Size.zero,
+                                padding:
+                                    EdgeInsets.all(Constants.padding * 0.5),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              icon: post.userLike
+                                  ? Icon(
+                                      Icons.thumb_up,
+                                      color: currTheme.primary,
+                                      size: Constants.iconButtonSize *
+                                          shrinkFactor,
+                                    )
+                                  : Icon(
+                                      Icons.thumb_up_outlined,
+                                      size: Constants.iconButtonSize *
+                                          shrinkFactor,
+                                    ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              String currentRoute =
+                                  GoRouter.of(context).currentRouteName ?? "";
+                              bool isPostPage =
+                                  currentRoute == RouterConstants.userPost;
+
+                              if (isPostPage) {
+                                context.read<PostCommentProvider>()
+                                  ..focusNode.requestFocus()
+                                  ..resetCommentTarget();
+                                return;
+                              }
+
+                              context.pushNamed(
+                                RouterConstants.userPost,
+                                pathParameters: {
+                                  "postId": post.id,
+                                },
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              foregroundColor: currTheme.secondary,
+                              minimumSize: Size.zero,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: Constants.padding * shrinkFactor,
+                                vertical: Constants.padding * 0.5,
+                              ),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: Text(
+                              "Comment",
+                              style: TextStyle(
+                                fontSize: superShrink
+                                    ? Constants.smallFontSize
+                                    : null,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       TextButton(
                         onPressed: () {
-                          String currentRoute =
-                              GoRouter.of(context).currentRouteName ?? "";
-                          bool isPostPage =
-                              currentRoute == RouterConstants.userPost;
-
-                          if (isPostPage) {
-                            context.read<PostCommentProvider>()
-                              ..focusNode.requestFocus()
-                              ..resetCommentTarget();
-                            return;
-                          }
-
-                          context.pushNamed(
-                            RouterConstants.userPost,
-                            pathParameters: {
-                              "postId": post.id,
-                            },
+                          // todo : allow sending to user chat
+                          Share.share(
+                            "https://doki.com/post/${post.id}",
+                            subject: "Check this post on doki.",
                           );
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: currTheme.secondary,
                           minimumSize: Size.zero,
                           padding: EdgeInsets.symmetric(
-                            horizontal: Constants.padding,
+                            horizontal: Constants.padding * shrinkFactor,
                             vertical: Constants.padding * 0.5,
                           ),
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
-                        child: const Text("Comment"),
+                        child: Text(
+                          "Share",
+                          style: TextStyle(
+                            fontSize:
+                                superShrink ? Constants.smallFontSize : null,
+                          ),
+                        ),
                       ),
                     ],
-                  ),
-                  const SizedBox(
-                    width: Constants.gap * 0.75,
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // todo : allow sending to user chat
-                      Share.share(
-                        "https://doki.com/post/${post.id}",
-                        subject: "Check this post on doki.",
-                      );
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: currTheme.secondary,
-                      minimumSize: Size.zero,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: Constants.padding,
-                        vertical: Constants.padding * 0.5,
-                      ),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: const Text("Share"),
-                  ),
+                  )
                 ],
-              )
-            ],
-          ),
+              ),
+            );
+          },
         );
       },
     );
