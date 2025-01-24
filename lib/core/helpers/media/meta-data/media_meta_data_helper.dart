@@ -16,6 +16,25 @@ String? getFileExtensionFromMimeType(String mimeType) {
   return _mimeToExtension[mimeType];
 }
 
+/// used with instant messaging preview
+String getFileTypeFromPath(String path) {
+  String extension = path.split('.').last.toLowerCase();
+
+  if (_imageExtensions.contains(extension)) {
+    return "image";
+  }
+
+  if (_videoExtensions.contains(extension)) {
+    return "video";
+  }
+
+  if (_audioExtensions.contains(extension)) {
+    return "audio";
+  }
+
+  return "file";
+}
+
 String? getFileExtensionFromFileName(String fileName) {
   if (fileName.isEmpty) return null;
 

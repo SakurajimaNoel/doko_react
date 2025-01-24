@@ -105,3 +105,18 @@ const List<String> _videoExtensions = [
   'webm',
   '3gp'
 ];
+
+const List<String> _audioExtensions = [
+  'mp3',
+  'wav',
+  'flac',
+  'aac',
+  'ogg',
+  'm4a',
+  'wma',
+  'aiff',
+  'alac',
+  'opus',
+  'pcm',
+  'webm'
+];
