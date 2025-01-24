@@ -756,9 +756,9 @@ class GraphqlQueries {
   }
 
   // post by id
-  static String getPostById() {
+  static String getCompletePostById() {
     return """
-     query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$first: Int, \$likedByWhere3: UserWhere, \$commentsWhere2: CommentWhere, \$limit: Int, \$likedByWhere4: UserWhere, \$sort: [CommentSort!]) {
+     query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$first: Int, \$likedByWhere3: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
       posts(where: \$where) {
         id
         createdOn
@@ -769,11 +769,19 @@ class GraphqlQueries {
           username
           name
           profilePicture
+          friendsConnection(where: \$friendsConnectionWhere2) {
+            edges {
+              properties {
+                addedOn
+                requestedBy
+                status
+              }
+            }
+          }
         }
         likedBy(where: \$likedByWhere2) {
           username
-        }
-       
+        }   
         likedByConnection {
           totalCount
         }
@@ -806,26 +814,14 @@ class GraphqlQueries {
                 username
                 profilePicture
                 name
-              }
-              comments(where: \$commentsWhere2, limit: \$limit, sort: \$sort) {
-                id
-                media
-                content
-                createdOn
-                likedByConnection {
-                  totalCount
-                }
-                mentions {
-                  username
-                }
-                likedBy(where: \$likedByWhere4) {
-                  username
-                }
-                commentBy {
-                  id
-                  username
-                  name
-                  profilePicture
+                friendsConnection(where: \$friendsConnectionWhere3) {
+                  edges {
+                    properties {
+                      addedOn
+                      requestedBy
+                      status
+                    }
+                  }
                 }
               }
             }
@@ -836,7 +832,7 @@ class GraphqlQueries {
     """;
   }
 
-  static Map<String, dynamic> getPostByIdVariables(
+  static Map<String, dynamic> getCompletePostByIdVariables(
     String postId, {
     required String username,
   }) {
@@ -851,20 +847,16 @@ class GraphqlQueries {
       "likedByWhere3": {
         "username_EQ": username,
       },
-      "commentsWhere2": {
-        "commentBy": {
+      "friendsConnectionWhere2": {
+        "node": {
           "username_EQ": username,
         }
       },
-      "limit": 1, // user own comment reply first
-      "likedByWhere4": {
-        "username_EQ": username,
-      },
-      "sort": [
-        {
-          "createdOn": "DESC",
+      "friendsConnectionWhere3": {
+        "node": {
+          "username_EQ": username,
         }
-      ]
+      },
     };
   }
 

@@ -23,8 +23,8 @@ class PostRemoteDataSource {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(GraphqlQueries.getPostById()),
-          variables: GraphqlQueries.getPostByIdVariables(
+          document: gql(GraphqlQueries.getCompletePostById()),
+          variables: GraphqlQueries.getCompletePostByIdVariables(
             details.postId,
             username: details.username,
           ),
