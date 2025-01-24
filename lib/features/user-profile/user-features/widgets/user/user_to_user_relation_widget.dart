@@ -1,3 +1,4 @@
+import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/relation/user_to_user_relation.dart';
@@ -6,6 +7,7 @@ import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class UserToUserRelationWidget extends StatefulWidget {
   const UserToUserRelationWidget({
@@ -87,6 +89,15 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
       username: username,
       requestedBy: user.relationInfo!.requestedBy,
     ));
+  }
+
+  void goToMessageArchive() {
+    context.pushNamed(
+      RouterConstants.messageArchive,
+      pathParameters: {
+        "username": username,
+      },
+    );
   }
 
   @override
@@ -265,7 +276,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
                 ),
               ),
               OutlinedButton.icon(
-                onPressed: () {},
+                onPressed: goToMessageArchive,
                 icon: Icon(
                   Icons.chat_outlined,
                 ),
@@ -299,7 +310,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
               ),
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: goToMessageArchive,
               icon: Icon(
                 Icons.chat_outlined,
                 color: currTheme.primary,

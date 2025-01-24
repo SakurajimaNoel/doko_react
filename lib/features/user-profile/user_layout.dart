@@ -9,6 +9,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
+import 'package:doko_react/core/helpers/extension/go_router_extension.dart';
 import 'package:doko_react/core/helpers/notifications/notifications_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -98,7 +99,6 @@ class _UserLayoutState extends State<UserLayout> {
               ));
         }
 
-        // showMessage(message.toJSON());
         showNewMessageNotification(message, generateUserNodeKey(remoteUser));
         realTimeBloc.add(RealTimeNewMessageEvent(
           message: message,
@@ -185,6 +185,14 @@ class _UserLayoutState extends State<UserLayout> {
   }
 
   void showNewMessageNotification(ChatMessage message, String userKey) {
+    final String routeName = GoRouter.of(context).currentRouteName ?? "";
+    final Map<String, String> pathParams =
+        GoRouter.of(context).currentRoutePathParameters;
+    if (routeName == RouterConstants.messageArchive &&
+        pathParams["username"] == getUsernameFromUserKey(userKey)) {
+      return;
+    }
+
     final inAppNotification = createNewNotification(
       leading: UserWidget.avtar(
         userKey: userKey,
@@ -201,7 +209,7 @@ class _UserLayoutState extends State<UserLayout> {
       ),
       onTap: () {
         context.pushNamed(
-          RouterConstants.userProfile,
+          RouterConstants.messageArchive,
           pathParameters: {
             "username": getUsernameFromUserKey(userKey),
           },

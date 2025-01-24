@@ -11,7 +11,7 @@ NiceInAppNotification createNewNotification({
   Widget? trailing,
   VoidCallback? onTap,
 }) {
-  final currScheme = Theme.of(context).colorScheme;
+  final currTheme = Theme.of(context).colorScheme;
 
   return NiceInAppNotification(
     vibrate: false,
@@ -26,7 +26,7 @@ NiceInAppNotification createNewNotification({
     title: title,
     body: body,
     trailing: trailing,
-    backgroundColor: currScheme.surfaceContainer,
+    backgroundColor: currTheme.surfaceContainer,
     displayDuration: Constants.notificationDuration,
     showingAnimationDuration: Duration(
       milliseconds: 250,
@@ -37,7 +37,7 @@ NiceInAppNotification createNewNotification({
     onTap: onTap,
     boxShadows: [
       BoxShadow(
-        color: currScheme.shadow.withValues(
+        color: currTheme.shadow.withValues(
           alpha: 0.5,
         ),
         spreadRadius: 0,

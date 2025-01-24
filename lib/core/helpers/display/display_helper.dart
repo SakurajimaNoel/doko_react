@@ -72,3 +72,57 @@ String getUsernameFromCommentInput(String username) {
   // trimming initial @ and end zero-width-whitespace
   return username.substring(1, username.length - 1);
 }
+
+String formatDateToWeekDays(DateTime date) {
+  // Convert UTC to local time
+  DateTime localDate = date.toLocal();
+
+  // Get the current local date
+  DateTime now = DateTime.now();
+  DateTime today = DateTime(now.year, now.month, now.day);
+  DateTime yesterday = today.subtract(Duration(days: 1));
+
+  // Start of the current week (assuming week starts on Monday)
+  DateTime startOfWeek = today.subtract(Duration(days: today.weekday - 1));
+
+  // Check for Today or Yesterday
+  if (localDate.year == today.year &&
+      localDate.month == today.month &&
+      localDate.day == today.day) {
+    return "Today";
+  } else if (localDate.year == yesterday.year &&
+      localDate.month == yesterday.month &&
+      localDate.day == yesterday.day) {
+    return "Yesterday";
+  }
+
+  // Check if the date is within the current week
+  if (localDate.isAfter(startOfWeek.subtract(Duration(seconds: 1))) &&
+      localDate.isBefore(startOfWeek.add(Duration(days: 7)))) {
+    return _daysOfWeek[localDate.weekday - 1];
+  } // Weekday name
+
+  // Otherwise, format as "12 Dec 2024"
+  String day = localDate.day.toString();
+  String month = _monthsAbbr[localDate.month - 1];
+  String year = localDate.year.toString();
+
+  return "$day $month $year";
+}
+
+String formatDateTimeToTimeString(DateTime date) {
+  // Convert to local time if necessary
+  DateTime localDateTime = date.toLocal();
+
+  // Extract the hour, minute, and period (AM/PM)
+  int hour = localDateTime.hour;
+  String period = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12 == 0
+      ? 12
+      : hour % 12; // Convert 0 or 24 to 12 in 12-hour format
+  String minute =
+      localDateTime.minute.toString().padLeft(2, '0'); // Ensure two digits
+
+  // Format the time as "hh:mm AM/PM"
+  return "$hour:$minute $period";
+}

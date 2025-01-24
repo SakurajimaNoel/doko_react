@@ -169,7 +169,7 @@ class CreatePostPageState extends State<CreatePostPage> {
     required String path,
   }) {
     var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
-    var currScheme = Theme.of(context).colorScheme;
+    var currTheme = Theme.of(context).colorScheme;
 
     return SizedBox(
       width: width,
@@ -211,9 +211,9 @@ class CreatePostPageState extends State<CreatePostPage> {
                     ),
                   ),
                 IconButton.filledTonal(
-                  color: currScheme.onError,
+                  color: currTheme.onError,
                   style: IconButton.styleFrom(
-                    backgroundColor: currScheme.error,
+                    backgroundColor: currTheme.error,
                   ),
                   onPressed: () async {
                     var type = content[index].type;

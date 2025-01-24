@@ -9,7 +9,7 @@ class GraphErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currScheme = Theme.of(context).colorScheme;
+    final currTheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -30,7 +30,7 @@ class GraphErrorPage extends StatelessWidget {
                   child: Heading(
                     Constants.errorMessage,
                     size: Constants.heading4,
-                    color: currScheme.error,
+                    color: currTheme.error,
                   ),
                 ),
                 TextButton(

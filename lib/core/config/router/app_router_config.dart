@@ -16,6 +16,8 @@ import 'package:doko_react/features/complete-profile/presentation/pages/username
 import 'package:doko_react/features/error-pages/auth_error_page.dart';
 import 'package:doko_react/features/error-pages/graph_error_page.dart';
 import 'package:doko_react/features/settings/presentation/pages/settings_page.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/pages/message-archive/message_archive_page.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/pages/message-inbox/message_inbox_page.dart';
 import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/create_post_page.dart';
@@ -231,6 +233,25 @@ class AppRouterConfig {
                   return const ProfilePage();
                 },
                 routes: [
+                  GoRoute(
+                      parentNavigatorKey: rootNavigatorKey,
+                      path: "message-inbox",
+                      name: RouterConstants.messageInbox,
+                      builder: (context, state) => MessageInboxPage(),
+                      routes: [
+                        GoRoute(
+                          parentNavigatorKey: rootNavigatorKey,
+                          path: "message-archive/:username",
+                          name: RouterConstants.messageArchive,
+                          builder: (context, state) {
+                            String username = state.pathParameters["username"]!;
+
+                            return MessageArchivePage(
+                              username: username,
+                            );
+                          },
+                        )
+                      ]),
                   GoRoute(
                     parentNavigatorKey: rootNavigatorKey,
                     path: "settings",

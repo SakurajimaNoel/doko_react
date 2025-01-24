@@ -15,7 +15,7 @@ Future<CroppedFile?> getCroppedImage(
   required BuildContext context,
   required ImageLocation location,
 }) async {
-  var currScheme = Theme.of(context).colorScheme;
+  var currTheme = Theme.of(context).colorScheme;
   CropAspectRatio ratio;
 
   switch (location) {
@@ -36,13 +36,13 @@ Future<CroppedFile?> getCroppedImage(
     uiSettings: [
       AndroidUiSettings(
         toolbarTitle: 'Profile Picture',
-        toolbarColor: currScheme.surface,
-        toolbarWidgetColor: currScheme.onSurface,
-        statusBarColor: currScheme.surface,
-        backgroundColor: currScheme.surface,
-        dimmedLayerColor: currScheme.surface.withValues(alpha: 0.75),
-        cropFrameColor: currScheme.onSurface,
-        cropGridColor: currScheme.onSurface,
+        toolbarColor: currTheme.surface,
+        toolbarWidgetColor: currTheme.onSurface,
+        statusBarColor: currTheme.surface,
+        backgroundColor: currTheme.surface,
+        dimmedLayerColor: currTheme.surface.withValues(alpha: 0.75),
+        cropFrameColor: currTheme.onSurface,
+        cropGridColor: currTheme.onSurface,
         cropFrameStrokeWidth: 6,
         cropGridStrokeWidth: 6,
       ),

@@ -9,6 +9,8 @@ class ArchiveEntity extends GraphEntity {
 
   // todo: handle messages in better way try SplayTreeSet
   Nodes archiveMessages;
+
+  // latest messages are at front
   Set<String> currentSessionMessages;
 
   void addCurrentSessionMessages(String message) {
