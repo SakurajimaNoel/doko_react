@@ -28,40 +28,6 @@ class ArchiveItem extends StatelessWidget {
   final String messageKey;
   final bool showDate;
 
-  Widget messageContainer(
-      Widget child, BuildContext context, bool self, DateTime sendAt) {
-    if (!showDate) return child;
-
-    final currTheme = Theme.of(context).colorScheme;
-
-    return Column(
-      crossAxisAlignment:
-          self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-      children: [
-        const SizedBox(
-          height: Constants.gap * 0.5,
-        ),
-        Center(
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              vertical: Constants.gap * 0.5,
-              horizontal: Constants.gap * 0.75,
-            ),
-            decoration: BoxDecoration(
-              color: currTheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(displayDateDifference(sendAt)),
-          ),
-        ),
-        const SizedBox(
-          height: Constants.gap * 1.25,
-        ),
-        child,
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final username =
@@ -119,15 +85,66 @@ class ArchiveItem extends StatelessWidget {
         );
     }
 
-    Widget child = FractionallySizedBox(
-      alignment: alignment,
-      widthFactor: 0.8,
-      child: Align(
+    return _AddDayToast(
+      date: message.sendAt,
+      showDate: showDate,
+      self: self,
+      child: FractionallySizedBox(
         alignment: alignment,
-        child: body,
+        widthFactor: 0.8,
+        child: Align(
+          alignment: alignment,
+          child: body,
+        ),
       ),
     );
+  }
+}
 
-    return messageContainer(child, context, self, message.sendAt);
+class _AddDayToast extends StatelessWidget {
+  const _AddDayToast({
+    required this.child,
+    required this.date,
+    required this.showDate,
+    required this.self,
+  });
+
+  final Widget child;
+  final DateTime date;
+  final bool showDate;
+  final bool self;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!showDate) return child;
+
+    final currTheme = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment:
+          self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        const SizedBox(
+          height: Constants.gap * 0.5,
+        ),
+        Center(
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              vertical: Constants.gap * 0.5,
+              horizontal: Constants.gap * 0.75,
+            ),
+            decoration: BoxDecoration(
+              color: currTheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(Constants.radius * 0.5),
+            ),
+            child: Text(displayDateDifference(date)),
+          ),
+        ),
+        const SizedBox(
+          height: Constants.gap * 1.25,
+        ),
+        child,
+      ],
+    );
   }
 }
