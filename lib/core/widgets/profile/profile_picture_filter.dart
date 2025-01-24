@@ -5,13 +5,38 @@ class ProfilePictureFilter extends StatelessWidget {
   const ProfilePictureFilter({
     super.key,
     this.child = const SizedBox.shrink(),
-  });
+  }) : preview = false;
+
+  const ProfilePictureFilter.preview({
+    super.key,
+    this.child = const SizedBox.shrink(),
+  }) : preview = true;
 
   final Widget child;
+  final bool preview;
 
   @override
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
+
+    if (preview) {
+      return Container(
+        alignment: Alignment.bottomLeft,
+        padding: EdgeInsets.all(Constants.padding),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.transparent,
+                currTheme.primary.withValues(
+                  alpha: 0.75,
+                ),
+              ]),
+        ),
+        child: child,
+      );
+    }
 
     return Container(
       alignment: Alignment.bottomLeft,
@@ -21,40 +46,12 @@ class ProfilePictureFilter extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            // increase to increase breakpoint
-            currTheme.surface.withValues(
-              alpha: 0.30,
-            ),
-            currTheme.surface.withValues(
-              alpha: 0.25,
-            ),
-            currTheme.surface.withValues(
-              alpha: 0.20,
-            ),
-            currTheme.surface.withValues(
-              alpha: 0.15,
+            currTheme.primaryContainer.withValues(
+              alpha: 0.75,
             ),
             Colors.transparent,
-            Colors.transparent,
-            Colors.transparent,
-            Colors.transparent,
-            Colors.transparent,
-            Colors.transparent,
-            Colors.transparent,
-            currTheme.surface.withValues(
-              alpha: 0.15,
-            ),
-            currTheme.surface.withValues(
-              alpha: 0.20,
-            ),
-            currTheme.surface.withValues(
-              alpha: 0.25,
-            ),
-            currTheme.surface.withValues(
-              alpha: 0.30,
-            ),
-            currTheme.surface.withValues(
-              alpha: 0.35,
+            currTheme.primaryContainer.withValues(
+              alpha: 0.75,
             ),
           ],
         ),
