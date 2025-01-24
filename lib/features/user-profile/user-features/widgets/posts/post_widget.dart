@@ -43,7 +43,7 @@ class PostWidget extends StatelessWidget {
           ),
           child: LayoutBuilder(builder: (context, constraints) {
             bool shrink = constraints.maxWidth < Constants.postMetadataWidth;
-            double shrinkFactor = shrink ? 1 : 0.75;
+            double shrinkFactor = shrink ? 0.75 : 1;
 
             bool superShrink = constraints.maxWidth < 250;
 
