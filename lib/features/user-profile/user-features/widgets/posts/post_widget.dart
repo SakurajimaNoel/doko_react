@@ -42,16 +42,16 @@ class PostWidget extends StatelessWidget {
             horizontal: Constants.padding,
           ),
           child: LayoutBuilder(builder: (context, constraints) {
-            bool fullSize = constraints.maxWidth >= Constants.postMetadataWidth;
-            double shrink = fullSize ? 1 : 0.85;
+            bool shrink = constraints.maxWidth < Constants.postMetadataWidth;
+            double shrinkFactor = shrink ? 1 : 0.75;
 
-            bool hideDate = constraints.maxWidth < 250;
+            bool superShrink = constraints.maxWidth < 250;
 
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (fullSize)
+                if (!shrink)
                   UserWidget(
                     userKey: post.createdBy,
                   )
@@ -60,14 +60,14 @@ class PostWidget extends StatelessWidget {
                     key: ValueKey("${post.createdBy}-with-small-size"),
                     userKey: post.createdBy,
                   ),
-                if (!hideDate)
+                if (!superShrink)
                   Text(
                     displayDateDifference(
                       post.createdOn,
-                      small: !fullSize,
+                      small: shrink,
                     ),
                     style: TextStyle(
-                      fontSize: Constants.smallFontSize * shrink,
+                      fontSize: Constants.smallFontSize * shrinkFactor,
                     ),
                   ),
               ],
@@ -398,9 +398,12 @@ class _PostActionState extends State<_PostAction>
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    spacing: Constants.gap * 1.25 * shrinkFactor,
+                    spacing:
+                        Constants.gap * shrinkFactor - (superShrink ? 0.9 : 0),
                     children: [
                       Row(
+                        spacing: Constants.gap * shrinkFactor -
+                            (superShrink ? 0.9 : 0),
                         children: [
                           ScaleTransition(
                             scale: Tween(begin: 1.25, end: 1.0).animate(
@@ -470,8 +473,7 @@ class _PostActionState extends State<_PostAction>
                               foregroundColor: currTheme.secondary,
                               minimumSize: Size.zero,
                               padding: EdgeInsets.symmetric(
-                                horizontal:
-                                    Constants.padding * 1.15 * shrinkFactor,
+                                horizontal: Constants.padding * shrinkFactor,
                                 vertical: Constants.padding * 0.5,
                               ),
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -499,7 +501,7 @@ class _PostActionState extends State<_PostAction>
                           foregroundColor: currTheme.secondary,
                           minimumSize: Size.zero,
                           padding: EdgeInsets.symmetric(
-                            horizontal: Constants.padding * 1.15 * shrinkFactor,
+                            horizontal: Constants.padding * shrinkFactor,
                             vertical: Constants.padding * 0.5,
                           ),
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,

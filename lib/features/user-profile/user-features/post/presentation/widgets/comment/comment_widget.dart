@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
@@ -65,11 +67,26 @@ class _CommentWidgetState extends State<CommentWidget> {
                 userKey: comment.commentBy,
                 key: ValueKey(comment.id),
               ),
-              Text(
-                displayDateDifference(comment.createdOn),
-                style: const TextStyle(
-                  fontSize: Constants.smallFontSize * 0.9,
-                ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = MediaQuery.sizeOf(context).width;
+                  bool shrink = min(constraints.maxWidth, width) < 320;
+                  bool superShrink = min(constraints.maxWidth, width) < 280;
+                  double shrinkFactor = shrink ? 0.75 : 1;
+
+                  if (superShrink) return SizedBox.shrink();
+
+                  return Text(
+                    key: ValueKey("date-diff-$shrink"),
+                    displayDateDifference(
+                      comment.createdOn,
+                      small: shrink,
+                    ),
+                    style: TextStyle(
+                      fontSize: Constants.smallFontSize * 0.9 * shrinkFactor,
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -131,14 +148,21 @@ class _CommentWrapper extends StatelessWidget {
     final currTheme = Theme.of(context).colorScheme;
 
     if (isReply) {
-      return Container(
-        margin: const EdgeInsets.only(
-          left: Constants.padding,
-        ),
-        padding: EdgeInsets.only(
-          top: Constants.padding * 0.75,
-        ),
-        child: child,
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          bool shrink = constraints.maxWidth < 275;
+          double shrinkFactor = shrink ? 0.75 : 1;
+
+          return Container(
+            margin: EdgeInsets.only(
+              left: Constants.padding * shrinkFactor,
+            ),
+            padding: EdgeInsets.only(
+              top: Constants.padding * 0.75,
+            ),
+            child: child,
+          );
+        },
       );
     }
 
@@ -419,13 +443,20 @@ class _CommentActionsState extends State<_CommentActions>
                 ),
                 // todo: for hierarchy show this
                 if (!widget.isReply)
-                  Text(
-                    "${displayNumberFormat(comment.commentsCount)} Repl${comment.commentsCount > 1 ? "ies" : "y"}",
-                    style: TextStyle(
-                      color: currTheme.onSurfaceVariant,
-                      fontSize: Constants.smallFontSize * 0.9,
-                    ),
-                  ),
+                  LayoutBuilder(builder: (context, constraints) {
+                    final width = MediaQuery.sizeOf(context).width;
+                    bool shrink = width < 250;
+
+                    if (shrink) return SizedBox.shrink();
+
+                    return Text(
+                      "${displayNumberFormat(comment.commentsCount)} Repl${comment.commentsCount > 1 ? "ies" : "y"}",
+                      style: TextStyle(
+                        color: currTheme.onSurfaceVariant,
+                        fontSize: Constants.smallFontSize * 0.9,
+                      ),
+                    );
+                  }),
               ],
             );
           },
