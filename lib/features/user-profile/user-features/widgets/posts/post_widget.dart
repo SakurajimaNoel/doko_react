@@ -398,7 +398,7 @@ class _PostActionState extends State<_PostAction>
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    spacing: Constants.gap * shrinkFactor,
+                    spacing: Constants.gap * 1.25 * shrinkFactor,
                     children: [
                       Row(
                         children: [
@@ -470,7 +470,8 @@ class _PostActionState extends State<_PostAction>
                               foregroundColor: currTheme.secondary,
                               minimumSize: Size.zero,
                               padding: EdgeInsets.symmetric(
-                                horizontal: Constants.padding * shrinkFactor,
+                                horizontal:
+                                    Constants.padding * 1.15 * shrinkFactor,
                                 vertical: Constants.padding * 0.5,
                               ),
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -498,7 +499,7 @@ class _PostActionState extends State<_PostAction>
                           foregroundColor: currTheme.secondary,
                           minimumSize: Size.zero,
                           padding: EdgeInsets.symmetric(
-                            horizontal: Constants.padding * shrinkFactor,
+                            horizontal: Constants.padding * 1.15 * shrinkFactor,
                             vertical: Constants.padding * 0.5,
                           ),
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
