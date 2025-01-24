@@ -67,6 +67,7 @@ class Constants {
   // profile
   static const double sliverPersistentHeaderHeight = 50;
   static const double sliverBorder = 1.5;
+  static const double userRelationWidth = (_root * 16) + (padding * 2); // 268
 
   // comment
   static const double commentWidth = 3;

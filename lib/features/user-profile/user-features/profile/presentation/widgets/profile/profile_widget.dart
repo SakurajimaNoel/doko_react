@@ -162,9 +162,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       );
     }
 
-    return UserToUserRelationWidget.label(
-      username: username,
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      if (constraints.maxWidth > Constants.userRelationWidth) {
+        return UserToUserRelationWidget.label(
+          username: username,
+        );
+      }
+
+      return UserToUserRelationWidget(
+        key: ValueKey("$username-relation-without-label"),
+        username: username,
+      );
+    });
   }
 
   Widget userProfileInfo(String key) {
@@ -285,6 +294,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: Constants.gap,
                       children: [
                         StyledText.error(state.message),
                         ElevatedButton(
@@ -389,10 +399,22 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                             child: Stack(
                               fit: StackFit.loose,
                               children: [
-                                UserToUserRelationWidget.label(
-                                  username: username,
-                                  disabled: true,
-                                ),
+                                LayoutBuilder(builder: (context, constraints) {
+                                  if (constraints.maxWidth >
+                                      Constants.userRelationWidth) {
+                                    return UserToUserRelationWidget.label(
+                                      username: username,
+                                      disabled: true,
+                                    );
+                                  }
+
+                                  return UserToUserRelationWidget(
+                                    key: ValueKey(
+                                        "$username-relation-without-label"),
+                                    username: username,
+                                    disabled: true,
+                                  );
+                                }),
                                 Container(
                                   color: currTheme.surface.withValues(
                                     alpha: 0.75,
@@ -447,6 +469,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         expandedHeight: height,
                         title: Heading(
                           username,
+                          color: currTheme.onSurface,
                           size: Constants.heading4,
                         ),
                         actions: appBarActions(),
