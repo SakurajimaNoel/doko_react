@@ -62,7 +62,9 @@ class MessageArchivePage extends StatelessWidget {
               );
 
           return Padding(
-            padding: const EdgeInsets.all(Constants.padding),
+            padding: const EdgeInsets.symmetric(
+              horizontal: Constants.padding * 0.5,
+            ),
             child: ListView.separated(
               reverse: true,
               itemCount: messages.length,

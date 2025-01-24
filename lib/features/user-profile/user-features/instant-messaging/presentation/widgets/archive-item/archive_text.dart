@@ -13,35 +13,33 @@ class _ArchiveText extends StatefulWidget {
 }
 
 class _ArchiveTextState extends State<_ArchiveText> {
-  int highLightIndex = -1;
-
-  TextSpan buildText(
+  InlineSpan buildText(
     String str, {
     TextStyle? style,
-    GestureRecognizer? recognizer,
+    VoidCallback? onLongPress,
+    VoidCallback? onTap,
   }) {
-    return TextSpan(
-      text: str,
-      style: style,
-      recognizer: recognizer,
+    if (onLongPress == null || onTap == null) {
+      return TextSpan(
+        text: str,
+        style: style,
+      );
+    }
+
+    return WidgetSpan(
+      child: InkWell(
+        onLongPress: onLongPress,
+        onTap: onTap,
+        child: Text(
+          str,
+          style: style,
+        ),
+      ),
     );
   }
 
-  void resetHighlight() {
-    Timer(
-        Duration(
-          milliseconds: 500,
-        ), () {
-      if (mounted) {
-        setState(() {
-          highLightIndex = -1;
-        });
-      }
-    });
-  }
-
   // todo improve this
-  TextSpan buildMessageBody(String body, ColorScheme currScheme) {
+  TextSpan buildMessageBody(String body, ColorScheme currTheme, bool self) {
     final RegExp emailRegex =
         RegExp(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
     final RegExp urlRegex = RegExp(
@@ -77,7 +75,13 @@ class _ArchiveTextState extends State<_ArchiveText> {
     }
 
     int startIndex = 0;
-    final children = <TextSpan>[];
+    final children = <InlineSpan>[];
+
+    final TextStyle highlightStyle = TextStyle(
+      color: currTheme.primary,
+      fontWeight: FontWeight.w500,
+      wordSpacing: 5,
+    );
 
     for (int i = 0; i < validMatches.length; i++) {
       final highlightMatch = validMatches[i];
@@ -93,53 +97,31 @@ class _ArchiveTextState extends State<_ArchiveText> {
 
       startIndex = end;
 
-      final TextStyle highlightStyle = TextStyle(
-        color: currScheme.primary,
-        fontWeight: FontWeight.w500,
-        wordSpacing: 5,
-        backgroundColor:
-            highLightIndex == i ? currScheme.onPrimary : Colors.transparent,
-      );
-
       children.add(buildText(normalText));
       children.add(
         buildText(
           highlightText,
           style: highlightStyle,
-          recognizer: LongPressGestureRecognizer()
-            ..onLongPress = () {
-              setState(() {
-                highLightIndex = i;
-              });
-              // resetHighlight();
-
-              HapticFeedback.vibrate();
-              Clipboard.setData(ClipboardData(
-                text: highlightText,
-              )).then((value) {});
+          onLongPress: () {
+            HapticFeedback.vibrate();
+            Clipboard.setData(ClipboardData(
+              text: highlightText,
+            )).then((value) {});
+          },
+          onTap: () {
+            if (type == "email") {
+              final emailUri = Uri(scheme: "mailto", path: highlightText);
+              launchUrl(emailUri);
+            } else if (type == "url") {
+              final urlUri = Uri.parse(highlightText.startsWith('http')
+                  ? highlightText
+                  : 'http://$highlightText');
+              launchUrl(urlUri);
+            } else if (type == "phone") {
+              final phoneUri = Uri(scheme: "tel", path: highlightText);
+              launchUrl(phoneUri);
             }
-            ..onLongPressCancel = () {
-              setState(() {
-                highLightIndex = i;
-              });
-              resetHighlight();
-
-              if (type == "email") {
-                final emailUri = Uri(scheme: "mailto", path: highlightText);
-                launchUrl(emailUri);
-              } else if (type == "url") {
-                final urlUri = Uri.parse(highlightText.startsWith('http')
-                    ? highlightText
-                    : 'http://$highlightText');
-                launchUrl(urlUri);
-              } else if (type == "phone") {
-                final phoneUri = Uri(scheme: "tel", path: highlightText);
-                launchUrl(phoneUri);
-              }
-            }
-            ..onLongPressEnd = (_) {
-              resetHighlight();
-            },
+          },
         ),
       );
     }
@@ -150,6 +132,8 @@ class _ArchiveTextState extends State<_ArchiveText> {
       style: TextStyle(
         height: 1.25,
         wordSpacing: 1.25,
+        fontSize: Constants.fontSize * 0.9,
+        color: self ? currTheme.onPrimaryContainer : currTheme.onSurface,
       ),
       children: children,
     );
@@ -175,21 +159,34 @@ class _ArchiveTextState extends State<_ArchiveText> {
         ChatMessage message = entity.message;
         bool self = message.from == username;
 
+        if (entity.deleted) return SizedBox.shrink();
+
         /// full screen gradient color for chat message [https://docs.flutter.dev/cookbook/effects/gradient-bubbles]
         /// reference above cookbook for more info about gradient effect
         List<Color> colors = self
             ? [
-                currTheme.primaryContainer.withBlue(50),
+                currTheme.primaryContainer.withValues(
+                  alpha: 0.5,
+                ),
                 currTheme.primaryContainer,
               ]
             : [
-                currTheme.secondaryContainer.withBlue(50),
-                currTheme.secondaryContainer,
+                currTheme.surfaceContainer.withValues(
+                  alpha: 0.5,
+                ),
+                currTheme.surfaceContainerHighest,
               ];
 
-        TextStyle textStyle = TextStyle(
-          color: self ? currTheme.onPrimaryContainer : currTheme.onSurface,
-          fontSize: Constants.fontSize,
+        TextStyle metaDataStyle = TextStyle(
+          fontSize: Constants.smallFontSize,
+          fontWeight: FontWeight.w600,
+          color: self
+              ? currTheme.onPrimaryContainer.withValues(
+                  alpha: 0.5,
+                )
+              : currTheme.onSurface.withValues(
+                  alpha: 0.5,
+                ),
         );
 
         return ClipRRect(
@@ -200,44 +197,42 @@ class _ArchiveTextState extends State<_ArchiveText> {
           ),
           child: BubbleBackground(
             colors: colors,
-            child: DefaultTextStyle.merge(
-              style: textStyle,
-              child: Column(
-                crossAxisAlignment:
-                    self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: Constants.padding * 0.75,
-                      right: Constants.padding * 0.75,
-                      top: Constants.padding * 0.75,
-                    ),
-                    child: RichText(
-                      text: buildMessageBody(message.body, currTheme),
-                    ),
+            child: Column(
+              crossAxisAlignment:
+                  self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: Constants.padding * 0.75,
+                    right: Constants.padding * 0.75,
+                    top: Constants.padding * 0.75,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: Constants.padding * 0.25,
-                      horizontal: Constants.padding * 0.75,
-                    ),
-                    child: Text(
-                      formatDateTimeToTimeString(message.sendAt),
-                      style: TextStyle(
-                        fontSize: Constants.smallFontSize,
-                        fontWeight: FontWeight.w600,
-                        color: self
-                            ? currTheme.onPrimaryContainer.withValues(
-                                alpha: 0.5,
-                              )
-                            : currTheme.onSecondaryContainer.withValues(
-                                alpha: 0.5,
-                              ),
+                  child: RichText(
+                    text: buildMessageBody(message.body, currTheme, self),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: Constants.padding * 0.25,
+                    horizontal: Constants.padding * 0.75,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: Constants.gap * 1.5,
+                    children: [
+                      Text(
+                        formatDateTimeToTimeString(message.sendAt),
+                        style: metaDataStyle,
                       ),
-                    ),
+                      if (entity.edited)
+                        Text(
+                          "edited",
+                          style: metaDataStyle,
+                        ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
