@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
+import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
@@ -11,13 +12,16 @@ import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.d
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/message-body-type/message_body_type.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/posts/post_preview_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 part "archive_external_resource.dart";
+part "archive_post.dart";
 part "archive_text.dart";
 part "archive_user_profile.dart";
 
@@ -68,15 +72,33 @@ class ArchiveItem extends StatelessWidget {
                 ),
         );
 
+        /// full screen gradient color for chat message [https://docs.flutter.dev/cookbook/effects/gradient-bubbles]
+        /// reference above cookbook for more info about gradient effect
+        List<Color> colors = self
+            ? [
+                currTheme.primaryContainer.withValues(
+                  alpha: 0.5,
+                ),
+                currTheme.primaryContainer,
+              ]
+            : [
+                currTheme.surfaceContainer.withValues(
+                  alpha: 0.5,
+                ),
+                currTheme.surfaceContainerHighest,
+              ];
+
         Widget body;
         switch (message.subject) {
           case MessageSubject.text:
             body = _ArchiveText(
+              colors: colors,
               metaDataStyle: metaDataStyle,
               messageKey: messageKey,
             );
           case MessageSubject.mediaBucketResource:
             body = _ArchiveText(
+              colors: colors,
               metaDataStyle: metaDataStyle,
               messageKey: messageKey,
             );
@@ -87,6 +109,7 @@ class ArchiveItem extends StatelessWidget {
             );
           case MessageSubject.userLocation:
             body = _ArchiveText(
+              colors: colors,
               metaDataStyle: metaDataStyle,
               messageKey: messageKey,
             );
@@ -96,22 +119,26 @@ class ArchiveItem extends StatelessWidget {
               messageKey: messageKey,
             );
           case MessageSubject.dokiPost:
-            body = _ArchiveText(
+            body = _ArchivePost(
               metaDataStyle: metaDataStyle,
               messageKey: messageKey,
+              colors: colors,
             );
           case MessageSubject.dokiPage:
             body = _ArchiveText(
+              colors: colors,
               metaDataStyle: metaDataStyle,
               messageKey: messageKey,
             );
           case MessageSubject.dokiDiscussion:
             body = _ArchiveText(
+              colors: colors,
               metaDataStyle: metaDataStyle,
               messageKey: messageKey,
             );
           case MessageSubject.dokiPolls:
             body = _ArchiveText(
+              colors: colors,
               metaDataStyle: metaDataStyle,
               messageKey: messageKey,
             );

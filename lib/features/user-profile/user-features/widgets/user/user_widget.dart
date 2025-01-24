@@ -112,7 +112,16 @@ class UserWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: currTheme.primaryContainer,
                     borderRadius: BorderRadius.circular(Constants.radius),
-                    // borderRadius:
+                    boxShadow: [
+                      BoxShadow(
+                        color: currTheme.shadow.withValues(
+                          alpha: 0.5,
+                        ),
+                        spreadRadius: 0,
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Stack(
@@ -179,7 +188,16 @@ class UserWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: currTheme.primaryContainer,
                     borderRadius: BorderRadius.circular(Constants.radius),
-                    // borderRadius:
+                    boxShadow: [
+                      BoxShadow(
+                        color: currTheme.shadow.withValues(
+                          alpha: 0.25,
+                        ),
+                        spreadRadius: 0,
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Stack(

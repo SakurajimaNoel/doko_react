@@ -46,12 +46,8 @@ class _UserFeedPageState extends State<UserFeedPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(Constants.padding),
-        child: Column(
-          children: [
-            UserWidget.preview(
-              userKey: generateUserNodeKey(username),
-            )
-          ],
+        child: UserWidget.preview(
+          userKey: generateUserNodeKey(username),
         ),
       ),
     );

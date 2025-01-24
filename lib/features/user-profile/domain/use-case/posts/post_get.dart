@@ -11,6 +11,6 @@ class PostGetUseCase extends UseCases<bool, GetPostInput> {
 
   @override
   FutureOr<bool> call(GetPostInput params) async {
-    return profileRepository.getUserByUsername(params.postId, params.username);
+    return profileRepository.getPostById(params.postId, params.username);
   }
 }

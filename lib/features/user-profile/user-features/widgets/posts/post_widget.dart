@@ -21,16 +21,16 @@ import 'package:share_plus/share_plus.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PostWidget extends StatelessWidget {
-  PostWidget({
+  const PostWidget({
     super.key,
     required this.postKey,
   });
 
   final String postKey;
-  final UserGraph graph = UserGraph();
 
   @override
   Widget build(BuildContext context) {
+    final UserGraph graph = UserGraph();
     final PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
 
     return Column(
@@ -79,7 +79,7 @@ class PostWidget extends StatelessWidget {
           const SizedBox(
             height: Constants.gap * 0.5,
           ),
-          _PostContent(
+          PostContent(
             content: post.content,
           ),
           const SizedBox(
@@ -109,13 +109,20 @@ class PostWidget extends StatelessWidget {
   }
 }
 
-class _PostContent extends StatelessWidget {
-  _PostContent({
+class PostContent extends StatelessWidget {
+  PostContent({
+    super.key,
     required this.content,
-  });
+  }) : preview = false;
+
+  PostContent.preview({
+    super.key,
+    required this.content,
+  }) : preview = true;
 
   final List<PostContentEntity> content;
   final CarouselController controller = CarouselController();
+  final bool preview;
 
   Widget imageContent(PostContentEntity image) {
     return CachedNetworkImage(
@@ -147,47 +154,53 @@ class _PostContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final height = width * (1 / Constants.postContainer);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final height = width * (1 / Constants.postContainer);
 
-    return Column(
-      children: [
-        SizedBox(
-          height: height,
-          child: CarouselView(
-            enableSplash: false,
-            controller: controller,
-            itemExtent: width,
-            shrinkExtent: width * 0.5,
-            itemSnapping: true,
-            padding: const EdgeInsets.symmetric(
-              horizontal: Constants.padding * 0.25,
-            ),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(Constants.radius * 0.25),
+        return Column(
+          children: [
+            SizedBox(
+              height: height,
+              child: CarouselView(
+                enableSplash: false,
+                controller: controller,
+                itemExtent: width,
+                shrinkExtent: width * 0.5,
+                itemSnapping: true,
+                padding: EdgeInsets.symmetric(
+                  horizontal: Constants.padding * (preview ? 0.15 : 0.25),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(Constants.radius * (preview ? 1 : 0.25)),
+                  ),
+                ),
+                children: content.map(
+                  (item) {
+                    switch (item.mediaType) {
+                      case MediaTypeValue.image:
+                        return imageContent(item);
+                      case MediaTypeValue.video:
+                        return videoContent(item);
+                      default:
+                        return unknownContent(item);
+                    }
+                  },
+                ).toList(),
               ),
             ),
-            children: content.map(
-              (item) {
-                switch (item.mediaType) {
-                  case MediaTypeValue.image:
-                    return imageContent(item);
-                  case MediaTypeValue.video:
-                    return videoContent(item);
-                  default:
-                    return unknownContent(item);
-                }
-              },
-            ).toList(),
-          ),
-        ),
-        if (content.length > 1)
-          _PostContentIndicator(
-            controller: controller,
-            contentLength: content.length,
-          ),
-      ],
+            if (content.length > 1)
+              _PostContentIndicator(
+                controller: controller,
+                contentLength: content.length,
+                width: width,
+                preview: preview,
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -196,10 +209,14 @@ class _PostContentIndicator extends StatefulWidget {
   const _PostContentIndicator({
     required this.contentLength,
     required this.controller,
+    required this.width,
+    required this.preview,
   });
 
   final int contentLength;
   final ScrollController controller;
+  final double width;
+  final bool preview;
 
   @override
   State<_PostContentIndicator> createState() => _PostContentIndicatorState();
@@ -226,9 +243,8 @@ class _PostContentIndicatorState extends State<_PostContentIndicator> {
 
   int getActiveItem() {
     double offset = controller.hasClients ? controller.offset : -1;
-    var width = MediaQuery.sizeOf(context).width - Constants.padding * 0.5;
 
-    int item = (offset / width).round();
+    int item = (offset / widget.width).round();
 
     return item;
   }
@@ -239,17 +255,18 @@ class _PostContentIndicatorState extends State<_PostContentIndicator> {
 
     return Column(
       children: [
-        const SizedBox(
-          height: Constants.gap,
+        SizedBox(
+          height: Constants.gap * (widget.preview ? 0.5 : 1),
         ),
         AnimatedSmoothIndicator(
           activeIndex: activeItem,
           count: widget.contentLength,
           effect: ScrollingDotsEffect(
             activeDotColor: currTheme.primary,
-            dotWidth: Constants.carouselDots,
-            dotHeight: Constants.carouselDots,
-            activeDotScale: Constants.carouselActiveDotScale,
+            dotWidth: Constants.carouselDots * (widget.preview ? 0.75 : 1),
+            dotHeight: Constants.carouselDots * (widget.preview ? 0.75 : 1),
+            activeDotScale:
+                Constants.carouselActiveDotScale * (widget.preview ? 0.75 : 1),
           ),
         ),
       ],

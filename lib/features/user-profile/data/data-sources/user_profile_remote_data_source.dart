@@ -378,13 +378,6 @@ class UserProfileRemoteDataSource {
         graph.addEntity(postKey, post);
       }
 
-      UserEntity user = await UserEntity.createEntity(
-        map: res[0],
-      );
-
-      String key = generateUserNodeKey(user.username);
-      graph.addEntity(key, user);
-
       return true;
     } catch (e) {
       rethrow;

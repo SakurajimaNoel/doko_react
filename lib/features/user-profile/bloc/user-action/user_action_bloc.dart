@@ -460,7 +460,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         postId: event.postId,
       ));
 
-      getPostRequest.remove(event.username);
+      getPostRequest.remove(event.postId);
       emit(UserActionPostDataFetchedState(
         postId: event.postId,
       ));

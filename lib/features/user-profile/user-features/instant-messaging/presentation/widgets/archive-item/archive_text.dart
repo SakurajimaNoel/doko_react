@@ -5,16 +5,20 @@ class _ArchiveText extends StatefulWidget {
   const _ArchiveText({
     required this.messageKey,
     required this.metaDataStyle,
+    required this.colors,
   });
 
   final String messageKey;
   final TextStyle metaDataStyle;
+  final List<Color> colors;
 
   @override
   State<_ArchiveText> createState() => _ArchiveTextState();
 }
 
 class _ArchiveTextState extends State<_ArchiveText> {
+  late final List<Color> colors = widget.colors;
+
   InlineSpan buildText(
     String str, {
     TextStyle? style,
@@ -157,22 +161,6 @@ class _ArchiveTextState extends State<_ArchiveText> {
             graph.getValueByKey(widget.messageKey)! as MessageEntity;
         ChatMessage message = entity.message;
         bool self = message.from == username;
-
-        /// full screen gradient color for chat message [https://docs.flutter.dev/cookbook/effects/gradient-bubbles]
-        /// reference above cookbook for more info about gradient effect
-        List<Color> colors = self
-            ? [
-                currTheme.primaryContainer.withValues(
-                  alpha: 0.5,
-                ),
-                currTheme.primaryContainer,
-              ]
-            : [
-                currTheme.surfaceContainer.withValues(
-                  alpha: 0.5,
-                ),
-                currTheme.surfaceContainerHighest,
-              ];
 
         return ClipRRect(
           borderRadius: const BorderRadius.all(
