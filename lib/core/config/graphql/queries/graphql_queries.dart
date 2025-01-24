@@ -867,7 +867,7 @@ class GraphqlQueries {
   }) {
     if (cursor == null || cursor.isEmpty) {
       return '''
-        query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$sort: [CommentSort!]) {
+        query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$sort: [CommentSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
           commentsConnection(first: \$first, where: \$where, sort: \$sort) {
             pageInfo {
               endCursor
@@ -896,6 +896,15 @@ class GraphqlQueries {
                   username
                   profilePicture
                   name
+                   friendsConnection(where: \$friendsConnectionWhere2) {
+                    edges {
+                      properties {
+                        addedOn
+                        requestedBy
+                        status
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -905,7 +914,7 @@ class GraphqlQueries {
     }
 
     return '''
-      query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$sort: [CommentSort!], \$after: String) {
+      query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$sort: [CommentSort!], \$after: String, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
         commentsConnection(first: \$first, where: \$where, sort: \$sort, after: \$after) {
           pageInfo {
             endCursor
@@ -934,6 +943,15 @@ class GraphqlQueries {
                 username
                 profilePicture
                 name
+                 friendsConnection(where: \$friendsConnectionWhere2) {
+                  edges {
+                    properties {
+                      addedOn
+                      requestedBy
+                      status
+                    }
+                  }
+                }
               }
             }
           }
@@ -969,6 +987,11 @@ class GraphqlQueries {
             "createdOn": sort,
           }
         ],
+        "friendsConnectionWhere2": {
+          "node": {
+            "username_EQ": username,
+          }
+        },
       };
     }
 
@@ -990,6 +1013,11 @@ class GraphqlQueries {
           "createdOn": sort,
         }
       ],
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
     };
   }
 }
