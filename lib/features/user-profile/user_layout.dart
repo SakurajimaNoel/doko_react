@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
+import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/auth/auth.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
@@ -184,8 +185,25 @@ class _UserLayoutState extends State<UserLayout> {
   void showNewMessageNotification(ChatMessage message, String userKey) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        dismissDirection: DismissDirection.up,
+        action: SnackBarAction(
+          label: "Profile",
+          onPressed: () {
+            context.pushNamed(
+              RouterConstants.userProfile,
+              pathParameters: {
+                "username": getUsernameFromUserKey(userKey),
+              },
+            );
+          },
+        ),
         showCloseIcon: true,
         behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(
+          left: Constants.padding,
+          right: Constants.padding,
+          bottom: MediaQuery.sizeOf(context).height - 200,
+        ),
         content: Column(
           spacing: Constants.gap * 0.5,
           mainAxisSize: MainAxisSize.min,
@@ -206,7 +224,7 @@ class _UserLayoutState extends State<UserLayout> {
           ],
         ),
         duration: Duration(
-          seconds: 30,
+          seconds: 2,
         ),
       ),
     );
