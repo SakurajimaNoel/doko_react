@@ -124,6 +124,7 @@ class _UserLayoutState extends State<UserLayout> {
       },
       onReconnectSuccess: () {
         /// find latest message from inbox and fetch based on that
+        showMessage("reconnected to the webserver");
       },
       onConnectionClosure: (retry) async {
         StreamSubscription<FGBGType>? fgBgSubscription;
@@ -137,8 +138,6 @@ class _UserLayoutState extends State<UserLayout> {
         Future<void> handleReconnection() async {
           bool isConnected = await connectionChecker.hasConnection;
           if (isConnected) {
-            showMessage("App has internet connection");
-
             retry();
             cancelSubscriptions();
           } else {
@@ -146,8 +145,6 @@ class _UserLayoutState extends State<UserLayout> {
             internetSubscription = connectionChecker.onStatusChange.listen(
               (InternetConnectionStatus status) {
                 if (status == InternetConnectionStatus.connected) {
-                  showMessage("App has internet connection");
-
                   retry();
                   cancelSubscriptions();
                 }
@@ -157,13 +154,11 @@ class _UserLayoutState extends State<UserLayout> {
         }
 
         if (isForeground) {
-          showMessage("App is in foreground");
           await handleReconnection();
         } else {
           fgBgSubscription = FGBGEvents.instance.stream.listen(
             (event) async {
               if (event == FGBGType.foreground) {
-                showMessage("App is in foreground");
                 await handleReconnection();
               }
             },
