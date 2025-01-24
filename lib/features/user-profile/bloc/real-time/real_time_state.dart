@@ -1,16 +1,16 @@
-part of 'instant_messaging_bloc.dart';
+part of 'real_time_bloc.dart';
 
-sealed class InstantMessagingState extends Equatable {
-  const InstantMessagingState();
+sealed class RealTimeState extends Equatable {
+  const RealTimeState();
 }
 
-final class InstantMessagingInitial extends InstantMessagingState {
+final class RealTimeInitial extends RealTimeState {
   @override
   List<Object> get props => [];
 }
 
-final class InstantMessagingNewMessageState extends InstantMessagingState {
-  const InstantMessagingNewMessageState({
+final class RealTimeNewMessageState extends RealTimeState {
+  const RealTimeNewMessageState({
     required this.id,
     required this.archiveUser,
   });
@@ -22,8 +22,8 @@ final class InstantMessagingNewMessageState extends InstantMessagingState {
   List<Object?> get props => [id, archiveUser];
 }
 
-final class InstantMessagingTypingStatusState extends InstantMessagingState {
-  InstantMessagingTypingStatusState({
+final class RealTimeTypingStatusState extends RealTimeState {
+  RealTimeTypingStatusState({
     required this.archiveUser,
     required this.typing,
   });
@@ -36,8 +36,8 @@ final class InstantMessagingTypingStatusState extends InstantMessagingState {
   List<Object?> get props => [archiveUser, statusAt, typing];
 }
 
-final class InstantMessagingEditMessageState extends InstantMessagingState {
-  InstantMessagingEditMessageState({
+final class RealTimeEditMessageState extends RealTimeState {
+  RealTimeEditMessageState({
     required this.id,
     required this.archiveUser,
   });
@@ -50,8 +50,8 @@ final class InstantMessagingEditMessageState extends InstantMessagingState {
   List<Object?> get props => [id, editedAt, archiveUser];
 }
 
-final class InstantMessagingDeleteMessageState extends InstantMessagingState {
-  InstantMessagingDeleteMessageState({
+final class RealTimeDeleteMessageState extends RealTimeState {
+  RealTimeDeleteMessageState({
     required this.id,
     required this.archiveUser,
   });

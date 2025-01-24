@@ -6,24 +6,19 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
-part 'instant_messaging_event.dart';
-part 'instant_messaging_state.dart';
+part 'real_time_event.dart';
+part 'real_time_state.dart';
 
-class InstantMessagingBloc
-    extends Bloc<InstantMessagingEvent, InstantMessagingState> {
-  InstantMessagingBloc() : super(InstantMessagingInitial()) {
-    on<InstantMessagingNewMessageEvent>(_handleInstantMessagingNewMessageEvent);
-    on<InstantMessagingTypingStatusEvent>(
-        _handleInstantMessagingTypingStatusEvent);
-    on<InstantMessagingEditMessageEvent>(
-        _handleInstantMessagingEditMessageEvent);
-    on<InstantMessagingDeleteMessageEvent>(
-        _handleInstantMessagingDeleteMessageEvent);
+class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
+  RealTimeBloc() : super(RealTimeInitial()) {
+    on<RealTimeNewMessageEvent>(_handleRealTimeNewMessageEvent);
+    on<RealTimeTypingStatusEvent>(_handleRealTimeTypingStatusEvent);
+    on<RealTimeEditMessageEvent>(_handleRealTimeEditMessageEvent);
+    on<RealTimeDeleteMessageEvent>(_handleRealTimeDeleteMessageEvent);
   }
 
-  FutureOr<void> _handleInstantMessagingNewMessageEvent(
-      InstantMessagingNewMessageEvent event,
-      Emitter<InstantMessagingState> emit) {
+  FutureOr<void> _handleRealTimeNewMessageEvent(
+      RealTimeNewMessageEvent event, Emitter<RealTimeState> emit) {
     UserGraph graph = UserGraph();
     ChatMessage message = event.message;
     graph.addNewMessage(message, event.username);
@@ -41,16 +36,15 @@ class InstantMessagingBloc
       from: message.from,
     );
 
-    emit(InstantMessagingNewMessageState(
+    emit(RealTimeNewMessageState(
       id: message.id,
       archiveUser: archiveUser,
     ));
   }
 
-  FutureOr<void> _handleInstantMessagingTypingStatusEvent(
-      InstantMessagingTypingStatusEvent event,
-      Emitter<InstantMessagingState> emit) async {
-    emit(InstantMessagingTypingStatusState(
+  FutureOr<void> _handleRealTimeTypingStatusEvent(
+      RealTimeTypingStatusEvent event, Emitter<RealTimeState> emit) async {
+    emit(RealTimeTypingStatusState(
       archiveUser: event.status.from,
       typing: true,
     ));
@@ -61,15 +55,14 @@ class InstantMessagingBloc
       ),
     );
 
-    emit(InstantMessagingTypingStatusState(
+    emit(RealTimeTypingStatusState(
       archiveUser: event.status.from,
       typing: false,
     ));
   }
 
-  FutureOr<void> _handleInstantMessagingEditMessageEvent(
-      InstantMessagingEditMessageEvent event,
-      Emitter<InstantMessagingState> emit) async {
+  FutureOr<void> _handleRealTimeEditMessageEvent(
+      RealTimeEditMessageEvent event, Emitter<RealTimeState> emit) async {
     UserGraph graph = UserGraph();
     graph.editMessage(event.message);
 
@@ -78,15 +71,14 @@ class InstantMessagingBloc
       to: event.message.to,
       from: event.message.from,
     );
-    emit(InstantMessagingEditMessageState(
+    emit(RealTimeEditMessageState(
       id: event.message.id,
       archiveUser: archiveUser,
     ));
   }
 
-  FutureOr<void> _handleInstantMessagingDeleteMessageEvent(
-      InstantMessagingDeleteMessageEvent event,
-      Emitter<InstantMessagingState> emit) async {
+  FutureOr<void> _handleRealTimeDeleteMessageEvent(
+      RealTimeDeleteMessageEvent event, Emitter<RealTimeState> emit) async {
     UserGraph graph = UserGraph();
     graph.deleteMessage(event.message);
 
@@ -95,7 +87,7 @@ class InstantMessagingBloc
       to: event.message.to,
       from: event.message.from,
     );
-    emit(InstantMessagingDeleteMessageState(
+    emit(RealTimeDeleteMessageState(
       id: event.message.id,
       archiveUser: archiveUser,
     ));

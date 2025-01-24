@@ -6,7 +6,7 @@ import 'package:doko_react/core/global/bloc/theme/theme_bloc.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
-import 'package:doko_react/features/user-profile/bloc/instant-messaging/instant_messaging_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +51,7 @@ void main() async {
             create: (BuildContext context) => serviceLocator<UserActionBloc>(),
           ),
           BlocProvider(
-            create: (BuildContext context) => InstantMessagingBloc(),
+            create: (BuildContext context) => RealTimeBloc(),
           ),
         ],
         child: MultiProvider(

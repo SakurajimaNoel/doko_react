@@ -10,7 +10,6 @@ import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.d
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
-import 'package:doko_react/features/user-profile/bloc/instant-messaging/instant_messaging_bloc.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -23,6 +22,8 @@ import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:provider/provider.dart';
+
+import 'bloc/real-time/real_time_bloc.dart';
 
 class UserLayout extends StatefulWidget {
   const UserLayout(this.navigationShell, {super.key});
@@ -71,7 +72,7 @@ class _UserLayoutState extends State<UserLayout> {
       }
     });
 
-    final instantMessagingBloc = context.read<InstantMessagingBloc>();
+    final realTimeBloc = context.read<RealTimeBloc>();
     final UserGraph graph = UserGraph();
 
     // create websocket client
@@ -97,24 +98,24 @@ class _UserLayoutState extends State<UserLayout> {
 
         // showMessage(message.toJSON());
         showNewMessageNotification(message, generateUserNodeKey(remoteUser));
-        instantMessagingBloc.add(InstantMessagingNewMessageEvent(
+        realTimeBloc.add(RealTimeNewMessageEvent(
           message: message,
           username: username,
         ));
       },
       onTypingStatusReceived: (TypingStatus status) {
-        instantMessagingBloc.add(InstantMessagingTypingStatusEvent(
+        realTimeBloc.add(RealTimeTypingStatusEvent(
           status: status,
         ));
       },
       onEditMessageReceived: (EditMessage message) {
-        instantMessagingBloc.add(InstantMessagingEditMessageEvent(
+        realTimeBloc.add(RealTimeEditMessageEvent(
           message: message,
           username: username,
         ));
       },
       onDeleteMessageReceived: (DeleteMessage message) {
-        instantMessagingBloc.add(InstantMessagingDeleteMessageEvent(
+        realTimeBloc.add(RealTimeDeleteMessageEvent(
           message: message,
           username: username,
         ));
