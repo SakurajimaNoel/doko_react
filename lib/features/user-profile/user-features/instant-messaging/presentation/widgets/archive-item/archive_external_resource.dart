@@ -27,20 +27,26 @@ class _ArchiveExternalResource extends StatelessWidget {
           crossAxisAlignment:
               self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            CachedNetworkImage(
-              cacheKey: message.body,
-              fit: BoxFit.contain,
-              imageUrl: message.body,
-              placeholder: (context, url) => SizedBox(
-                height: constraints.maxWidth,
-                child: Center(
-                  child: SmallLoadingIndicator.small(),
-                ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(Constants.radius),
               ),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-              filterQuality: FilterQuality.high,
-              memCacheHeight: Constants.archiveMedia,
-              width: constraints.maxWidth,
+              clipBehavior: Clip.antiAlias,
+              child: CachedNetworkImage(
+                cacheKey: message.body,
+                fit: BoxFit.contain,
+                imageUrl: message.body,
+                placeholder: (context, url) => SizedBox(
+                  height: constraints.maxWidth,
+                  child: Center(
+                    child: SmallLoadingIndicator.small(),
+                  ),
+                ),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+                filterQuality: FilterQuality.high,
+                memCacheHeight: Constants.archiveMedia,
+                width: constraints.maxWidth,
+              ),
             ),
             Text(
               formatDateTimeToTimeString(message.sendAt),
