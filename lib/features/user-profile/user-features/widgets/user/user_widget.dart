@@ -3,7 +3,9 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
+import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -17,47 +19,64 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
   })  : small = false,
         profileOnly = false,
-        textOnly = false;
+        textOnly = false,
+        preview = false;
 
   const UserWidget.avtar({
     super.key,
     required this.userKey,
   })  : small = false,
         profileOnly = true,
-        textOnly = false;
+        textOnly = false,
+        preview = false;
 
   const UserWidget.info({
     super.key,
     required this.userKey,
   })  : small = false,
         profileOnly = false,
-        textOnly = true;
+        textOnly = true,
+        preview = false;
 
   const UserWidget.small({
     super.key,
     required this.userKey,
   })  : small = true,
         profileOnly = false,
-        textOnly = false;
+        textOnly = false,
+        preview = false;
 
   const UserWidget.avtarSmall({
     super.key,
     required this.userKey,
   })  : small = true,
         profileOnly = true,
-        textOnly = false;
+        textOnly = false,
+        preview = false;
 
   const UserWidget.infoSmall({
     super.key,
     required this.userKey,
   })  : small = true,
         profileOnly = false,
-        textOnly = true;
+        textOnly = true,
+        preview = false;
+
+  const UserWidget.preview({
+    super.key,
+    required this.userKey,
+  })  : small = false,
+        profileOnly = false,
+        textOnly = false,
+        preview = true;
 
   final String userKey;
   final bool small;
   final bool profileOnly;
   final bool textOnly;
+
+  // highest priority and used in messages
+  final bool preview;
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +85,7 @@ class UserWidget extends StatelessWidget {
 
     double gapScale = small ? 0.75 : 1;
     final username = getUsernameFromUserKey(userKey);
+    final currTheme = Theme.of(context).colorScheme;
 
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
@@ -82,6 +102,45 @@ class UserWidget extends StatelessWidget {
 
         if (userDataExists) {
           final UserEntity user = graph.getValueByKey(userKey)! as UserEntity;
+
+          if (preview) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                return Container(
+                  height: constraints.maxWidth,
+                  width: constraints.maxWidth,
+                  decoration: BoxDecoration(
+                    color: currTheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(Constants.radius),
+                    // borderRadius:
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Stack(
+                    children: [
+                      userPreviewAvtar(user.profilePicture, constraints),
+                      ProfilePictureFilter.preview(
+                        child: userPreviewInfo(user, currTheme, username),
+                      ),
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            context.pushNamed(
+                              RouterConstants.userProfile,
+                              pathParameters: {
+                                "username": user.username,
+                              },
+                            );
+                          },
+                          onLongPress: () {},
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
 
           if (profileOnly) {
             return userAvtar(user.profilePicture);
@@ -110,6 +169,45 @@ class UserWidget extends StatelessWidget {
           );
         } else {
           final emptyResource = StorageResource.empty();
+
+          if (preview) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                return Container(
+                  height: constraints.maxWidth,
+                  width: constraints.maxWidth,
+                  decoration: BoxDecoration(
+                    color: currTheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(Constants.radius),
+                    // borderRadius:
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Stack(
+                    children: [
+                      userPreviewAvtar(emptyResource, constraints),
+                      ProfilePictureFilter.preview(
+                        child: userPreviewInfo(null, currTheme, username),
+                      ),
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            context.pushNamed(
+                              RouterConstants.userProfile,
+                              pathParameters: {
+                                "username": username,
+                              },
+                            );
+                          },
+                          onLongPress: () {},
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
 
           if (profileOnly) {
             return userAvtar(emptyResource);
@@ -147,6 +245,7 @@ class UserWidget extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           user.name,
@@ -204,6 +303,62 @@ class UserWidget extends StatelessWidget {
           memCacheHeight: Constants.thumbnailCacheHeight,
         ),
       ),
+    );
+  }
+
+  Widget userPreviewInfo(
+      UserEntity? user, ColorScheme currTheme, String usename) {
+    if (user == null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Heading.left(
+            "@$usename",
+            color: currTheme.onPrimary,
+            size: Constants.heading3,
+          )
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Heading.left(
+          user.name,
+          color: currTheme.onPrimary,
+          size: Constants.heading3,
+        ),
+        Heading.left(
+          "@${user.username}",
+          size: Constants.fontSize,
+          color: currTheme.onPrimary,
+        )
+      ],
+    );
+  }
+
+  Widget userPreviewAvtar(
+      StorageResource profilePicture, BoxConstraints constraints) {
+    if (profilePicture.bucketPath.isEmpty) {
+      return Icon(
+        Icons.person,
+        size: constraints.maxWidth,
+      );
+    }
+
+    return CachedNetworkImage(
+      cacheKey: profilePicture.bucketPath,
+      imageUrl: profilePicture.accessURI,
+      placeholder: (context, url) => const Center(
+        child: SmallLoadingIndicator.small(),
+      ),
+      errorWidget: (context, url, error) => const Icon(Icons.error),
+      fit: BoxFit.cover,
+      memCacheHeight: Constants.profileCacheHeight,
+      width: constraints.maxWidth,
     );
   }
 }

@@ -1,6 +1,10 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class UserFeedPage extends StatefulWidget {
@@ -13,6 +17,9 @@ class UserFeedPage extends StatefulWidget {
 class _UserFeedPageState extends State<UserFeedPage> {
   @override
   Widget build(BuildContext context) {
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Doki"),
@@ -36,6 +43,16 @@ class _UserFeedPageState extends State<UserFeedPage> {
             icon: const Icon(Icons.person),
           ),
         ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(Constants.padding),
+        child: Column(
+          children: [
+            UserWidget.preview(
+              userKey: generateUserNodeKey(username),
+            )
+          ],
+        ),
       ),
     );
   }
