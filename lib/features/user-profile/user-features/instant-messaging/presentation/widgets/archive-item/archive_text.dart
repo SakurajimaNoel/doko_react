@@ -105,7 +105,6 @@ class _ArchiveTextState extends State<_ArchiveText> {
           highlightText,
           style: highlightStyle,
           onLongPress: () {
-            HapticFeedback.vibrate();
             Clipboard.setData(ClipboardData(
               text: highlightText,
             )).then((value) {});

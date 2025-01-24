@@ -94,9 +94,16 @@ class _UserLayoutState extends State<UserLayout> {
         );
 
         /// todo: fix this to show correct user when receiving a new message
-        if (!graph.containsKey(generateUserNodeKey(remoteUser))) {
+
+        /// fetch remote user details user already exists is handled by bloc
+        context.read<UserActionBloc>().add(UserActionGetUserByUsernameEvent(
+              username: remoteUser,
+              currentUser: username,
+            ));
+
+        if (message.subject == MessageSubject.dokiUser) {
           context.read<UserActionBloc>().add(UserActionGetUserByUsernameEvent(
-                username: remoteUser,
+                username: message.body,
                 currentUser: username,
               ));
         }

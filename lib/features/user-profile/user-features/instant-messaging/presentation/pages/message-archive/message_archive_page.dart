@@ -69,10 +69,10 @@ class MessageArchivePage extends StatelessWidget {
               reverse: true,
               itemCount: messages.length,
               cacheExtent: height * 2,
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(Constants.padding),
               separatorBuilder: (context, index) {
                 return SizedBox(
-                  height: 12,
+                  height: Constants.gap,
                 );
               },
               itemBuilder: (BuildContext context, int index) {

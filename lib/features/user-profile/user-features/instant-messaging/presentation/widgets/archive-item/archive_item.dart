@@ -11,6 +11,7 @@ import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.d
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/message-body-type/message_body_type.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,6 +19,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 part "archive_external_resource.dart";
 part "archive_text.dart";
+part "archive_user_profile.dart";
 
 class ArchiveItem extends StatelessWidget {
   const ArchiveItem({
@@ -89,7 +91,7 @@ class ArchiveItem extends StatelessWidget {
               messageKey: messageKey,
             );
           case MessageSubject.dokiUser:
-            body = _ArchiveText(
+            body = _ArchiveUserProfile(
               metaDataStyle: metaDataStyle,
               messageKey: messageKey,
             );
@@ -167,7 +169,7 @@ class _AddDayToast extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: currTheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(Constants.radius * 0.5),
+              borderRadius: BorderRadius.circular(Constants.radius),
             ),
             child: Text(displayDateDifference(date)),
           ),
