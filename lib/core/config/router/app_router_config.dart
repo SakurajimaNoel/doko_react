@@ -234,24 +234,25 @@ class AppRouterConfig {
                 },
                 routes: [
                   GoRoute(
-                      parentNavigatorKey: rootNavigatorKey,
-                      path: "message-inbox",
-                      name: RouterConstants.messageInbox,
-                      builder: (context, state) => MessageInboxPage(),
-                      routes: [
-                        GoRoute(
-                          parentNavigatorKey: rootNavigatorKey,
-                          path: "message-archive/:username",
-                          name: RouterConstants.messageArchive,
-                          builder: (context, state) {
-                            String username = state.pathParameters["username"]!;
+                    parentNavigatorKey: rootNavigatorKey,
+                    path: "message-inbox",
+                    name: RouterConstants.messageInbox,
+                    builder: (context, state) => MessageInboxPage(),
+                    routes: [
+                      GoRoute(
+                        parentNavigatorKey: rootNavigatorKey,
+                        path: "message-archive/:username",
+                        name: RouterConstants.messageArchive,
+                        builder: (context, state) {
+                          String username = state.pathParameters["username"]!;
 
-                            return MessageArchivePage(
-                              username: username,
-                            );
-                          },
-                        )
-                      ]),
+                          return MessageArchivePage(
+                            username: username,
+                          );
+                        },
+                      )
+                    ],
+                  ),
                   GoRoute(
                     parentNavigatorKey: rootNavigatorKey,
                     path: "settings",
@@ -259,16 +260,19 @@ class AppRouterConfig {
                     builder: (context, state) => const SettingsPage(),
                     routes: [
                       GoRoute(
+                        parentNavigatorKey: rootNavigatorKey,
                         name: RouterConstants.mfaSetup,
                         path: "mfa-setup",
                         builder: (context, state) => const SetupMfaPage(),
                         routes: [
                           GoRoute(
+                            parentNavigatorKey: rootNavigatorKey,
                             name: RouterConstants.verifyMfa,
                             path: "verify-mfa",
                             builder: (context, state) => const VerifyMfaPage(),
                           ),
                           GoRoute(
+                            parentNavigatorKey: rootNavigatorKey,
                             name: RouterConstants.updatePassword,
                             path: "change-password",
                             builder: (context, state) =>
@@ -279,11 +283,13 @@ class AppRouterConfig {
                     ],
                   ),
                   GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
                     name: RouterConstants.token,
                     path: "tokens",
                     builder: (context, state) => const TokenPage(),
                   ),
                   GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
                     name: RouterConstants.createPost,
                     path: "/create-post",
                     builder: (context, state) => const CreatePostPage(),
