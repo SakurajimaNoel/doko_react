@@ -79,9 +79,23 @@ class UserGraph {
     /// create list of individual post items key
     /// to store it in user posts
     List<String> postKeys = newPosts.map((postItem) {
+      /// check if post already exists
+      /// if already exists than just update meta data
       String postKey = generatePostNodeKey(postItem.id);
+      PostEntity postToAdd;
+      if (containsKey(postKey)) {
+        final existsPost = getValueByKey(postKey)! as PostEntity;
+
+        existsPost.updateCommentsCount(postItem.commentsCount);
+        existsPost.updateUserLikes(postItem.userLike, postItem.likesCount);
+
+        postToAdd = existsPost;
+      } else {
+        postToAdd = postItem;
+      }
+
       // adding post entity
-      tempMap[postKey] = postItem;
+      tempMap[postKey] = postToAdd;
 
       return postKey;
     }).toList();
