@@ -1,4 +1,5 @@
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -21,6 +22,17 @@ class PostPreviewWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final graph = UserGraph();
     final currTheme = Theme.of(context).colorScheme;
+
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
+    if (!graph.containsKey(postKey)) {
+      // send a req to fetch the post
+      context.read<UserActionBloc>().add(UserActionGetPostByIdEvent(
+            username: username,
+            postId: getPostIdFromPostKey(postKey),
+          ));
+    }
 
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {

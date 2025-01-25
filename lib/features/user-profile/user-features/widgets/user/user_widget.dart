@@ -80,12 +80,22 @@ class UserWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentUserKey = generateUserNodeKey(
-        (context.read<UserBloc>().state as UserCompleteState).username);
+    final currentUser =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+    final currentUserKey = generateUserNodeKey(currentUser);
 
     double gapScale = small ? 0.75 : 1;
     final username = getUsernameFromUserKey(userKey);
     final currTheme = Theme.of(context).colorScheme;
+
+    final UserGraph graph = UserGraph();
+    if (!graph.containsKey(userKey)) {
+      // send a req to fetch this user
+      context.read<UserActionBloc>().add(UserActionGetUserByUsernameEvent(
+            username: username,
+            currentUser: currentUser,
+          ));
+    }
 
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
