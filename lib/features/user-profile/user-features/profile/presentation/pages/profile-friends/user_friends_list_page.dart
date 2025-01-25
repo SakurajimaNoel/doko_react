@@ -31,8 +31,6 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
   late final bool self;
 
   final TextEditingController queryController = TextEditingController();
-
-  late final CompleteUserEntity user;
   late final String graphKey;
   final graph = UserGraph();
 
@@ -48,11 +46,6 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
 
     self = username == currentUsername;
     graphKey = generateUserNodeKey(username);
-
-    /// map makes data by reference so no need to refetch the data
-    /// just need to trigger rebuild when data is updated
-    /// and latest data will be shown in the feed
-    user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
   }
 
   void showMessage(String message) {
@@ -66,6 +59,7 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
   }
 
   Widget buildFriendItems(BuildContext context, int index) {
+    final user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
     final Nodes userFriends = user.friends;
 
     if (index >= userFriends.items.length) {
@@ -149,6 +143,7 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
               }
 
               // handle friends load success
+              final user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
               final Nodes userFriends = user.friends;
 
               context.read<UserActionBloc>().add(UserActionFriendLoadEvent(
@@ -216,6 +211,8 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
                             (self || state.username == username));
                   },
                   builder: (context, state) {
+                    final user =
+                        graph.getValueByKey(graphKey)! as CompleteUserEntity;
                     final Nodes userFriends = user.friends;
 
                     if (userFriends.items.isEmpty) {
