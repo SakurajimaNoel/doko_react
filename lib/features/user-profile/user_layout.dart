@@ -197,9 +197,10 @@ class _UserLayoutState extends State<UserLayout> {
   }
 
   Future<void> connectWS() async {
-    context.read<WebsocketClientProvider>().addClient(client);
     await client.connect();
     showSuccess("Connected to websocket server.");
+    if (!mounted) return;
+    context.read<WebsocketClientProvider>().addClient(client);
   }
 
   void showNewMessageNotification(ChatMessage message, String userKey) {
