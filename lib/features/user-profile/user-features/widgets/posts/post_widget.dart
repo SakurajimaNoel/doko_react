@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
@@ -7,6 +8,7 @@ import 'package:doko_react/core/helpers/extension/go_router_extension.dart';
 import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/widgets/like-widget/like_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/share/share.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/core/widgets/video-player/video_player.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -18,7 +20,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PostWidget extends StatelessWidget {
@@ -465,10 +466,15 @@ class _PostActionState extends State<_PostAction> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Share.share(
-                            "https://doki.com/post/${post.id}",
-                            subject: "Check this post on doki.",
+                          Share.shareOptions(
+                            context: context,
+                            subject: MessageSubject.dokiPost,
+                            nodeIdentifier: post.id,
                           );
+                          // Share.share(
+                          //   "https://doki.com/post/${post.id}",
+                          //   subject: "Check this post on doki.",
+                          // );
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: currTheme.secondary,

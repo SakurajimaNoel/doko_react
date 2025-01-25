@@ -33,12 +33,15 @@ class _ArchiveTextState extends State<_ArchiveText> {
     }
 
     return WidgetSpan(
-      child: InkWell(
-        onLongPress: onLongPress,
-        onTap: onTap,
-        child: Text(
-          str,
-          style: style,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onLongPress: onLongPress,
+          onTap: onTap,
+          child: Text(
+            str,
+            style: style,
+          ),
         ),
       ),
     );
