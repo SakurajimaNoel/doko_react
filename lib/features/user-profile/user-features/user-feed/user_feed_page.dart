@@ -182,36 +182,25 @@ class _ShareWidget extends StatefulWidget {
 class _ShareWidgetState extends State<_ShareWidget> {
   List<String> selectedUsers = [];
   bool loading = false;
-  final FocusNode focusNode = FocusNode();
   final UserGraph graph = UserGraph();
   late final String username;
   late final String graphKey;
+  final TextEditingController queryController = TextEditingController();
+
+  List<String> tempSearchResults = [];
 
   @override
   void initState() {
     super.initState();
 
-    focusNode.addListener(handleFocus);
     username = (context.read<UserBloc>().state as UserCompleteState).username;
 
     graphKey = generateUserNodeKey(username);
   }
 
-  void handleFocus() {
-    final viewPortHeight = MediaQuery.sizeOf(context).height;
-    if (focusNode.hasFocus) {
-      widget.controller.animateTo(
-        viewPortHeight,
-        curve: Curves.easeIn,
-        duration: const Duration(milliseconds: 300),
-      );
-    }
-  }
-
   @override
   void dispose() {
-    focusNode.removeListener(handleFocus);
-    focusNode.dispose();
+    queryController.dispose();
     super.dispose();
   }
 
@@ -235,11 +224,28 @@ class _ShareWidgetState extends State<_ShareWidget> {
     NiceOverlay.showToast(toast);
   }
 
-  Widget buildFriendItems(BuildContext context, int index) {
+  void onUserSelect(String username) {
+    int selectedLength = selectedUsers.length;
+    bool selected = selectedUsers.contains(username);
+    if (selected) {
+      selectedUsers.remove(username);
+    } else {
+      if (selectedLength < Constants.shareLimit) {
+        selectedUsers.add(username);
+      } else {
+        showInfo("You can send up to ${Constants.shareLimit} users at a time.");
+      }
+    }
+
+    setState(() {});
+  }
+
+  Widget buildFriendItems(
+      BuildContext context, int index, List<String> displayFriends) {
     final user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
     final Nodes userFriends = user.friends;
 
-    if (index >= userFriends.items.length) {
+    if (index >= displayFriends.length) {
       /// fetch more friends if exits
       if (!userFriends.pageInfo.hasNextPage) {
         return const SizedBox.shrink();
@@ -262,13 +268,294 @@ class _ShareWidgetState extends State<_ShareWidget> {
       );
     }
 
+    final userKey = displayFriends[index];
+    bool isSelected = selectedUsers.contains(
+      getUsernameFromUserKey(userKey),
+    );
+
+    return _ShareItem(
+      userKey: userKey,
+      onUserSelect: onUserSelect,
+      isSelected: isSelected,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height;
+    final width = MediaQuery.sizeOf(context).width;
+
+    final itemSize = 105;
+
+    final gridDelegate = SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: (width ~/ itemSize),
+      mainAxisSpacing: Constants.gap * 0.5,
+      crossAxisSpacing: Constants.gap * 0.5,
+    );
+
     final currTheme = Theme.of(context).colorScheme;
 
-    final userKey = userFriends.items[index];
-    final friendUsername = getUsernameFromUserKey(userKey);
+    final GetProfileInput details = GetProfileInput(
+      username: username,
+      currentUsername: username,
+    );
 
-    bool isSelected = selectedUsers.contains(friendUsername);
     int selectedLength = selectedUsers.length;
+    String sendText = selectedUsers.isEmpty
+        ? "Send"
+        : "Send to $selectedLength user${selectedLength > 1 ? "s" : ""}";
+
+    return SizedBox(
+      width: double.infinity,
+      child: BlocConsumer<ProfileBloc, ProfileState>(
+        listenWhen: (previousState, state) {
+          return state is ProfileFriendLoadResponse;
+        },
+        listener: (context, state) {
+          loading = false;
+          String errorMessage = "";
+
+          if (state is ProfileFriendLoadError) {
+            errorMessage = state.message;
+          }
+          if (state is ProfileUserSearchErrorState) {
+            errorMessage = state.message;
+          }
+
+          if (errorMessage.isNotEmpty) {
+            showError(errorMessage);
+            return;
+          }
+
+          // handle friends load success
+          final user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
+          final Nodes userFriends = user.friends;
+
+          context.read<UserActionBloc>().add(UserActionFriendLoadEvent(
+                friendsCount: userFriends.items.length,
+                username: username,
+              ));
+        },
+        buildWhen: (previousState, state) {
+          return state is! ProfileFriendLoadResponse;
+        },
+        builder: (context, state) {
+          bool searching = state is ProfileUserSearchLoadingState;
+          bool searchResult = state is ProfileUserSearchSuccessState &&
+              queryController.text.trim().isNotEmpty;
+          if (searchResult) {
+            tempSearchResults = state.searchResults;
+          }
+          List<String> searchDisplay = tempSearchResults.toList();
+          searchDisplay.removeWhere(
+            (String userKey) =>
+                selectedUsers.contains(
+                  getUsernameFromUserKey(userKey),
+                ) ||
+                username == getUsernameFromUserKey(userKey),
+          );
+
+          if (state is ProfileLoading || state is ProfileInitial) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (state is ProfileError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  StyledText.error(state.message),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<ProfileBloc>().add(GetUserProfileEvent(
+                            userDetails: details,
+                          ));
+                    },
+                    child: const Text("Retry"),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
+          final Nodes userFriends = user.friends;
+
+          List<String> displayFriends = userFriends.items.toList();
+          displayFriends.removeWhere(
+            (String userKey) => selectedUsers.contains(
+              getUsernameFromUserKey(userKey),
+            ),
+          );
+
+          return Column(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(Constants.padding),
+                  child: CustomScrollView(
+                    cacheExtent: height,
+                    controller: widget.controller,
+                    slivers: [
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: _SliverAppBarDelegate(
+                          Stack(
+                            alignment: AlignmentDirectional.centerEnd,
+                            children: [
+                              TextField(
+                                controller: queryController,
+                                minLines: 1,
+                                maxLines: 4,
+                                onChanged: (String value) {
+                                  if (value.isEmpty) {
+                                    setState(() {});
+                                    return;
+                                  }
+
+                                  UserSearchInput searchDetails =
+                                      UserSearchInput(
+                                    username: username,
+                                    query: value,
+                                  );
+
+                                  context
+                                      .read<ProfileBloc>()
+                                      .add(UserSearchEvent(
+                                        searchDetails: searchDetails,
+                                      ));
+                                },
+                                decoration: const InputDecoration(
+                                  hintText: "Search users by name or username",
+                                ),
+                              ),
+                              if (searching) const SmallLoadingIndicator(),
+                              if (!searching && state is! ProfileInitial)
+                                Icon(
+                                  Icons.check,
+                                  color: currTheme.primary,
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: Constants.gap,
+                        ),
+                      ),
+                      if (selectedUsers.isNotEmpty)
+                        SliverGrid.builder(
+                          gridDelegate: gridDelegate,
+                          itemCount: selectedUsers.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final username = selectedUsers[index];
+
+                            return _ShareItem(
+                              userKey: generateUserNodeKey(username),
+                              onUserSelect: onUserSelect,
+                              isSelected: selectedUsers.contains(username),
+                            );
+                          },
+                        ),
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: Constants.gap * 0.5,
+                        ),
+                      ),
+                      searchResult
+                          ? tempSearchResults.isEmpty
+                              ? SliverToBoxAdapter(
+                                  child: Center(
+                                    child: Text(
+                                        "No user found with \"${queryController.text.trim()}\""),
+                                  ),
+                                )
+                              : SliverGrid.builder(
+                                  gridDelegate: gridDelegate,
+                                  itemCount: searchDisplay.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    final userKey = searchDisplay[index];
+                                    bool isSelected = selectedUsers.contains(
+                                      getUsernameFromUserKey(userKey),
+                                    );
+
+                                    return _ShareItem(
+                                      userKey: userKey,
+                                      onUserSelect: onUserSelect,
+                                      isSelected: isSelected,
+                                    );
+                                  },
+                                )
+                          : userFriends.items.isEmpty
+                              ? SliverToBoxAdapter(
+                                  child: Center(
+                                    child: Text(
+                                      "You don't have friends right now.",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : SliverGrid.builder(
+                                  gridDelegate: gridDelegate,
+                                  itemCount: displayFriends.length + 1,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return buildFriendItems(
+                                        context, index, displayFriends);
+                                  },
+                                ),
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: Constants.gap,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(Constants.padding),
+                child: FilledButton(
+                  onPressed: selectedUsers.isEmpty ? null : () {},
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(
+                      Constants.buttonWidth,
+                      Constants.buttonHeight,
+                    ),
+                  ),
+                  child: Text(sendText),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ShareItem extends StatelessWidget {
+  const _ShareItem({
+    super.key,
+    required this.userKey,
+    required this.onUserSelect,
+    required this.isSelected,
+  });
+
+  final String userKey;
+  final bool isSelected;
+  final ValueSetter<String> onUserSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final currTheme = Theme.of(context).colorScheme;
+    final friendUsername = getUsernameFromUserKey(userKey);
 
     return Container(
       padding: EdgeInsets.all(Constants.padding * 0.25),
@@ -282,19 +569,7 @@ class _ShareWidgetState extends State<_ShareWidget> {
       ),
       child: GestureDetector(
         onTap: () {
-          bool selected = selectedUsers.contains(friendUsername);
-          if (selected) {
-            selectedUsers.remove(friendUsername);
-          } else {
-            if (selectedLength < Constants.shareLimit) {
-              selectedUsers.add(friendUsername);
-            } else {
-              showInfo(
-                  "You can send up to ${Constants.shareLimit} users at a time.");
-            }
-          }
-
-          setState(() {});
+          onUserSelect(friendUsername);
         },
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -320,134 +595,31 @@ class _ShareWidgetState extends State<_ShareWidget> {
       ),
     );
   }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final Widget _widget;
+
+  _SliverAppBarDelegate(this._widget);
 
   @override
-  Widget build(BuildContext context) {
-    final viewPortHeight = MediaQuery.sizeOf(context).height;
+  double get minExtent => 48;
 
-    final GetProfileInput details = GetProfileInput(
-      username: username,
-      currentUsername: username,
-    );
+  @override
+  double get maxExtent => 48;
 
-    int selectedLength = selectedUsers.length;
-    String sendText = selectedUsers.isEmpty
-        ? "Send"
-        : "Send to $selectedLength user${selectedLength > 1 ? "s" : ""}";
-
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final currTheme = Theme.of(context).colorScheme;
     return Container(
-      padding: EdgeInsets.all(Constants.padding),
-      width: double.infinity,
-      child: Column(
-        spacing: Constants.gap * 1.5,
-        children: [
-          TextField(
-            focusNode: focusNode,
-            minLines: 1,
-            maxLines: 4,
-            decoration: const InputDecoration(
-              hintText: "Search users by name or username",
-            ),
-          ),
-          Expanded(
-            child: LayoutBuilder(builder: (context, constraints) {
-              final width = constraints.maxWidth;
-              final itemSize = 105;
-
-              return BlocConsumer<ProfileBloc, ProfileState>(
-                listenWhen: (previousState, state) {
-                  return state is ProfileFriendLoadResponse;
-                },
-                listener: (context, state) {
-                  loading = false;
-                  String errorMessage = "";
-
-                  if (state is ProfileFriendLoadError) {
-                    errorMessage = state.message;
-                  }
-                  if (state is ProfileUserSearchErrorState) {
-                    errorMessage = state.message;
-                  }
-
-                  if (errorMessage.isNotEmpty) {
-                    showError(errorMessage);
-                    return;
-                  }
-
-                  // handle friends load success
-                  final user =
-                      graph.getValueByKey(graphKey)! as CompleteUserEntity;
-                  final Nodes userFriends = user.friends;
-
-                  context.read<UserActionBloc>().add(UserActionFriendLoadEvent(
-                        friendsCount: userFriends.items.length,
-                        username: username,
-                      ));
-                },
-                buildWhen: (previousState, state) {
-                  return state is! ProfileFriendLoadResponse;
-                },
-                builder: (context, state) {
-                  if (state is ProfileLoading || state is ProfileInitial) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-
-                  if (state is ProfileError) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          StyledText.error(state.message),
-                          ElevatedButton(
-                            onPressed: () {
-                              context
-                                  .read<ProfileBloc>()
-                                  .add(GetUserProfileEvent(
-                                    userDetails: details,
-                                  ));
-                            },
-                            child: const Text("Retry"),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  final user =
-                      graph.getValueByKey(graphKey)! as CompleteUserEntity;
-                  final Nodes userFriends = user.friends;
-
-                  return GridView.builder(
-                    controller: widget.controller,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: (width ~/ itemSize),
-                      mainAxisSpacing: Constants.gap * 0.5,
-                      crossAxisSpacing: Constants.gap * 0.5,
-                    ),
-                    cacheExtent: viewPortHeight,
-                    itemCount: userFriends.items.length + 1,
-                    itemBuilder: buildFriendItems,
-                  );
-                },
-              );
-            }),
-          ),
-          SizedBox(
-            child: FilledButton(
-              onPressed: selectedUsers.isEmpty ? null : () {},
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(
-                  Constants.buttonWidth,
-                  Constants.buttonHeight,
-                ),
-              ),
-              child: Text(sendText),
-            ),
-          ),
-        ],
-      ),
+      color: currTheme.surfaceContainerLow,
+      child: _widget,
     );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return true;
   }
 }

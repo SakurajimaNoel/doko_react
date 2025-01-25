@@ -314,14 +314,16 @@ class UserWidget extends StatelessWidget {
             fontSize: Constants.smallFontSize * nameScale,
           ),
         ),
-        if (!share)
-          Text(
+        Text(
+          trimText(
             "@${user.username}",
-            style: TextStyle(
-              fontSize: Constants.smallFontSize * usernameScale,
-              fontWeight: FontWeight.w600,
-            ),
+            len: share ? 12 : 50,
           ),
+          style: TextStyle(
+            fontSize: Constants.smallFontSize * usernameScale,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
   }
