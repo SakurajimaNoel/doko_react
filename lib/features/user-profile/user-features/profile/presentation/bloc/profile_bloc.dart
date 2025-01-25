@@ -166,6 +166,15 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           emit(ProfileSuccess());
           return;
         }
+
+        if (user is! CompleteUserEntity) {
+          // if user is not complete user entity
+          add(GetUserProfileEvent(
+            userDetails: event.userDetails,
+            indirect: true,
+          ));
+          return;
+        }
       } else {
         // if user doesn't exist first fetch user
         add(GetUserProfileEvent(
