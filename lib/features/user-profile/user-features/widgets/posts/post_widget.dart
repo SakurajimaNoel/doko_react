@@ -5,6 +5,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/helpers/extension/go_router_extension.dart';
 import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
+import 'package:doko_react/core/widgets/like-widget/like_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/core/widgets/video-player/video_player.dart';
@@ -341,22 +342,8 @@ class _PostAction extends StatefulWidget {
   State<_PostAction> createState() => _PostActionState();
 }
 
-class _PostActionState extends State<_PostAction>
-    with SingleTickerProviderStateMixin {
+class _PostActionState extends State<_PostAction> {
   final UserGraph graph = UserGraph();
-  late final AnimationController controller = AnimationController(
-    duration: const Duration(
-      milliseconds: 200,
-    ),
-    vsync: this,
-    value: 1.0,
-  );
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -422,48 +409,18 @@ class _PostActionState extends State<_PostAction>
                         spacing: Constants.gap * shrinkFactor -
                             (superShrink ? 0.9 : 0),
                         children: [
-                          ScaleTransition(
-                            scale: Tween(begin: 1.25, end: 1.0).animate(
-                              CurvedAnimation(
-                                parent: controller,
-                                curve: Curves.easeOut,
-                              ),
-                            ),
-                            child: IconButton(
-                              onPressed: () {
-                                if (!post.userLike) {
-                                  controller
-                                      .reverse()
-                                      .then((value) => controller.forward());
-                                }
-
-                                context
-                                    .read<UserActionBloc>()
-                                    .add(UserActionPostLikeActionEvent(
-                                      postId: post.id,
-                                      userLike: !post.userLike,
-                                      username: username,
-                                    ));
-                              },
-                              style: IconButton.styleFrom(
-                                minimumSize: Size.zero,
-                                padding:
-                                    EdgeInsets.all(Constants.padding * 0.5),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              icon: post.userLike
-                                  ? Icon(
-                                      Icons.thumb_up,
-                                      color: currTheme.primary,
-                                      size: Constants.iconButtonSize *
-                                          shrinkFactor,
-                                    )
-                                  : Icon(
-                                      Icons.thumb_up_outlined,
-                                      size: Constants.iconButtonSize *
-                                          shrinkFactor,
-                                    ),
-                            ),
+                          LikeWidget(
+                            shrinkFactor: shrinkFactor,
+                            onPress: () {
+                              context
+                                  .read<UserActionBloc>()
+                                  .add(UserActionPostLikeActionEvent(
+                                    postId: post.id,
+                                    userLike: !post.userLike,
+                                    username: username,
+                                  ));
+                            },
+                            userLike: post.userLike,
                           ),
                           TextButton(
                             onPressed: () {
@@ -508,7 +465,6 @@ class _PostActionState extends State<_PostAction>
                       ),
                       TextButton(
                         onPressed: () {
-                          // todo : allow sending to user chat
                           Share.share(
                             "https://doki.com/post/${post.id}",
                             subject: "Check this post on doki.",

@@ -84,7 +84,7 @@ class Constants {
   );
 
   // icon size
-  static const double iconButtonSize = _root * 1.5;
+  static const double iconButtonSize = _root * 2.5;
   static const double dividerThickness = _root * 0.125;
 
   // scroll offset

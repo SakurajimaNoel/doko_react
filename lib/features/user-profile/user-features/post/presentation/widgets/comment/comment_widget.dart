@@ -6,6 +6,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
+import 'package:doko_react/core/widgets/like-widget/like_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -301,28 +302,13 @@ class _CommentActions extends StatefulWidget {
   State<_CommentActions> createState() => _CommentActionsState();
 }
 
-class _CommentActionsState extends State<_CommentActions>
-    with SingleTickerProviderStateMixin {
+class _CommentActionsState extends State<_CommentActions> {
   final UserGraph graph = UserGraph();
 
   late final String commentId = widget.commentId;
   late final String commentKey = generateCommentNodeKey(commentId);
   late final String username =
       (context.read<UserBloc>().state as UserCompleteState).username;
-
-  late final AnimationController controller = AnimationController(
-    duration: const Duration(
-      milliseconds: 200,
-    ),
-    vsync: this,
-    value: 1.0,
-  );
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -346,45 +332,18 @@ class _CommentActionsState extends State<_CommentActions>
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    ScaleTransition(
-                      scale: Tween(begin: 1.25, end: 1.0).animate(
-                        CurvedAnimation(
-                          parent: controller,
-                          curve: Curves.easeOut,
-                        ),
-                      ),
-                      child: IconButton(
-                        onPressed: () {
-                          if (!comment.userLike) {
-                            controller
-                                .reverse()
-                                .then((value) => controller.forward());
-                          }
-
-                          context
-                              .read<UserActionBloc>()
-                              .add(UserActionCommentLikeActionEvent(
-                                commentId: comment.id,
-                                userLike: !comment.userLike,
-                                username: username,
-                              ));
-                        },
-                        style: IconButton.styleFrom(
-                          minimumSize: Size.zero,
-                          padding: EdgeInsets.all(Constants.padding * 0.5),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        iconSize: Constants.iconButtonSize * 0.75,
-                        icon: comment.userLike
-                            ? Icon(
-                                Icons.thumb_up,
-                                color: currTheme.primary,
-                              )
-                            : Icon(
-                                Icons.thumb_up_outlined,
-                                color: currTheme.secondary,
-                              ),
-                      ),
+                    LikeWidget(
+                      onPress: () {
+                        context
+                            .read<UserActionBloc>()
+                            .add(UserActionCommentLikeActionEvent(
+                              commentId: comment.id,
+                              userLike: !comment.userLike,
+                              username: username,
+                            ));
+                      },
+                      userLike: comment.userLike,
+                      shrinkFactor: 0.85,
                     ),
                     const SizedBox(
                       width: Constants.gap * 0.125,
