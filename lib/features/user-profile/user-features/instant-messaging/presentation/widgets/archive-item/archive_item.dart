@@ -199,7 +199,7 @@ class _AddDayToast extends StatelessWidget {
               color: currTheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(Constants.radius),
             ),
-            child: Text(displayDateDifference(date)),
+            child: Text(formatDateToWeekDays(date)),
           ),
         ),
         const SizedBox(
