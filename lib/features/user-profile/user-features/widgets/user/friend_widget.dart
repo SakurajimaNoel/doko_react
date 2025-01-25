@@ -16,51 +16,53 @@ class FriendWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      bool shrink = constraints.maxWidth < 320;
-      bool superShrink = constraints.maxWidth < 290;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool shrink = constraints.maxWidth < 320;
+        bool superShrink = constraints.maxWidth < 290;
 
-      double shrinkFactor = shrink ? 0.75 : 1;
+        double shrinkFactor = shrink ? 0.75 : 1;
 
-      return ListTile(
-        onTap: () {
-          context.pushNamed(
-            RouterConstants.userProfile,
-            pathParameters: {
-              "username": getUsernameFromUserKey(userKey),
-            },
-          );
-        },
-        minVerticalPadding: Constants.padding * 0.75,
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: Constants.padding,
-        ),
-        leading: shrink
-            ? UserWidget.avtarSmall(
-                key: ValueKey("$userKey-small-avtar"),
-                userKey: userKey,
-              )
-            : UserWidget.avtar(
-                userKey: userKey,
-              ),
-        trailing: superShrink
-            ? null
-            : Transform.scale(
-                scale: shrinkFactor,
-                child: UserToUserRelationWidget(
-                  username: getUsernameFromUserKey(userKey),
-                  key: ValueKey("${userKey}_relation"),
+        return ListTile(
+          onTap: () {
+            context.pushNamed(
+              RouterConstants.userProfile,
+              pathParameters: {
+                "username": getUsernameFromUserKey(userKey),
+              },
+            );
+          },
+          minVerticalPadding: Constants.padding * 0.75,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: Constants.padding,
+          ),
+          leading: shrink
+              ? UserWidget.avtarSmall(
+                  key: ValueKey("$userKey-small-avtar"),
+                  userKey: userKey,
+                )
+              : UserWidget.avtar(
+                  userKey: userKey,
                 ),
-              ),
-        title: shrink
-            ? UserWidget.infoSmall(
-                key: ValueKey("$userKey-user-info-small"),
-                userKey: userKey,
-              )
-            : UserWidget.info(
-                userKey: userKey,
-              ),
-      );
-    });
+          trailing: superShrink
+              ? null
+              : Transform.scale(
+                  scale: shrinkFactor,
+                  child: UserToUserRelationWidget(
+                    username: getUsernameFromUserKey(userKey),
+                    key: ValueKey("${userKey}_relation"),
+                  ),
+                ),
+          title: shrink
+              ? UserWidget.infoSmall(
+                  key: ValueKey("$userKey-user-info-small"),
+                  userKey: userKey,
+                )
+              : UserWidget.info(
+                  userKey: userKey,
+                ),
+        );
+      },
+    );
   }
 }

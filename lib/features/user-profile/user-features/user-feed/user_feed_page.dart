@@ -19,6 +19,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
   Widget build(BuildContext context) {
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
+    final currTheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -41,6 +42,15 @@ class _UserFeedPageState extends State<UserFeedPage> {
               context.pushNamed(RouterConstants.pendingRequests);
             },
             icon: const Icon(Icons.person),
+          ),
+          IconButton(
+            onPressed: () {
+              context.pushNamed(RouterConstants.messageInbox);
+            },
+            icon: Icon(
+              Icons.mark_chat_unread,
+              color: currTheme.primary,
+            ),
           ),
         ],
       ),
