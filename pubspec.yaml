@@ -57,6 +57,7 @@ dependencies:
   flutter_fgbg: ^0.6.0
   internet_connection_checker: ^3.0.1
   nice_overlay: ^1.0.1
+  lottie: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -87,6 +88,8 @@ flutter:
     - assets/logo.svg
     - assets/logo.png
     - .env
+    - assets/media-animation.lottie
+    - assets/like-animation.lottie
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
