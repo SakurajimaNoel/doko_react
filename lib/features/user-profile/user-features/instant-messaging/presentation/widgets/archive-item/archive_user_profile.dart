@@ -20,6 +20,14 @@ class _ArchiveUserProfile extends StatelessWidget {
     ChatMessage message = entity.message;
     bool self = username == message.from;
 
+    Widget type = Text(
+      "USER PROFILE",
+      style: TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: Constants.smallFontSize,
+      ),
+    );
+
     return Column(
       spacing: Constants.gap * 0.5,
       crossAxisAlignment:
@@ -46,9 +54,16 @@ class _ArchiveUserProfile extends StatelessWidget {
         UserWidget.preview(
           userKey: generateUserNodeKey(message.body),
         ),
-        Text(
-          formatDateTimeToTimeString(message.sendAt),
-          style: metaDataStyle,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            if (self) type,
+            Text(
+              formatDateTimeToTimeString(message.sendAt),
+              style: metaDataStyle,
+            ),
+            if (!self) type
+          ],
         ),
       ],
     );

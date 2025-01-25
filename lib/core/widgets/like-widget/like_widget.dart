@@ -1,6 +1,7 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/lottie/lottie_decoder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 
 class LikeWidget extends StatefulWidget {
@@ -55,6 +56,7 @@ class LikeWidgetState extends State<LikeWidget>
         if (widget.userLike) {
           controller.reset();
         } else {
+          HapticFeedback.vibrate();
           controller.forward();
         }
 

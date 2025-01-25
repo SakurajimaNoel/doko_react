@@ -22,7 +22,7 @@ class _ArchiveExternalResource extends StatelessWidget {
     final currTheme = Theme.of(context).colorScheme;
 
     Widget type = Text(
-      messagePreview(message),
+      "GIF / STICKER 🖼️",
       style: TextStyle(
         fontWeight: FontWeight.w600,
         fontSize: Constants.smallFontSize,

@@ -76,7 +76,6 @@ class _UserLayoutState extends State<UserLayout> {
     });
 
     final realTimeBloc = context.read<RealTimeBloc>();
-    final UserGraph graph = UserGraph();
 
     // create websocket client
     client = Client(
@@ -212,6 +211,9 @@ class _UserLayoutState extends State<UserLayout> {
       return;
     }
 
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
     final inAppNotification = createNewNotification(
       leading: UserWidget.avtar(
         userKey: userKey,
@@ -219,7 +221,7 @@ class _UserLayoutState extends State<UserLayout> {
       title: UserWidget.infoSmall(
         userKey: userKey,
       ),
-      body: Text(messagePreview(message)),
+      body: Text(messagePreview(message, username)),
       trailing: Text(
         displayDateDifference(message.sendAt),
         style: TextStyle(

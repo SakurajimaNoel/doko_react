@@ -22,6 +22,14 @@ class _ArchivePost extends StatelessWidget {
     ChatMessage message = entity.message;
     bool self = username == message.from;
 
+    Widget type = Text(
+      "POST",
+      style: TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: Constants.smallFontSize,
+      ),
+    );
+
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -51,27 +59,37 @@ class _ArchivePost extends StatelessWidget {
                 ),
                 Align(
                   alignment: Alignment.topLeft,
-                  child: InkWell(
-                    onTap: () {
-                      context.pushNamed(
-                        RouterConstants.userPost,
-                        pathParameters: {
-                          "postId": message.body,
-                        },
-                      );
-                    },
-                    onLongPress: () {},
-                    child: Text(
-                      "Check this post and its comments.",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        context.pushNamed(
+                          RouterConstants.userPost,
+                          pathParameters: {
+                            "postId": message.body,
+                          },
+                        );
+                      },
+                      onLongPress: () {},
+                      child: Text(
+                        "Check this post out!",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),
                 ),
-                Text(
-                  formatDateTimeToTimeString(message.sendAt),
-                  style: metaDataStyle,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (self) type,
+                    Text(
+                      formatDateTimeToTimeString(message.sendAt),
+                      style: metaDataStyle,
+                    ),
+                    if (!self) type
+                  ],
                 ),
               ],
             ),
