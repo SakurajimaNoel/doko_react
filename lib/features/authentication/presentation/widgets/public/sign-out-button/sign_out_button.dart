@@ -39,14 +39,24 @@ class _SignOutButtonState extends State<SignOutButton> {
         },
         listener: stateActions,
         builder: (context, state) {
-          return TextButton(
+          return FilledButton(
             onPressed: () {
               context.read<AuthenticationBloc>().add(LogoutEvent());
             },
+            style: FilledButton.styleFrom(
+              backgroundColor: currTheme.error,
+              minimumSize: Size.zero,
+              padding: EdgeInsets.symmetric(
+                vertical: Constants.padding * 0.5,
+                horizontal: Constants.padding * 0.75,
+              ),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
             child: Text(
               "Sign out",
               style: TextStyle(
-                color: currTheme.error,
+                color: currTheme.onError,
+                fontSize: Constants.smallFontSize,
               ),
             ),
           );

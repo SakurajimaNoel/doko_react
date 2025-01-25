@@ -108,35 +108,38 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   List<Widget> appBarActions() {
     if (!self) {
       return [
-        TextButton(
+        FilledButton.tonalIcon(
           onPressed: handleShare,
-          child: Text("Share"),
+          icon: const Icon(Icons.share),
+          label: Text("Share"),
         ),
       ];
     }
 
+    final currTheme = Theme.of(context).colorScheme;
     return [
-      IconButton(
+      IconButton.filledTonal(
         onPressed: () {
           context.pushNamed(RouterConstants.settings);
         },
-        icon: const Icon(Icons.settings),
+        icon: Icon(
+          Icons.settings,
+          color: currTheme.onPrimaryContainer,
+        ),
         tooltip: "Settings",
       ),
       const SignOutButton(),
-      const SizedBox(
-        width: Constants.padding,
-      ),
     ];
   }
 
   Widget userProfileAction(CompleteUserEntity user) {
     if (self) {
-      return Row(
+      return Wrap(
         spacing: Constants.gap * 2,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        alignment: WrapAlignment.spaceBetween,
+        runSpacing: Constants.gap * 2,
         children: [
-          FilledButton.tonalIcon(
+          FilledButton.icon(
             onPressed: () {
               // go to edit page
               context.pushNamed<String>(
@@ -146,9 +149,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             label: const Text("Edit"),
             icon: const Icon(Icons.edit_note),
           ),
-          TextButton(
+          FilledButton.tonalIcon(
             onPressed: handleShare,
-            child: Text("Share"),
+            icon: const Icon(Icons.share),
+            label: Text("Share"),
           ),
           ElevatedButton(
             onPressed: () {
@@ -351,7 +355,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                     top: Constants.padding * 2,
                                     bottom: Constants.padding,
                                     left: Constants.padding,
-                                    right: 0,
+                                    right: Constants.padding,
                                   ),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
@@ -380,6 +384,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                             size: Constants.heading4,
                                           ),
                                           Row(
+                                            spacing: Constants.gap,
                                             children: appBarActions(),
                                           ),
                                         ],
@@ -399,22 +404,24 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                             child: Stack(
                               fit: StackFit.loose,
                               children: [
-                                LayoutBuilder(builder: (context, constraints) {
-                                  if (constraints.maxWidth >
-                                      Constants.userRelationWidth) {
-                                    return UserToUserRelationWidget.label(
+                                LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    if (constraints.maxWidth >
+                                        Constants.userRelationWidth) {
+                                      return UserToUserRelationWidget.label(
+                                        username: username,
+                                        disabled: true,
+                                      );
+                                    }
+
+                                    return UserToUserRelationWidget(
+                                      key: ValueKey(
+                                          "$username-relation-without-label"),
                                       username: username,
                                       disabled: true,
                                     );
-                                  }
-
-                                  return UserToUserRelationWidget(
-                                    key: ValueKey(
-                                        "$username-relation-without-label"),
-                                    username: username,
-                                    disabled: true,
-                                  );
-                                }),
+                                  },
+                                ),
                                 Container(
                                   color: currTheme.surface.withValues(
                                     alpha: 0.75,
@@ -472,7 +479,17 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           color: currTheme.onSurface,
                           size: Constants.heading4,
                         ),
-                        actions: appBarActions(),
+                        actions: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                              right: Constants.padding,
+                            ),
+                            child: Row(
+                              spacing: Constants.gap,
+                              children: appBarActions(),
+                            ),
+                          ),
+                        ],
                         flexibleSpace: FlexibleSpaceBar(
                           background:
                               BlocBuilder<UserActionBloc, UserActionState>(
