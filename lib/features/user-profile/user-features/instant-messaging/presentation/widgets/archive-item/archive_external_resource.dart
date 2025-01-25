@@ -19,6 +19,16 @@ class _ArchiveExternalResource extends StatelessWidget {
     ChatMessage message = entity.message;
     bool self = username == message.from;
 
+    final currTheme = Theme.of(context).colorScheme;
+
+    Widget type = Text(
+      messagePreview(message),
+      style: TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: Constants.smallFontSize,
+      ),
+    );
+
     return LayoutBuilder(builder: (context, constraints) {
       return SizedBox(
         width: constraints.maxWidth,
@@ -30,6 +40,16 @@ class _ArchiveExternalResource extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Constants.radius),
+                boxShadow: [
+                  BoxShadow(
+                    color: currTheme.shadow.withValues(
+                      alpha: 0.25,
+                    ),
+                    spreadRadius: 0,
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
               ),
               clipBehavior: Clip.antiAlias,
               child: CachedNetworkImage(
@@ -48,9 +68,16 @@ class _ArchiveExternalResource extends StatelessWidget {
                 width: constraints.maxWidth,
               ),
             ),
-            Text(
-              formatDateTimeToTimeString(message.sendAt),
-              style: metaDataStyle,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (self) type,
+                Text(
+                  formatDateTimeToTimeString(message.sendAt),
+                  style: metaDataStyle,
+                ),
+                if (!self) type
+              ],
             ),
           ],
         ),

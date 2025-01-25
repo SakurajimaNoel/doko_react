@@ -137,7 +137,7 @@ class _ArchiveTextState extends State<_ArchiveText> {
       style: TextStyle(
         height: 1.25,
         wordSpacing: 1.25,
-        fontSize: Constants.fontSize * 0.9,
+        fontSize: Constants.fontSize,
         color: self ? currTheme.onPrimaryContainer : currTheme.onSurface,
       ),
       children: children,
@@ -162,50 +162,64 @@ class _ArchiveTextState extends State<_ArchiveText> {
         ChatMessage message = entity.message;
         bool self = message.from == username;
 
-        return ClipRRect(
-          borderRadius: const BorderRadius.all(
-            Radius.circular(
-              Constants.radius,
-            ),
-          ),
-          child: BubbleBackground(
-            colors: colors,
-            child: Column(
-              crossAxisAlignment:
-                  self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: Constants.padding * 0.75,
-                    right: Constants.padding * 0.75,
-                    top: Constants.padding * 0.75,
-                  ),
-                  child: RichText(
-                    text: buildMessageBody(message.body, currTheme, self),
-                  ),
+        return Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: currTheme.shadow.withValues(
+                  alpha: 0.25,
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: Constants.padding * 0.25,
-                    horizontal: Constants.padding * 0.75,
+                spreadRadius: 0,
+                blurRadius: 10,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(
+              Radius.circular(
+                Constants.radius,
+              ),
+            ),
+            child: BubbleBackground(
+              colors: colors,
+              child: Column(
+                crossAxisAlignment:
+                    self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: Constants.padding * 0.75,
+                      right: Constants.padding * 0.75,
+                      top: Constants.padding * 0.75,
+                    ),
+                    child: RichText(
+                      text: buildMessageBody(message.body, currTheme, self),
+                    ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: Constants.gap * 1.5,
-                    children: [
-                      Text(
-                        formatDateTimeToTimeString(message.sendAt),
-                        style: widget.metaDataStyle,
-                      ),
-                      if (entity.edited)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: Constants.padding * 0.25,
+                      horizontal: Constants.padding * 0.75,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: Constants.gap * 1.5,
+                      children: [
                         Text(
-                          "edited",
+                          formatDateTimeToTimeString(message.sendAt),
                           style: widget.metaDataStyle,
                         ),
-                    ],
+                        if (entity.edited)
+                          Text(
+                            "edited",
+                            style: widget.metaDataStyle,
+                          ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -262,6 +276,7 @@ class BubblePainter extends CustomPainter {
 
     final origin =
         bubbleBox.localToGlobal(Offset.zero, ancestor: scrollableBox);
+
     final paint = Paint()
       ..shader = ui.Gradient.linear(
         scrollableRect.topCenter,
@@ -271,6 +286,7 @@ class BubblePainter extends CustomPainter {
         TileMode.clamp,
         Matrix4.translationValues(-origin.dx, -origin.dy, 0.0).storage,
       );
+
     canvas.drawRect(Offset.zero & size, paint);
   }
 
