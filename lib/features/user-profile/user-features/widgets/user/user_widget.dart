@@ -3,6 +3,7 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
+import 'package:doko_react/core/helpers/display/display_helper.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
@@ -20,7 +21,8 @@ class UserWidget extends StatelessWidget {
   })  : small = false,
         profileOnly = false,
         textOnly = false,
-        preview = false;
+        preview = false,
+        share = false;
 
   const UserWidget.avtar({
     super.key,
@@ -28,7 +30,8 @@ class UserWidget extends StatelessWidget {
   })  : small = false,
         profileOnly = true,
         textOnly = false,
-        preview = false;
+        preview = false,
+        share = false;
 
   const UserWidget.info({
     super.key,
@@ -36,7 +39,8 @@ class UserWidget extends StatelessWidget {
   })  : small = false,
         profileOnly = false,
         textOnly = true,
-        preview = false;
+        preview = false,
+        share = false;
 
   const UserWidget.small({
     super.key,
@@ -44,7 +48,8 @@ class UserWidget extends StatelessWidget {
   })  : small = true,
         profileOnly = false,
         textOnly = false,
-        preview = false;
+        preview = false,
+        share = false;
 
   const UserWidget.avtarSmall({
     super.key,
@@ -52,7 +57,8 @@ class UserWidget extends StatelessWidget {
   })  : small = true,
         profileOnly = true,
         textOnly = false,
-        preview = false;
+        preview = false,
+        share = false;
 
   const UserWidget.infoSmall({
     super.key,
@@ -60,7 +66,8 @@ class UserWidget extends StatelessWidget {
   })  : small = true,
         profileOnly = false,
         textOnly = true,
-        preview = false;
+        preview = false,
+        share = false;
 
   const UserWidget.preview({
     super.key,
@@ -68,12 +75,32 @@ class UserWidget extends StatelessWidget {
   })  : small = false,
         profileOnly = false,
         textOnly = false,
-        preview = true;
+        preview = true,
+        share = false;
+
+  const UserWidget.avtarShare({
+    super.key,
+    required this.userKey,
+  })  : small = false,
+        profileOnly = true,
+        textOnly = false,
+        preview = false,
+        share = true;
+
+  const UserWidget.infoShare({
+    super.key,
+    required this.userKey,
+  })  : small = false,
+        profileOnly = false,
+        textOnly = true,
+        preview = false,
+        share = true;
 
   final String userKey;
   final bool small;
   final bool profileOnly;
   final bool textOnly;
+  final bool share;
 
   // highest priority and used in messages
   final bool preview;
@@ -272,22 +299,29 @@ class UserWidget extends StatelessWidget {
     double nameScale = small ? 1.1 : 1.2;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          share ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          user.name,
+          share
+              ? trimText(
+                  user.name,
+                  len: 12,
+                )
+              : user.name,
           style: TextStyle(
             fontSize: Constants.smallFontSize * nameScale,
           ),
         ),
-        Text(
-          "@${user.username}",
-          style: TextStyle(
-            fontSize: Constants.smallFontSize * usernameScale,
-            fontWeight: FontWeight.w600,
+        if (!share)
+          Text(
+            "@${user.username}",
+            style: TextStyle(
+              fontSize: Constants.smallFontSize * usernameScale,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
       ],
     );
   }
@@ -305,8 +339,13 @@ class UserWidget extends StatelessWidget {
   }
 
   Widget userAvtar(StorageResource profilePicture) {
-    double imageDiameter = 40;
-    double avtarRadius = small ? 17.5 : 20;
+    double radiusFactor = share
+        ? 2
+        : small
+            ? 1
+            : 1.25;
+    double avtarRadius = Constants.radius * radiusFactor;
+    double imageDiameter = avtarRadius * 2;
 
     if (profilePicture.bucketPath.isEmpty) {
       return CircleAvatar(

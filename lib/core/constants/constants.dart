@@ -92,4 +92,5 @@ class Constants {
 
   // instant messaging media
   static int archiveMedia = (_root * 25).round();
+  static const int shareLimit = 10;
 }
