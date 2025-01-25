@@ -185,7 +185,7 @@ class _MessageInputState extends State<MessageInput> {
                       if (messageBody.isEmpty) return;
 
                       if (client == null || !client.isActive) {
-                        showError("You are not connected.");
+                        showError("You are offline.");
                         return;
                       }
 
