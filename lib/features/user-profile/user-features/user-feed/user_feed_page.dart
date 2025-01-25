@@ -1,8 +1,6 @@
-import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
-import 'package:doko_react/core/widgets/share/share_widget.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
@@ -54,10 +52,6 @@ class _UserFeedPageState extends State<UserFeedPage> {
             children: [
               UserWidget.preview(
                 userKey: generateUserNodeKey(username),
-              ),
-              ShareWidget(
-                subject: MessageSubject.dokiUser,
-                nodeIdentifier: "rohan_verma__",
               ),
             ],
           ),

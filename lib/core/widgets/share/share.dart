@@ -21,22 +21,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nice_overlay/nice_overlay.dart';
 
-class ShareWidget extends StatefulWidget {
-  const ShareWidget({
+class Share extends StatelessWidget {
+  const Share({
     super.key,
-    required this.subject,
-    required this.nodeIdentifier,
   });
 
-  final MessageSubject subject;
-  final String nodeIdentifier;
-
-  @override
-  State<ShareWidget> createState() => ShareWidgetState();
-}
-
-class ShareWidgetState extends State<ShareWidget> {
-  void shareOptions() {
+  static void shareOptions({
+    required BuildContext context,
+    required MessageSubject subject,
+    required String nodeIdentifier,
+  }) {
     showModalBottomSheet(
       useRootNavigator: true,
       context: context,
@@ -49,21 +43,24 @@ class ShareWidgetState extends State<ShareWidget> {
           minChildSize: 0.5,
           builder: (BuildContext context, ScrollController controller) {
             final username =
-                (context.read<UserBloc>().state as UserCompleteState).username;
+                (context
+                    .read<UserBloc>()
+                    .state as UserCompleteState).username;
             final GetProfileInput details = GetProfileInput(
               username: username,
               currentUsername: username,
             );
 
             return BlocProvider(
-              create: (context) => serviceLocator<ProfileBloc>()
+              create: (context) =>
+              serviceLocator<ProfileBloc>()
                 ..add(GetUserFriendsEvent(
                   userDetails: details,
                 )),
               child: _ShareDetails(
                 controller: controller,
-                subject: widget.subject,
-                nodeIdentifier: widget.nodeIdentifier,
+                subject: subject,
+                nodeIdentifier: nodeIdentifier,
               ),
             );
           },
@@ -74,12 +71,7 @@ class ShareWidgetState extends State<ShareWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        shareOptions();
-      },
-      child: Text("Share"),
-    );
+    return Text("Use static method \"Share options\" to allow sharing.");
   }
 }
 
@@ -112,7 +104,9 @@ class _ShareDetailsState extends State<_ShareDetails> {
   void initState() {
     super.initState();
 
-    username = (context.read<UserBloc>().state as UserCompleteState).username;
+    username = (context
+        .read<UserBloc>()
+        .state as UserCompleteState).username;
 
     graphKey = generateUserNodeKey(username);
   }
@@ -169,8 +163,8 @@ class _ShareDetailsState extends State<_ShareDetails> {
     setState(() {});
   }
 
-  Widget buildFriendItems(
-      BuildContext context, int index, List<String> displayFriends) {
+  Widget buildFriendItems(BuildContext context, int index,
+      List<String> displayFriends) {
     final user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
     final Nodes userFriends = user.friends;
 
@@ -184,12 +178,12 @@ class _ShareDetailsState extends State<_ShareDetails> {
       if (!loading) {
         loading = true;
         context.read<ProfileBloc>().add(LoadMoreProfileFriendsEvent(
-              friendDetails: UserProfileNodesInput(
-                username: username,
-                cursor: userFriends.pageInfo.endCursor!,
-                currentUsername: username,
-              ),
-            ));
+          friendDetails: UserProfileNodesInput(
+            username: username,
+            cursor: userFriends.pageInfo.endCursor!,
+            currentUsername: username,
+          ),
+        ));
       }
 
       return const Center(
@@ -211,8 +205,12 @@ class _ShareDetailsState extends State<_ShareDetails> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height;
-    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery
+        .sizeOf(context)
+        .height;
+    final width = MediaQuery
+        .sizeOf(context)
+        .width;
 
     final itemSize = 105;
 
@@ -222,7 +220,9 @@ class _ShareDetailsState extends State<_ShareDetails> {
       crossAxisSpacing: Constants.gap * 0.5,
     );
 
-    final currTheme = Theme.of(context).colorScheme;
+    final currTheme = Theme
+        .of(context)
+        .colorScheme;
 
     final GetProfileInput details = GetProfileInput(
       username: username,
@@ -261,9 +261,9 @@ class _ShareDetailsState extends State<_ShareDetails> {
           final Nodes userFriends = user.friends;
 
           context.read<UserActionBloc>().add(UserActionFriendLoadEvent(
-                friendsCount: userFriends.items.length,
-                username: username,
-              ));
+            friendsCount: userFriends.items.length,
+            username: username,
+          ));
         },
         buildWhen: (previousState, state) {
           return state is! ProfileFriendLoadResponse;
@@ -271,16 +271,18 @@ class _ShareDetailsState extends State<_ShareDetails> {
         builder: (context, state) {
           bool searching = state is ProfileUserSearchLoadingState;
           bool searchResult = state is ProfileUserSearchSuccessState &&
-              queryController.text.trim().isNotEmpty;
+              queryController.text
+                  .trim()
+                  .isNotEmpty;
           if (searchResult) {
             tempSearchResults = state.searchResults;
           }
           List<String> searchDisplay = tempSearchResults.toList();
           searchDisplay.removeWhere(
-            (String userKey) =>
-                selectedUsers.contains(
-                  getUsernameFromUserKey(userKey),
-                ) ||
+                (String userKey) =>
+            selectedUsers.contains(
+              getUsernameFromUserKey(userKey),
+            ) ||
                 username == getUsernameFromUserKey(userKey),
           );
 
@@ -299,8 +301,8 @@ class _ShareDetailsState extends State<_ShareDetails> {
                   ElevatedButton(
                     onPressed: () {
                       context.read<ProfileBloc>().add(GetUserProfileEvent(
-                            userDetails: details,
-                          ));
+                        userDetails: details,
+                      ));
                     },
                     child: const Text("Retry"),
                   ),
@@ -314,9 +316,10 @@ class _ShareDetailsState extends State<_ShareDetails> {
 
           List<String> displayFriends = userFriends.items.toList();
           displayFriends.removeWhere(
-            (String userKey) => selectedUsers.contains(
-              getUsernameFromUserKey(userKey),
-            ),
+                (String userKey) =>
+                selectedUsers.contains(
+                  getUsernameFromUserKey(userKey),
+                ),
           );
 
           return Column(
@@ -345,7 +348,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                   }
 
                                   UserSearchInput searchDetails =
-                                      UserSearchInput(
+                                  UserSearchInput(
                                     username: username,
                                     query: value,
                                   );
@@ -353,8 +356,8 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                   context
                                       .read<ProfileBloc>()
                                       .add(UserSearchEvent(
-                                        searchDetails: searchDetails,
-                                      ));
+                                    searchDetails: searchDetails,
+                                  ));
                                 },
                                 decoration: const InputDecoration(
                                   hintText: "Search users by name or username",
@@ -396,49 +399,50 @@ class _ShareDetailsState extends State<_ShareDetails> {
                       ),
                       searchResult
                           ? tempSearchResults.isEmpty
-                              ? SliverToBoxAdapter(
-                                  child: Center(
-                                    child: Text(
-                                        "No user found with \"${queryController.text.trim()}\""),
-                                  ),
-                                )
-                              : SliverGrid.builder(
-                                  gridDelegate: gridDelegate,
-                                  itemCount: searchDisplay.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    final userKey = searchDisplay[index];
-                                    bool isSelected = selectedUsers.contains(
-                                      getUsernameFromUserKey(userKey),
-                                    );
+                          ? SliverToBoxAdapter(
+                        child: Center(
+                          child: Text(
+                              "No user found with \"${queryController.text
+                                  .trim()}\""),
+                        ),
+                      )
+                          : SliverGrid.builder(
+                        gridDelegate: gridDelegate,
+                        itemCount: searchDisplay.length,
+                        itemBuilder:
+                            (BuildContext context, int index) {
+                          final userKey = searchDisplay[index];
+                          bool isSelected = selectedUsers.contains(
+                            getUsernameFromUserKey(userKey),
+                          );
 
-                                    return _ShareUserWidget(
-                                      userKey: userKey,
-                                      onUserSelect: onUserSelect,
-                                      isSelected: isSelected,
-                                    );
-                                  },
-                                )
+                          return _ShareUserWidget(
+                            userKey: userKey,
+                            onUserSelect: onUserSelect,
+                            isSelected: isSelected,
+                          );
+                        },
+                      )
                           : userFriends.items.isEmpty
-                              ? SliverToBoxAdapter(
-                                  child: Center(
-                                    child: Text(
-                                      "You don't have friends right now.",
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : SliverGrid.builder(
-                                  gridDelegate: gridDelegate,
-                                  itemCount: displayFriends.length + 1,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return buildFriendItems(
-                                        context, index, displayFriends);
-                                  },
-                                ),
+                          ? SliverToBoxAdapter(
+                        child: Center(
+                          child: Text(
+                            "You don't have friends right now.",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      )
+                          : SliverGrid.builder(
+                        gridDelegate: gridDelegate,
+                        itemCount: displayFriends.length + 1,
+                        itemBuilder:
+                            (BuildContext context, int index) {
+                          return buildFriendItems(
+                              context, index, displayFriends);
+                        },
+                      ),
                       SliverToBoxAdapter(
                         child: SizedBox(
                           height: Constants.gap,
@@ -454,56 +458,60 @@ class _ShareDetailsState extends State<_ShareDetails> {
                   onPressed: selectedUsers.isEmpty
                       ? null
                       : () {
-                          final client =
-                              context.read<WebsocketClientProvider>().client;
+                    final client =
+                        context
+                            .read<WebsocketClientProvider>()
+                            .client;
 
-                          if (client == null || !client.isActive) {
-                            showError("You are offline.");
-                            return;
-                          }
+                    if (client == null || !client.isActive) {
+                      showError("You are offline.");
+                      return;
+                    }
 
-                          final realTimeBloc = context.read<RealTimeBloc>();
-                          for (String userToSend in selectedUsers) {
-                            ChatMessage message = ChatMessage(
-                              from: username,
-                              to: userToSend,
-                              id: generateUniqueString(),
-                              subject: widget.subject,
-                              body: widget.nodeIdentifier,
-                            );
+                    final realTimeBloc = context.read<RealTimeBloc>();
+                    for (String userToSend in selectedUsers) {
+                      ChatMessage message = ChatMessage(
+                        from: username,
+                        to: userToSend,
+                        id: generateUniqueString(),
+                        subject: widget.subject,
+                        body: widget.nodeIdentifier,
+                      );
 
-                            client.sendMessage(message);
-                            // fire bloc event
-                            realTimeBloc.add(RealTimeNewMessageEvent(
-                              message: message,
-                              username: username,
-                            ));
-                          }
+                      client.sendMessage(message);
+                      // fire bloc event
+                      realTimeBloc.add(RealTimeNewMessageEvent(
+                        message: message,
+                        username: username,
+                      ));
+                    }
 
-                          String successMessage;
-                          String messageEnd =
-                              "with $selectedLength user${selectedLength > 1 ? "s" : ""}";
-                          switch (widget.subject) {
-                            case MessageSubject.dokiUser:
-                              successMessage =
-                                  "Shared @${widget.nodeIdentifier} profile $messageEnd";
-                            case MessageSubject.dokiPost:
-                              successMessage = "Shared post $messageEnd";
-                            case MessageSubject.dokiPage:
-                              successMessage = "Shared page $messageEnd";
-                            case MessageSubject.dokiDiscussion:
-                              successMessage = "Shared discussion $messageEnd";
-                            case MessageSubject.dokiPolls:
-                              successMessage = "Shared polls $messageEnd";
-                            default:
-                              successMessage = "";
-                          }
+                    String successMessage;
+                    String messageEnd =
+                        "with $selectedLength user${selectedLength > 1
+                        ? "s"
+                        : ""}";
+                    switch (widget.subject) {
+                      case MessageSubject.dokiUser:
+                        successMessage =
+                        "Shared @${widget.nodeIdentifier} profile $messageEnd";
+                      case MessageSubject.dokiPost:
+                        successMessage = "Shared post $messageEnd";
+                      case MessageSubject.dokiPage:
+                        successMessage = "Shared page $messageEnd";
+                      case MessageSubject.dokiDiscussion:
+                        successMessage = "Shared discussion $messageEnd";
+                      case MessageSubject.dokiPolls:
+                        successMessage = "Shared polls $messageEnd";
+                      default:
+                        successMessage = "";
+                    }
 
-                          if (successMessage.isNotEmpty) {
-                            showSuccess(successMessage);
-                          }
-                          context.pop();
-                        },
+                    if (successMessage.isNotEmpty) {
+                      showSuccess(successMessage);
+                    }
+                    context.pop();
+                  },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(
                       Constants.buttonWidth,
@@ -534,7 +542,9 @@ class _ShareUserWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currTheme = Theme.of(context).colorScheme;
+    final currTheme = Theme
+        .of(context)
+        .colorScheme;
     final friendUsername = getUsernameFromUserKey(userKey);
 
     return Container(
@@ -543,8 +553,8 @@ class _ShareUserWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(Constants.radius * 0.5),
         color: isSelected
             ? currTheme.primaryContainer.withValues(
-                alpha: 0.75,
-              )
+          alpha: 0.75,
+        )
             : Colors.transparent,
       ),
       child: GestureDetector(
@@ -589,9 +599,11 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => 48;
 
   @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    final currTheme = Theme.of(context).colorScheme;
+  Widget build(BuildContext context, double shrinkOffset,
+      bool overlapsContent) {
+    final currTheme = Theme
+        .of(context)
+        .colorScheme;
     return Container(
       color: currTheme.surfaceContainerLow,
       child: _widget,
