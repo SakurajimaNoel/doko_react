@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:doko_react/core/helpers/extension/go_router_extension.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
+import 'package:doko_react/core/widgets/share/share.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/public/sign-out-button/sign_out_button.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -103,20 +105,35 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     );
   }
 
-  void handleShare() {}
+  void handleUserProfileShare() {
+    Share.shareOptions(
+      context: context,
+      subject: MessageSubject.dokiUser,
+      nodeIdentifier: username,
+    );
+  }
 
   List<Widget> appBarActions() {
+    final currTheme = Theme.of(context).colorScheme;
+
     if (!self) {
       return [
         FilledButton.tonalIcon(
-          onPressed: handleShare,
+          onPressed: handleUserProfileShare,
           icon: const Icon(Icons.share),
+          style: FilledButton.styleFrom(
+            minimumSize: Size.zero,
+            padding: EdgeInsets.symmetric(
+              vertical: Constants.padding * 0.5,
+              horizontal: Constants.padding * 0.75,
+            ),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
           label: Text("Share"),
         ),
       ];
     }
 
-    final currTheme = Theme.of(context).colorScheme;
     return [
       IconButton.filledTonal(
         onPressed: () {
@@ -150,7 +167,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             icon: const Icon(Icons.edit_note),
           ),
           FilledButton.tonalIcon(
-            onPressed: handleShare,
+            onPressed: handleUserProfileShare,
             icon: const Icon(Icons.share),
             label: Text("Share"),
           ),
