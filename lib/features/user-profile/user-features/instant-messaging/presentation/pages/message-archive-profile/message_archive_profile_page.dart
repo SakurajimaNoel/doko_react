@@ -46,15 +46,15 @@ class MessageArchiveProfilePage extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.all(Constants.padding),
               decoration: BoxDecoration(
-                color: currTheme.primaryContainer,
+                color: currTheme.secondaryContainer,
                 borderRadius: BorderRadius.circular(Constants.radius),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Heading.left(
-                    "No media files yet.",
-                    size: Constants.heading4,
+                    "Sent media files will appear here.",
+                    size: Constants.fontSize,
                   ),
                   Expanded(
                     child: Center(
@@ -101,7 +101,7 @@ class _LottieMediaFileState extends State<_LottieMediaFile>
   @override
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
-    final color = currTheme.onPrimaryContainer;
+    final color = currTheme.onSecondaryContainer;
 
     return Lottie.asset(
       "assets/media-animation.lottie",
@@ -112,6 +112,8 @@ class _LottieMediaFileState extends State<_LottieMediaFile>
         controller.forward();
         controller.repeat();
       },
+      width: Constants.width * 10,
+      height: Constants.width * 10,
       delegates: LottieDelegates(
         values: [
           ValueDelegate.color(
