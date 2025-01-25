@@ -25,7 +25,6 @@ import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:nice_overlay/nice_overlay.dart';
-import 'package:provider/provider.dart';
 
 import 'bloc/real-time/real_time_bloc.dart';
 
@@ -113,8 +112,11 @@ class _UserLayoutState extends State<UserLayout> {
               ));
         }
 
-        // todo replace remote user with from
-        showNewMessageNotification(message, generateUserNodeKey(remoteUser));
+        if (remoteUser == message.from) {
+          showNewMessageNotification(
+              message, generateUserNodeKey(message.from));
+        }
+
         realTimeBloc.add(RealTimeNewMessageEvent(
           message: message,
           username: username,
@@ -139,9 +141,11 @@ class _UserLayoutState extends State<UserLayout> {
       },
       onReconnectSuccess: () {
         /// find latest message from inbox and fetch based on that
-        showMessage("reconnected to the webserver");
+        showSuccess("Reconnected to websocket server.");
       },
       onConnectionClosure: (retry) async {
+        showError("Lost connection to websocket server.");
+
         StreamSubscription<FGBGType>? fgBgSubscription;
         StreamSubscription<InternetConnectionStatus>? internetSubscription;
 
@@ -156,10 +160,13 @@ class _UserLayoutState extends State<UserLayout> {
             retry();
             cancelSubscriptions();
           } else {
+            showError("No internet connection.");
+
             // Listen for internet connection changes
             internetSubscription = connectionChecker.onStatusChange.listen(
               (InternetConnectionStatus status) {
                 if (status == InternetConnectionStatus.connected) {
+                  showSuccess("Internet connection found.");
                   retry();
                   cancelSubscriptions();
                 }
@@ -190,8 +197,9 @@ class _UserLayoutState extends State<UserLayout> {
   }
 
   Future<void> connectWS() async {
+    context.read<WebsocketClientProvider>().addClient(client);
     await client.connect();
-    showMessage("connected to websocket server");
+    showSuccess("Connected to websocket server.");
   }
 
   void showNewMessageNotification(ChatMessage message, String userKey) {
@@ -231,14 +239,34 @@ class _UserLayoutState extends State<UserLayout> {
     NiceOverlay.showInAppNotification(inAppNotification);
   }
 
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
+  void showError(String message) {
+    final toast = createNewToast(
+      context,
+      message: message,
+      type: ToastType.error,
     );
+
+    NiceOverlay.showToast(toast);
+  }
+
+  void showNormal(String message) {
+    final toast = createNewToast(
+      context,
+      message: message,
+      type: ToastType.normal,
+    );
+
+    NiceOverlay.showToast(toast);
+  }
+
+  void showSuccess(String message) {
+    final toast = createNewToast(
+      context,
+      message: message,
+      type: ToastType.success,
+    );
+
+    NiceOverlay.showToast(toast);
   }
 
   @override
@@ -333,60 +361,55 @@ class _UserLayoutState extends State<UserLayout> {
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
 
-    return ChangeNotifierProvider<WebsocketClientProvider>(
-      create: (_) => WebsocketClientProvider(
-        client: client,
-      ),
-      child: BlocBuilder<UserActionBloc, UserActionState>(
-        buildWhen: (previousState, state) {
-          return state is UserActionUpdateProfile;
-        },
-        builder: (context, state) {
-          final username =
-              (context.read<UserBloc>().state as UserCompleteState).username;
-          String key = generateUserNodeKey(username);
+    return BlocBuilder<UserActionBloc, UserActionState>(
+      buildWhen: (previousState, state) {
+        return state is UserActionUpdateProfile;
+      },
+      builder: (context, state) {
+        final username =
+            (context.read<UserBloc>().state as UserCompleteState).username;
+        String key = generateUserNodeKey(username);
 
-          final UserGraph graph = UserGraph();
-          UserEntity user = graph.getValueByKey(key)! as UserEntity;
-          bool profileEmpty = user.profilePicture.bucketPath.isEmpty;
+        final UserGraph graph = UserGraph();
+        UserEntity user = graph.getValueByKey(key)! as UserEntity;
+        bool profileEmpty = user.profilePicture.bucketPath.isEmpty;
 
-          return PopScope(
-            canPop: false,
-            onPopInvokedWithResult: (bool didPop, _) {
-              /// this handles going to user feed page
-              /// when in one of the other pages of
-              /// stateful shell route
-              if (didPop) return;
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (bool didPop, _) {
+            /// this handles going to user feed page
+            /// when in one of the other pages of
+            /// stateful shell route
+            if (didPop) return;
 
-              if (activeIndex == 0) {
-                SystemNavigator.pop();
-                return;
-              }
+            if (activeIndex == 0) {
+              SystemNavigator.pop();
+              return;
+            }
 
-              context.read<BottomNavProvider>().showBottomNav();
-              onDestinationSelected(0, profileEmpty);
-            },
-            child: Scaffold(
-              body: widget.navigationShell,
-              bottomNavigationBar: Builder(builder: (context) {
-                bool show = context.watch<BottomNavProvider>().show;
+            context.read<BottomNavProvider>().showBottomNav();
+            onDestinationSelected(0, profileEmpty);
+          },
+          child: Scaffold(
+            body: widget.navigationShell,
+            bottomNavigationBar: Builder(builder: (context) {
+              bool show = context.watch<BottomNavProvider>().show;
 
-                return show
-                    ? NavigationBar(
-                        indicatorColor: (activeIndex != 2 || profileEmpty)
-                            ? currTheme.primary
-                            : Colors.transparent,
-                        selectedIndex: widget.navigationShell.currentIndex,
-                        destinations: getDestinations(user),
-                        onDestinationSelected: (index) =>
-                            onDestinationSelected(index, profileEmpty),
-                      )
-                    : SizedBox.shrink();
-              }),
-            ),
-          );
-        },
-      ),
+              return show
+                  ? NavigationBar(
+                      indicatorColor: (activeIndex != 2 || profileEmpty)
+                          ? currTheme.primary
+                          : Colors.transparent,
+                      selectedIndex: widget.navigationShell.currentIndex,
+                      destinations: getDestinations(user),
+                      onDestinationSelected: (index) =>
+                          onDestinationSelected(index, profileEmpty),
+                    )
+                  : SizedBox.shrink();
+            }),
+          ),
+        );
+      },
     );
   }
 

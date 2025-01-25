@@ -192,7 +192,6 @@ class AppRouterConfig {
           )
         ],
       ),
-
       // complete profile routes
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -250,7 +249,7 @@ class AppRouterConfig {
                             username: username,
                           );
                         },
-                      )
+                      ),
                     ],
                   ),
                   GoRoute(

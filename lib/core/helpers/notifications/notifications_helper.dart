@@ -2,6 +2,8 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:nice_overlay/nice_overlay.dart';
 
+part "notification_helper_lib.dart";
+
 /// [createNewNotification] is used to create [NiceInAppNotification]
 NiceInAppNotification createNewNotification({
   required BuildContext context,
@@ -50,5 +52,57 @@ NiceInAppNotification createNewNotification({
       vertical: Constants.padding * 0.5,
       horizontal: Constants.padding,
     ),
+  );
+}
+
+NiceToast createNewToast(
+  BuildContext context, {
+  required String message,
+  required ToastType type,
+}) {
+  final currTheme = Theme.of(context).colorScheme;
+  final backgroundColor = type == ToastType.error
+      ? currTheme.errorContainer
+      : type == ToastType.success
+          ? Colors.green
+          : currTheme.inverseSurface;
+  final textColor = type == ToastType.error
+      ? currTheme.onErrorContainer
+      : type == ToastType.success
+          ? Colors.white
+          : currTheme.onInverseSurface;
+
+  return NiceToast(
+    backgroundColor: backgroundColor,
+    displayDuration: Constants.notificationDuration,
+    showingAnimationDuration: Duration(
+      milliseconds: 250,
+    ),
+    closingAnimationDuration: Duration(
+      milliseconds: 250,
+    ),
+    dismissDirection: DismissDirection.up,
+    vibrate: false,
+    message: Text(
+      message,
+      style: TextStyle(
+        color: textColor,
+      ),
+    ),
+    niceToastPosition: NiceToastPosition.top,
+    margin: EdgeInsets.symmetric(
+      vertical: Constants.padding * 0.5,
+      horizontal: Constants.padding,
+    ),
+    boxShadows: [
+      BoxShadow(
+        color: currTheme.shadow.withValues(
+          alpha: 0.5,
+        ),
+        spreadRadius: 0,
+        blurRadius: 20,
+        offset: Offset(0, 4),
+      ),
+    ],
   );
 }

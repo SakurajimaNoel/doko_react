@@ -5,6 +5,7 @@ import 'package:doko_react/core/global/bloc/preferences/preferences_bloc.dart';
 import 'package:doko_react/core/global/bloc/theme/theme_bloc.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
+import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -61,6 +62,9 @@ void main() async {
           providers: [
             ChangeNotifierProvider(
               create: (_) => BottomNavProvider(),
+            ),
+            ChangeNotifierProvider(
+              create: (_) => WebsocketClientProvider(),
             ),
           ],
           child: const Doki(),
