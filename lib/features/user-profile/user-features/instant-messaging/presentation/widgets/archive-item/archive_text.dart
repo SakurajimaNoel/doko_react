@@ -176,11 +176,7 @@ class _ArchiveTextState extends State<_ArchiveText> {
             ],
           ),
           child: ClipRRect(
-            borderRadius: const BorderRadius.all(
-              Radius.circular(
-                Constants.radius,
-              ),
-            ),
+            borderRadius: BorderRadius.circular(Constants.radius),
             child: BubbleBackground(
               colors: colors,
               child: Column(

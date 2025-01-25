@@ -395,10 +395,9 @@ class CreatePostPageState extends State<CreatePostPage> {
                             padding: const EdgeInsets.symmetric(
                               horizontal: Constants.padding * 0.5,
                             ),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(Constants.radius * 0.5),
-                              ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(Constants.radius),
                             ),
                             children: [
                               if (content.isNotEmpty)

@@ -47,8 +47,7 @@ class MessageArchiveProfilePage extends StatelessWidget {
               padding: EdgeInsets.all(Constants.padding),
               decoration: BoxDecoration(
                 color: currTheme.primaryContainer,
-                borderRadius:
-                    BorderRadius.all(Radius.circular(Constants.radius)),
+                borderRadius: BorderRadius.circular(Constants.radius),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

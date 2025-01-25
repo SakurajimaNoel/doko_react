@@ -174,8 +174,8 @@ class PostContent extends StatelessWidget {
                   horizontal: Constants.padding * (preview ? 0.15 : 0.25),
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(Constants.radius * (preview ? 1 : 0.25)),
+                  borderRadius: BorderRadius.circular(
+                    Constants.radius * (preview ? 1 : 0.25),
                   ),
                 ),
                 children: content.map(
