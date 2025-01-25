@@ -14,17 +14,27 @@ class UserToUserRelationWidget extends StatefulWidget {
     super.key,
     required this.username,
     this.disabled = false,
-  }) : label = false;
+  })  : label = false,
+        info = false;
 
   const UserToUserRelationWidget.label({
     super.key,
     required this.username,
     this.disabled = false,
-  }) : label = true;
+  })  : label = true,
+        info = false;
+
+  const UserToUserRelationWidget.info({
+    super.key,
+    required this.username,
+    this.disabled = false,
+  })  : label = false,
+        info = true;
 
   final String username;
   final bool label;
   final bool disabled;
+  final bool info;
 
   @override
   State<UserToUserRelationWidget> createState() =>
@@ -38,7 +48,8 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
   late final String currentUsername;
   late final String username;
   late final String graphKey;
-  late final bool label;
+  late final bool label = widget.label;
+  late final bool info = widget.info;
   late final bool disabled = widget.disabled;
 
   @override
@@ -49,7 +60,6 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
         (context.read<UserBloc>().state as UserCompleteState).username;
     username = widget.username;
     graphKey = generateUserNodeKey(username);
-    label = widget.label;
   }
 
   // create
@@ -130,6 +140,11 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
 
         // unrelated
         if (status == UserToUserRelation.unrelated) {
+          if (info) {
+            return Text(
+                "You both don't have a friend relation with @$username.");
+          }
+
           if (label) {
             return FilledButton.tonalIcon(
               onPressed: () => createFriendRelation(),
@@ -154,6 +169,10 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
 
         // outgoing req
         if (status == UserToUserRelation.outgoingReq) {
+          if (info) {
+            return Text("You have send request to @$username.");
+          }
+
           if (label) {
             return FilledButton.tonalIcon(
               onPressed: () => removeFriendRelation(user),
@@ -189,6 +208,10 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
 
         // incoming req
         if (status == UserToUserRelation.incomingReq) {
+          if (info) {
+            return Text("@$username has send friend request to you.");
+          }
+
           if (label) {
             return Row(
               spacing: Constants.gap,
@@ -252,6 +275,10 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
         }
 
         // friends
+        if (info) {
+          return Text("You and @$username are friends.");
+        }
+
         if (label) {
           return Row(
             mainAxisSize: MainAxisSize.min,

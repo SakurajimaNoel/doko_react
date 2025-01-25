@@ -1,3 +1,4 @@
+import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
@@ -6,7 +7,9 @@ import 'package:doko_react/features/user-profile/user-features/instant-messaging
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/message-input/message_input.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class MessageArchivePage extends StatelessWidget {
   const MessageArchivePage({
@@ -33,8 +36,31 @@ class MessageArchivePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: currTheme.surfaceContainer,
-        title: UserWidget(
-          userKey: generateUserNodeKey(username),
+        title: InkWell(
+          onTap: () {
+            context.pushNamed(
+              RouterConstants.messageArchiveProfile,
+              pathParameters: {
+                "username": username,
+              },
+            );
+          },
+          onLongPress: () {
+            Clipboard.setData(ClipboardData(
+              text: username,
+            )).then((value) {});
+          },
+          child: Row(
+            spacing: Constants.gap,
+            children: [
+              UserWidget.avtar(
+                userKey: generateUserNodeKey(username),
+              ),
+              UserWidget.info(
+                userKey: generateUserNodeKey(username),
+              ),
+            ],
+          ),
         ),
       ),
       body: Column(

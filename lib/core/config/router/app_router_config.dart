@@ -16,6 +16,7 @@ import 'package:doko_react/features/complete-profile/presentation/pages/username
 import 'package:doko_react/features/error-pages/auth_error_page.dart';
 import 'package:doko_react/features/error-pages/graph_error_page.dart';
 import 'package:doko_react/features/settings/presentation/pages/settings_page.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/pages/message-archive-profile/message_archive_profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/pages/message-archive/message_archive_page.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/pages/message-inbox/message_inbox_page.dart';
 import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
@@ -239,17 +240,31 @@ class AppRouterConfig {
                     builder: (context, state) => MessageInboxPage(),
                     routes: [
                       GoRoute(
-                        parentNavigatorKey: rootNavigatorKey,
-                        path: "message-archive/:username",
-                        name: RouterConstants.messageArchive,
-                        builder: (context, state) {
-                          String username = state.pathParameters["username"]!;
+                          parentNavigatorKey: rootNavigatorKey,
+                          path: "message-archive/:username",
+                          name: RouterConstants.messageArchive,
+                          builder: (context, state) {
+                            String username = state.pathParameters["username"]!;
 
-                          return MessageArchivePage(
-                            username: username,
-                          );
-                        },
-                      ),
+                            return MessageArchivePage(
+                              username: username,
+                            );
+                          },
+                          routes: [
+                            GoRoute(
+                              parentNavigatorKey: rootNavigatorKey,
+                              path: "message-archive-profile",
+                              name: RouterConstants.messageArchiveProfile,
+                              builder: (context, state) {
+                                String username =
+                                    state.pathParameters["username"]!;
+
+                                return MessageArchiveProfilePage(
+                                  username: username,
+                                );
+                              },
+                            ),
+                          ]),
                     ],
                   ),
                   GoRoute(
