@@ -106,7 +106,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   }
 
   void handleUserProfileShare() {
-    Share.shareOptions(
+    Share.share(
       context: context,
       subject: MessageSubject.dokiUser,
       nodeIdentifier: username,

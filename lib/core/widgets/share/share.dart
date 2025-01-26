@@ -20,13 +20,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nice_overlay/nice_overlay.dart';
+import 'package:share_plus/share_plus.dart' as share_external;
 
 class Share extends StatelessWidget {
   const Share({
     super.key,
   });
 
-  static void shareOptions({
+  static void share({
     required BuildContext context,
     required MessageSubject subject,
     required String nodeIdentifier,
@@ -204,7 +205,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
     final height = MediaQuery.sizeOf(context).height;
     final width = MediaQuery.sizeOf(context).width;
 
-    final itemSize = 125;
+    final itemSize = 130;
 
     final gridDelegate = SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: (width ~/ itemSize),
@@ -448,68 +449,116 @@ class _ShareDetailsState extends State<_ShareDetails> {
               ),
               Padding(
                 padding: const EdgeInsets.all(Constants.padding),
-                child: FilledButton(
-                  onPressed: selectedUsers.isEmpty
-                      ? null
-                      : () {
-                          final client =
-                              context.read<WebsocketClientProvider>().client;
+                child: selectedUsers.isEmpty
+                    ? FilledButton.tonal(
+                        onPressed: () {
+                          final String baseUrl = "https://doki.co.in";
+                          String url;
+                          String supportingText;
 
-                          if (client == null || !client.isActive) {
-                            showError("You are offline.");
-                            return;
-                          }
-
-                          final realTimeBloc = context.read<RealTimeBloc>();
-                          for (String userToSend in selectedUsers) {
-                            ChatMessage message = ChatMessage(
-                              from: username,
-                              to: userToSend,
-                              id: generateUniqueString(),
-                              subject: widget.subject,
-                              body: widget.nodeIdentifier,
-                            );
-
-                            client.sendMessage(message);
-                            // fire bloc event
-                            realTimeBloc.add(RealTimeNewMessageEvent(
-                              message: message,
-                              username: username,
-                            ));
-                          }
-
-                          String successMessage;
-                          String messageEnd =
-                              "with $selectedLength user${selectedLength > 1 ? "s" : ""}";
                           switch (widget.subject) {
                             case MessageSubject.dokiUser:
-                              successMessage =
-                                  "Shared @${widget.nodeIdentifier} profile $messageEnd";
+                              url = "$baseUrl/user/${widget.nodeIdentifier}";
+                              supportingText =
+                                  "Check @${widget.nodeIdentifier} profile on doki.";
                             case MessageSubject.dokiPost:
-                              successMessage = "Shared post $messageEnd";
+                              url = "$baseUrl/post/${widget.nodeIdentifier}";
+                              supportingText = "Check this Post on doki.";
                             case MessageSubject.dokiPage:
-                              successMessage = "Shared page $messageEnd";
+                              url = "$baseUrl/page/${widget.nodeIdentifier}";
+                              supportingText = "Check this Page on doki.";
                             case MessageSubject.dokiDiscussion:
-                              successMessage = "Shared discussion $messageEnd";
+                              url =
+                                  "$baseUrl/discussion/${widget.nodeIdentifier}";
+                              supportingText = "Check this Discussion on doki.";
                             case MessageSubject.dokiPolls:
-                              successMessage = "Shared polls $messageEnd";
+                              url = "$baseUrl/poll/${widget.nodeIdentifier}";
+                              supportingText = "Check this Poll on doki.";
                             default:
-                              successMessage = "";
+                              url = "";
+                              supportingText = "";
                           }
 
-                          if (successMessage.isNotEmpty) {
-                            showSuccess(successMessage);
-                          }
-                          context.pop();
+                          if (url.isEmpty || supportingText.isEmpty) return;
+
+                          share_external.Share.share(
+                            url,
+                            subject: supportingText,
+                          );
                         },
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(
-                      Constants.buttonWidth,
-                      Constants.buttonHeight,
-                    ),
-                  ),
-                  child: Text(sendText),
-                ),
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size(
+                            Constants.buttonWidth,
+                            Constants.buttonHeight,
+                          ),
+                        ),
+                        child: Text("More share options."),
+                      )
+                    : FilledButton(
+                        onPressed: selectedUsers.isEmpty
+                            ? null
+                            : () {
+                                final client = context
+                                    .read<WebsocketClientProvider>()
+                                    .client;
+
+                                if (client == null || !client.isActive) {
+                                  showError("You are offline.");
+                                  return;
+                                }
+
+                                final realTimeBloc =
+                                    context.read<RealTimeBloc>();
+                                for (String userToSend in selectedUsers) {
+                                  ChatMessage message = ChatMessage(
+                                    from: username,
+                                    to: userToSend,
+                                    id: generateUniqueString(),
+                                    subject: widget.subject,
+                                    body: widget.nodeIdentifier,
+                                  );
+
+                                  client.sendMessage(message);
+                                  // fire bloc event
+                                  realTimeBloc.add(RealTimeNewMessageEvent(
+                                    message: message,
+                                    username: username,
+                                  ));
+                                }
+
+                                String successMessage;
+                                String messageEnd =
+                                    "with $selectedLength user${selectedLength > 1 ? "s" : ""}";
+                                switch (widget.subject) {
+                                  case MessageSubject.dokiUser:
+                                    successMessage =
+                                        "Shared @${widget.nodeIdentifier} profile $messageEnd";
+                                  case MessageSubject.dokiPost:
+                                    successMessage = "Shared post $messageEnd";
+                                  case MessageSubject.dokiPage:
+                                    successMessage = "Shared page $messageEnd";
+                                  case MessageSubject.dokiDiscussion:
+                                    successMessage =
+                                        "Shared discussion $messageEnd";
+                                  case MessageSubject.dokiPolls:
+                                    successMessage = "Shared polls $messageEnd";
+                                  default:
+                                    successMessage = "";
+                                }
+
+                                if (successMessage.isNotEmpty) {
+                                  showSuccess(successMessage);
+                                }
+                                context.pop();
+                              },
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size(
+                            Constants.buttonWidth,
+                            Constants.buttonHeight,
+                          ),
+                        ),
+                        child: Text(sendText),
+                      ),
               ),
             ],
           );

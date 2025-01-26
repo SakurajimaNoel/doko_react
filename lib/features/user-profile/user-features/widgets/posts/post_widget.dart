@@ -460,7 +460,7 @@ class _PostActionState extends State<_PostAction> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Share.shareOptions(
+                          Share.share(
                             context: context,
                             subject: MessageSubject.dokiPost,
                             nodeIdentifier: post.id,
