@@ -6,9 +6,11 @@ import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bl
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/post_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/posts/provider/post_carousel_indicator_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 class PostPreviewWidget extends StatelessWidget {
   const PostPreviewWidget({
@@ -59,7 +61,8 @@ class PostPreviewWidget extends StatelessWidget {
 
         return LayoutBuilder(
           builder: (context, constraints) {
-            bool shrink = constraints.maxWidth < 235;
+            final width = constraints.maxWidth;
+            bool shrink = width < 235;
             double shrinkFactor = shrink ? 0.75 : 1;
 
             return SizedBox(
@@ -132,8 +135,14 @@ class PostPreviewWidget extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: PostContent.preview(
-                        content: post.content,
+                      child: ChangeNotifierProvider(
+                        create: (_) => PostCarouselIndicatorProvider(
+                          currentItem: 0,
+                          width: width,
+                        ),
+                        child: PostContent.preview(
+                          content: post.content,
+                        ),
                       ),
                     ),
                   Text(trimText(post.caption)),

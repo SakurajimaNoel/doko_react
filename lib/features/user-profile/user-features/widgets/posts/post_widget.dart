@@ -15,11 +15,13 @@ import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bl
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/post/presentation/provider/post_provider.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/posts/provider/post_carousel_indicator_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PostWidget extends StatelessWidget {
@@ -81,9 +83,18 @@ class PostWidget extends StatelessWidget {
           const SizedBox(
             height: Constants.gap * 0.5,
           ),
-          PostContent(
-            content: post.content,
-          ),
+          LayoutBuilder(builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            return ChangeNotifierProvider(
+              create: (_) => PostCarouselIndicatorProvider(
+                currentItem: 0,
+                width: width,
+              ),
+              child: PostContent(
+                content: post.content,
+              ),
+            );
+          }),
           const SizedBox(
             height: Constants.gap * 0.5,
           ),
@@ -111,20 +122,52 @@ class PostWidget extends StatelessWidget {
   }
 }
 
-class PostContent extends StatelessWidget {
-  PostContent({
+// [PostContent] should always have a parent with [PostCarouselIndicatorProvider]
+class PostContent extends StatefulWidget {
+  const PostContent({
     super.key,
     required this.content,
   }) : preview = false;
 
-  PostContent.preview({
+  const PostContent.preview({
     super.key,
     required this.content,
   }) : preview = true;
 
   final List<PostContentEntity> content;
-  final CarouselController controller = CarouselController();
   final bool preview;
+
+  @override
+  State<PostContent> createState() => _PostContentState();
+}
+
+class _PostContentState extends State<PostContent> {
+  final CarouselController controller = CarouselController();
+  late final preview = widget.preview;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller.addListener(updateCurrentItem);
+  }
+
+  void updateCurrentItem() {
+    double offset = controller.hasClients ? controller.offset : -1;
+    double width = context.read<PostCarouselIndicatorProvider>().width;
+
+    int item = (offset / width).round();
+
+    context.read<PostCarouselIndicatorProvider>().updateCurrentItem(item);
+  }
+
+  @override
+  void dispose() {
+    controller.removeListener(updateCurrentItem);
+    controller.dispose();
+
+    super.dispose();
+  }
 
   Widget imageContent(PostContentEntity image) {
     return CachedNetworkImage(
@@ -156,12 +199,16 @@ class PostContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currTheme = Theme.of(context).colorScheme;
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final height = width * (1 / Constants.postContainer);
 
+        context.read<PostCarouselIndicatorProvider>().updateWidth(width);
+
         return Column(
+          spacing: Constants.gap * (preview ? 0.75 : 1),
           children: [
             SizedBox(
               height: height,
@@ -172,14 +219,15 @@ class PostContent extends StatelessWidget {
                 shrinkExtent: width * 0.5,
                 itemSnapping: true,
                 padding: EdgeInsets.symmetric(
-                  horizontal: Constants.padding * (preview ? 0.15 : 0.25),
+                  horizontal:
+                      Constants.padding * (widget.preview ? 0.15 : 0.25),
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(
-                    Constants.radius * (preview ? 1 : 0.25),
+                    Constants.radius * (widget.preview ? 1 : 0.25),
                   ),
                 ),
-                children: content.map(
+                children: widget.content.map(
                   (item) {
                     switch (item.mediaType) {
                       case MediaTypeValue.image:
@@ -193,85 +241,31 @@ class PostContent extends StatelessWidget {
                 ).toList(),
               ),
             ),
-            if (content.length > 1)
-              _PostContentIndicator(
-                controller: controller,
-                contentLength: content.length,
-                width: width,
-                preview: preview,
+            if (widget.content.length > 1)
+              Builder(
+                builder: (context) {
+                  final currItem = context.select(
+                      (PostCarouselIndicatorProvider provider) =>
+                          provider.currentItem);
+
+                  return AnimatedSmoothIndicator(
+                    activeIndex: currItem,
+                    count: widget.content.length,
+                    effect: ScrollingDotsEffect(
+                      activeDotColor: currTheme.primary,
+                      dotWidth:
+                          Constants.carouselDots * (widget.preview ? 0.75 : 1),
+                      dotHeight:
+                          Constants.carouselDots * (widget.preview ? 0.75 : 1),
+                      activeDotScale: Constants.carouselActiveDotScale *
+                          (widget.preview ? 0.75 : 1),
+                    ),
+                  );
+                },
               ),
           ],
         );
       },
-    );
-  }
-}
-
-class _PostContentIndicator extends StatefulWidget {
-  const _PostContentIndicator({
-    required this.contentLength,
-    required this.controller,
-    required this.width,
-    required this.preview,
-  });
-
-  final int contentLength;
-  final ScrollController controller;
-  final double width;
-  final bool preview;
-
-  @override
-  State<_PostContentIndicator> createState() => _PostContentIndicatorState();
-}
-
-class _PostContentIndicatorState extends State<_PostContentIndicator> {
-  int activeItem = 0;
-  late final ScrollController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = widget.controller;
-
-    controller.addListener(() {
-      int active = getActiveItem();
-      if (active != activeItem) {
-        setState(() {
-          activeItem = active;
-        });
-      }
-    });
-  }
-
-  int getActiveItem() {
-    double offset = controller.hasClients ? controller.offset : -1;
-
-    int item = (offset / widget.width).round();
-
-    return item;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final currTheme = Theme.of(context).colorScheme;
-
-    return Column(
-      children: [
-        SizedBox(
-          height: Constants.gap * (widget.preview ? 0.5 : 1),
-        ),
-        AnimatedSmoothIndicator(
-          activeIndex: activeItem,
-          count: widget.contentLength,
-          effect: ScrollingDotsEffect(
-            activeDotColor: currTheme.primary,
-            dotWidth: Constants.carouselDots * (widget.preview ? 0.75 : 1),
-            dotHeight: Constants.carouselDots * (widget.preview ? 0.75 : 1),
-            activeDotScale:
-                Constants.carouselActiveDotScale * (widget.preview ? 0.75 : 1),
-          ),
-        ),
-      ],
     );
   }
 }
