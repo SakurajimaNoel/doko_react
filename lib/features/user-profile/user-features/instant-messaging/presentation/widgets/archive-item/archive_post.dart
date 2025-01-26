@@ -29,57 +29,55 @@ class _ArchivePost extends StatelessWidget {
       ),
     );
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(Constants.radius),
-      child: BubbleBackground(
-        colors: colors,
-        child: Padding(
-          padding: EdgeInsets.all(Constants.padding * 0.5),
-          child: Column(
-            spacing: Constants.gap * 0.5,
-            crossAxisAlignment:
-                self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-            children: [
-              PostPreviewWidget(
-                postKey: generatePostNodeKey(message.body),
-              ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      context.pushNamed(
-                        RouterConstants.userPost,
-                        pathParameters: {
-                          "postId": message.body,
-                        },
-                      );
+    return Container(
+      padding: EdgeInsets.all(Constants.padding * 0.5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(Constants.radius),
+        color: colors.last,
+      ),
+      child: Column(
+        spacing: Constants.gap * 0.5,
+        crossAxisAlignment:
+            self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          PostPreviewWidget(
+            postKey: generatePostNodeKey(message.body),
+          ),
+          Align(
+            alignment: Alignment.topLeft,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  context.pushNamed(
+                    RouterConstants.userPost,
+                    pathParameters: {
+                      "postId": message.body,
                     },
-                    onLongPress: () {},
-                    child: Text(
-                      "Check this post out!",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                  );
+                },
+                onLongPress: () {},
+                child: Text(
+                  "Check this post out!",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (self) type,
-                  Text(
-                    formatDateTimeToTimeString(message.sendAt),
-                    style: metaDataStyle,
-                  ),
-                  if (!self) type
-                ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (self) type,
+              Text(
+                formatDateTimeToTimeString(message.sendAt),
+                style: metaDataStyle,
               ),
+              if (!self) type
             ],
           ),
-        ),
+        ],
       ),
     );
   }

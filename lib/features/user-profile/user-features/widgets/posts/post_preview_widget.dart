@@ -124,11 +124,11 @@ class PostPreviewWidget extends StatelessWidget {
                         boxShadow: [
                           BoxShadow(
                             color: currTheme.shadow.withValues(
-                              alpha: 0.2,
+                              alpha: 0.25,
                             ),
                             spreadRadius: 0,
                             blurRadius: 10,
-                            offset: Offset(0, 4),
+                            offset: Offset(0, -2),
                           ),
                         ],
                       ),
