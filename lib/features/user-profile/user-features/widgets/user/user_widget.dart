@@ -295,8 +295,16 @@ class UserWidget extends StatelessWidget {
   }
 
   Widget userInfo(UserEntity user) {
-    double usernameScale = small ? 0.9 : 1;
-    double nameScale = small ? 1.1 : 1.2;
+    double usernameScale = small
+        ? 0.9
+        : share
+            ? 0.75
+            : 1;
+    double nameScale = small
+        ? 1.1
+        : share
+            ? 1
+            : 1.2;
 
     return Column(
       crossAxisAlignment:
