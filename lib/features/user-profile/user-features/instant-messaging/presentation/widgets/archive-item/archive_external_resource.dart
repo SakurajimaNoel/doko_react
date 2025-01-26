@@ -19,8 +19,6 @@ class _ArchiveExternalResource extends StatelessWidget {
     ChatMessage message = entity.message;
     bool self = username == message.from;
 
-    final currTheme = Theme.of(context).colorScheme;
-
     Widget type = Text(
       "GIF / STICKER 🖼️",
       style: TextStyle(
@@ -40,16 +38,6 @@ class _ArchiveExternalResource extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Constants.radius),
-                boxShadow: [
-                  BoxShadow(
-                    color: currTheme.shadow.withValues(
-                      alpha: 0.25,
-                    ),
-                    spreadRadius: 0,
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  ),
-                ],
               ),
               clipBehavior: Clip.antiAlias,
               child: CachedNetworkImage(

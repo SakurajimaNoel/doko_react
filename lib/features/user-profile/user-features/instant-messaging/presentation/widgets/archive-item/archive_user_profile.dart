@@ -11,7 +11,6 @@ class _ArchiveUserProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currTheme = Theme.of(context).colorScheme;
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
     UserGraph graph = UserGraph();
@@ -33,24 +32,6 @@ class _ArchiveUserProfile extends StatelessWidget {
       crossAxisAlignment:
           self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(
-            style: TextStyle(
-              color: currTheme.onSurface,
-              fontSize: Constants.fontSize * 0.9,
-              letterSpacing: 0.75,
-            ),
-            text: "User profile shared: ",
-            children: [
-              TextSpan(
-                text: "@${message.body}",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
         UserWidget.preview(
           userKey: generateUserNodeKey(message.body),
         ),

@@ -76,15 +76,11 @@ class ArchiveItem extends StatelessWidget {
         /// reference above cookbook for more info about gradient effect
         List<Color> colors = self
             ? [
-                currTheme.primaryContainer.withValues(
-                  alpha: 0.75,
-                ),
+                currTheme.secondaryContainer,
                 currTheme.primaryContainer,
               ]
             : [
-                currTheme.surfaceContainer.withValues(
-                  alpha: 0.75,
-                ),
+                currTheme.surfaceContainerLowest,
                 currTheme.surfaceContainerHighest,
               ];
 

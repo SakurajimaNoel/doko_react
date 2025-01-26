@@ -165,60 +165,46 @@ class _ArchiveTextState extends State<_ArchiveText> {
         ChatMessage message = entity.message;
         bool self = message.from == username;
 
-        return Container(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: currTheme.shadow.withValues(
-                  alpha: 0.25,
-                ),
-                spreadRadius: 0,
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(Constants.radius),
-            child: BubbleBackground(
-              colors: colors,
-              child: Column(
-                crossAxisAlignment:
-                    self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: Constants.padding * 0.75,
-                      right: Constants.padding * 0.75,
-                      top: Constants.padding * 0.75,
-                    ),
-                    child: RichText(
-                      text: buildMessageBody(message.body, currTheme, self),
-                    ),
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(Constants.radius),
+          child: BubbleBackground(
+            colors: colors,
+            child: Column(
+              crossAxisAlignment:
+                  self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: Constants.padding * 0.75,
+                    right: Constants.padding * 0.75,
+                    top: Constants.padding * 0.75,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: Constants.padding * 0.25,
-                      horizontal: Constants.padding * 0.75,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: Constants.gap * 1.5,
-                      children: [
+                  child: RichText(
+                    text: buildMessageBody(message.body, currTheme, self),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: Constants.padding * 0.25,
+                    horizontal: Constants.padding * 0.75,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: Constants.gap * 1.5,
+                    children: [
+                      Text(
+                        formatDateTimeToTimeString(message.sendAt),
+                        style: widget.metaDataStyle,
+                      ),
+                      if (entity.edited)
                         Text(
-                          formatDateTimeToTimeString(message.sendAt),
+                          "edited",
                           style: widget.metaDataStyle,
                         ),
-                        if (entity.edited)
-                          Text(
-                            "edited",
-                            style: widget.metaDataStyle,
-                          ),
-                      ],
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
