@@ -192,6 +192,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
     );
 
     return _ShareUserWidget(
+      key: ValueKey("friends-$userKey"),
       userKey: userKey,
       onUserSelect: onUserSelect,
       isSelected: isSelected,
@@ -378,6 +379,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                             final username = selectedUsers[index];
 
                             return _ShareUserWidget(
+                              key: ValueKey("selected-$username"),
                               userKey: generateUserNodeKey(username),
                               onUserSelect: onUserSelect,
                               isSelected: selectedUsers.contains(username),
@@ -408,6 +410,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                     );
 
                                     return _ShareUserWidget(
+                                      key: ValueKey("search-$userKey"),
                                       userKey: userKey,
                                       onUserSelect: onUserSelect,
                                       isSelected: isSelected,
@@ -518,6 +521,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
 
 class _ShareUserWidget extends StatelessWidget {
   const _ShareUserWidget({
+    required super.key,
     required this.userKey,
     required this.onUserSelect,
     required this.isSelected,
@@ -533,7 +537,6 @@ class _ShareUserWidget extends StatelessWidget {
     final friendUsername = getUsernameFromUserKey(userKey);
 
     return Container(
-      padding: EdgeInsets.all(Constants.padding * 0.25),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Constants.radius),
         color: isSelected
@@ -542,30 +545,37 @@ class _ShareUserWidget extends StatelessWidget {
               )
             : Colors.transparent,
       ),
-      child: GestureDetector(
-        onTap: () {
-          onUserSelect(friendUsername);
-        },
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: Constants.gap * 0.5,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            UserWidget.avtarShare(
-              userKey: userKey,
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            onUserSelect(friendUsername);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(Constants.padding * 0.25),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: Constants.gap * 0.5,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                UserWidget.avtarShare(
+                  userKey: userKey,
+                ),
+                DefaultTextStyle.merge(
+                  style: TextStyle(
+                    color: isSelected
+                        ? currTheme.onPrimaryContainer
+                        : currTheme.onSurface,
+                  ),
+                  child: UserWidget.infoShare(
+                    userKey: userKey,
+                  ),
+                ),
+              ],
             ),
-            DefaultTextStyle.merge(
-              style: TextStyle(
-                color: isSelected
-                    ? currTheme.onPrimaryContainer
-                    : currTheme.onSurface,
-              ),
-              child: UserWidget.infoShare(
-                userKey: userKey,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
