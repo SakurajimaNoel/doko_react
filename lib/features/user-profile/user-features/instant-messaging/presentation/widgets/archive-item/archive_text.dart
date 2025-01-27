@@ -65,6 +65,7 @@ class _ArchiveTextState extends State<_ArchiveText> {
                 Constants.padding * 0.75,
               ),
               child: _ArchiveTextBubble(
+                key: ValueKey("$messageId-${message.body}"),
                 body: message.body,
                 textColor: textColor,
               ),
@@ -93,6 +94,7 @@ class _ArchiveTextState extends State<_ArchiveText> {
 
 class _ArchiveTextBubble extends StatefulWidget {
   const _ArchiveTextBubble({
+    required super.key,
     required this.body,
     required this.textColor,
   });

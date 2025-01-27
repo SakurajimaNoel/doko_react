@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 part "archive_external_resource.dart";
@@ -52,7 +53,7 @@ class ArchiveItem extends StatelessWidget {
       required bool everyone,
     }) {
       final client = context.read<WebsocketClientProvider>().client;
-      if (client == null) {
+      if (client == null || !client.isActive) {
         showError(context, "You are not connected.");
       }
 
@@ -125,8 +126,19 @@ class ArchiveItem extends StatelessWidget {
                     if (self && subject == MessageSubject.text)
                       InkWell(
                         onTap: () {
-                          showInfo(context, "Coming soon");
-                          // context.pop();
+                          context.pop();
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return ChangeNotifierProvider.value(
+                                value: archiveMessageProvider,
+                                child: _EditMessage(
+                                  messageId: messageId,
+                                  body: body,
+                                ),
+                              );
+                            },
+                          );
                         },
                         child: _ArchiveItemOptions(
                           icon: Icons.edit,
@@ -397,6 +409,112 @@ class _ArchiveItemOptions extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _EditMessage extends StatefulWidget {
+  const _EditMessage({
+    required this.messageId,
+    required this.body,
+  });
+
+  final String messageId;
+  final String body;
+
+  @override
+  State<_EditMessage> createState() => _EditMessageState();
+}
+
+class _EditMessageState extends State<_EditMessage> {
+  late final TextEditingController controller =
+      TextEditingController(text: widget.body);
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+
+    return AlertDialog(
+      title: Text("Edit message"),
+      content: SizedBox(
+        width: width,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              minLines: 4,
+              maxLines: 8,
+              autofocus: true,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(
+                  Constants.messageLimit,
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                ),
+              ],
+              decoration: const InputDecoration(
+                hintText: "Edit your message here...",
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            context.pop();
+          },
+          child: Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () {
+            String newBody = controller.text.trim();
+
+            if (newBody.isEmpty) {
+              showError(context, "Message can't be empty.");
+              return;
+            }
+
+            final client = context.read<WebsocketClientProvider>().client;
+            if (client == null || !client.isActive) {
+              showError(context, "You are not connected.");
+            }
+
+            final archiveMessageProvider =
+                context.read<ArchiveMessageProvider>();
+            final username =
+                (context.read<UserBloc>().state as UserCompleteState).username;
+            EditMessage editedMessage = EditMessage(
+              from: username,
+              to: archiveMessageProvider.archiveUser,
+              id: widget.messageId,
+              body: newBody,
+            );
+
+            if (client!.editMessage(editedMessage)) {
+              // success
+              showSuccess(context, "Message edited.");
+              context.read<RealTimeBloc>().add(RealTimeEditMessageEvent(
+                    message: editedMessage,
+                    username: username,
+                  ));
+            } else {
+              showError(context, "Failed to edit message.");
+              return;
+            }
+
+            context.pop();
+          },
+          child: Text("Edit"),
+        ),
+      ],
     );
   }
 }
