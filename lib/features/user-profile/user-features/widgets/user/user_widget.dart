@@ -178,7 +178,6 @@ class UserWidget extends StatelessWidget {
                               },
                             );
                           },
-                          onLongPress: () {},
                         ),
                       ),
                     ],
@@ -254,7 +253,6 @@ class UserWidget extends StatelessWidget {
                               },
                             );
                           },
-                          onLongPress: () {},
                         ),
                       ),
                     ],

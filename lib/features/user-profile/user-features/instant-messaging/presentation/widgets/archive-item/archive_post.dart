@@ -70,7 +70,6 @@ class _ArchivePost extends StatelessWidget {
                         },
                       );
                     },
-                    onLongPress: () {},
                     child: Text(
                       "Check this post out!",
                       style: TextStyle(
