@@ -23,7 +23,6 @@ class PostPreviewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final graph = UserGraph();
-    final currTheme = Theme.of(context).colorScheme;
 
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
@@ -121,28 +120,13 @@ class PostPreviewWidget extends StatelessWidget {
                     ],
                   ),
                   if (post.content.isNotEmpty)
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(Constants.radius),
-                        boxShadow: [
-                          BoxShadow(
-                            color: currTheme.shadow.withValues(
-                              alpha: 0.25,
-                            ),
-                            spreadRadius: 0,
-                            blurRadius: 10,
-                            offset: Offset(0, -2),
-                          ),
-                        ],
+                    ChangeNotifierProvider(
+                      create: (_) => PostCarouselIndicatorProvider(
+                        currentItem: 0,
+                        width: width,
                       ),
-                      child: ChangeNotifierProvider(
-                        create: (_) => PostCarouselIndicatorProvider(
-                          currentItem: 0,
-                          width: width,
-                        ),
-                        child: PostContent.preview(
-                          content: post.content,
-                        ),
+                      child: PostContent.preview(
+                        content: post.content,
                       ),
                     ),
                   Text(trimText(post.caption)),
