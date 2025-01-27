@@ -4,12 +4,14 @@ class _ArchivePost extends StatelessWidget {
   const _ArchivePost({
     required this.messageKey,
     required this.metaDataStyle,
-    required this.colors,
+    required this.bubbleColor,
+    required this.textColor,
   });
 
   final String messageKey;
   final TextStyle metaDataStyle;
-  final List<Color> colors;
+  final Color bubbleColor;
+  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +41,7 @@ class _ArchivePost extends StatelessWidget {
           padding: EdgeInsets.all(Constants.padding * 0.5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(Constants.radius),
-            color: colors.last,
+            color: bubbleColor,
             boxShadow: [
               BoxShadow(
                 color: currTheme.shadow.withValues(
@@ -74,6 +76,7 @@ class _ArchivePost extends StatelessWidget {
                       "Check this post out!",
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
+                        color: textColor,
                       ),
                     ),
                   ),

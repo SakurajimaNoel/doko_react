@@ -6,6 +6,7 @@ import 'package:doki_websocket_client/doki_websocket_client.dart'
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
@@ -14,6 +15,7 @@ import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.d
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/message-body-type/message_body_type.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/provider/archive_message_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/post_preview_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/gestures.dart';
@@ -29,28 +31,53 @@ part "archive_text.dart";
 part "archive_user_profile.dart";
 
 class ArchiveItem extends StatelessWidget {
-  const ArchiveItem({
+  ArchiveItem({
     super.key,
     required this.messageKey,
     this.showDate = false,
-    required this.onSelect,
-    required this.isSelected,
-    required this.canShowMoreOptions,
-    required this.deleteMessage,
-  });
+  }) : messageId = getMessageIdFromMessageKey(messageKey);
 
   final String messageKey;
   final bool showDate;
-  final VoidCallback onSelect;
-  final ValueGetter<bool> isSelected;
-  final ValueGetter<bool> canShowMoreOptions;
-  final ValueSetter<bool> deleteMessage;
+  final String messageId;
 
   void showMoreOptions(
       BuildContext context, bool self, MessageSubject subject, String body) {
     final width = MediaQuery.sizeOf(context).width;
     final currTheme = Theme.of(context).colorScheme;
     final height = MediaQuery.sizeOf(context).height / 2;
+    final archiveMessageProvider = context.read<ArchiveMessageProvider>();
+
+    void deleteMessage({
+      required bool everyone,
+    }) {
+      final client = context.read<WebsocketClientProvider>().client;
+      if (client == null) {
+        showError(context, "You are not connected.");
+      }
+
+      final username =
+          (context.read<UserBloc>().state as UserCompleteState).username;
+      final archiveMessageProvider = context.read<ArchiveMessageProvider>();
+
+      DeleteMessage deleteMessage = DeleteMessage(
+        from: username,
+        to: archiveMessageProvider.archiveUser,
+        id: [messageId],
+        everyone: everyone,
+      );
+
+      bool result = client!.deleteMessage(deleteMessage);
+      if (result) {
+        context.read<RealTimeBloc>().add(RealTimeDeleteMessageEvent(
+              message: deleteMessage,
+              username: username,
+            ));
+        archiveMessageProvider.clearSelect();
+      } else {
+        showError(context, "Failed to delete message.");
+      }
+    }
 
     showModalBottomSheet(
       useRootNavigator: true,
@@ -86,7 +113,7 @@ class ArchiveItem extends StatelessWidget {
                   children: [
                     InkWell(
                       onTap: () {
-                        onSelect();
+                        archiveMessageProvider.selectMessage(messageId);
                         context.pop();
                       },
                       child: _ArchiveItemOptions(
@@ -123,7 +150,9 @@ class ArchiveItem extends StatelessWidget {
                       ),
                     InkWell(
                       onTap: () {
-                        deleteMessage(false);
+                        deleteMessage(
+                          everyone: false,
+                        );
                         context.pop();
                       },
                       child: _ArchiveItemOptions(
@@ -135,7 +164,9 @@ class ArchiveItem extends StatelessWidget {
                     if (self)
                       InkWell(
                         onTap: () {
-                          deleteMessage(true);
+                          deleteMessage(
+                            everyone: true,
+                          );
                           context.pop();
                         },
                         child: _ArchiveItemOptions(
@@ -151,9 +182,7 @@ class ArchiveItem extends StatelessWidget {
           ),
         );
       },
-    ).whenComplete(() {
-      FocusManager.instance.primaryFocus?.unfocus();
-    });
+    );
   }
 
   @override
@@ -161,6 +190,7 @@ class ArchiveItem extends StatelessWidget {
     final currTheme = Theme.of(context).colorScheme;
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
+
     final UserGraph graph = UserGraph();
     MessageEntity messageEntity =
         graph.getValueByKey(messageKey)! as MessageEntity;
@@ -168,40 +198,39 @@ class ArchiveItem extends StatelessWidget {
     bool self = message.from == username;
 
     final alignment = self ? Alignment.topRight : Alignment.topLeft;
+    final archiveProvider = context.read<ArchiveMessageProvider>();
 
     TextStyle metaDataStyle = TextStyle(
       fontSize: Constants.smallFontSize,
       fontWeight: FontWeight.w600,
       color: self
-          ? currTheme.onPrimaryContainer.withValues(
+          ? archiveProvider.selfTextColor.withValues(
               alpha: 0.5,
             )
-          : currTheme.onSurface.withValues(
+          : archiveProvider.textColor.withValues(
               alpha: 0.5,
             ),
     );
 
-    List<Color> colors = self
-        ? [
-            currTheme.secondaryContainer,
-            currTheme.primaryContainer,
-          ]
-        : [
-            currTheme.surfaceContainerLowest,
-            currTheme.surfaceContainerHighest,
-          ];
+    Color bubbleColor = self
+        ? archiveProvider.selfBackgroundColor
+        : archiveProvider.backgroundColor;
+    Color textColor =
+        self ? archiveProvider.selfTextColor : archiveProvider.textColor;
 
     Widget body;
     switch (message.subject) {
       case MessageSubject.text:
         body = _ArchiveText(
-          colors: colors,
+          bubbleColor: bubbleColor,
+          textColor: textColor,
           metaDataStyle: metaDataStyle,
           messageKey: messageKey,
         );
       case MessageSubject.mediaBucketResource:
         body = _ArchiveText(
-          colors: colors,
+          bubbleColor: bubbleColor,
+          textColor: textColor,
           metaDataStyle: metaDataStyle,
           messageKey: messageKey,
         );
@@ -212,7 +241,8 @@ class ArchiveItem extends StatelessWidget {
         );
       case MessageSubject.userLocation:
         body = _ArchiveText(
-          colors: colors,
+          bubbleColor: bubbleColor,
+          textColor: textColor,
           metaDataStyle: metaDataStyle,
           messageKey: messageKey,
         );
@@ -225,23 +255,27 @@ class ArchiveItem extends StatelessWidget {
         body = _ArchivePost(
           metaDataStyle: metaDataStyle,
           messageKey: messageKey,
-          colors: colors,
+          bubbleColor: bubbleColor,
+          textColor: textColor,
         );
       case MessageSubject.dokiPage:
         body = _ArchiveText(
-          colors: colors,
+          bubbleColor: bubbleColor,
+          textColor: textColor,
           metaDataStyle: metaDataStyle,
           messageKey: messageKey,
         );
       case MessageSubject.dokiDiscussion:
         body = _ArchiveText(
-          colors: colors,
+          bubbleColor: bubbleColor,
+          textColor: textColor,
           metaDataStyle: metaDataStyle,
           messageKey: messageKey,
         );
       case MessageSubject.dokiPolls:
         body = _ArchiveText(
-          colors: colors,
+          bubbleColor: bubbleColor,
+          textColor: textColor,
           metaDataStyle: metaDataStyle,
           messageKey: messageKey,
         );
@@ -250,31 +284,39 @@ class ArchiveItem extends StatelessWidget {
     return _AddDayToast(
       date: message.sendAt,
       showDate: showDate,
-      child: Container(
-        width: double.infinity,
-        color: isSelected() ? currTheme.secondaryContainer : Colors.transparent,
-        child: InkWell(
-          onLongPress: canShowMoreOptions()
-              ? () =>
-                  showMoreOptions(context, self, message.subject, message.body)
-              : null,
-          onTap: canShowMoreOptions() ? null : onSelect,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: Constants.padding,
-              vertical: Constants.padding * 0.5,
-            ),
-            child: FractionallySizedBox(
-              alignment: alignment,
-              widthFactor: 0.8,
-              child: Align(
+      child: Builder(builder: (context) {
+        final _ = context.watch<ArchiveMessageProvider>();
+
+        return Container(
+          width: double.infinity,
+          color: archiveProvider.isSelected(messageId)
+              ? currTheme.secondaryContainer
+              : Colors.transparent,
+          child: InkWell(
+            onLongPress: archiveProvider.canShowMoreOptions()
+                ? () => showMoreOptions(
+                    context, self, message.subject, message.body)
+                : null,
+            onTap: archiveProvider.canShowMoreOptions()
+                ? null
+                : () => archiveProvider.selectMessage(messageId),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: Constants.padding,
+                vertical: Constants.padding * 0.5,
+              ),
+              child: FractionallySizedBox(
                 alignment: alignment,
-                child: body,
+                widthFactor: 0.8,
+                child: Align(
+                  alignment: alignment,
+                  child: body,
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }
@@ -343,7 +385,6 @@ class _ArchiveItemOptions extends StatelessWidget {
         children: [
           Icon(
             icon,
-            // size: Constants.iconButtonSize ,
             color: color,
           ),
           Text(

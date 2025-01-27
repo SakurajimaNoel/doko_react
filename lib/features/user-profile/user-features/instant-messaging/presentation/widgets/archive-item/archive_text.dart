@@ -5,19 +5,22 @@ class _ArchiveText extends StatefulWidget {
   const _ArchiveText({
     required this.messageKey,
     required this.metaDataStyle,
-    required this.colors,
+    required this.bubbleColor,
+    required this.textColor,
   });
 
   final String messageKey;
   final TextStyle metaDataStyle;
-  final List<Color> colors;
+  final Color bubbleColor;
+  final Color textColor;
 
   @override
   State<_ArchiveText> createState() => _ArchiveTextState();
 }
 
 class _ArchiveTextState extends State<_ArchiveText> {
-  late final List<Color> colors = widget.colors;
+  late final bubbleColor = widget.bubbleColor;
+  late final textColor = widget.textColor;
   bool viewMore = false;
 
   @override
@@ -46,7 +49,7 @@ class _ArchiveTextState extends State<_ArchiveText> {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Constants.radius),
-                color: colors.last,
+                color: bubbleColor,
                 boxShadow: [
                   BoxShadow(
                     color: currTheme.shadow.withValues(
@@ -63,7 +66,7 @@ class _ArchiveTextState extends State<_ArchiveText> {
               ),
               child: _ArchiveTextBubble(
                 body: message.body,
-                self: self,
+                textColor: textColor,
               ),
             ),
             Row(
@@ -91,11 +94,11 @@ class _ArchiveTextState extends State<_ArchiveText> {
 class _ArchiveTextBubble extends StatefulWidget {
   const _ArchiveTextBubble({
     required this.body,
-    required this.self,
+    required this.textColor,
   });
 
   final String body;
-  final bool self;
+  final Color textColor;
 
   @override
   State<_ArchiveTextBubble> createState() => _ArchiveTextBubbleState();
@@ -104,7 +107,7 @@ class _ArchiveTextBubble extends StatefulWidget {
 class _ArchiveTextBubbleState extends State<_ArchiveTextBubble> {
   bool viewMore = false;
   late final String body = widget.body;
-  late final bool self = widget.self;
+  late final textColor = widget.textColor;
 
   InlineSpan buildText(
     String str, {
@@ -134,7 +137,7 @@ class _ArchiveTextBubbleState extends State<_ArchiveTextBubble> {
     );
   }
 
-  TextSpan buildMessageBody(String body, bool self) {
+  TextSpan buildMessageBody(String body) {
     final currTheme = Theme.of(context).colorScheme;
 
     final matches = <MessageBodyType>[
@@ -229,7 +232,7 @@ class _ArchiveTextBubbleState extends State<_ArchiveTextBubble> {
         height: 1.25,
         wordSpacing: 1.25,
         fontSize: Constants.fontSize,
-        color: self ? currTheme.onPrimaryContainer : currTheme.onSurface,
+        color: textColor,
       ),
       children: children,
     );
@@ -237,8 +240,6 @@ class _ArchiveTextBubbleState extends State<_ArchiveTextBubble> {
 
   @override
   Widget build(BuildContext context) {
-    final currTheme = Theme.of(context).colorScheme;
-
     String displayBody = viewMore
         ? body
         : trimText(
@@ -252,12 +253,12 @@ class _ArchiveTextBubbleState extends State<_ArchiveTextBubble> {
     return RichText(
       text: TextSpan(
         children: [
-          buildMessageBody(displayBody, self),
+          buildMessageBody(displayBody),
           if (showButton)
             TextSpan(
               text: " $buttonText",
               style: TextStyle(
-                color: self ? currTheme.primary : currTheme.onSurface,
+                color: textColor,
                 fontWeight: FontWeight.w600,
                 fontSize: Constants.fontSize,
               ),

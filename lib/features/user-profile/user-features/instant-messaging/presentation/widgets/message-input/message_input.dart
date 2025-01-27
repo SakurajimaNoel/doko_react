@@ -6,6 +6,7 @@ import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/gif-picker/gif_picker.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/provider/archive_message_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,11 +16,9 @@ class MessageInput extends StatefulWidget {
   const MessageInput({
     super.key,
     required this.archiveUser,
-    required this.focusNode,
   });
 
   final String archiveUser;
-  final FocusNode focusNode;
 
   @override
   State<MessageInput> createState() => _MessageInputState();
@@ -27,14 +26,14 @@ class MessageInput extends StatefulWidget {
 
 class _MessageInputState extends State<MessageInput> {
   final TextEditingController controller = TextEditingController();
-  late final FocusNode focusNode;
+  late final FocusNode focusNode =
+      context.read<ArchiveMessageProvider>().focusNode;
 
   bool showMoreOptions = false;
 
   @override
   void initState() {
     super.initState();
-    focusNode = widget.focusNode;
     focusNode.addListener(onFocusChange);
   }
 
@@ -124,7 +123,6 @@ class _MessageInputState extends State<MessageInput> {
                   focusNode: focusNode,
                   minLines: 1,
                   maxLines: 4,
-                  // maxLength: Constants.messageLimit,
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(
                       Constants.messageLimit,
