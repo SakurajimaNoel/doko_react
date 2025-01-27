@@ -13,6 +13,7 @@ class _ArchivePost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currTheme = Theme.of(context).colorScheme;
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
     UserGraph graph = UserGraph();
@@ -29,56 +30,71 @@ class _ArchivePost extends StatelessWidget {
       ),
     );
 
-    return Container(
-      padding: EdgeInsets.all(Constants.padding * 0.5),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(Constants.radius),
-        color: colors.last,
-      ),
-      child: Column(
-        spacing: Constants.gap * 0.5,
-        crossAxisAlignment:
-            self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          PostPreviewWidget(
-            postKey: generatePostNodeKey(message.body),
+    return Column(
+      spacing: Constants.gap * 0.5,
+      crossAxisAlignment:
+          self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: EdgeInsets.all(Constants.padding * 0.5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(Constants.radius),
+            color: colors.last,
+            boxShadow: [
+              BoxShadow(
+                color: currTheme.shadow.withValues(
+                  alpha: 0.25,
+                ),
+                spreadRadius: 0,
+                blurRadius: 10,
+                offset: Offset(0, 4),
+              ),
+            ],
           ),
-          Align(
-            alignment: Alignment.topLeft,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  context.pushNamed(
-                    RouterConstants.userPost,
-                    pathParameters: {
-                      "postId": message.body,
+          child: Column(
+            spacing: Constants.gap * 0.5,
+            children: [
+              PostPreviewWidget(
+                postKey: generatePostNodeKey(message.body),
+              ),
+              Align(
+                alignment: Alignment.topLeft,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      context.pushNamed(
+                        RouterConstants.userPost,
+                        pathParameters: {
+                          "postId": message.body,
+                        },
+                      );
                     },
-                  );
-                },
-                onLongPress: () {},
-                child: Text(
-                  "Check this post out!",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
+                    onLongPress: () {},
+                    child: Text(
+                      "Check this post out!",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if (self) type,
-              Text(
-                formatDateTimeToTimeString(message.sendAt),
-                style: metaDataStyle,
-              ),
-              if (!self) type
             ],
           ),
-        ],
-      ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            if (self) type,
+            Text(
+              formatDateTimeToTimeString(message.sendAt),
+              style: metaDataStyle,
+            ),
+            if (!self) type
+          ],
+        ),
+      ],
     );
   }
 }
