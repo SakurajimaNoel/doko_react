@@ -1,3 +1,5 @@
+import 'package:doko_react/core/utils/notifications/notifications_helper.dart';
+import 'package:flutter/material.dart';
 import 'package:nice_overlay/nice_overlay.dart';
 import 'package:vibration/vibration.dart';
 
@@ -9,10 +11,34 @@ void showNotification(NiceInAppNotification notification) {
   NiceOverlay.showInAppNotification(notification);
 }
 
-void showToast(NiceToast toast) {
-  Vibration.vibrate(
-    pattern: [0, 100],
-    intensities: [0, 128],
-  );
+void _showToast(NiceToast toast) {
+  // Vibration.vibrate(
+  //   pattern: [0, 100],
+  //   intensities: [0, 128],
+  // );
   NiceOverlay.showToast(toast);
+}
+
+void showError(BuildContext context, String message) {
+  _showToast(createNewToast(
+    context,
+    message: message,
+    type: ToastType.error,
+  ));
+}
+
+void showInfo(BuildContext context, String message) {
+  _showToast(createNewToast(
+    context,
+    message: message,
+    type: ToastType.normal,
+  ));
+}
+
+void showSuccess(BuildContext context, String message) {
+  _showToast(createNewToast(
+    context,
+    message: message,
+    type: ToastType.success,
+  ));
 }

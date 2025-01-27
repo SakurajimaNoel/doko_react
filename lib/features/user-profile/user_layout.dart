@@ -122,7 +122,7 @@ class _UserLayoutState extends State<UserLayout> {
       },
       onReconnectSuccess: () {
         /// find latest message from inbox and fetch based on that
-        showSuccess("Reconnected to websocket server.");
+        showSuccess(context, "Reconnected to websocket server.");
       },
       onConnectionClosure: (retry) async {
         StreamSubscription<FGBGType>? fgBgSubscription;
@@ -139,7 +139,8 @@ class _UserLayoutState extends State<UserLayout> {
             retry();
             cancelSubscriptions();
           } else {
-            showError("No internet connection.");
+            if (!mounted) return;
+            showError(context, "No internet connection.");
 
             // Listen for internet connection changes
             internetSubscription = connectionChecker.onStatusChange.listen(
@@ -176,8 +177,9 @@ class _UserLayoutState extends State<UserLayout> {
 
   Future<void> connectWS() async {
     await client.connect();
-    showSuccess("Connected to websocket server.");
     if (!mounted) return;
+
+    showSuccess(context, "Connected to websocket server.");
     context.read<WebsocketClientProvider>().addClient(client);
   }
 
@@ -223,36 +225,6 @@ class _UserLayoutState extends State<UserLayout> {
     );
 
     showNotification(inAppNotification);
-  }
-
-  void showError(String message) {
-    final toast = createNewToast(
-      context,
-      message: message,
-      type: ToastType.error,
-    );
-
-    showToast(toast);
-  }
-
-  void showNormal(String message) {
-    final toast = createNewToast(
-      context,
-      message: message,
-      type: ToastType.normal,
-    );
-
-    showToast(toast);
-  }
-
-  void showSuccess(String message) {
-    final toast = createNewToast(
-      context,
-      message: message,
-      type: ToastType.success,
-    );
-
-    showToast(toast);
   }
 
   @override

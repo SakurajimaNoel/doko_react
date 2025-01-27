@@ -5,7 +5,6 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
-import 'package:doko_react/core/utils/notifications/notifications_helper.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
@@ -113,36 +112,6 @@ class _ShareDetailsState extends State<_ShareDetails> {
     super.dispose();
   }
 
-  void showInfo(String message) {
-    final toast = createNewToast(
-      context,
-      message: message,
-      type: ToastType.normal,
-    );
-
-    showToast(toast);
-  }
-
-  void showError(String message) {
-    final toast = createNewToast(
-      context,
-      message: message,
-      type: ToastType.error,
-    );
-
-    showToast(toast);
-  }
-
-  void showSuccess(String message) {
-    final toast = createNewToast(
-      context,
-      message: message,
-      type: ToastType.success,
-    );
-
-    showToast(toast);
-  }
-
   void onUserSelect(String username) {
     int selectedLength = selectedUsers.length;
     bool selected = selectedUsers.contains(username);
@@ -152,7 +121,8 @@ class _ShareDetailsState extends State<_ShareDetails> {
       if (selectedLength < Constants.shareLimit) {
         selectedUsers.add(username);
       } else {
-        showInfo("You can send up to ${Constants.shareLimit} users at a time.");
+        showInfo(context,
+            "You can send up to ${Constants.shareLimit} users at a time.");
       }
     }
 
@@ -226,7 +196,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
         : "Send to $selectedLength user${selectedLength > 1 ? "s" : ""}";
 
     return SizedBox(
-      width: double.infinity,
+      width: width,
       child: BlocConsumer<ProfileBloc, ProfileState>(
         listenWhen: (previousState, state) {
           return state is ProfileFriendLoadResponse;
@@ -243,7 +213,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
           }
 
           if (errorMessage.isNotEmpty) {
-            showError(errorMessage);
+            showError(context, errorMessage);
             return;
           }
 
@@ -503,7 +473,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                     .client;
 
                                 if (client == null || !client.isActive) {
-                                  showError("You are offline.");
+                                  showError(context, "You are offline.");
                                   return;
                                 }
 
@@ -547,7 +517,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                 }
 
                                 if (successMessage.isNotEmpty) {
-                                  showSuccess(successMessage);
+                                  showSuccess(context, successMessage);
                                 }
                                 context.pop();
                               },

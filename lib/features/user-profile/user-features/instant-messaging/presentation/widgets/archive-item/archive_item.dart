@@ -1,11 +1,14 @@
 import 'dart:collection';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doki_websocket_client/doki_websocket_client.dart';
+import 'package:doki_websocket_client/doki_websocket_client.dart'
+    hide ValueGetter, ValueSetter;
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
@@ -29,10 +32,128 @@ class ArchiveItem extends StatelessWidget {
     super.key,
     required this.messageKey,
     this.showDate = false,
+    required this.onSelect,
+    required this.isSelected,
+    required this.canShowMoreOptions,
+    required this.deleteMessage,
   });
 
   final String messageKey;
   final bool showDate;
+  final VoidCallback onSelect;
+  final ValueGetter<bool> isSelected;
+  final ValueGetter<bool> canShowMoreOptions;
+  final ValueSetter<bool> deleteMessage;
+
+  void showMoreOptions(
+      BuildContext context, bool self, MessageSubject subject, String body) {
+    final width = MediaQuery.sizeOf(context).width;
+    final currTheme = Theme.of(context).colorScheme;
+    final height = MediaQuery.sizeOf(context).height / 2;
+
+    showModalBottomSheet(
+      useRootNavigator: true,
+      context: context,
+      showDragHandle: true,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.only(
+            bottom: Constants.padding,
+          ),
+          constraints: BoxConstraints(
+            maxHeight: height,
+          ),
+          width: width,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: Constants.gap * 0.5,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Constants.padding,
+                  ),
+                  child: Heading.left(
+                    "Message options...",
+                    size: Constants.heading4,
+                  ),
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: Constants.gap * 0.5,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        onSelect();
+                        context.pop();
+                      },
+                      child: _ArchiveItemOptions(
+                        icon: Icons.check,
+                        label: "Select",
+                        color: currTheme.secondary,
+                      ),
+                    ),
+                    if (self && subject == MessageSubject.text)
+                      InkWell(
+                        onTap: () {
+                          showInfo(context, "Coming soon");
+                          // context.pop();
+                        },
+                        child: _ArchiveItemOptions(
+                          icon: Icons.edit,
+                          label: "Edit message",
+                          color: currTheme.secondary,
+                        ),
+                      ),
+                    if (subject == MessageSubject.text)
+                      InkWell(
+                        onTap: () {
+                          Clipboard.setData(ClipboardData(
+                            text: body,
+                          ));
+                          context.pop();
+                        },
+                        child: _ArchiveItemOptions(
+                          icon: Icons.copy,
+                          label: "Copy message",
+                          color: currTheme.secondary,
+                        ),
+                      ),
+                    InkWell(
+                      onTap: () {
+                        deleteMessage(false);
+                        context.pop();
+                      },
+                      child: _ArchiveItemOptions(
+                        icon: Icons.delete,
+                        label: "Delete",
+                        color: currTheme.error,
+                      ),
+                    ),
+                    if (self)
+                      InkWell(
+                        onTap: () {
+                          deleteMessage(true);
+                          context.pop();
+                        },
+                        child: _ArchiveItemOptions(
+                          icon: Icons.delete_forever,
+                          label: "Delete for everyone",
+                          color: currTheme.error,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
+      FocusManager.instance.primaryFocus?.unfocus();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,20 +249,26 @@ class ArchiveItem extends StatelessWidget {
     return _AddDayToast(
       date: message.sendAt,
       showDate: showDate,
-      self: self,
-      child: InkWell(
-        onLongPress: () {},
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Constants.padding,
-            vertical: Constants.padding * 0.5,
-          ),
-          child: FractionallySizedBox(
-            alignment: alignment,
-            widthFactor: 0.8,
-            child: Align(
+      child: Container(
+        width: double.infinity,
+        color: isSelected() ? currTheme.secondaryContainer : Colors.transparent,
+        child: InkWell(
+          onLongPress: canShowMoreOptions()
+              ? () =>
+                  showMoreOptions(context, self, message.subject, message.body)
+              : null,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Constants.padding,
+              vertical: Constants.padding * 0.5,
+            ),
+            child: FractionallySizedBox(
               alignment: alignment,
-              child: body,
+              widthFactor: 0.8,
+              child: Align(
+                alignment: alignment,
+                child: body,
+              ),
             ),
           ),
         ),
@@ -155,13 +282,11 @@ class _AddDayToast extends StatelessWidget {
     required this.child,
     required this.date,
     required this.showDate,
-    required this.self,
   });
 
   final Widget child;
   final DateTime date;
   final bool showDate;
-  final bool self;
 
   @override
   Widget build(BuildContext context) {
@@ -190,11 +315,45 @@ class _AddDayToast extends StatelessWidget {
         const SizedBox(
           height: Constants.gap * 1.25,
         ),
-        SizedBox(
-          width: double.infinity,
-          child: child,
-        ),
+        child,
       ],
+    );
+  }
+}
+
+class _ArchiveItemOptions extends StatelessWidget {
+  const _ArchiveItemOptions({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(Constants.padding),
+      child: Row(
+        spacing: Constants.gap * 1.5,
+        children: [
+          Icon(
+            icon,
+            // size: Constants.iconButtonSize ,
+            color: color,
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: Constants.fontSize,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
