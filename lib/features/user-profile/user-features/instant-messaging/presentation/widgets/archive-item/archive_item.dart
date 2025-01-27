@@ -42,12 +42,17 @@ class ArchiveItem extends StatelessWidget {
   final bool showDate;
   final String messageId;
 
-  void showMoreOptions(
-      BuildContext context, bool self, MessageSubject subject, String body) {
+  void showMoreOptions(BuildContext context, bool self) {
     final width = MediaQuery.sizeOf(context).width;
     final currTheme = Theme.of(context).colorScheme;
     final height = MediaQuery.sizeOf(context).height / 2;
+
     final archiveMessageProvider = context.read<ArchiveMessageProvider>();
+
+    final UserGraph graph = UserGraph();
+    MessageEntity messageEntity =
+        graph.getValueByKey(messageKey)! as MessageEntity;
+    final message = messageEntity.message;
 
     void deleteMessage({
       required bool everyone,
@@ -123,7 +128,7 @@ class ArchiveItem extends StatelessWidget {
                         color: currTheme.secondary,
                       ),
                     ),
-                    if (self && subject == MessageSubject.text)
+                    if (self && message.subject == MessageSubject.text)
                       InkWell(
                         onTap: () {
                           context.pop();
@@ -134,7 +139,7 @@ class ArchiveItem extends StatelessWidget {
                                 value: archiveMessageProvider,
                                 child: _EditMessage(
                                   messageId: messageId,
-                                  body: body,
+                                  body: message.body,
                                 ),
                               );
                             },
@@ -146,11 +151,11 @@ class ArchiveItem extends StatelessWidget {
                           color: currTheme.secondary,
                         ),
                       ),
-                    if (subject == MessageSubject.text)
+                    if (message.subject == MessageSubject.text)
                       InkWell(
                         onTap: () {
                           Clipboard.setData(ClipboardData(
-                            text: body,
+                            text: message.body,
                           ));
                           context.pop();
                         },
@@ -306,8 +311,7 @@ class ArchiveItem extends StatelessWidget {
               : Colors.transparent,
           child: InkWell(
             onLongPress: archiveProvider.canShowMoreOptions()
-                ? () => showMoreOptions(
-                    context, self, message.subject, message.body)
+                ? () => showMoreOptions(context, self)
                 : null,
             onTap: archiveProvider.canShowMoreOptions()
                 ? null
