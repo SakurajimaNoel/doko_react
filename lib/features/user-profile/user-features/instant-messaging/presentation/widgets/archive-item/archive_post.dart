@@ -47,7 +47,7 @@ class _ArchivePost extends StatelessWidget {
                 ),
                 spreadRadius: 0,
                 blurRadius: 10,
-                offset: Offset(0, 4),
+                offset: Offset(0, 2),
               ),
             ],
           ),

@@ -44,7 +44,7 @@ NiceInAppNotification createNewNotification({
         ),
         spreadRadius: 0,
         blurRadius: 20,
-        offset: Offset(0, 4),
+        offset: Offset(0, 2),
       ),
     ],
     padding: EdgeInsets.all(Constants.padding),
@@ -101,7 +101,7 @@ NiceToast createNewToast(
         ),
         spreadRadius: 0,
         blurRadius: 20,
-        offset: Offset(0, 4),
+        offset: Offset(0, 2),
       ),
     ],
   );
