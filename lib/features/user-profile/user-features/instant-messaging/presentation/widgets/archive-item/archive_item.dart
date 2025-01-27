@@ -258,6 +258,7 @@ class ArchiveItem extends StatelessWidget {
               ? () =>
                   showMoreOptions(context, self, message.subject, message.body)
               : null,
+          onTap: canShowMoreOptions() ? null : onSelect,
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: Constants.padding,

@@ -205,7 +205,10 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
               IconButton(
                 onPressed: deleteSelected,
                 color: currTheme.error,
-                icon: Icon(Icons.delete_forever),
+                icon: Badge(
+                  label: Text(messagesSelected.length.toString()),
+                  child: Icon(Icons.delete_forever),
+                ),
               ),
           ],
         ),
