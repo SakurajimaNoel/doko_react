@@ -30,9 +30,11 @@ class LikeWidgetState extends State<LikeWidget>
     controller = AnimationController(
       vsync: this,
       duration: const Duration(
-        seconds: 2,
+        milliseconds: 1800,
       ),
-    )..value = widget.userLike ? 1.0 : 0;
+    )..value = widget.userLike
+        ? 1
+        : 0; // when first render show the correct state of user like
   }
 
   @override
@@ -46,6 +48,15 @@ class LikeWidgetState extends State<LikeWidget>
     final currTheme = Theme.of(context).colorScheme;
     final color = currTheme.primary;
 
+    /// after user like status is changed
+    /// update animation from here in order to sync
+    /// with all the widgets that share the same node
+    if (widget.userLike) {
+      controller.forward();
+    } else {
+      controller.reset();
+    }
+
     return TextButton(
       style: TextButton.styleFrom(
         minimumSize: Size.zero,
@@ -53,13 +64,10 @@ class LikeWidgetState extends State<LikeWidget>
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       onPressed: () {
-        if (widget.userLike) {
-          controller.reset();
-        } else {
+        // just handle feedback here
+        if (!widget.userLike) {
           HapticFeedback.vibrate();
-          controller.forward();
         }
-
         widget.onPress();
       },
       child: Lottie.asset(

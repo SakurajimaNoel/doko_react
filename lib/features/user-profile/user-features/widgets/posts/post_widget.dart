@@ -465,10 +465,6 @@ class _PostActionState extends State<_PostAction> {
                             subject: MessageSubject.dokiPost,
                             nodeIdentifier: post.id,
                           );
-                          // Share.share(
-                          //   "https://doki.com/post/${post.id}",
-                          //   subject: "Check this post on doki.",
-                          // );
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: currTheme.secondary,
