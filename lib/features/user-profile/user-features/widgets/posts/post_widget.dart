@@ -306,18 +306,19 @@ class _PostCaptionState extends State<_PostCaption> {
         children: showButton
             ? [
                 TextSpan(
-                    text: " $buttonText",
-                    style: TextStyle(
-                      color: currTheme.outline,
-                      fontWeight: FontWeight.w600,
-                      fontSize: Constants.smallFontSize,
-                    ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        setState(() {
-                          viewMore = !viewMore;
-                        });
-                      }),
+                  text: " $buttonText",
+                  style: TextStyle(
+                    color: currTheme.outline,
+                    fontWeight: FontWeight.w600,
+                    fontSize: Constants.smallFontSize,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      setState(() {
+                        viewMore = !viewMore;
+                      });
+                    },
+                ),
               ]
             : [],
       ),

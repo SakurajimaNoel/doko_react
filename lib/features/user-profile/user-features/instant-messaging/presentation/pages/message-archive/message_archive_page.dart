@@ -132,6 +132,7 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
     String messageKey = messages[index];
     String messageId = getMessageIdFromMessageKey(messageKey);
     return ArchiveItem(
+      key: ValueKey(messageId),
       showDate: showDate,
       messageKey: messageKey,
       onSelect: () {

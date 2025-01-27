@@ -16,6 +16,7 @@ import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.da
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/message-body-type/message_body_type.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/post_preview_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

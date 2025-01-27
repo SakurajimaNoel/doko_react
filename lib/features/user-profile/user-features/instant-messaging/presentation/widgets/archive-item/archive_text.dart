@@ -18,6 +18,93 @@ class _ArchiveText extends StatefulWidget {
 
 class _ArchiveTextState extends State<_ArchiveText> {
   late final List<Color> colors = widget.colors;
+  bool viewMore = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final currTheme = Theme.of(context).colorScheme;
+    final String messageId = getMessageIdFromMessageKey(widget.messageKey);
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
+    return BlocBuilder<RealTimeBloc, RealTimeState>(
+      buildWhen: (previousState, state) {
+        return (state is RealTimeEditMessageState && state.id == messageId);
+      },
+      builder: (context, state) {
+        UserGraph graph = UserGraph();
+        final MessageEntity entity =
+            graph.getValueByKey(widget.messageKey)! as MessageEntity;
+        ChatMessage message = entity.message;
+        bool self = message.from == username;
+
+        return Column(
+          spacing: Constants.gap * 0.5,
+          crossAxisAlignment:
+              self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(Constants.radius),
+                color: colors.last,
+                boxShadow: [
+                  BoxShadow(
+                    color: currTheme.shadow.withValues(
+                      alpha: 0.25,
+                    ),
+                    spreadRadius: 0,
+                    blurRadius: 10,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.all(
+                Constants.padding * 0.75,
+              ),
+              child: _ArchiveTextBubble(
+                body: message.body,
+                self: self,
+              ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: Constants.gap * 1.5,
+              children: [
+                Text(
+                  formatDateTimeToTimeString(message.sendAt),
+                  style: widget.metaDataStyle,
+                ),
+                if (entity.edited)
+                  Text(
+                    "edited",
+                    style: widget.metaDataStyle,
+                  ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ArchiveTextBubble extends StatefulWidget {
+  const _ArchiveTextBubble({
+    required this.body,
+    required this.self,
+  });
+
+  final String body;
+  final bool self;
+
+  @override
+  State<_ArchiveTextBubble> createState() => _ArchiveTextBubbleState();
+}
+
+class _ArchiveTextBubbleState extends State<_ArchiveTextBubble> {
+  bool viewMore = false;
+  late final String body = widget.body;
+  late final bool self = widget.self;
 
   InlineSpan buildText(
     String str, {
@@ -47,33 +134,34 @@ class _ArchiveTextState extends State<_ArchiveText> {
     );
   }
 
-  // todo improve this
-  TextSpan buildMessageBody(String body, ColorScheme currTheme, bool self) {
-    final RegExp emailRegex =
-        RegExp(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
-    final RegExp urlRegex = RegExp(
-        r"(?!@)(https?:\/\/)?([a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}([\/\w\-\.~]*)?(\?[^\s#@]*)?(\#[^\s@]*)?");
-    final RegExp phoneRegex = RegExp(
-        r"(\+?[0-9]{1,3})?[ ]?[0-9]{3}[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}");
+  TextSpan buildMessageBody(String body, bool self) {
+    final currTheme = Theme.of(context).colorScheme;
 
     final matches = <MessageBodyType>[
-      ...emailRegex.allMatches(body).map((m) => MessageBodyType(m, "email")),
-      ...urlRegex.allMatches(body).map((m) => MessageBodyType(m, "url")),
-      ...phoneRegex.allMatches(body).map((m) => MessageBodyType(m, "phone")),
+      ...Constants.emailRegexMessage
+          .allMatches(body)
+          .map((m) => MessageBodyType(m, "email")),
+      ...Constants.urlRegexMessage
+          .allMatches(body)
+          .map((m) => MessageBodyType(m, "url")),
+      ...Constants.phoneRegexMessage
+          .allMatches(body)
+          .map((m) => MessageBodyType(m, "phone")),
     ]..sort((a, b) {
+        // sort result on start index
         return a.match.start <= b.match.start ? -1 : 1;
       });
 
+    // remove duplicate matches
     Set<int> removedMatches = HashSet<int>();
+    int lastEnd = -1;
+
     for (int i = 0; i < matches.length; i++) {
-      if (removedMatches.contains(i)) continue;
-      final first = matches[i];
-      for (int j = i + 1; j < matches.length; j++) {
-        if (removedMatches.contains(j)) continue;
-
-        final second = matches[j];
-
-        if (first.match.end >= second.match.start) removedMatches.add(j);
+      final current = matches[i];
+      if (current.match.start < lastEnd) {
+        removedMatches.add(i);
+      } else {
+        lastEnd = current.match.end;
       }
     }
 
@@ -150,66 +238,38 @@ class _ArchiveTextState extends State<_ArchiveText> {
   @override
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
-    final String messageId = getMessageIdFromMessageKey(widget.messageKey);
-    final username =
-        (context.read<UserBloc>().state as UserCompleteState).username;
 
-    return BlocBuilder<RealTimeBloc, RealTimeState>(
-      buildWhen: (previousState, state) {
-        return (state is RealTimeEditMessageState && state.id == messageId);
-      },
-      builder: (context, state) {
-        UserGraph graph = UserGraph();
-        final MessageEntity entity =
-            graph.getValueByKey(widget.messageKey)! as MessageEntity;
-        ChatMessage message = entity.message;
-        bool self = message.from == username;
+    String displayBody = viewMore
+        ? body
+        : trimText(
+            body,
+            len: Constants.messageDisplayLimit,
+          );
 
-        return Column(
-          spacing: Constants.gap * 0.5,
-          crossAxisAlignment:
-              self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(Constants.radius),
-                color: colors.last,
-                boxShadow: [
-                  BoxShadow(
-                    color: currTheme.shadow.withValues(
-                      alpha: 0.25,
-                    ),
-                    spreadRadius: 0,
-                    blurRadius: 10,
-                    offset: Offset(0, 2),
-                  ),
-                ],
+    bool showButton = body.length > Constants.messageDisplayLimit;
+    String buttonText = viewMore ? "View less" : "View More";
+
+    return RichText(
+      text: TextSpan(
+        children: [
+          buildMessageBody(displayBody, self),
+          if (showButton)
+            TextSpan(
+              text: " $buttonText",
+              style: TextStyle(
+                color: self ? currTheme.primary : currTheme.onSurface,
+                fontWeight: FontWeight.w600,
+                fontSize: Constants.fontSize,
               ),
-              padding: EdgeInsets.all(
-                Constants.padding * 0.75,
-              ),
-              child: RichText(
-                text: buildMessageBody(message.body, currTheme, self),
-              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  setState(() {
+                    viewMore = !viewMore;
+                  });
+                },
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: Constants.gap * 1.5,
-              children: [
-                Text(
-                  formatDateTimeToTimeString(message.sendAt),
-                  style: widget.metaDataStyle,
-                ),
-                if (entity.edited)
-                  Text(
-                    "edited",
-                    style: widget.metaDataStyle,
-                  ),
-              ],
-            ),
-          ],
-        );
-      },
+        ],
+      ),
     );
   }
 }

@@ -96,4 +96,11 @@ class Constants {
   static int archiveMedia = (_root * 25).round();
   static const int shareLimit = 10;
   static const int messageLimit = 10000;
+  static const int messageDisplayLimit = 512;
+  static final RegExp emailRegexMessage =
+      RegExp(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
+  static final RegExp urlRegexMessage = RegExp(
+      r"(?!@)(https?:\/\/)?([a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}([\/\w\-\.~]*)?(\?[^\s#@]*)?(\#[^\s@]*)?");
+  static final RegExp phoneRegexMessage =
+      RegExp(r"(\+?[0-9]{1,3})?[ ]?[0-9]{3}[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}");
 }
