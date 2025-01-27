@@ -573,7 +573,7 @@ class UserGraph {
     addEntity(messageKey, messageEntity);
   }
 
-  void deleteMessage(DeleteMessage message) {
+  void deleteMessage(DeleteMessage message, String archiveUser) {
     for (String messageId in message.id) {
       String messageKey = generateMessageKey(messageId);
       if (!containsKey(messageKey)) continue;
@@ -582,6 +582,13 @@ class UserGraph {
       messageEntity.deleteMessage();
 
       addEntity(messageKey, messageEntity);
+
+      // remove from list too
+      String archiveKey = generateArchiveKey(archiveUser);
+      if (!containsKey(archiveKey)) return;
+
+      final archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
+      archiveEntity.removeMessage(messageKey);
     }
   }
 }

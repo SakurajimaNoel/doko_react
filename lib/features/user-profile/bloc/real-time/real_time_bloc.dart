@@ -80,13 +80,14 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
   FutureOr<void> _handleRealTimeDeleteMessageEvent(
       RealTimeDeleteMessageEvent event, Emitter<RealTimeState> emit) async {
     UserGraph graph = UserGraph();
-    graph.deleteMessage(event.message);
 
     String archiveUser = getUsernameFromMessageParams(
       event.username,
       to: event.message.to,
       from: event.message.from,
     );
+    graph.deleteMessage(event.message, archiveUser);
+
     emit(RealTimeDeleteMessageState(
       id: event.message.id,
       archiveUser: archiveUser,

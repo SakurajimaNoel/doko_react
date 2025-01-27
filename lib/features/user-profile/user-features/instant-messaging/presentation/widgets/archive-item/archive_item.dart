@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
@@ -38,122 +37,115 @@ class ArchiveItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
-    String messageId = getMessageIdFromMessageKey(messageKey);
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
+    final UserGraph graph = UserGraph();
+    MessageEntity messageEntity =
+        graph.getValueByKey(messageKey)! as MessageEntity;
+    final message = messageEntity.message;
+    bool self = message.from == username;
 
-    return BlocBuilder<RealTimeBloc, RealTimeState>(
-      buildWhen: (previousState, state) {
-        return (state is RealTimeDeleteMessageState &&
-            state.id.contains(messageId));
-      },
-      builder: (context, state) {
-        final UserGraph graph = UserGraph();
-        if (!graph.containsKey(messageKey)) {
-          return SizedBox.shrink();
-        }
+    final alignment = self ? Alignment.topRight : Alignment.topLeft;
 
-        MessageEntity messageEntity =
-            graph.getValueByKey(messageKey)! as MessageEntity;
-        final message = messageEntity.message;
-        bool self = message.from == username;
+    TextStyle metaDataStyle = TextStyle(
+      fontSize: Constants.smallFontSize,
+      fontWeight: FontWeight.w600,
+      color: self
+          ? currTheme.onPrimaryContainer.withValues(
+              alpha: 0.5,
+            )
+          : currTheme.onSurface.withValues(
+              alpha: 0.5,
+            ),
+    );
 
-        final alignment = self ? Alignment.topRight : Alignment.topLeft;
+    List<Color> colors = self
+        ? [
+            currTheme.secondaryContainer,
+            currTheme.primaryContainer,
+          ]
+        : [
+            currTheme.surfaceContainerLowest,
+            currTheme.surfaceContainerHighest,
+          ];
 
-        TextStyle metaDataStyle = TextStyle(
-          fontSize: Constants.smallFontSize,
-          fontWeight: FontWeight.w600,
-          color: self
-              ? currTheme.onPrimaryContainer.withValues(
-                  alpha: 0.5,
-                )
-              : currTheme.onSurface.withValues(
-                  alpha: 0.5,
-                ),
+    Widget body;
+    switch (message.subject) {
+      case MessageSubject.text:
+        body = _ArchiveText(
+          colors: colors,
+          metaDataStyle: metaDataStyle,
+          messageKey: messageKey,
         );
+      case MessageSubject.mediaBucketResource:
+        body = _ArchiveText(
+          colors: colors,
+          metaDataStyle: metaDataStyle,
+          messageKey: messageKey,
+        );
+      case MessageSubject.mediaExternal:
+        body = _ArchiveExternalResource(
+          messageKey: messageKey,
+          metaDataStyle: metaDataStyle,
+        );
+      case MessageSubject.userLocation:
+        body = _ArchiveText(
+          colors: colors,
+          metaDataStyle: metaDataStyle,
+          messageKey: messageKey,
+        );
+      case MessageSubject.dokiUser:
+        body = _ArchiveUserProfile(
+          metaDataStyle: metaDataStyle,
+          messageKey: messageKey,
+        );
+      case MessageSubject.dokiPost:
+        body = _ArchivePost(
+          metaDataStyle: metaDataStyle,
+          messageKey: messageKey,
+          colors: colors,
+        );
+      case MessageSubject.dokiPage:
+        body = _ArchiveText(
+          colors: colors,
+          metaDataStyle: metaDataStyle,
+          messageKey: messageKey,
+        );
+      case MessageSubject.dokiDiscussion:
+        body = _ArchiveText(
+          colors: colors,
+          metaDataStyle: metaDataStyle,
+          messageKey: messageKey,
+        );
+      case MessageSubject.dokiPolls:
+        body = _ArchiveText(
+          colors: colors,
+          metaDataStyle: metaDataStyle,
+          messageKey: messageKey,
+        );
+    }
 
-        /// full screen gradient color for chat message [https://docs.flutter.dev/cookbook/effects/gradient-bubbles]
-        /// reference above cookbook for more info about gradient effect
-        List<Color> colors = self
-            ? [
-                currTheme.secondaryContainer,
-                currTheme.primaryContainer,
-              ]
-            : [
-                currTheme.surfaceContainerLowest,
-                currTheme.surfaceContainerHighest,
-              ];
-
-        Widget body;
-        switch (message.subject) {
-          case MessageSubject.text:
-            body = _ArchiveText(
-              colors: colors,
-              metaDataStyle: metaDataStyle,
-              messageKey: messageKey,
-            );
-          case MessageSubject.mediaBucketResource:
-            body = _ArchiveText(
-              colors: colors,
-              metaDataStyle: metaDataStyle,
-              messageKey: messageKey,
-            );
-          case MessageSubject.mediaExternal:
-            body = _ArchiveExternalResource(
-              messageKey: messageKey,
-              metaDataStyle: metaDataStyle,
-            );
-          case MessageSubject.userLocation:
-            body = _ArchiveText(
-              colors: colors,
-              metaDataStyle: metaDataStyle,
-              messageKey: messageKey,
-            );
-          case MessageSubject.dokiUser:
-            body = _ArchiveUserProfile(
-              metaDataStyle: metaDataStyle,
-              messageKey: messageKey,
-            );
-          case MessageSubject.dokiPost:
-            body = _ArchivePost(
-              metaDataStyle: metaDataStyle,
-              messageKey: messageKey,
-              colors: colors,
-            );
-          case MessageSubject.dokiPage:
-            body = _ArchiveText(
-              colors: colors,
-              metaDataStyle: metaDataStyle,
-              messageKey: messageKey,
-            );
-          case MessageSubject.dokiDiscussion:
-            body = _ArchiveText(
-              colors: colors,
-              metaDataStyle: metaDataStyle,
-              messageKey: messageKey,
-            );
-          case MessageSubject.dokiPolls:
-            body = _ArchiveText(
-              colors: colors,
-              metaDataStyle: metaDataStyle,
-              messageKey: messageKey,
-            );
-        }
-
-        return _AddDayToast(
-          date: message.sendAt,
-          showDate: showDate,
-          self: self,
+    return _AddDayToast(
+      date: message.sendAt,
+      showDate: showDate,
+      self: self,
+      child: InkWell(
+        onLongPress: () {},
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Constants.padding,
+            vertical: Constants.padding * 0.5,
+          ),
           child: FractionallySizedBox(
             alignment: alignment,
             widthFactor: 0.8,
             child: Align(
               alignment: alignment,
-              child: messageEntity.deleted ? null : body,
+              child: body,
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

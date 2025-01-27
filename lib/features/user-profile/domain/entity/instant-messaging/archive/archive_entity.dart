@@ -16,4 +16,13 @@ class ArchiveEntity extends GraphEntity {
   void addCurrentSessionMessages(String message) {
     currentSessionMessages.add(message);
   }
+
+  void removeMessage(String message) {
+    if (currentSessionMessages.contains(message)) {
+      currentSessionMessages.remove(message);
+      return;
+    }
+
+    archiveMessages.removeItem(message);
+  }
 }
