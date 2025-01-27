@@ -352,7 +352,7 @@ class UserWidget extends StatelessWidget {
         : small
             ? 1
             : 1.25;
-    double avtarRadius = Constants.radius * radiusFactor;
+    double avtarRadius = Constants.avtarRadius * radiusFactor;
     double imageDiameter = avtarRadius * 2;
 
     if (profilePicture.bucketPath.isEmpty) {

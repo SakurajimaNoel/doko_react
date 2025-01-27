@@ -17,7 +17,9 @@ class Constants {
 
   static const double padding = _root;
   static const double gap = _root;
-  static const double radius = _root;
+  static const double radius = _root * 0.75;
+  static const double avtarRadius = _root;
+
   static const double width = _root;
   static const double height = _root;
 
