@@ -1,6 +1,6 @@
 // complete user profile query and variables
 import 'package:doko_react/core/config/graphql/graphql_constants.dart';
-import 'package:doko_react/core/helpers/display/display_helper.dart';
+import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';

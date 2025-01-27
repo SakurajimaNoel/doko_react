@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
+import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 final _cacheManager = DefaultCacheManager();

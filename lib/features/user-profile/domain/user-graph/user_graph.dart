@@ -4,7 +4,7 @@ import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
-import 'package:doko_react/core/helpers/relation/user_to_user_relation.dart';
+import 'package:doko_react/core/utils/relation/user_to_user_relation.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';

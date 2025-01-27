@@ -1,5 +1,5 @@
 import 'package:doko_react/core/constants/constants.dart';
-import 'package:doko_react/core/helpers/display/display_helper.dart';
+import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:flutter/material.dart';
 
 class CommentContentInput {

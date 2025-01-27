@@ -1,6 +1,6 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
-import 'package:doko_react/core/helpers/display/display_helper.dart';
+import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/public/sign-out-button/sign_out_button.dart';
 import 'package:flutter/material.dart';

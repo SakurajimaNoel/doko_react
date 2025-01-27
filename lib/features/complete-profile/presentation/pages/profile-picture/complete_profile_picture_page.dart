@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
-import 'package:doko_react/core/helpers/media/image-cropper/image_cropper_helper.dart';
-import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
+import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
+import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';

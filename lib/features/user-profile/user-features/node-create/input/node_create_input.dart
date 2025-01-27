@@ -1,5 +1,5 @@
-import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
-import 'package:doko_react/core/helpers/text-controller/mention_text_controller.dart';
+import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
+import 'package:doko_react/core/utils/text-controller/mention_text_controller.dart';
 import 'package:doko_react/core/validation/input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/domain/entity/comment/comment_media.dart';
 

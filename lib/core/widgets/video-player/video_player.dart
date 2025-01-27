@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/preferences/preferences_bloc.dart';
-import 'package:doko_react/core/helpers/extension/go_router_extension.dart';
-import 'package:doko_react/core/helpers/media/video/video.dart';
+import 'package:doko_react/core/utils/extension/go_router_extension.dart';
+import 'package:doko_react/core/utils/media/video/video.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_kit/media_kit.dart';

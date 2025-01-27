@@ -1,5 +1,5 @@
 import 'package:doko_react/core/config/graphql/graphql_constants.dart';
-import 'package:doko_react/core/helpers/query/query_helper.dart';
+import 'package:doko_react/core/utils/query/query_helper.dart';
 
 class GraphqlQueries {
   // get user query and variables for self

@@ -1,6 +1,6 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
-import 'package:doko_react/core/helpers/media/giphy/giphy_uri.dart';
+import 'package:doko_react/core/utils/media/giphy/giphy_uri.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

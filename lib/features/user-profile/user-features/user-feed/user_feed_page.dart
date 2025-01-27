@@ -6,6 +6,8 @@ import 'package:doko_react/features/user-profile/user-features/widgets/user/user
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vibration/vibration.dart';
+import 'package:vibration/vibration_presets.dart';
 
 class UserFeedPage extends StatefulWidget {
   const UserFeedPage({super.key});
@@ -15,6 +17,23 @@ class UserFeedPage extends StatefulWidget {
 }
 
 class _UserFeedPageState extends State<UserFeedPage> {
+  List<Widget> vibrations() {
+    List<Widget> vibrate = [];
+
+    for (VibrationPreset preset in VibrationPreset.values) {
+      vibrate.add(FilledButton(
+        onPressed: () {
+          Vibration.vibrate(
+            preset: preset,
+          );
+        },
+        child: Text(preset.name),
+      ));
+    }
+
+    return vibrate;
+  }
+
   @override
   Widget build(BuildContext context) {
     final username =
@@ -69,6 +88,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
               UserWidget.preview(
                 userKey: generateUserNodeKey(username),
               ),
+              ...vibrations(),
             ],
           ),
         ),

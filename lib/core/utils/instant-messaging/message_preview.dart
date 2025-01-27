@@ -1,6 +1,6 @@
 import 'package:doki_websocket_client/doki_websocket_client.dart';
-import 'package:doko_react/core/helpers/display/display_helper.dart';
-import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
+import 'package:doko_react/core/utils/display/display_helper.dart';
+import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 
 String messagePreview(ChatMessage message, String username) {
   bool self = message.from == username;

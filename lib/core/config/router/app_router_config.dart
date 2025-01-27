@@ -1,6 +1,6 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
-import 'package:doko_react/core/helpers/page/token_page.dart';
+import 'package:doko_react/core/utils/page/token_page.dart';
 import 'package:doko_react/core/widgets/error/error_unknown_route.dart';
 import 'package:doko_react/features/authentication/presentation/pages/login/confirm_login_page.dart';
 import 'package:doko_react/features/authentication/presentation/pages/login/login_page.dart';

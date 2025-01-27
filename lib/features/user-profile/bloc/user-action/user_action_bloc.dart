@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:doko_react/core/config/graphql/graphql_constants.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
-import 'package:doko_react/core/helpers/relation/user_to_user_relation.dart';
+import 'package:doko_react/core/utils/relation/user_to_user_relation.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';

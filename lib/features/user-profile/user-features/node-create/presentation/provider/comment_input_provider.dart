@@ -1,4 +1,4 @@
-import 'package:doko_react/core/helpers/text-controller/mention_text_controller.dart';
+import 'package:doko_react/core/utils/text-controller/mention_text_controller.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/domain/entity/comment/comment_media.dart';
 import 'package:flutter/material.dart';
 

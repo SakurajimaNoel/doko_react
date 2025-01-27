@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
-import 'package:doko_react/core/helpers/display/display_helper.dart';
+import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
 import 'package:doko_react/core/widgets/like-widget/like_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';

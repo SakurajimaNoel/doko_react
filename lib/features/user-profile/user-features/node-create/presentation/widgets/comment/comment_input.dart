@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
-import 'package:doko_react/core/helpers/media/image-cropper/image_cropper_helper.dart';
-import 'package:doko_react/core/helpers/media/meta-data/media_meta_data_helper.dart';
-import 'package:doko_react/core/helpers/text-controller/mention_text_controller.dart';
-import 'package:doko_react/core/helpers/uuid/uuid_helper.dart';
+import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
+import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
+import 'package:doko_react/core/utils/text-controller/mention_text_controller.dart';
+import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/gif-picker/gif_picker.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
