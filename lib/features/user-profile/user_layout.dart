@@ -93,26 +93,6 @@ class _UserLayoutState extends State<UserLayout> {
           from: message.from,
         );
 
-        /// fetch remote user details user already exists is handled by bloc
-        context.read<UserActionBloc>().add(UserActionGetUserByUsernameEvent(
-              username: remoteUser,
-              currentUser: username,
-            ));
-
-        if (message.subject == MessageSubject.dokiUser) {
-          context.read<UserActionBloc>().add(UserActionGetUserByUsernameEvent(
-                username: message.body,
-                currentUser: username,
-              ));
-        }
-
-        if (message.subject == MessageSubject.dokiPost) {
-          context.read<UserActionBloc>().add(UserActionGetPostByIdEvent(
-                username: username,
-                postId: message.body,
-              ));
-        }
-
         if (remoteUser == message.from) {
           showNewMessageNotification(
               message, generateUserNodeKey(message.from));
@@ -145,8 +125,6 @@ class _UserLayoutState extends State<UserLayout> {
         showSuccess("Reconnected to websocket server.");
       },
       onConnectionClosure: (retry) async {
-        showError("Lost connection to websocket server.");
-
         StreamSubscription<FGBGType>? fgBgSubscription;
         StreamSubscription<InternetConnectionStatus>? internetSubscription;
 
@@ -167,7 +145,6 @@ class _UserLayoutState extends State<UserLayout> {
             internetSubscription = connectionChecker.onStatusChange.listen(
               (InternetConnectionStatus status) {
                 if (status == InternetConnectionStatus.connected) {
-                  showSuccess("Internet connection found.");
                   retry();
                   cancelSubscriptions();
                 }

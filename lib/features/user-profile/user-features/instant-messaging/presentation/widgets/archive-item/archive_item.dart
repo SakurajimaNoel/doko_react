@@ -170,8 +170,6 @@ class _AddDayToast extends StatelessWidget {
     final currTheme = Theme.of(context).colorScheme;
 
     return Column(
-      crossAxisAlignment:
-          self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         const SizedBox(
           height: Constants.gap * 0.5,
@@ -192,7 +190,10 @@ class _AddDayToast extends StatelessWidget {
         const SizedBox(
           height: Constants.gap * 1.25,
         ),
-        child,
+        SizedBox(
+          width: double.infinity,
+          child: child,
+        ),
       ],
     );
   }
