@@ -182,14 +182,14 @@ class _VideoPlayerState extends State<VideoPlayer> {
                             }
                             preferences.add(PreferencesAudioToggleEvent());
                           },
+                          iconSize: Constants.width,
+                          color: primary,
                           icon: Builder(builder: (BuildContext context) {
                             bool audio = context.select(
                                 (PreferencesBloc bloc) => bloc.state.audio);
 
                             return Icon(
                               audio ? Icons.volume_up : Icons.volume_off,
-                              size: Constants.width,
-                              color: primary,
                             );
                           }),
                         ),

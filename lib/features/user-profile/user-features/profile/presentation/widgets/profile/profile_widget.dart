@@ -139,9 +139,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         onPressed: () {
           context.pushNamed(RouterConstants.settings);
         },
+        color: currTheme.onPrimaryContainer,
         icon: Icon(
           Icons.settings,
-          color: currTheme.onPrimaryContainer,
         ),
         tooltip: "Settings",
       ),

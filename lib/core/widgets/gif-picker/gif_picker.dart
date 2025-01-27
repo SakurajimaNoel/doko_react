@@ -45,9 +45,9 @@ class GifPicker extends StatelessWidget {
         padding: EdgeInsets.all(Constants.padding * 0.5),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
+      color: currTheme.primary,
       icon: Icon(
         Icons.gif_box_outlined,
-        color: currTheme.primary,
       ),
     );
   }

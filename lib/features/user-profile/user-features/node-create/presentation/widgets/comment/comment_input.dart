@@ -617,9 +617,9 @@ class _CommentMedia extends StatelessWidget {
                       : () {
                           commentInputProvider.removeMedia();
                         },
+                  color: currTheme.onError,
                   icon: Icon(
                     Icons.delete,
-                    color: currTheme.onError,
                   ),
                 );
               },
@@ -774,9 +774,9 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                   padding: EdgeInsets.all(Constants.padding * 0.5),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
+                color: currTheme.primary,
                 icon: Icon(
                   Icons.collections_outlined,
-                  color: currTheme.primary,
                 ),
               ),
               const SizedBox(

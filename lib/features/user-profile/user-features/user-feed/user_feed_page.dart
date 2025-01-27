@@ -47,9 +47,9 @@ class _UserFeedPageState extends State<UserFeedPage> {
             onPressed: () {
               context.pushNamed(RouterConstants.messageInbox);
             },
+            color: currTheme.primary,
             icon: Icon(
               Icons.mark_chat_unread,
-              color: currTheme.primary,
             ),
           ),
         ],

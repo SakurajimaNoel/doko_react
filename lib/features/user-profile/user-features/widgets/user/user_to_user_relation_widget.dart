@@ -153,11 +153,11 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
             );
           }
 
-          return IconButton(
+          return IconButton.outlined(
             onPressed: () => createFriendRelation(),
+            color: currTheme.primary,
             icon: Icon(
               Icons.person_add_alt_1,
-              color: currTheme.primary,
             ),
             style: IconButton.styleFrom(
               side: BorderSide(
@@ -194,9 +194,9 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
 
           return IconButton(
             onPressed: () => removeFriendRelation(user),
+            color: currTheme.error,
             icon: Icon(
               Icons.close,
-              color: currTheme.error,
             ),
             style: IconButton.styleFrom(
               side: BorderSide(
@@ -248,9 +248,9 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
             children: [
               IconButton(
                 onPressed: () => acceptFriendRelation(user),
+                color: currTheme.primary,
                 icon: Icon(
                   Icons.check,
-                  color: currTheme.primary,
                 ),
                 style: IconButton.styleFrom(
                   side: BorderSide(
@@ -260,9 +260,9 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
               ),
               IconButton(
                 onPressed: () => removeFriendRelation(user),
+                color: currTheme.error,
                 icon: Icon(
                   Icons.close,
-                  color: currTheme.error,
                 ),
                 style: IconButton.styleFrom(
                   side: BorderSide(
@@ -326,9 +326,9 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
           children: [
             IconButton(
               onPressed: () => removeFriendRelation(user),
+              color: currTheme.error,
               icon: Icon(
                 Icons.person_remove_alt_1,
-                color: currTheme.error,
               ),
               style: IconButton.styleFrom(
                 side: BorderSide(
@@ -338,9 +338,9 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
             ),
             IconButton(
               onPressed: goToMessageArchive,
+              color: currTheme.primary,
               icon: Icon(
                 Icons.chat_outlined,
-                color: currTheme.primary,
               ),
               style: IconButton.styleFrom(
                 side: BorderSide(
