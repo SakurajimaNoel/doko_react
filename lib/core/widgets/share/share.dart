@@ -579,7 +579,7 @@ class _ShareUserWidget extends StatelessWidget {
               spacing: Constants.gap * 0.5,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                UserWidget.avtarShare(
+                UserWidget.avtarLarge(
                   userKey: userKey,
                 ),
                 DefaultTextStyle.merge(

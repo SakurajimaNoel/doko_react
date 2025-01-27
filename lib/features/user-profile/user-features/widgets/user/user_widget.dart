@@ -22,6 +22,7 @@ class UserWidget extends StatelessWidget {
         profileOnly = false,
         textOnly = false,
         preview = false,
+        large = false,
         share = false;
 
   const UserWidget.avtar({
@@ -31,6 +32,7 @@ class UserWidget extends StatelessWidget {
         profileOnly = true,
         textOnly = false,
         preview = false,
+        large = false,
         share = false;
 
   const UserWidget.info({
@@ -40,6 +42,7 @@ class UserWidget extends StatelessWidget {
         profileOnly = false,
         textOnly = true,
         preview = false,
+        large = false,
         share = false;
 
   const UserWidget.small({
@@ -49,6 +52,7 @@ class UserWidget extends StatelessWidget {
         profileOnly = false,
         textOnly = false,
         preview = false,
+        large = false,
         share = false;
 
   const UserWidget.avtarSmall({
@@ -58,6 +62,7 @@ class UserWidget extends StatelessWidget {
         profileOnly = true,
         textOnly = false,
         preview = false,
+        large = false,
         share = false;
 
   const UserWidget.infoSmall({
@@ -67,6 +72,7 @@ class UserWidget extends StatelessWidget {
         profileOnly = false,
         textOnly = true,
         preview = false,
+        large = false,
         share = false;
 
   const UserWidget.preview({
@@ -76,16 +82,18 @@ class UserWidget extends StatelessWidget {
         profileOnly = false,
         textOnly = false,
         preview = true,
+        large = false,
         share = false;
 
-  const UserWidget.avtarShare({
+  const UserWidget.avtarLarge({
     super.key,
     required this.userKey,
   })  : small = false,
         profileOnly = true,
         textOnly = false,
         preview = false,
-        share = true;
+        large = true,
+        share = false;
 
   const UserWidget.infoShare({
     super.key,
@@ -94,12 +102,24 @@ class UserWidget extends StatelessWidget {
         profileOnly = false,
         textOnly = true,
         preview = false,
+        large = false,
         share = true;
+
+  const UserWidget.infoVertical({
+    super.key,
+    required this.userKey,
+  })  : small = false,
+        profileOnly = false,
+        textOnly = true,
+        preview = false,
+        large = false,
+        share = false;
 
   final String userKey;
   final bool small;
   final bool profileOnly;
   final bool textOnly;
+  final bool large;
   final bool share;
 
   // highest priority and used in messages
@@ -310,12 +330,10 @@ class UserWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          share
-              ? trimText(
-                  user.name,
-                  len: 12,
-                )
-              : user.name,
+          trimText(
+            user.name,
+            len: share ? 12 : 50,
+          ),
           style: TextStyle(
             fontSize: Constants.smallFontSize * nameScale,
           ),
@@ -347,7 +365,7 @@ class UserWidget extends StatelessWidget {
   }
 
   Widget userAvtar(StorageResource profilePicture) {
-    double radiusFactor = share
+    double radiusFactor = large
         ? 2
         : small
             ? 1

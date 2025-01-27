@@ -48,10 +48,14 @@ class MessageInboxPage extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         bool shrink = constraints.maxWidth < 320;
+        final currTheme = Theme.of(context).colorScheme;
         // bool superShrink = constraints.maxWidth < 290;
 
         // double shrinkFactor = shrink ? 0.75 : 1;
+        bool selected = false;
+
         return ListTile(
+          isThreeLine: true,
           onTap: () {
             context.pushNamed(
               RouterConstants.messageArchive,
@@ -60,26 +64,32 @@ class MessageInboxPage extends StatelessWidget {
               },
             );
           },
-          minVerticalPadding: Constants.padding * 0.75,
+          selectedTileColor: currTheme.primaryContainer,
+          selectedColor: currTheme.onPrimaryContainer,
+          selected: selected,
+          dense: true,
           contentPadding: EdgeInsets.symmetric(
             horizontal: Constants.padding,
           ),
-          leading: shrink
-              ? UserWidget.avtarSmall(
-                  key: ValueKey("$userKey-small-avtar"),
-                  userKey: userKey,
+          leading: selected
+              ? CircleAvatar(
+                  backgroundColor: currTheme.onPrimaryContainer,
+                  child: Icon(
+                    Icons.check,
+                    color: currTheme.primaryContainer,
+                  ),
                 )
-              : UserWidget.avtar(
-                  userKey: userKey,
-                ),
-          title: shrink
-              ? UserWidget.infoSmall(
-                  key: ValueKey("$userKey-user-info-small"),
-                  userKey: userKey,
-                )
-              : UserWidget.info(
-                  userKey: userKey,
-                ),
+              : shrink
+                  ? UserWidget.avtarSmall(
+                      key: ValueKey("$userKey-small-avtar"),
+                      userKey: userKey,
+                    )
+                  : UserWidget.avtar(
+                      userKey: userKey,
+                    ),
+          title: UserWidget.info(
+            userKey: userKey,
+          ),
           subtitle: latestMessage == null
               ? Text("Start the conversation.")
               : Text(messagePreview(latestMessage.message, currentUser)),
@@ -141,9 +151,8 @@ class MessageInboxPage extends StatelessWidget {
               return buildItems(context, index, items);
             },
             separatorBuilder: (BuildContext context, int index) {
-              return Divider(
+              return SizedBox(
                 height: Constants.gap,
-                thickness: Constants.gap * 0.125,
               );
             },
             itemCount: items.length,

@@ -7,6 +7,7 @@ import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/gif-picker/gif_picker.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vibration/vibration.dart';
 
@@ -123,6 +124,13 @@ class _MessageInputState extends State<MessageInput> {
                   focusNode: focusNode,
                   minLines: 1,
                   maxLines: 4,
+                  // maxLength: Constants.messageLimit,
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(
+                      Constants.messageLimit,
+                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                    ),
+                  ],
                   decoration: const InputDecoration(
                     hintText: "Type your message here...",
                   ),
@@ -139,7 +147,7 @@ class _MessageInputState extends State<MessageInput> {
                 const Spacer(),
                 FilledButton(
                   onPressed: () {
-                    final messageBody = controller.text;
+                    final messageBody = controller.text.trim();
                     if (messageBody.isEmpty) return;
 
                     if (client == null || !client.isActive) {
