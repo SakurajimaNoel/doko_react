@@ -27,9 +27,10 @@ class _ArchiveExternalResource extends StatelessWidget {
       ),
     );
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Column(
+    return LayoutBuilder(builder: (context, constraints) {
+      return SizedBox(
+        width: constraints.maxWidth,
+        child: Column(
           spacing: Constants.gap * 0.5,
           crossAxisAlignment:
               self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -52,6 +53,7 @@ class _ArchiveExternalResource extends StatelessWidget {
                 errorWidget: (context, url, error) => const Icon(Icons.error),
                 filterQuality: FilterQuality.high,
                 memCacheHeight: Constants.archiveMedia,
+                width: constraints.maxWidth,
               ),
             ),
             Row(
@@ -66,8 +68,8 @@ class _ArchiveExternalResource extends StatelessWidget {
               ],
             ),
           ],
-        );
-      },
-    );
+        ),
+      );
+    });
   }
 }
