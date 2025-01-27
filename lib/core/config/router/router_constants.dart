@@ -39,4 +39,5 @@ class RouterConstants {
   static const String messageArchive = "message-archive";
   static const String messageInbox = "message-inbox";
   static const String messageArchiveProfile = "message-archive-profile";
+  static const String messageInboxSearch = "message-inbox-search";
 }

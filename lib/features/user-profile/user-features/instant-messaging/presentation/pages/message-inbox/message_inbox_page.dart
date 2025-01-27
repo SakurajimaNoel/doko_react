@@ -106,6 +106,16 @@ class MessageInboxPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Message Inbox"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              context.pushNamed(RouterConstants.messageInboxSearch);
+            },
+            icon: Icon(
+              Icons.search,
+            ),
+          ),
+        ],
       ),
       body: BlocBuilder<RealTimeBloc, RealTimeState>(
         buildWhen: (previousState, state) {

@@ -241,31 +241,40 @@ class AppRouterConfig {
                     builder: (context, state) => MessageInboxPage(),
                     routes: [
                       GoRoute(
-                          parentNavigatorKey: rootNavigatorKey,
-                          path: "message-archive/:username",
-                          name: RouterConstants.messageArchive,
-                          builder: (context, state) {
-                            String username = state.pathParameters["username"]!;
+                        parentNavigatorKey: rootNavigatorKey,
+                        path: "search",
+                        name: RouterConstants.messageInboxSearch,
+                        builder: (context, state) {
+                          return SearchPage.message();
+                        },
+                      ),
+                      GoRoute(
+                        parentNavigatorKey: rootNavigatorKey,
+                        path: "message-archive/:username",
+                        name: RouterConstants.messageArchive,
+                        builder: (context, state) {
+                          String username = state.pathParameters["username"]!;
 
-                            return MessageArchivePage(
-                              username: username,
-                            );
-                          },
-                          routes: [
-                            GoRoute(
-                              parentNavigatorKey: rootNavigatorKey,
-                              path: "message-archive-profile",
-                              name: RouterConstants.messageArchiveProfile,
-                              builder: (context, state) {
-                                String username =
-                                    state.pathParameters["username"]!;
+                          return MessageArchivePage(
+                            username: username,
+                          );
+                        },
+                        routes: [
+                          GoRoute(
+                            parentNavigatorKey: rootNavigatorKey,
+                            path: "message-archive-profile",
+                            name: RouterConstants.messageArchiveProfile,
+                            builder: (context, state) {
+                              String username =
+                                  state.pathParameters["username"]!;
 
-                                return MessageArchiveProfilePage(
-                                  username: username,
-                                );
-                              },
-                            ),
-                          ]),
+                              return MessageArchiveProfilePage(
+                                username: username,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                   GoRoute(

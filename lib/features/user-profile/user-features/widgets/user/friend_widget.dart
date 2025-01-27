@@ -10,9 +10,15 @@ class FriendWidget extends StatelessWidget {
   const FriendWidget({
     super.key,
     required this.userKey,
-  });
+  }) : showMessageOption = false;
+
+  const FriendWidget.message({
+    super.key,
+    required this.userKey,
+  }) : showMessageOption = true;
 
   final String userKey;
+  final bool showMessageOption;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +31,16 @@ class FriendWidget extends StatelessWidget {
 
         return ListTile(
           onTap: () {
+            if (showMessageOption) {
+              context.pushNamed(
+                RouterConstants.messageArchive,
+                pathParameters: {
+                  "username": getUsernameFromUserKey(userKey),
+                },
+              );
+              return;
+            }
+
             context.pushNamed(
               RouterConstants.userProfile,
               pathParameters: {
@@ -44,15 +60,17 @@ class FriendWidget extends StatelessWidget {
               : UserWidget.avtar(
                   userKey: userKey,
                 ),
-          trailing: superShrink
+          trailing: showMessageOption
               ? null
-              : Transform.scale(
-                  scale: shrinkFactor,
-                  child: UserToUserRelationWidget(
-                    username: getUsernameFromUserKey(userKey),
-                    key: ValueKey("${userKey}_relation"),
-                  ),
-                ),
+              : superShrink
+                  ? null
+                  : Transform.scale(
+                      scale: shrinkFactor,
+                      child: UserToUserRelationWidget(
+                        username: getUsernameFromUserKey(userKey),
+                        key: ValueKey("${userKey}_relation"),
+                      ),
+                    ),
           title: shrink
               ? UserWidget.infoSmall(
                   key: ValueKey("$userKey-user-info-small"),

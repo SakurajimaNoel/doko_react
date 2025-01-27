@@ -11,7 +11,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class SearchPage extends StatelessWidget {
-  const SearchPage({super.key});
+  const SearchPage({
+    super.key,
+  }) : inbox = false;
+
+  const SearchPage.message({
+    super.key,
+  }) : inbox = true;
+
+  final bool inbox;
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +134,12 @@ class SearchPage extends StatelessWidget {
                                       itemCount: tempResults.length,
                                       itemBuilder:
                                           (BuildContext context, int index) {
+                                        if (inbox) {
+                                          return FriendWidget.message(
+                                            userKey: tempResults[index],
+                                          );
+                                        }
+
                                         return FriendWidget(
                                           userKey: tempResults[index],
                                         );
