@@ -1,5 +1,6 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
@@ -30,28 +31,18 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   void stateActions(BuildContext context, AuthenticationState state) {
     if (state is AuthenticationSignUpSuccess) {
       formKey.currentState?.reset();
       String message =
-          "Almost there! Just one more step: verify your email address to activate your account. Look for the verification email in your inbox.";
-      showMessage(message);
+          "Almost there! Just one more step: verify your email address to activate your account.\nLook for the verification email in your inbox.";
+      showInfo(context, message);
       context.goNamed(RouterConstants.login);
       return;
     }
 
     String errorMessage = (state as AuthenticationError).message;
-    showMessage(errorMessage);
+    showError(context, errorMessage);
   }
 
   void handleSignUp(BuildContext context) {

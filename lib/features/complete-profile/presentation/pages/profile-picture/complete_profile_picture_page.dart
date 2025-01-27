@@ -4,6 +4,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
@@ -38,16 +39,6 @@ class _CompleteProfilePicturePageState
     extends State<CompleteProfilePicturePage> {
   String? profilePicture;
 
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   void selectProfilePicture(String selectedImagePath) {
     setState(() {
       profilePicture = selectedImagePath;
@@ -68,7 +59,7 @@ class _CompleteProfilePicturePageState
     }
 
     String errorMessage = (state as CompleteProfileErrorState).message;
-    showMessage(errorMessage);
+    showError(context, errorMessage);
   }
 
   void handleCompleteProfile(BuildContext context) {

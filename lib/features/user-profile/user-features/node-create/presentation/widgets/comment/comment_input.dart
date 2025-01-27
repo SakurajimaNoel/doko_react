@@ -3,6 +3,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/text-controller/mention_text_controller.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/gif-picker/gif_picker.dart';
@@ -34,16 +35,6 @@ import 'package:provider/provider.dart';
 class CommentInput extends StatelessWidget {
   const CommentInput({super.key});
 
-  void showMessage(String message, BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
@@ -71,7 +62,7 @@ class CommentInput extends StatelessWidget {
           listener: (context, state) {
             if (state is! NodeCreateSuccess) {
               if (state is NodeCreateError) {
-                showMessage(state.message, context);
+                showError(context, state.message);
               }
               return;
             }
@@ -103,7 +94,7 @@ class CommentInput extends StatelessWidget {
               commentsCount = comment.commentsCount;
             }
 
-            showMessage("Comment added successfully", context);
+            showSuccess(context, "Comment added successfully");
 
             // clean up
             context.read<CommentInputProvider>().reset();
@@ -311,16 +302,6 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
     } else if (overlayPortalController.isShowing) {
       overlayPortalController.hide();
     }
-  }
-
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
   }
 
   Widget generateOverlayContent() {
@@ -544,7 +525,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                           getFileExtensionFromMimeType(data.mimeType);
 
                       if (extension == null) {
-                        showMessage(Constants.errorMessage);
+                        showError(context, Constants.errorMessage);
                         return;
                       }
 
@@ -640,14 +621,8 @@ class _CommentInputActions extends StatefulWidget {
 }
 
 class _CommentInputActionsState extends State<_CommentInputActions> {
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
+  void showToastMediaError() {
+    showError(context, "Invalid media file selected.");
   }
 
   void addMedia(CommentMedia selectedMedia) {
@@ -744,7 +719,8 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                             getFileExtensionFromFileName(selectedMedia.path);
 
                         if (extension == null) {
-                          showMessage("Invalid media file selected.");
+                          if (!mounted) return;
+                          showToastMediaError();
                           return;
                         }
 

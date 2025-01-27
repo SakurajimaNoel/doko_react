@@ -1,6 +1,7 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
@@ -31,16 +32,6 @@ class _PostPublishPageState extends State<PostPublishPage> {
     super.dispose();
   }
 
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +47,7 @@ class _PostPublishPageState extends State<PostPublishPage> {
           listener: (context, state) {
             if (state is NodeCreateSuccess) {
               String message = "Successfully created new post.";
-              showMessage(message);
+              showSuccess(context, message);
 
               context.read<UserActionBloc>().add(
                     UserActionNewPostEvent(
@@ -67,7 +58,7 @@ class _PostPublishPageState extends State<PostPublishPage> {
               return;
             }
 
-            showMessage((state as NodeCreateError).message);
+            showError(context, (state as NodeCreateError).message);
           },
           builder: (context, state) {
             bool uploading = state is NodeCreateLoading;
@@ -80,7 +71,7 @@ class _PostPublishPageState extends State<PostPublishPage> {
                 if (uploading) {
                   String message =
                       "Your post is almost there! Please let it finish uploading before navigating away.";
-                  showMessage(message);
+                  showInfo(context, message);
                   return;
                 }
 
@@ -101,11 +92,11 @@ class _PostPublishPageState extends State<PostPublishPage> {
                             enabled: !uploading,
                             controller: captionController,
                             decoration: const InputDecoration(
+                              alignLabelWithHint: true,
                               border: OutlineInputBorder(),
                               labelText: "Caption",
                               hintText: "Caption here...",
                             ),
-                            autofocus: true,
                             keyboardType: TextInputType.multiline,
                             maxLines: 12,
                             minLines: 5,
@@ -131,8 +122,8 @@ class _PostPublishPageState extends State<PostPublishPage> {
                               if (caption.isEmpty &&
                                   widget.postDetails.content.isEmpty) {
                                 String message =
-                                    "Your post needs either content or a caption. Please add at least one to proceed.";
-                                showMessage(message);
+                                    "Your post needs either content or a caption.\nPlease add at least one to proceed.";
+                                showError(context, message);
                                 return;
                               }
 

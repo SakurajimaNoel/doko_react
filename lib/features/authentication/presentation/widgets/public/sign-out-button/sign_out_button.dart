@@ -1,4 +1,5 @@
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
@@ -12,19 +13,9 @@ class SignOutButton extends StatefulWidget {
 }
 
 class _SignOutButtonState extends State<SignOutButton> {
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   void stateActions(BuildContext context, AuthenticationState state) {
     String errorMessage = (state as AuthenticationError).message;
-    showMessage(errorMessage);
+    showError(context, errorMessage);
   }
 
   @override

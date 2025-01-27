@@ -1,5 +1,6 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
@@ -31,16 +32,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   void stateActions(BuildContext context, AuthenticationState state) {
     if (state is AuthenticationLoginSuccess) {
       LoginStatus status = state.status;
@@ -55,14 +46,14 @@ class _LoginPageState extends State<LoginPage> {
           return;
         case LoginStatus.confirmSingUp:
           String message =
-              "A verification email has been sent to your inbox. Please click the link to confirm your email address and log in.";
-          showMessage(message);
+              "A verification email has been sent to your inbox.\nPlease click the link to confirm your email address and log in.";
+          showInfo(context, message);
           return;
       }
     }
 
     String errorMessage = (state as AuthenticationError).message;
-    showMessage(errorMessage);
+    showError(context, errorMessage);
   }
 
   void handleLogin(BuildContext context) {

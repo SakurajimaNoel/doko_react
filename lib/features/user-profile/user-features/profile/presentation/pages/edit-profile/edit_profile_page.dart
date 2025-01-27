@@ -6,6 +6,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
 import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
@@ -64,19 +65,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     newProfilePicture = user.profilePicture.bucketPath;
   }
 
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   void stateActions(BuildContext context, ProfileState state) {
     if (state is ProfileEditSuccess) {
-      showMessage('Successfully updated user profile');
+      showSuccess(context, 'Successfully updated user profile');
 
       UserGraph graph = UserGraph();
       String key = generateUserNodeKey(user.username);
@@ -93,7 +84,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
 
     String errorMessage = (state as ProfileError).message;
-    showMessage(errorMessage);
+    showError(context, errorMessage);
   }
 
   bool needsUpdate() {

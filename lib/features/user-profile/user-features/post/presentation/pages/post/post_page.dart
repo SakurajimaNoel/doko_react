@@ -1,5 +1,6 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -34,20 +35,14 @@ class _PostPageState extends State<PostPage> {
   late final username =
       (context.read<UserBloc>().state as UserCompleteState).username;
 
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   Future<void> handlePostRefreshEvent() async {
     context.read<UserActionBloc>().add(UserActionPostRefreshEvent(
           postId: widget.postId,
         ));
+  }
+
+  void showToastError(String message) {
+    showError(context, message);
   }
 
   @override
@@ -71,7 +66,7 @@ class _PostPageState extends State<PostPage> {
             return state is LoadErrorState;
           },
           listener: (context, state) {
-            if (state is LoadErrorState) showMessage(state.message);
+            if (state is LoadErrorState) showError(context, state.message);
           },
           buildWhen: (previousState, state) {
             return state is PostInitial;
@@ -125,7 +120,8 @@ class _PostPageState extends State<PostPage> {
                         final PostState state = await postBloc;
 
                         if (state is PostRefreshErrorState) {
-                          showMessage(state.message);
+                          if (!mounted) return;
+                          showToastError(state.message);
                           return;
                         }
 

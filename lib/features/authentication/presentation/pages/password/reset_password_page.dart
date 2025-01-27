@@ -1,5 +1,6 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
@@ -28,16 +29,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     super.dispose();
   }
 
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   void stateActions(BuildContext context, AuthenticationState state) {
     if (state is AuthenticationResetPasswordSuccess) {
       context.pushNamed(
@@ -50,7 +41,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     }
 
     String errorMessage = (state as AuthenticationError).message;
-    showMessage(errorMessage);
+    showError(context, errorMessage);
   }
 
   void handleResetPassword(BuildContext context) {

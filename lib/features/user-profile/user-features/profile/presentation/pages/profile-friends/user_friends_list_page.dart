@@ -1,6 +1,7 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -48,16 +49,6 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
     graphKey = generateUserNodeKey(username);
   }
 
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   Widget buildFriendItems(BuildContext context, int index) {
     final user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
     final Nodes userFriends = user.friends;
@@ -96,6 +87,10 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
   void dispose() {
     queryController.dispose();
     super.dispose();
+  }
+
+  void showToastError(String message) {
+    showError(context, message);
   }
 
   @override
@@ -138,7 +133,7 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
               }
 
               if (errorMessage.isNotEmpty) {
-                showMessage(errorMessage);
+                showError(context, errorMessage);
                 return;
               }
 
@@ -200,7 +195,8 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
 
                   final ProfileState state = await profileBloc;
                   if (state is ProfileRefreshError) {
-                    showMessage(state.message);
+                    if (!mounted) return;
+                    showToastError(state.message);
                   }
                 },
                 child: BlocBuilder<UserActionBloc, UserActionState>(

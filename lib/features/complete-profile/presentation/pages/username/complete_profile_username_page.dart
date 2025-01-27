@@ -1,5 +1,6 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
 import 'package:doko_react/core/widgets/bullet-list/bullet_list.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
@@ -38,19 +39,9 @@ class _CompleteProfileUsernamePageState
     "Contain only letters, numbers, underscores ( _ ), periods ( . ), and hyphens ( - ).",
   ];
 
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   void stateActions(BuildContext context, CompleteProfileState state) {
     String errorMessage = (state as CompleteProfileErrorState).message;
-    showMessage(errorMessage);
+    showError(context, errorMessage);
   }
 
   @override

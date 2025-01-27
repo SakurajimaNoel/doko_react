@@ -1,5 +1,5 @@
-import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
@@ -14,16 +14,6 @@ class RemoveMfaButton extends StatefulWidget {
 }
 
 class _RemoveMfaButtonState extends State<RemoveMfaButton> {
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   void stateActions(BuildContext context, AuthenticationState state) {
     if (state is AuthenticationRemoveMFASuccess) {
       context.read<UserBloc>().add(UserUpdateMFAEvent(
@@ -32,7 +22,7 @@ class _RemoveMfaButtonState extends State<RemoveMfaButton> {
       return;
     }
     String errorMessage = (state as AuthenticationError).message;
-    showMessage(errorMessage);
+    showError(context, errorMessage);
   }
 
   @override

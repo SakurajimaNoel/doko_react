@@ -6,6 +6,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/utils/media/video/video.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/bullet-list/bullet_list.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
@@ -51,16 +52,6 @@ class CreatePostPageState extends State<CreatePostPage> {
     userId = (context.read<UserBloc>().state as UserCompleteState).id;
   }
 
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   String generateBucketPath(String path) {
     String randomString = generateUniqueString();
     String extension = getFileExtensionFromFileName(path) ?? "";
@@ -97,8 +88,10 @@ class CreatePostPageState extends State<CreatePostPage> {
     if (compressedVideo == null) {
       // handle failed case
       String message =
-          "Uh-oh, looks like we couldn't add that video. Please try selecting it again.";
-      showMessage(message);
+          "Uh-oh, looks like we couldn't add that video.\nPlease try selecting it again.";
+      if (!mounted) return;
+
+      showError(context, message);
       setState(() {
         content.removeLast();
       });
@@ -136,8 +129,8 @@ class CreatePostPageState extends State<CreatePostPage> {
     }
 
     String message =
-        "It seems like we don't support that file type. Please try uploading an image or video instead.";
-    showMessage(message);
+        "It seems like we don't support that file type.\nPlease try uploading an image or video instead.";
+    showError(context, message);
   }
 
   void onSelection(List<XFile> selectedFiles) {

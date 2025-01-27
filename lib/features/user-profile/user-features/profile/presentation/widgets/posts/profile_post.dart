@@ -1,6 +1,7 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -39,16 +40,6 @@ class _ProfilePostState extends State<ProfilePost> {
     username = widget.username;
     graphKey = generateUserNodeKey(username);
     user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
-  }
-
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
   }
 
   Widget buildPostItems(BuildContext context, int index) {
@@ -105,7 +96,7 @@ class _ProfilePostState extends State<ProfilePost> {
         loading = false;
 
         if (state is ProfilePostLoadError) {
-          showMessage(state.message);
+          showError(context, state.message);
           return;
         }
 

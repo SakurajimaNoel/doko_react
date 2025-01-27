@@ -6,6 +6,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
@@ -93,16 +94,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   void dispose() {
     controller.removeListener(handleScroll);
     super.dispose();
-  }
-
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
   }
 
   void handleUserProfileShare() {
@@ -266,6 +257,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     context.read<UserActionBloc>().add(UserActionUserRefreshEvent(
           username: username,
         ));
+  }
+
+  void showToastError(String message) {
+    showError(context, message);
   }
 
   @override
@@ -475,7 +470,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     final ProfileState state = await profileBloc;
 
                     if (state is ProfileRefreshError) {
-                      showMessage(state.message);
+                      if (!mounted) return;
+                      showToastError(state.message);
                     } else {
                       // trigger ui rebuilds
                       if (mounted) {

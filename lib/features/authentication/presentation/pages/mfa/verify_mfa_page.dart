@@ -1,6 +1,7 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
@@ -26,29 +27,19 @@ class _VerifyMfaPageState extends State<VerifyMfaPage> {
     super.dispose();
   }
 
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(message),
-        duration: Constants.snackBarDuration,
-      ),
-    );
-  }
-
   void stateActions(BuildContext context, AuthenticationState state) {
     if (state is AuthenticationVerifyMFASuccess) {
       // update status
       context.read<UserBloc>().add(UserUpdateMFAEvent(
             mfaStatus: true,
           ));
-      showMessage('Successfully added MFA to this account!');
+      showSuccess(context, 'Successfully added MFA to this account!');
       context.goNamed(RouterConstants.settings);
       return;
     }
 
     String errorMessage = (state as AuthenticationError).message;
-    showMessage(errorMessage);
+    showError(context, errorMessage);
   }
 
   void handleVerifyMFA(BuildContext context) {
