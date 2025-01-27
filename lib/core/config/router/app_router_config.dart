@@ -208,6 +208,7 @@ class AppRouterConfig {
                   builder: (context, state) => const UserFeedPage(),
                   routes: [
                     GoRoute(
+                      parentNavigatorKey: rootNavigatorKey,
                       name: RouterConstants.userSearch,
                       path: "search",
                       builder: (context, state) => const SearchPage(),
