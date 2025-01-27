@@ -4,6 +4,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/notifications/notifications_helper.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
@@ -19,7 +20,6 @@ import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nice_overlay/nice_overlay.dart';
 import 'package:share_plus/share_plus.dart' as share_external;
 
 class Share extends StatelessWidget {
@@ -120,7 +120,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
       type: ToastType.normal,
     );
 
-    NiceOverlay.showToast(toast);
+    showToast(toast);
   }
 
   void showError(String message) {
@@ -130,7 +130,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
       type: ToastType.error,
     );
 
-    NiceOverlay.showToast(toast);
+    showToast(toast);
   }
 
   void showSuccess(String message) {
@@ -140,7 +140,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
       type: ToastType.success,
     );
 
-    NiceOverlay.showToast(toast);
+    showToast(toast);
   }
 
   void onUserSelect(String username) {

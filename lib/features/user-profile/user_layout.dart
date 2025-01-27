@@ -11,6 +11,7 @@ import 'package:doko_react/core/global/provider/websocket-client/websocket_clien
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/utils/instant-messaging/message_preview.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/notifications/notifications_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -24,7 +25,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:nice_overlay/nice_overlay.dart';
+import 'package:vibration/vibration.dart';
+import 'package:vibration/vibration_presets.dart';
 
 import 'bloc/real-time/real_time_bloc.dart';
 
@@ -208,6 +210,10 @@ class _UserLayoutState extends State<UserLayout> {
         GoRouter.of(context).currentRoutePathParameters;
     if (routeName == RouterConstants.messageArchive &&
         pathParams["username"] == getUsernameFromUserKey(userKey)) {
+      // gentle remainder
+      Vibration.vibrate(
+        preset: VibrationPreset.gentleReminder,
+      );
       return;
     }
 
@@ -239,7 +245,7 @@ class _UserLayoutState extends State<UserLayout> {
       context: context,
     );
 
-    NiceOverlay.showInAppNotification(inAppNotification);
+    showNotification(inAppNotification);
   }
 
   void showError(String message) {
@@ -249,7 +255,7 @@ class _UserLayoutState extends State<UserLayout> {
       type: ToastType.error,
     );
 
-    NiceOverlay.showToast(toast);
+    showToast(toast);
   }
 
   void showNormal(String message) {
@@ -259,7 +265,7 @@ class _UserLayoutState extends State<UserLayout> {
       type: ToastType.normal,
     );
 
-    NiceOverlay.showToast(toast);
+    showToast(toast);
   }
 
   void showSuccess(String message) {
@@ -269,7 +275,7 @@ class _UserLayoutState extends State<UserLayout> {
       type: ToastType.success,
     );
 
-    NiceOverlay.showToast(toast);
+    showToast(toast);
   }
 
   @override

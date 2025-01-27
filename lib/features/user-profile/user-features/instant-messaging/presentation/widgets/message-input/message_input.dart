@@ -2,6 +2,7 @@ import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/notifications/notifications_helper.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/gif-picker/gif_picker.dart';
@@ -9,7 +10,7 @@ import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.d
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nice_overlay/nice_overlay.dart';
+import 'package:vibration/vibration.dart';
 
 class MessageInput extends StatefulWidget {
   const MessageInput({
@@ -69,7 +70,7 @@ class _MessageInputState extends State<MessageInput> {
       type: ToastType.error,
     );
 
-    NiceOverlay.showToast(toast);
+    showToast(toast);
   }
 
   void showNormal(String message) {
@@ -79,7 +80,7 @@ class _MessageInputState extends State<MessageInput> {
       type: ToastType.normal,
     );
 
-    NiceOverlay.showToast(toast);
+    showToast(toast);
   }
 
   void showSuccess(String message) {
@@ -89,7 +90,7 @@ class _MessageInputState extends State<MessageInput> {
       type: ToastType.success,
     );
 
-    NiceOverlay.showToast(toast);
+    showToast(toast);
   }
 
   @override
@@ -198,6 +199,10 @@ class _MessageInputState extends State<MessageInput> {
                       );
                       client.sendMessage(message);
 
+                      Vibration.vibrate(
+                        pattern: [0, 100],
+                        intensities: [0, 64],
+                      );
                       // fire bloc event
                       realTimeBloc.add(RealTimeNewMessageEvent(
                         message: message,
