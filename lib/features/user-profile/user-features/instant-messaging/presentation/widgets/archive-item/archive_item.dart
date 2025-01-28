@@ -110,7 +110,7 @@ class ArchiveItem extends StatelessWidget {
                   ),
                   child: Heading.left(
                     "Message options...",
-                    size: Constants.heading4,
+                    size: Constants.fontSize * 1.25,
                   ),
                 ),
                 Column(
@@ -397,7 +397,7 @@ class _ArchiveItemOptions extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(Constants.padding),
       child: Row(
-        spacing: Constants.gap * 1.5,
+        spacing: Constants.gap * 1,
         children: [
           Icon(
             icon,
@@ -407,7 +407,7 @@ class _ArchiveItemOptions extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: Constants.smallFontSize,
+              fontSize: Constants.fontSize * 0.875,
               fontWeight: FontWeight.w500,
               color: color,
             ),
