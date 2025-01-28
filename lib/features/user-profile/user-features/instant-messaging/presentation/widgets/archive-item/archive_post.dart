@@ -38,7 +38,6 @@ class _ArchivePost extends StatelessWidget {
           self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Container(
-          padding: EdgeInsets.all(Constants.padding * 0.5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(Constants.radius),
             color: bubbleColor,
@@ -53,36 +52,25 @@ class _ArchivePost extends StatelessWidget {
               ),
             ],
           ),
-          child: Column(
-            spacing: Constants.gap * 0.5,
-            children: [
-              PostPreviewWidget(
-                postKey: generatePostNodeKey(message.body),
-              ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      context.pushNamed(
-                        RouterConstants.userPost,
-                        pathParameters: {
-                          "postId": message.body,
-                        },
-                      );
-                    },
-                    child: Text(
-                      "Check this post out!",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: textColor,
-                      ),
-                    ),
-                  ),
+          clipBehavior: Clip.antiAlias,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                context.pushNamed(
+                  RouterConstants.userPost,
+                  pathParameters: {
+                    "postId": message.body,
+                  },
+                );
+              },
+              child: Padding(
+                padding: EdgeInsets.all(Constants.padding * 0.5),
+                child: PostPreviewWidget(
+                  postKey: generatePostNodeKey(message.body),
                 ),
               ),
-            ],
+            ),
           ),
         ),
         Row(

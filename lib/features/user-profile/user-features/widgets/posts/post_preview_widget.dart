@@ -123,11 +123,12 @@ class PostPreviewWidget extends StatelessWidget {
                 if (post.content.isNotEmpty)
                   ChangeNotifierProvider(
                     create: (_) => PostCarouselIndicatorProvider(
-                      currentItem: 0,
+                      currentItem: post.currDisplay,
                       width: width,
                     ),
                     child: PostContent.preview(
                       content: post.content,
+                      postId: post.id,
                     ),
                   ),
                 Text(trimText(post.caption)),

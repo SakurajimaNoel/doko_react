@@ -134,7 +134,7 @@ class _ProfilePostState extends State<ProfilePost> {
             itemBuilder: buildPostItems,
             separatorBuilder: (BuildContext context, int index) {
               return const SizedBox(
-                height: Constants.gap * 2.5,
+                height: Constants.gap * 1.75,
               );
             },
           );

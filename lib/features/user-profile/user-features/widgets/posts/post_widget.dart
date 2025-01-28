@@ -37,89 +37,120 @@ class PostWidget extends StatelessWidget {
     final UserGraph graph = UserGraph();
     final PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // post meta data
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Constants.padding,
-          ),
-          child: LayoutBuilder(builder: (context, constraints) {
-            bool shrink = constraints.maxWidth < Constants.postMetadataWidth;
-            double shrinkFactor = shrink ? 0.75 : 1;
+    String currentRoute = GoRouter.of(context).currentRouteName ?? "";
+    bool isPostPage = currentRoute == RouterConstants.userPost;
 
-            bool superShrink = constraints.maxWidth < 250;
-
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (!shrink)
-                  UserWidget(
-                    userKey: post.createdBy,
-                  )
-                else
-                  UserWidget.small(
-                    key: ValueKey("${post.createdBy}-with-small-size"),
-                    userKey: post.createdBy,
-                  ),
-                if (!superShrink)
-                  Text(
-                    displayDateDifference(
-                      post.createdOn,
-                      small: shrink,
-                    ),
-                    style: TextStyle(
-                      fontSize: Constants.smallFontSize * shrinkFactor,
-                    ),
-                  ),
-              ],
-            );
-          }),
-        ),
-        // post content
-        if (post.content.isNotEmpty) ...[
-          const SizedBox(
-            height: Constants.gap * 0.5,
-          ),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final width = constraints.maxWidth;
-              return ChangeNotifierProvider(
-                create: (_) => PostCarouselIndicatorProvider(
-                  currentItem: 0,
-                  width: width,
-                ),
-                child: PostContent(
-                  content: post.content,
-                ),
+    return InkWell(
+      onTap: isPostPage
+          ? null
+          : () {
+              context.pushNamed(
+                RouterConstants.userPost,
+                pathParameters: {
+                  "postId": post.id,
+                },
               );
             },
-          ),
-          const SizedBox(
-            height: Constants.gap * 0.5,
-          ),
-        ],
-        const SizedBox(
-          height: Constants.gap * 0.5,
+      onLongPress: isPostPage
+          ? null
+          : () {
+              Share.share(
+                context: context,
+                subject: MessageSubject.dokiPost,
+                nodeIdentifier: post.id,
+              );
+            },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: Constants.padding * 0.75,
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Constants.padding,
-            vertical: Constants.padding * 0.5,
-          ),
-          child: _PostCaption(
-            caption: post.caption,
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // post meta data
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: Constants.padding,
+              ),
+              child: LayoutBuilder(builder: (context, constraints) {
+                bool shrink =
+                    constraints.maxWidth < Constants.postMetadataWidth;
+                double shrinkFactor = shrink ? 0.75 : 1;
+
+                bool superShrink = constraints.maxWidth < 250;
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (!shrink)
+                      UserWidget(
+                        userKey: post.createdBy,
+                      )
+                    else
+                      UserWidget.small(
+                        key: ValueKey("${post.createdBy}-with-small-size"),
+                        userKey: post.createdBy,
+                      ),
+                    if (!superShrink)
+                      Text(
+                        displayDateDifference(
+                          post.createdOn,
+                          small: shrink,
+                        ),
+                        style: TextStyle(
+                          fontSize: Constants.smallFontSize * shrinkFactor,
+                        ),
+                      ),
+                  ],
+                );
+              }),
+            ),
+            // post content
+            if (post.content.isNotEmpty) ...[
+              const SizedBox(
+                height: Constants.gap * 0.5,
+              ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
+                  return ChangeNotifierProvider(
+                    create: (_) => PostCarouselIndicatorProvider(
+                      currentItem: post.currDisplay,
+                      width: width,
+                    ),
+                    child: PostContent(
+                      content: post.content,
+                      postId: post.id,
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(
+                height: Constants.gap * 0.5,
+              ),
+            ],
+            const SizedBox(
+              height: Constants.gap * 0.5,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: Constants.padding,
+                vertical: Constants.padding * 0.5,
+              ),
+              child: _PostCaption(
+                caption: post.caption,
+              ),
+            ),
+            const SizedBox(
+              height: Constants.gap * 0.5,
+            ),
+            _PostAction(
+              postId: post.id,
+            ),
+          ],
         ),
-        const SizedBox(
-          height: Constants.gap * 0.5,
-        ),
-        _PostAction(
-          postId: post.id,
-        ),
-      ],
+      ),
     );
   }
 }
@@ -129,28 +160,37 @@ class PostContent extends StatefulWidget {
   const PostContent({
     super.key,
     required this.content,
+    required this.postId,
   }) : preview = false;
 
   const PostContent.preview({
     super.key,
     required this.content,
+    required this.postId,
   }) : preview = true;
 
   final List<PostContentEntity> content;
   final bool preview;
+  final String postId;
 
   @override
   State<PostContent> createState() => _PostContentState();
 }
 
 class _PostContentState extends State<PostContent> {
-  final CarouselController controller = CarouselController();
+  late final CarouselController controller;
   late final preview = widget.preview;
+  final UserGraph graph = UserGraph();
+  late final String postKey = generatePostNodeKey(widget.postId);
 
   @override
   void initState() {
     super.initState();
+    final PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
 
+    controller = CarouselController(
+      initialItem: post.currDisplay,
+    );
     controller.addListener(updateCurrentItem);
   }
 
@@ -159,6 +199,9 @@ class _PostContentState extends State<PostContent> {
     double width = context.read<PostCarouselIndicatorProvider>().width;
 
     int item = (offset / width).round();
+
+    final PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
+    post.updateDisplayItem(item);
 
     context.read<PostCarouselIndicatorProvider>().updateCurrentItem(item);
   }
