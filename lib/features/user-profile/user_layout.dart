@@ -93,7 +93,7 @@ class _UserLayoutState extends State<UserLayout> {
           from: message.from,
         );
 
-        if (remoteUser == message.from) {
+        if (remoteUser == message.from && username != remoteUser) {
           showNewMessageNotification(
               message, generateUserNodeKey(message.from));
         }
