@@ -6,14 +6,19 @@ class Throttle {
   final Duration interval;
   Timer? _timer;
   VoidCallback? latest;
+  bool runAtEnd;
 
-  Throttle(this.interval);
+  Throttle(this.interval) : runAtEnd = false;
+
+  /// this is used when we need to call the latest available callback
+  /// after timer duration is completed
+  Throttle.runAtEnd(this.interval) : runAtEnd = true;
 
   call(VoidCallback callback) {
     /// if existing timer is running
     /// save current callback to call when timer ends
     if (_timer != null) {
-      latest = callback;
+      if (runAtEnd) latest = callback;
       return;
     }
 
