@@ -3,6 +3,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/utils/throttle/throttle.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/gif-picker/gif_picker.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
@@ -29,13 +30,34 @@ class _MessageInputState extends State<MessageInput> {
   final TextEditingController controller = TextEditingController();
   late final FocusNode focusNode =
       context.read<ArchiveMessageProvider>().focusNode;
+  final Throttle throttle = Throttle(Constants.typingStatusEventDuration);
+  late final Client? client;
+  late final username =
+      (context.read<UserBloc>().state as UserCompleteState).username;
 
   bool showMoreOptions = false;
 
   @override
   void initState() {
     super.initState();
+
     focusNode.addListener(onFocusChange);
+    controller.addListener(handleTextChange);
+    client = context.read<WebsocketClientProvider>().client;
+  }
+
+  void handleTextChange() {
+    if (client == null || !client!.isActive) {
+      return;
+    }
+    TypingStatus sendStatus = TypingStatus(
+      from: username,
+      to: widget.archiveUser,
+    );
+
+    throttle(() {
+      client!.sendTypingStatus(sendStatus);
+    });
   }
 
   void onFocusChange() {
@@ -57,7 +79,7 @@ class _MessageInputState extends State<MessageInput> {
   @override
   void dispose() {
     focusNode.removeListener(onFocusChange);
-
+    controller.removeListener(handleTextChange);
     controller.dispose();
 
     super.dispose();

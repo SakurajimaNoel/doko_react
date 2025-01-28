@@ -104,6 +104,6 @@ class Constants {
   static final RegExp phoneRegexMessage =
       RegExp(r"(\+?[0-9]{1,3})?[ ]?[0-9]{3}[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}");
   static final Duration typingStatusEventDuration = Duration(
-    seconds: 5,
+    seconds: 3,
   ); // used for both firing end events and sending typing events
 }
