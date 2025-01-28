@@ -96,7 +96,9 @@ class SearchPage extends StatelessWidget {
                                   ),
                                 ),
                                 if (loading) const SmallLoadingIndicator(),
-                                if (!loading && state is! ProfileInitial)
+                                if (!error &&
+                                    !loading &&
+                                    state is! ProfileInitial)
                                   Icon(
                                     Icons.check,
                                     color: currTheme.primary,
