@@ -12,6 +12,7 @@ import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.da
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/provider/archive_message_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/archive-item/archive_item.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/message-input/message_input.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/typing-status/typing_status_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -103,6 +104,7 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
             },
             child: Scaffold(
               appBar: AppBar(
+                toolbarHeight: Constants.height * 5,
                 backgroundColor: currTheme.surfaceContainer,
                 title: InkWell(
                   onTap: () {
@@ -124,20 +126,32 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                       double shrinkFactor = shrink ? 0.75 : 1;
                       double infoFactor = shrink ? 1 : 0.625;
 
-                      return Row(
-                        spacing: Constants.gap * shrinkFactor,
-                        mainAxisSize: MainAxisSize.min,
+                      return Column(
+                        spacing: Constants.gap * 0.25,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (!shrink)
-                            UserWidget.avtar(
-                              userKey: generateUserNodeKey(widget.username),
-                            ),
-                          SizedBox(
-                            width: constraints.maxWidth * infoFactor,
-                            child: UserWidget.info(
-                              userKey: generateUserNodeKey(widget.username),
-                            ),
+                          Row(
+                            spacing: Constants.gap * shrinkFactor,
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              if (!shrink)
+                                UserWidget.avtar(
+                                  userKey: generateUserNodeKey(widget.username),
+                                ),
+                              SizedBox(
+                                width: constraints.maxWidth * infoFactor,
+                                child: UserWidget.info(
+                                  userKey: generateUserNodeKey(widget.username),
+                                ),
+                              ),
+                            ],
                           ),
+                          Builder(builder: (context) {
+                            return TypingStatusWidget.canHide(
+                              username: widget.username,
+                            );
+                          }),
                         ],
                       );
                     },

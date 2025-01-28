@@ -7,6 +7,7 @@ import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/gif-picker/gif_picker.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/provider/archive_message_provider.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/typing-status/typing_status_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -95,92 +96,109 @@ class _MessageInputState extends State<MessageInput> {
       disabled: false,
     );
 
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: Constants.padding * 0.125,
-        horizontal: Constants.padding,
-      ),
-      decoration: BoxDecoration(
-        color: currTheme.surfaceContainerLow,
-        border: Border(
-          top: BorderSide(
-            width: 1.5,
-            color: currTheme.outline,
+    return Column(
+      spacing: Constants.gap * 0.5,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Constants.padding,
           ),
+          child: Builder(builder: (context) {
+            return TypingStatusWidget(
+              username: widget.archiveUser,
+            );
+          }),
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        spacing: Constants.gap * 0.25,
-        children: [
-          Row(
+        Container(
+          padding: const EdgeInsets.symmetric(
+            vertical: Constants.padding * 0.125,
+            horizontal: Constants.padding,
+          ),
+          decoration: BoxDecoration(
+            color: currTheme.surfaceContainerLow,
+            border: Border(
+              top: BorderSide(
+                width: 1.5,
+                color: currTheme.outline,
+              ),
+            ),
+          ),
+          child: Column(
             mainAxisSize: MainAxisSize.min,
-            spacing: Constants.gap * 0.5,
+            spacing: Constants.gap * 0.25,
             children: [
-              Expanded(
-                child: TextField(
-                  controller: controller,
-                  focusNode: focusNode,
-                  minLines: 1,
-                  maxLines: 4,
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(
-                      Constants.messageLimit,
-                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: Constants.gap * 0.5,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      minLines: 1,
+                      maxLines: 4,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(
+                          Constants.messageLimit,
+                          maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                        ),
+                      ],
+                      decoration: const InputDecoration(
+                        hintText: "Type your message here...",
+                      ),
+                    ),
+                  ),
+                  if (!showMoreOptions) gifPicker,
+                ],
+              ),
+              if (showMoreOptions)
+                Row(
+                  spacing: Constants.gap * 0.5,
+                  children: [
+                    gifPicker,
+                    const Spacer(),
+                    FilledButton(
+                      onPressed: () {
+                        final messageBody = controller.text.trim();
+                        if (messageBody.isEmpty) return;
+
+                        if (client == null || !client.isActive) {
+                          showError(context, "You are offline.");
+                          return;
+                        }
+
+                        ChatMessage message = ChatMessage(
+                          from: username,
+                          to: widget.archiveUser,
+                          id: generateUniqueString(),
+                          subject: MessageSubject.text,
+                          body: messageBody,
+                        );
+                        client.sendMessage(message);
+
+                        Vibration.vibrate(
+                          pattern: [0, 100],
+                          intensities: [0, 64],
+                        );
+                        // fire bloc event
+                        realTimeBloc.add(RealTimeNewMessageEvent(
+                          message: message,
+                          username: username,
+                        ));
+
+                        controller.clear();
+                        setState(() {});
+                      },
+                      child: Text("Send"),
                     ),
                   ],
-                  decoration: const InputDecoration(
-                    hintText: "Type your message here...",
-                  ),
                 ),
-              ),
-              if (!showMoreOptions) gifPicker,
             ],
           ),
-          if (showMoreOptions)
-            Row(
-              spacing: Constants.gap * 0.5,
-              children: [
-                gifPicker,
-                const Spacer(),
-                FilledButton(
-                  onPressed: () {
-                    final messageBody = controller.text.trim();
-                    if (messageBody.isEmpty) return;
-
-                    if (client == null || !client.isActive) {
-                      showError(context, "You are offline.");
-                      return;
-                    }
-
-                    ChatMessage message = ChatMessage(
-                      from: username,
-                      to: widget.archiveUser,
-                      id: generateUniqueString(),
-                      subject: MessageSubject.text,
-                      body: messageBody,
-                    );
-                    client.sendMessage(message);
-
-                    Vibration.vibrate(
-                      pattern: [0, 100],
-                      intensities: [0, 64],
-                    );
-                    // fire bloc event
-                    realTimeBloc.add(RealTimeNewMessageEvent(
-                      message: message,
-                      username: username,
-                    ));
-
-                    controller.clear();
-                    setState(() {});
-                  },
-                  child: Text("Send"),
-                ),
-              ],
-            ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
