@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:doko_react/core/config/graphql/graphql_constants.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
@@ -28,9 +29,10 @@ part 'user_action_state.dart';
 
 class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final UserGraph graph = UserGraph();
-  final Set<String> getUserRequest = {};
-  final Set<String> getPostRequest = {};
-  final Set<String> nodeLikeActionRequest = {};
+  final Set<String> getUserRequest = HashSet();
+  final Set<String> getPostRequest = HashSet();
+  final Set<String> nodeLikeActionRequest = HashSet();
+  final Set<String> userToUserRelation = HashSet(); // currentUser@remoteUser
 
   final PostAddLikeUseCase _postAddLikeUseCase;
   final PostRemoveLikeUseCase _postRemoveLikeUseCase;
@@ -202,6 +204,14 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   FutureOr<void> _handleUserActionCreateFriendRelation(
       UserActionCreateFriendRelationEvent event,
       Emitter<UserActionState> emit) async {
+    String currentUsername = event.currentUsername;
+    String username = event.username;
+    String setKey = "$currentUsername@$username";
+
+    if (userToUserRelation.contains(setKey)) return;
+
+    userToUserRelation.add(setKey);
+
     /// optimistically update only affected user relation status
     /// friends list, friends count and pending request list
     /// will be handled by data source
@@ -253,11 +263,20 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         ),
       ));
     }
+    userToUserRelation.remove(setKey);
   }
 
   FutureOr<void> _handleUserActionAcceptFriendRelation(
       UserActionAcceptFriendRelationEvent event,
       Emitter<UserActionState> emit) async {
+    String currentUsername = event.currentUsername;
+    String username = event.username;
+    String setKey = "$currentUsername@$username";
+
+    if (userToUserRelation.contains(setKey)) return;
+
+    userToUserRelation.add(setKey);
+
     /// optimistically update only affected user relation status
     /// friends list, friends count and pending request list
     /// will be handled by data source
@@ -311,11 +330,20 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         ),
       ));
     }
+    userToUserRelation.remove(setKey);
   }
 
   FutureOr<void> _handleUserActionRemoveFriendRelation(
       UserActionRemoveFriendRelationEvent event,
       Emitter<UserActionState> emit) async {
+    String currentUsername = event.currentUsername;
+    String username = event.username;
+    String setKey = "$currentUsername@$username";
+
+    if (userToUserRelation.contains(setKey)) return;
+
+    userToUserRelation.add(setKey);
+
     /// optimistically update only affected user relation status
     /// friends list, friends count and pending request list
     /// will be handled by data source
@@ -368,6 +396,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         ),
       ));
     }
+    userToUserRelation.remove(setKey);
   }
 
   FutureOr<void> _handleUserActionCommentLikeActionEvent(
