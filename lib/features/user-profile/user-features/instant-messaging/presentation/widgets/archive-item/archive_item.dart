@@ -402,11 +402,12 @@ class _ArchiveItemOptions extends StatelessWidget {
           Icon(
             icon,
             color: color,
+            size: Constants.iconButtonSize * 0.5,
           ),
           Text(
             label,
             style: TextStyle(
-              fontSize: Constants.fontSize,
+              fontSize: Constants.smallFontSize,
               fontWeight: FontWeight.w500,
               color: color,
             ),
@@ -448,26 +449,21 @@ class _EditMessageState extends State<_EditMessage> {
       title: Text("Edit message"),
       content: SizedBox(
         width: width,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: controller,
-              minLines: 4,
-              maxLines: 8,
-              autofocus: true,
-              inputFormatters: [
-                LengthLimitingTextInputFormatter(
-                  Constants.messageLimit,
-                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                ),
-              ],
-              decoration: const InputDecoration(
-                hintText: "Edit your message here...",
-                border: OutlineInputBorder(),
-              ),
+        child: TextField(
+          controller: controller,
+          minLines: 2,
+          maxLines: 6,
+          autofocus: true,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(
+              Constants.messageLimit,
+              maxLengthEnforcement: MaxLengthEnforcement.enforced,
             ),
           ],
+          decoration: const InputDecoration(
+            hintText: "Edit your message here...",
+            border: OutlineInputBorder(),
+          ),
         ),
       ),
       actions: [
