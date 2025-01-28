@@ -103,4 +103,7 @@ class Constants {
       r"(?!@)(https?:\/\/)?([a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}([\/\w\-\.~]*)?(\?[^\s#@]*)?(\#[^\s@]*)?");
   static final RegExp phoneRegexMessage =
       RegExp(r"(\+?[0-9]{1,3})?[ ]?[0-9]{3}[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}");
+  static final Duration typingStatusEventDuration = Duration(
+    seconds: 5,
+  ); // used for both firing end events and sending typing events
 }

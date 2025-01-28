@@ -10,7 +10,7 @@ import 'package:doko_react/features/user-profile/domain/entity/instant-messaging
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/typing-status/typing_status_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/typing-status/typing_status_widget_wrapper.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -91,17 +91,12 @@ class MessageInboxPage extends StatelessWidget {
           title: UserWidget.info(
             userKey: userKey,
           ),
-          subtitle: Builder(builder: (context) {
-            if (true) {
-              return TypingStatusWidget.canHide(
-                username: getUsernameFromUserKey(userKey),
-              );
-            }
-
-            return latestMessage == null
+          subtitle: TypingStatusWidgetWrapper.canHide(
+            username: getUsernameFromUserKey(userKey),
+            child: latestMessage == null
                 ? Text("Start the conversation.")
-                : Text(messagePreview(latestMessage.message, currentUser));
-          }),
+                : Text(messagePreview(latestMessage.message, currentUser)),
+          ),
           trailing: latestMessage == null
               ? null
               : Text(formatDateTimeToTimeString(latestMessage.message.sendAt)),

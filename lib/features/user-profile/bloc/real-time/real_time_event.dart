@@ -21,6 +21,15 @@ final class RealTimeTypingStatusEvent extends RealTimeEvent {
   final TypingStatus status;
 }
 
+final class RealTimeTypingStatusEndEvent extends RealTimeEvent {
+  RealTimeTypingStatusEndEvent({
+    required this.username,
+  });
+
+  /// username of user whose typing status will expire
+  final String username;
+}
+
 final class RealTimeEditMessageEvent extends RealTimeEvent {
   RealTimeEditMessageEvent({
     required this.message,

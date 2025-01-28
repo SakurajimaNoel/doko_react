@@ -12,7 +12,7 @@ import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.da
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/provider/archive_message_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/archive-item/archive_item.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/message-input/message_input.dart';
-import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/typing-status/typing_status_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/typing-status/typing_status_widget_wrapper.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -147,11 +147,9 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                               ),
                             ],
                           ),
-                          Builder(builder: (context) {
-                            return TypingStatusWidget.canHide(
-                              username: widget.username,
-                            );
-                          }),
+                          TypingStatusWidgetWrapper.canHide(
+                            username: widget.username,
+                          ),
                         ],
                       );
                     },

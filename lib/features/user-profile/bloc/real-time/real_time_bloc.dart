@@ -13,6 +13,7 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
   RealTimeBloc() : super(RealTimeInitial()) {
     on<RealTimeNewMessageEvent>(_handleRealTimeNewMessageEvent);
     on<RealTimeTypingStatusEvent>(_handleRealTimeTypingStatusEvent);
+    on<RealTimeTypingStatusEndEvent>(_handleRealTimeTypingStatusEndEvent);
     on<RealTimeEditMessageEvent>(_handleRealTimeEditMessageEvent);
     on<RealTimeDeleteMessageEvent>(_handleRealTimeDeleteMessageEvent);
   }
@@ -49,14 +50,22 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
       typing: true,
     ));
 
-    await Future.delayed(
-      Duration(
-        seconds: 4,
-      ),
-    );
+    // await Future.delayed(
+    //   Duration(
+    //     seconds: 4,
+    //   ),
+    // );
+    //
+    // emit(RealTimeTypingStatusState(
+    //   archiveUser: event.status.from,
+    //   typing: false,
+    // ));
+  }
 
+  FutureOr<void> _handleRealTimeTypingStatusEndEvent(
+      RealTimeTypingStatusEndEvent event, Emitter<RealTimeState> emit) async {
     emit(RealTimeTypingStatusState(
-      archiveUser: event.status.from,
+      archiveUser: event.username,
       typing: false,
     ));
   }

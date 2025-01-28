@@ -7,7 +7,7 @@ import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/gif-picker/gif_picker.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/provider/archive_message_provider.dart';
-import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/typing-status/typing_status_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/typing-status/typing_status_widget_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -105,11 +105,9 @@ class _MessageInputState extends State<MessageInput> {
           padding: const EdgeInsets.symmetric(
             horizontal: Constants.padding,
           ),
-          child: Builder(builder: (context) {
-            return TypingStatusWidget(
-              username: widget.archiveUser,
-            );
-          }),
+          child: TypingStatusWidgetWrapper(
+            username: widget.archiveUser,
+          ),
         ),
         Container(
           padding: const EdgeInsets.symmetric(
