@@ -18,14 +18,14 @@ class PostRemoteDataSource {
   final GraphQLClient _client;
   final UserGraph graph = UserGraph();
 
-  Future<bool> getPostWithComments(GetPostInput details) async {
+  Future<bool> getPostWithComments(GetNodeInput details) async {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
           document: gql(GraphqlQueries.getCompletePostById()),
           variables: GraphqlQueries.getCompletePostByIdVariables(
-            details.postId,
+            details.nodeId,
             username: details.username,
           ),
         ),
@@ -63,7 +63,7 @@ class PostRemoteDataSource {
 
       List<CommentEntity> comments = await Future.wait(commentFutures);
       graph.addCommentListToPostEntity(
-        details.postId,
+        details.nodeId,
         comments: comments,
         pageInfo: info,
       );

@@ -5,6 +5,7 @@ import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/features/user-profile/data/models/comments/comment_action_model.dart';
 import 'package:doko_react/features/user-profile/data/models/post/post_action_model.dart';
+import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -377,6 +378,46 @@ class UserProfileRemoteDataSource {
       } else {
         graph.addEntity(postKey, post);
       }
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getCommentById(String commentId, String username) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.getCommentById()),
+          variables: GraphqlQueries.getCommentByIdVariables(
+            commentId: commentId,
+            username: username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+            reason: result.exception?.graphqlErrors.toString() ??
+                "Problem loading comment.");
+      }
+
+      List? res = result.data?["comments"];
+
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: "Comment doesn't exist.",
+        );
+      }
+
+      CommentEntity comment = await CommentEntity.createEntity(
+        map: res[0],
+      );
+
+      UserGraph graph = UserGraph();
+      graph.addEntity(comment.id, comment);
 
       return true;
     } catch (e) {

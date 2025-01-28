@@ -55,4 +55,9 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
   Future<bool> getPostById(String postId, String username) {
     return _remoteDataSource.getPostById(postId, username);
   }
+
+  @override
+  Future<bool> getCommentById(String commentId, String username) {
+    return _remoteDataSource.getCommentById(commentId, username);
+  }
 }

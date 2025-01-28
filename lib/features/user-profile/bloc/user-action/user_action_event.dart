@@ -161,3 +161,14 @@ final class UserActionGetPostByIdEvent extends UserActionEvent {
   final String username;
   final String postId;
 }
+
+// fetch comment by commentId for streaming
+final class UserActionGetCommentByIdEvent extends UserActionEvent {
+  UserActionGetCommentByIdEvent({
+    required this.username,
+    required this.commentId,
+  });
+
+  final String username;
+  final String commentId;
+}

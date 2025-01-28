@@ -1,10 +1,10 @@
-class GetPostInput {
-  const GetPostInput({
-    required this.postId,
+class GetNodeInput {
+  const GetNodeInput({
+    required this.nodeId,
     required this.username,
   });
 
-  final String postId;
+  final String nodeId;
   final String username;
 }
 

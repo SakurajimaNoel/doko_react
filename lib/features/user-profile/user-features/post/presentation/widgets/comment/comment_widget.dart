@@ -45,92 +45,125 @@ class CommentWidget extends StatefulWidget {
 class _CommentWidgetState extends State<CommentWidget> {
   @override
   Widget build(BuildContext context) {
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
     final UserGraph graph = UserGraph();
-
     final commentId = getCommentIdFromCommentKey(widget.commentKey);
-
-    final CommentEntity comment =
-        graph.getValueByKey(widget.commentKey)! as CommentEntity;
 
     final width = MediaQuery.sizeOf(context).width - Constants.padding * 3;
     final height = width / Constants.commentContainer;
 
-    return _CommentWrapper(
-      isReply: widget.isReply,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
+    if (!graph.containsKey(widget.commentKey)) {
+      // send a req to fetch the post
+      context.read<UserActionBloc>().add(UserActionGetCommentByIdEvent(
+            username: username,
+            commentId: commentId,
+          ));
+    }
+
+    return BlocBuilder<UserActionBloc, UserActionState>(
+      buildWhen: (previousState, state) {
+        return state is UserActionCommentDataFetchedState &&
+            state.commentId == commentId;
+      },
+      builder: (context, state) {
+        if (!graph.containsKey(widget.commentKey)) {
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              return SizedBox(
+                height: constraints.maxWidth,
+                child: Center(
+                  child: SmallLoadingIndicator.small(),
+                ),
+              );
+            },
+          );
+        }
+
+        final CommentEntity comment =
+            graph.getValueByKey(widget.commentKey)! as CommentEntity;
+
+        return _CommentWrapper(
+          isReply: widget.isReply,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              UserWidget.small(
-                userKey: comment.commentBy,
-                key: ValueKey(comment.id),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  UserWidget.small(
+                    userKey: comment.commentBy,
+                    key: ValueKey(comment.id),
+                  ),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final width = MediaQuery.sizeOf(context).width;
+                      bool shrink = min(constraints.maxWidth, width) < 320;
+                      bool superShrink = min(constraints.maxWidth, width) < 280;
+                      double shrinkFactor = shrink ? 0.75 : 1;
+
+                      if (superShrink) return SizedBox.shrink();
+
+                      return Text(
+                        key: ValueKey("date-diff-$shrink"),
+                        displayDateDifference(
+                          comment.createdOn,
+                          small: shrink,
+                        ),
+                        style: TextStyle(
+                          fontSize:
+                              Constants.smallFontSize * 0.9 * shrinkFactor,
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final width = MediaQuery.sizeOf(context).width;
-                  bool shrink = min(constraints.maxWidth, width) < 320;
-                  bool superShrink = min(constraints.maxWidth, width) < 280;
-                  double shrinkFactor = shrink ? 0.75 : 1;
-
-                  if (superShrink) return SizedBox.shrink();
-
-                  return Text(
-                    key: ValueKey("date-diff-$shrink"),
-                    displayDateDifference(
-                      comment.createdOn,
-                      small: shrink,
+              if (comment.media.bucketPath.isNotEmpty) ...[
+                SizedBox(
+                  height: Constants.gap * 0.5,
+                ),
+                Container(
+                  alignment: AlignmentDirectional.topStart,
+                  // height: height,
+                  child: CachedNetworkImage(
+                    cacheKey: comment.media.bucketPath,
+                    fit: BoxFit.contain,
+                    imageUrl: comment.media.accessURI,
+                    placeholder: (context, url) => const Center(
+                      child: SmallLoadingIndicator.small(),
                     ),
-                    style: TextStyle(
-                      fontSize: Constants.smallFontSize * 0.9 * shrinkFactor,
-                    ),
-                  );
-                },
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                    filterQuality: FilterQuality.high,
+                    memCacheHeight: height.toInt(),
+                    width: double.infinity,
+                    // height: height,
+                  ),
+                )
+              ],
+              if (comment.content.isNotEmpty) ...[
+                SizedBox(
+                  height: Constants.gap * 0.5,
+                ),
+                _CommentContent(
+                  content: comment.content,
+                ),
+              ],
+              SizedBox(
+                height: Constants.gap * 0.5,
+              ),
+              _CommentActions(
+                commentId: commentId,
+                isReply: widget.isReply,
+                parentNodeId: widget.parentNodeId,
               ),
             ],
           ),
-          if (comment.media.bucketPath.isNotEmpty) ...[
-            SizedBox(
-              height: Constants.gap * 0.5,
-            ),
-            Container(
-              alignment: AlignmentDirectional.topStart,
-              // height: height,
-              child: CachedNetworkImage(
-                cacheKey: comment.media.bucketPath,
-                fit: BoxFit.contain,
-                imageUrl: comment.media.accessURI,
-                placeholder: (context, url) => const Center(
-                  child: SmallLoadingIndicator.small(),
-                ),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-                filterQuality: FilterQuality.high,
-                memCacheHeight: height.toInt(),
-                width: double.infinity,
-                // height: height,
-              ),
-            )
-          ],
-          if (comment.content.isNotEmpty) ...[
-            SizedBox(
-              height: Constants.gap * 0.5,
-            ),
-            _CommentContent(
-              content: comment.content,
-            ),
-          ],
-          SizedBox(
-            height: Constants.gap * 0.5,
-          ),
-          _CommentActions(
-            commentId: commentId,
-            isReply: widget.isReply,
-            parentNodeId: widget.parentNodeId,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

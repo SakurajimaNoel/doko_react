@@ -19,7 +19,7 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<bool> getPostWithComment(GetPostInput details) {
+  Future<bool> getPostWithComment(GetNodeInput details) {
     return remoteDataSource.getPostWithComments(details);
   }
 

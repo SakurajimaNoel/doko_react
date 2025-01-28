@@ -8,6 +8,7 @@ import 'package:doko_react/features/user-profile/domain/entity/comment/comment_e
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_add_like_use_case.dart';
+import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_get.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_remove_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_add_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_get.dart';
@@ -30,7 +31,7 @@ part 'user_action_state.dart';
 class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final UserGraph graph = UserGraph();
   final Set<String> getUserRequest = HashSet();
-  final Set<String> getPostRequest = HashSet();
+  final Set<String> getNodeRequest = HashSet();
   final Set<String> nodeLikeActionRequest = HashSet();
   final Set<String> userToUserRelation = HashSet(); // currentUser@remoteUser
 
@@ -43,6 +44,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final CommentRemoveLikeUseCase _commentRemoveLikeUseCase;
   final UserGetUseCase _userGetUseCase;
   final PostGetUseCase _postGetUseCase;
+  final CommentGetUseCase _commentGetUseCase;
 
   UserActionBloc({
     required PostAddLikeUseCase postAddLikeUseCase,
@@ -54,6 +56,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     required CommentRemoveLikeUseCase commentRemoveLikeUseCase,
     required UserGetUseCase userGetUseCase,
     required PostGetUseCase postGetUseCase,
+    required CommentGetUseCase commentGetUseCase,
   })  : _postAddLikeUseCase = postAddLikeUseCase,
         _postRemoveLikeUseCase = postRemoveLikeUseCase,
         _userCreateFriendRelationUseCase = userCreateFriendRelationUseCase,
@@ -63,6 +66,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         _commentRemoveLikeUseCase = commentRemoveLikeUseCase,
         _userGetUseCase = userGetUseCase,
         _postGetUseCase = postGetUseCase,
+        _commentGetUseCase = commentGetUseCase,
         super(UserActionInitial()) {
     on<UserActionUpdateEvent>(_handleUserActionUpdateEvent);
     on<UserActionPostLikeActionEvent>(_handleUserActionPostLikeActionEvent);
@@ -121,6 +125,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     on<UserActionGetUserByUsernameEvent>(
         _handleUserActionGetUserByUsernameEvent);
     on<UserActionGetPostByIdEvent>(_handleUserActionGetPostByIdEvent);
+    on<UserActionGetCommentByIdEvent>(_handleUserActionGetCommentByIdEvent);
   }
 
   FutureOr<void> _handleUserActionUpdateEvent(
@@ -492,20 +497,42 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   FutureOr<void> _handleUserActionGetPostByIdEvent(
       UserActionGetPostByIdEvent event, Emitter<UserActionState> emit) async {
     try {
-      if (getPostRequest.contains(event.postId)) return;
+      if (getNodeRequest.contains(event.postId)) return;
 
       String key = generatePostNodeKey(event.postId);
       if (graph.containsKey(key)) return;
 
-      getPostRequest.add(event.postId);
-      await _postGetUseCase(GetPostInput(
+      getNodeRequest.add(event.postId);
+      await _postGetUseCase(GetNodeInput(
         username: event.username,
-        postId: event.postId,
+        nodeId: event.postId,
       ));
 
-      getPostRequest.remove(event.postId);
+      getNodeRequest.remove(event.postId);
       emit(UserActionPostDataFetchedState(
         postId: event.postId,
+      ));
+    } catch (_) {}
+  }
+
+  FutureOr<void> _handleUserActionGetCommentByIdEvent(
+      UserActionGetCommentByIdEvent event,
+      Emitter<UserActionState> emit) async {
+    try {
+      if (getNodeRequest.contains(event.commentId)) return;
+
+      String key = generateCommentNodeKey(event.commentId);
+      if (graph.containsKey(key)) return;
+
+      getNodeRequest.add(event.commentId);
+      await _commentGetUseCase(GetNodeInput(
+        username: event.username,
+        nodeId: event.commentId,
+      ));
+
+      getNodeRequest.remove(event.commentId);
+      emit(UserActionCommentDataFetchedState(
+        commentId: event.commentId,
       ));
     } catch (_) {}
   }

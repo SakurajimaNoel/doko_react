@@ -55,7 +55,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   FutureOr<void> _handlePostLoadEvent(
       PostLoadEvent event, Emitter<PostState> emit) async {
     try {
-      String postId = event.details.postId;
+      String postId = event.details.nodeId;
       String postKey = generatePostNodeKey(postId);
 
       if (graph.containsKey(postKey)) {

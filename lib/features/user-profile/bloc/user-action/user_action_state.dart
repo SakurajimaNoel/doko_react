@@ -190,3 +190,16 @@ class UserActionPostDataFetchedState extends UserActionState {
   @override
   List<Object?> get props => [postId, now];
 }
+
+// comment data fetched for streaming
+class UserActionCommentDataFetchedState extends UserActionState {
+  UserActionCommentDataFetchedState({
+    required this.commentId,
+  }) : now = DateTime.now();
+
+  final String commentId;
+  final DateTime now;
+
+  @override
+  List<Object?> get props => [commentId, now];
+}

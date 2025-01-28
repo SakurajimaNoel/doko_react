@@ -1077,4 +1077,64 @@ class GraphqlQueries {
       }
     };
   }
+
+  // get comment by id
+  static String getCommentById() {
+    return """
+    query Comments(\$where: CommentWhere, \$likedByWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+      comments(where: \$where) {
+        id
+        createdOn
+        media
+        content
+        mentions {
+          username
+        }
+        commentsConnection {
+          totalCount
+        }
+        likedByConnection {
+          totalCount
+        }
+        likedBy(where: \$likedByWhere2) {
+          username
+        }
+        commentBy {
+          id
+          name
+          username
+          profilePicture
+          friendsConnection(where: \$friendsConnectionWhere2) {
+            edges {
+              properties {
+                addedOn
+                requestedBy
+                status
+              }
+            }
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> getCommentByIdVariables({
+    required String commentId,
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": commentId,
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      }
+    };
+  }
 }

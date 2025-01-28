@@ -56,8 +56,8 @@ class _PostPageState extends State<PostPage> {
       body: BlocProvider(
         create: (context) => serviceLocator<PostBloc>()
           ..add(PostLoadEvent(
-            details: GetPostInput(
-              postId: widget.postId,
+            details: GetNodeInput(
+              nodeId: widget.postId,
               username: username,
             ),
           )),
@@ -111,8 +111,8 @@ class _PostPageState extends State<PostPage> {
                         Future postBloc = context.read<PostBloc>().stream.first;
 
                         context.read<PostBloc>().add(PostRefreshEvent(
-                              details: GetPostInput(
-                                postId: widget.postId,
+                              details: GetNodeInput(
+                                nodeId: widget.postId,
                                 username: username,
                               ),
                             ));

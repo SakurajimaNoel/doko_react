@@ -2,7 +2,7 @@ import 'package:doko_react/features/user-profile/user-features/post/input/post_i
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 
 abstract class PostRepository {
-  Future<bool> getPostWithComment(GetPostInput details);
+  Future<bool> getPostWithComment(GetNodeInput details);
 
   Future<bool> getPostComments(GetCommentsInput details);
 

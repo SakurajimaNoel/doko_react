@@ -4,7 +4,7 @@ import 'package:doko_react/core/use-cases/use_cases.dart';
 import 'package:doko_react/features/user-profile/user-features/post/domain/repository/post_repository.dart';
 import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
 
-class PostUseCase implements UseCases<bool, GetPostInput> {
+class PostUseCase implements UseCases<bool, GetNodeInput> {
   const PostUseCase({
     required this.postRepository,
   });
@@ -12,7 +12,7 @@ class PostUseCase implements UseCases<bool, GetPostInput> {
   final PostRepository postRepository;
 
   @override
-  FutureOr<bool> call(GetPostInput params) {
+  FutureOr<bool> call(GetNodeInput params) {
     return postRepository.getPostWithComment(params);
   }
 }

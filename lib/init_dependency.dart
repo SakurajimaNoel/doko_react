@@ -27,6 +27,7 @@ import "package:doko_react/features/user-profile/data/data-sources/user_profile_
 import "package:doko_react/features/user-profile/data/repository/user_profile_repository_impl.dart";
 import "package:doko_react/features/user-profile/domain/repository/user_profile_repository.dart";
 import "package:doko_react/features/user-profile/domain/use-case/comments/comment_add_like_use_case.dart";
+import "package:doko_react/features/user-profile/domain/use-case/comments/comment_get.dart";
 import "package:doko_react/features/user-profile/domain/use-case/comments/comment_remove_like_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/posts/post_add_like_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/posts/post_get.dart";
@@ -245,6 +246,12 @@ void _initUserAction() {
     ),
   );
 
+  serviceLocator.registerFactory<CommentGetUseCase>(
+    () => CommentGetUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerFactory<UserActionBloc>(
     () => UserActionBloc(
       postAddLikeUseCase: serviceLocator(),
@@ -256,6 +263,7 @@ void _initUserAction() {
       commentRemoveLikeUseCase: serviceLocator(),
       userGetUseCase: serviceLocator(),
       postGetUseCase: serviceLocator(),
+      commentGetUseCase: serviceLocator(),
     ),
   );
 }

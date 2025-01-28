@@ -8,7 +8,7 @@ class PostLoadEvent extends PostEvent {
     required this.details,
   });
 
-  final GetPostInput details;
+  final GetNodeInput details;
 }
 
 class CommentLoadEvent extends PostEvent {
@@ -46,5 +46,5 @@ class CommentMentionSearchEvent extends PostEvent {
 class PostRefreshEvent extends PostEvent {
   PostRefreshEvent({required this.details});
 
-  final GetPostInput details;
+  final GetNodeInput details;
 }

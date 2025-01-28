@@ -21,4 +21,6 @@ abstract class UserProfileRepository {
   Future<bool> getUserByUsername(String username, String currentUser);
 
   Future<bool> getPostById(String postId, String username);
+
+  Future<bool> getCommentById(String commentId, String username);
 }
