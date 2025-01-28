@@ -30,6 +30,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final UserGraph graph = UserGraph();
   final Set<String> getUserRequest = {};
   final Set<String> getPostRequest = {};
+  final Set<String> nodeLikeActionRequest = {};
 
   final PostAddLikeUseCase _postAddLikeUseCase;
   final PostRemoveLikeUseCase _postRemoveLikeUseCase;
@@ -134,6 +135,10 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   FutureOr<void> _handleUserActionPostLikeActionEvent(
       UserActionPostLikeActionEvent event,
       Emitter<UserActionState> emit) async {
+    String postId = event.postId;
+    if (nodeLikeActionRequest.contains(postId)) return;
+
+    nodeLikeActionRequest.add(postId);
     String postKey = generatePostNodeKey(event.postId);
     PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
 
@@ -190,6 +195,8 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         commentsCount: post.commentsCount,
       ));
     }
+
+    nodeLikeActionRequest.remove(postId);
   }
 
   FutureOr<void> _handleUserActionCreateFriendRelation(
@@ -366,6 +373,11 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   FutureOr<void> _handleUserActionCommentLikeActionEvent(
       UserActionCommentLikeActionEvent event,
       Emitter<UserActionState> emit) async {
+    String commentId = event.commentId;
+    if (nodeLikeActionRequest.contains(commentId)) return;
+
+    nodeLikeActionRequest.add(commentId);
+
     String commentKey = generateCommentNodeKey(event.commentId);
     CommentEntity comment = graph.getValueByKey(commentKey)! as CommentEntity;
 
@@ -422,6 +434,8 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         commentsCount: comment.commentsCount,
       ));
     }
+
+    nodeLikeActionRequest.remove(commentId);
   }
 
   FutureOr<void> _handleUserActionGetUserByUsernameEvent(
