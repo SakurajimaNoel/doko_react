@@ -34,123 +34,155 @@ class PostWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
     final UserGraph graph = UserGraph();
-    final PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
+    if (!graph.containsKey(postKey)) {
+      // send a req to fetch the post
+      context.read<UserActionBloc>().add(UserActionGetPostByIdEvent(
+            username: username,
+            postId: getPostIdFromPostKey(postKey),
+          ));
+    }
 
     String currentRoute = GoRouter.of(context).currentRouteName ?? "";
     bool isPostPage = currentRoute == RouterConstants.userPost;
 
-    return InkWell(
-      onTap: isPostPage
-          ? null
-          : () {
-              context.pushNamed(
-                RouterConstants.userPost,
-                pathParameters: {
-                  "postId": post.id,
-                },
+    return BlocBuilder<UserActionBloc, UserActionState>(
+      buildWhen: (previousState, state) {
+        return state is UserActionPostDataFetchedState &&
+            state.postId == getPostIdFromPostKey(postKey);
+      },
+      builder: (context, state) {
+        bool postExists = graph.containsKey(postKey);
+        if (!postExists) {
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              return SizedBox(
+                height: constraints.maxWidth,
+                child: Center(
+                  child: SmallLoadingIndicator.small(),
+                ),
               );
             },
-      onLongPress: isPostPage
-          ? null
-          : () {
-              Share.share(
-                context: context,
-                subject: MessageSubject.dokiPost,
-                nodeIdentifier: post.id,
-              );
-            },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: Constants.padding * 0.75,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // post meta data
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: Constants.padding,
-              ),
-              child: LayoutBuilder(builder: (context, constraints) {
-                bool shrink =
-                    constraints.maxWidth < Constants.postMetadataWidth;
-                double shrinkFactor = shrink ? 0.75 : 1;
+          );
+        }
 
-                bool superShrink = constraints.maxWidth < 250;
-
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    if (!shrink)
-                      UserWidget(
-                        userKey: post.createdBy,
-                      )
-                    else
-                      UserWidget.small(
-                        key: ValueKey("${post.createdBy}-with-small-size"),
-                        userKey: post.createdBy,
-                      ),
-                    if (!superShrink)
-                      Text(
-                        displayDateDifference(
-                          post.createdOn,
-                          small: shrink,
-                        ),
-                        style: TextStyle(
-                          fontSize: Constants.smallFontSize * shrinkFactor,
-                        ),
-                      ),
-                  ],
-                );
-              }),
-            ),
-            // post content
-            if (post.content.isNotEmpty) ...[
-              const SizedBox(
-                height: Constants.gap * 0.5,
-              ),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final width = constraints.maxWidth;
-                  return ChangeNotifierProvider(
-                    create: (_) => PostCarouselIndicatorProvider(
-                      currentItem: post.currDisplay,
-                      width: width,
-                    ),
-                    child: PostContent(
-                      content: post.content,
-                      postId: post.id,
-                    ),
+        final PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
+        return InkWell(
+          onTap: isPostPage
+              ? null
+              : () {
+                  context.pushNamed(
+                    RouterConstants.userPost,
+                    pathParameters: {
+                      "postId": post.id,
+                    },
                   );
                 },
-              ),
-              const SizedBox(
-                height: Constants.gap * 0.5,
-              ),
-            ],
-            const SizedBox(
-              height: Constants.gap * 0.5,
+          onLongPress: isPostPage
+              ? null
+              : () {
+                  Share.share(
+                    context: context,
+                    subject: MessageSubject.dokiPost,
+                    nodeIdentifier: post.id,
+                  );
+                },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: Constants.padding * 0.75,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: Constants.padding,
-                vertical: Constants.padding * 0.5,
-              ),
-              child: _PostCaption(
-                caption: post.caption,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // post meta data
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Constants.padding,
+                  ),
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    bool shrink =
+                        constraints.maxWidth < Constants.postMetadataWidth;
+                    double shrinkFactor = shrink ? 0.75 : 1;
+
+                    bool superShrink = constraints.maxWidth < 250;
+
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (!shrink)
+                          UserWidget(
+                            userKey: post.createdBy,
+                          )
+                        else
+                          UserWidget.small(
+                            key: ValueKey("${post.createdBy}-with-small-size"),
+                            userKey: post.createdBy,
+                          ),
+                        if (!superShrink)
+                          Text(
+                            displayDateDifference(
+                              post.createdOn,
+                              small: shrink,
+                            ),
+                            style: TextStyle(
+                              fontSize: Constants.smallFontSize * shrinkFactor,
+                            ),
+                          ),
+                      ],
+                    );
+                  }),
+                ),
+                // post content
+                if (post.content.isNotEmpty) ...[
+                  const SizedBox(
+                    height: Constants.gap * 0.5,
+                  ),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final width = constraints.maxWidth;
+                      return ChangeNotifierProvider(
+                        create: (_) => PostCarouselIndicatorProvider(
+                          currentItem: post.currDisplay,
+                          width: width,
+                        ),
+                        child: PostContent(
+                          content: post.content,
+                          postId: post.id,
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(
+                    height: Constants.gap * 0.5,
+                  ),
+                ],
+                const SizedBox(
+                  height: Constants.gap * 0.5,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Constants.padding,
+                    vertical: Constants.padding * 0.5,
+                  ),
+                  child: _PostCaption(
+                    caption: post.caption,
+                  ),
+                ),
+                const SizedBox(
+                  height: Constants.gap * 0.5,
+                ),
+                _PostAction(
+                  postId: post.id,
+                ),
+              ],
             ),
-            const SizedBox(
-              height: Constants.gap * 0.5,
-            ),
-            _PostAction(
-              postId: post.id,
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
