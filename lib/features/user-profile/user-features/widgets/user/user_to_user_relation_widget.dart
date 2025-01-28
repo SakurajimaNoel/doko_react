@@ -138,6 +138,13 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
           currentUsername: currentUsername,
         );
 
+        bool disabled = false;
+        if (state is UserActionUserRelationState) {
+          disabled = (state.relation == UserToUserRelation.optimisticFriends) ||
+              (state.relation == UserToUserRelation.optimisticOutgoingReq) ||
+              (state.relation == UserToUserRelation.optimisticUnrelated);
+        }
+
         // unrelated
         if (status == UserToUserRelation.unrelated) {
           if (info) {
@@ -147,14 +154,14 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
 
           if (label) {
             return FilledButton.tonalIcon(
-              onPressed: () => createFriendRelation(),
+              onPressed: disabled ? null : () => createFriendRelation(),
               icon: const Icon(Icons.person_add_alt_1),
               label: const Text("Add"),
             );
           }
 
           return IconButton.outlined(
-            onPressed: () => createFriendRelation(),
+            onPressed: disabled ? null : () => createFriendRelation(),
             color: currTheme.primary,
             icon: Icon(
               Icons.person_add_alt_1,
@@ -175,7 +182,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
 
           if (label) {
             return FilledButton.tonalIcon(
-              onPressed: () => removeFriendRelation(user),
+              onPressed: disabled ? null : () => removeFriendRelation(user),
               label: Text(
                 "Cancel request",
                 style: TextStyle(
@@ -193,7 +200,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
           }
 
           return IconButton(
-            onPressed: () => removeFriendRelation(user),
+            onPressed: disabled ? null : () => removeFriendRelation(user),
             color: currTheme.error,
             icon: Icon(
               Icons.close,
@@ -218,12 +225,12 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 FilledButton.tonalIcon(
-                  onPressed: () => acceptFriendRelation(user),
+                  onPressed: disabled ? null : () => acceptFriendRelation(user),
                   icon: const Icon(Icons.check),
                   label: const Text("Accept"),
                 ),
                 FilledButton.tonalIcon(
-                  onPressed: () => removeFriendRelation(user),
+                  onPressed: disabled ? null : () => removeFriendRelation(user),
                   label: Text(
                     "Cancel request",
                     style: TextStyle(
@@ -247,7 +254,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
             spacing: Constants.gap * 0.5,
             children: [
               IconButton(
-                onPressed: () => acceptFriendRelation(user),
+                onPressed: disabled ? null : () => acceptFriendRelation(user),
                 color: currTheme.primary,
                 icon: Icon(
                   Icons.check,
@@ -259,7 +266,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
                 ),
               ),
               IconButton(
-                onPressed: () => removeFriendRelation(user),
+                onPressed: disabled ? null : () => removeFriendRelation(user),
                 color: currTheme.error,
                 icon: Icon(
                   Icons.close,
@@ -285,7 +292,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
             spacing: Constants.gap,
             children: [
               OutlinedButton.icon(
-                onPressed: () => removeFriendRelation(user),
+                onPressed: disabled ? null : () => removeFriendRelation(user),
                 icon: Icon(
                   Icons.person_remove_alt_1,
                   color: currTheme.error,
@@ -303,7 +310,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
                 ),
               ),
               OutlinedButton.icon(
-                onPressed: goToMessageArchive,
+                onPressed: disabled ? null : goToMessageArchive,
                 icon: Icon(
                   Icons.chat_outlined,
                 ),
@@ -325,7 +332,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
           spacing: Constants.gap * 0.5,
           children: [
             IconButton(
-              onPressed: () => removeFriendRelation(user),
+              onPressed: disabled ? null : () => removeFriendRelation(user),
               color: currTheme.error,
               icon: Icon(
                 Icons.person_remove_alt_1,
@@ -337,7 +344,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
               ),
             ),
             IconButton(
-              onPressed: goToMessageArchive,
+              onPressed: disabled ? null : goToMessageArchive,
               color: currTheme.primary,
               icon: Icon(
                 Icons.chat_outlined,
