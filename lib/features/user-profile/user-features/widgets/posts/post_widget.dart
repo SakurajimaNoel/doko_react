@@ -83,18 +83,20 @@ class PostWidget extends StatelessWidget {
           const SizedBox(
             height: Constants.gap * 0.5,
           ),
-          LayoutBuilder(builder: (context, constraints) {
-            final width = constraints.maxWidth;
-            return ChangeNotifierProvider(
-              create: (_) => PostCarouselIndicatorProvider(
-                currentItem: 0,
-                width: width,
-              ),
-              child: PostContent(
-                content: post.content,
-              ),
-            );
-          }),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              return ChangeNotifierProvider(
+                create: (_) => PostCarouselIndicatorProvider(
+                  currentItem: 0,
+                  width: width,
+                ),
+                child: PostContent(
+                  content: post.content,
+                ),
+              );
+            },
+          ),
           const SizedBox(
             height: Constants.gap * 0.5,
           ),
@@ -204,8 +206,6 @@ class _PostContentState extends State<PostContent> {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final height = width * (1 / Constants.postContainer);
-
-        context.read<PostCarouselIndicatorProvider>().updateWidth(width);
 
         return Column(
           spacing: Constants.gap * (preview ? 0.75 : 1),

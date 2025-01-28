@@ -324,44 +324,55 @@ class UserWidget extends StatelessWidget {
             ? 1
             : 1.2;
 
-    return Column(
-      crossAxisAlignment:
-          share ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          trimText(
-            user.name,
-            len: share ? 12 : 50,
-          ),
-          style: TextStyle(
-            fontSize: Constants.smallFontSize * nameScale,
-          ),
-        ),
-        Text(
-          trimText(
-            "@${user.username}",
-            len: share ? 12 : 50,
-          ),
-          style: TextStyle(
-            fontSize: Constants.smallFontSize * usernameScale,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        bool shrink = width < 100;
+
+        return Column(
+          crossAxisAlignment:
+              share ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              trimText(
+                user.name,
+                len: share || shrink ? 12 : 50,
+              ),
+              style: TextStyle(
+                fontSize: Constants.smallFontSize * nameScale,
+              ),
+            ),
+            Text(
+              trimText(
+                "@${user.username}",
+                len: share || shrink ? 12 : 50,
+              ),
+              style: TextStyle(
+                fontSize: Constants.smallFontSize * usernameScale,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget userInfoEmpty(String username) {
     double usernameScale = small ? 1.1 : 1.2;
 
-    return Text(
-      "@$username",
-      style: TextStyle(
-        fontSize: Constants.smallFontSize * usernameScale,
-        fontWeight: FontWeight.w600,
-      ),
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      bool shrink = constraints.maxWidth < 235;
+
+      return Text(
+        trimText("@$username", len: shrink ? 8 : 50),
+        style: TextStyle(
+          fontSize: Constants.smallFontSize * usernameScale,
+          fontWeight: FontWeight.w600,
+        ),
+      );
+    });
   }
 
   Widget userAvtar(StorageResource profilePicture) {

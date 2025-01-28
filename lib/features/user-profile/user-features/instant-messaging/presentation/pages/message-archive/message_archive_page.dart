@@ -118,16 +118,29 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                       text: widget.username,
                     )).then((value) {});
                   },
-                  child: Row(
-                    spacing: Constants.gap,
-                    children: [
-                      UserWidget.avtar(
-                        userKey: generateUserNodeKey(widget.username),
-                      ),
-                      UserWidget.info(
-                        userKey: generateUserNodeKey(widget.username),
-                      ),
-                    ],
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      bool shrink = constraints.maxWidth < 150;
+                      double shrinkFactor = shrink ? 0.75 : 1;
+                      double infoFactor = shrink ? 1 : 0.625;
+
+                      return Row(
+                        spacing: Constants.gap * shrinkFactor,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (!shrink)
+                            UserWidget.avtar(
+                              userKey: generateUserNodeKey(widget.username),
+                            ),
+                          SizedBox(
+                            width: constraints.maxWidth * infoFactor,
+                            child: UserWidget.info(
+                              userKey: generateUserNodeKey(widget.username),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
                 actions: [

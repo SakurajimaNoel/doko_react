@@ -64,27 +64,27 @@ class PostPreviewWidget extends StatelessWidget {
             bool shrink = width < 235;
             double shrinkFactor = shrink ? 0.75 : 1;
 
-            return SizedBox(
-              width: constraints.maxWidth,
-              child: Column(
-                spacing: Constants.gap * 0.5,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    spacing: Constants.gap * 0.75 * shrinkFactor,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        spacing: Constants.gap * 0.75 * shrinkFactor,
-                        children: [
-                          UserWidget.avtarSmall(
-                            userKey: post.createdBy,
-                          ),
-                          UserWidget.infoSmall(
-                            userKey: post.createdBy,
-                          ),
-                        ],
+            return Column(
+              spacing: Constants.gap * 0.5,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  spacing: Constants.gap * 0.75 * shrinkFactor,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    UserWidget.avtarSmall(
+                      userKey: post.createdBy,
+                    ),
+                    SizedBox(
+                      width: shrink ? width / 1.5 : null,
+                      child: UserWidget.infoSmall(
+                        userKey: post.createdBy,
                       ),
+                    ),
+                    if (!shrink) ...[
+                      const Spacer(),
                       BlocBuilder<UserActionBloc, UserActionState>(
                         buildWhen: (previousState, state) {
                           return (state is UserActionNodeActionState &&
@@ -118,20 +118,20 @@ class PostPreviewWidget extends StatelessWidget {
                         },
                       ),
                     ],
-                  ),
-                  if (post.content.isNotEmpty)
-                    ChangeNotifierProvider(
-                      create: (_) => PostCarouselIndicatorProvider(
-                        currentItem: 0,
-                        width: width,
-                      ),
-                      child: PostContent.preview(
-                        content: post.content,
-                      ),
+                  ],
+                ),
+                if (post.content.isNotEmpty)
+                  ChangeNotifierProvider(
+                    create: (_) => PostCarouselIndicatorProvider(
+                      currentItem: 0,
+                      width: width,
                     ),
-                  Text(trimText(post.caption)),
-                ],
-              ),
+                    child: PostContent.preview(
+                      content: post.content,
+                    ),
+                  ),
+                Text(trimText(post.caption)),
+              ],
             );
           },
         );
