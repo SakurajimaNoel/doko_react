@@ -10,42 +10,42 @@ String messagePreview(ChatMessage message, String username) {
       return trimText(message.body);
     case MessageSubject.mediaBucketResource:
       String resourceType = getFileTypeFromPath(message.body);
-      String remoteResponse = "Sent you a $resourceType.";
+      String remoteResponse = "@${message.from} sent you a $resourceType.";
       String selfResponse = "You sent a $resourceType";
 
       return self ? selfResponse : remoteResponse;
     case MessageSubject.mediaExternal:
-      String remoteResponse = "${message.from} sent GIF / STICKER ️ 🖼️.";
+      String remoteResponse = "@${message.from} sent GIF / STICKER ️ 🖼️.";
       String selfResponse = "You sent GIF / STICKER ️ 🖼️.";
 
       return self ? selfResponse : remoteResponse;
     case MessageSubject.userLocation:
-      String remoteResponse = "${message.from} sent a location.";
+      String remoteResponse = "@${message.from} sent a location.";
       String selfResponse = "You sent a location.";
 
       return self ? selfResponse : remoteResponse;
     case MessageSubject.dokiUser:
-      String remoteResponse = "${message.from} sent a User Profile.";
+      String remoteResponse = "@${message.from} sent a User Profile.";
       String selfResponse = "You sent a User Profile.";
 
       return self ? selfResponse : remoteResponse;
     case MessageSubject.dokiPost:
-      String remoteResponse = "${message.from} sent a Post.";
+      String remoteResponse = "@${message.from} sent a Post.";
       String selfResponse = "You sent a Post.";
 
       return self ? selfResponse : remoteResponse;
     case MessageSubject.dokiPage:
-      String remoteResponse = "${message.from} sent a Page.";
+      String remoteResponse = "@${message.from} sent a Page.";
       String selfResponse = "You sent a Page.";
 
       return self ? selfResponse : remoteResponse;
     case MessageSubject.dokiDiscussion:
-      String remoteResponse = "${message.from} sent a Discussion.";
+      String remoteResponse = "@${message.from} sent a Discussion.";
       String selfResponse = "You sent a Discussion.";
 
       return self ? selfResponse : remoteResponse;
     case MessageSubject.dokiPolls:
-      String remoteResponse = "${message.from} sent a Poll.";
+      String remoteResponse = "@${message.from} sent a Poll.";
       String selfResponse = "You sent a Poll.";
 
       return self ? selfResponse : remoteResponse;

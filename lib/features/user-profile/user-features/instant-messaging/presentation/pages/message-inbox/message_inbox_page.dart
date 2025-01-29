@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
-import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/instant-messaging/message_preview.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
@@ -44,7 +43,14 @@ class MessageInboxPage extends StatelessWidget {
     final inboxItemEntity =
         graph.getValueByKey(inboxItemKey)! as InboxItemEntity;
 
-    final latestMessage = findFirstValidMessage(inboxItemEntity.messages);
+    String? inboxText = inboxItemEntity.activity.getActivityText(currentUser);
+    String? inboxActivityTime = inboxItemEntity.activity.getActivityTime();
+    if (inboxText == null) {
+      final latestMessage = findFirstValidMessage(inboxItemEntity.messages);
+      inboxText = latestMessage == null
+          ? "Start the conversation"
+          : messagePreview(latestMessage.message, currentUser);
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -93,13 +99,9 @@ class MessageInboxPage extends StatelessWidget {
           ),
           subtitle: TypingStatusWidgetWrapper.canHide(
             username: getUsernameFromUserKey(userKey),
-            child: latestMessage == null
-                ? Text("Start the conversation.")
-                : Text(messagePreview(latestMessage.message, currentUser)),
+            child: Text(inboxText!),
           ),
-          trailing: latestMessage == null
-              ? null
-              : Text(formatDateTimeToTimeString(latestMessage.message.sendAt)),
+          trailing: inboxActivityTime == null ? null : Text(inboxActivityTime),
         );
       },
     );
@@ -123,7 +125,9 @@ class MessageInboxPage extends StatelessWidget {
       ),
       body: BlocBuilder<RealTimeBloc, RealTimeState>(
         buildWhen: (previousState, state) {
-          return state is RealTimeNewMessageState;
+          return state is RealTimeNewMessageState ||
+              state is RealTimeEditMessageState ||
+              state is RealTimeDeleteMessageState;
         },
         builder: (context, state) {
           final UserGraph graph = UserGraph();

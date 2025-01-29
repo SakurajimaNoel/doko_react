@@ -124,8 +124,13 @@ String formatDateToWeekDays(DateTime date) {
 }
 
 String formatDateTimeToTimeString(DateTime date) {
-  // Convert to local time if necessary
+  DateTime now = DateTime.now();
   DateTime localDateTime = date.toLocal();
+
+  // Check if the given date is today
+  bool isToday = now.year == localDateTime.year &&
+      now.month == localDateTime.month &&
+      now.day == localDateTime.day;
 
   // Extract the hour, minute, and period (AM/PM)
   int hour = localDateTime.hour;
@@ -136,8 +141,16 @@ String formatDateTimeToTimeString(DateTime date) {
   String minute =
       localDateTime.minute.toString().padLeft(2, '0'); // Ensure two digits
 
-  // Format the time as "hh:mm AM/PM"
-  return "$hour:$minute $period";
+  String timeString = "$hour:$minute $period";
+
+  if (!isToday) {
+    // Format the date as "MMM d, yyyy"
+    String dateString =
+        "${localDateTime.day.toString().padLeft(2, '0')}-${localDateTime.month.toString().padLeft(2, '0')}-${localDateTime.year.toString()}";
+    return "$dateString $timeString";
+  }
+
+  return timeString;
 }
 
 bool areSameDay(DateTime date1, DateTime date2) {

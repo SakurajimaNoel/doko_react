@@ -501,6 +501,22 @@ class UserGraph {
   }
 
   /// instant messaging methods
+  void _reorderUserInbox(String inboxItemKey) {
+    // update user inbox
+    InboxEntity inbox;
+    String inboxKey = generateInboxKey();
+    if (containsKey(inboxKey)) {
+      inbox = getValueByKey(inboxKey)! as InboxEntity;
+      inbox.reorder(inboxItemKey);
+    } else {
+      // create inbox
+      inbox = InboxEntity.empty();
+      inbox.addItems([inboxItemKey]);
+    }
+
+    addEntity(inboxKey, inbox);
+  }
+
   void addNewMessage(ChatMessage message, String username) {
     // add new message
     String messageKey = generateMessageKey(message.id);
@@ -532,7 +548,6 @@ class UserGraph {
     addEntity(archiveKey, archiveEntity);
 
     // update inbox item entity
-
     String inboxItemKey = generateInboxItemKey(archiveUser);
 
     InboxItemEntity inboxItem;
@@ -540,30 +555,52 @@ class UserGraph {
       // create inbox item entity
       inboxItem = InboxItemEntity(
         messages: Queue<String>(),
+        activity: LatestActivity.empty(),
       );
     } else {
       inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
     }
 
-    inboxItem.addNewMessage(messageKey);
+    inboxItem.addNewMessage(messageKey, message.sendAt);
     addEntity(inboxItemKey, inboxItem);
 
-    // update user inbox
-    InboxEntity inbox;
-    String inboxKey = generateInboxKey();
-    if (containsKey(inboxKey)) {
-      inbox = getValueByKey(inboxKey)! as InboxEntity;
-      inbox.reorder(inboxItemKey);
-    } else {
-      // create inbox
-      inbox = InboxEntity.empty();
-      inbox.addItems([inboxItemKey]);
-    }
-
-    addEntity(inboxKey, inbox);
+    _reorderUserInbox(inboxItemKey);
   }
 
-  void editMessage(EditMessage message) {
+  void editMessage(EditMessage message, String username) {
+    String archiveUser = getUsernameFromMessageParams(
+      username,
+      to: message.to,
+      from: message.from,
+    );
+    bool self = username == archiveUser;
+
+    // update inbox item entity
+    String inboxItemKey = generateInboxItemKey(archiveUser);
+
+    InboxItemEntity inboxItem;
+    if (!containsKey(inboxItemKey)) {
+      // create inbox item entity
+      inboxItem = InboxItemEntity(
+        messages: Queue<String>(),
+        activity: LatestActivity.empty(),
+      );
+    } else {
+      inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
+    }
+
+    InboxLastActivity activity =
+        self ? InboxLastActivity.selfEdit : InboxLastActivity.remoteEdit;
+    inboxItem.activity.updateLatestActivity(
+      activity: activity,
+      lastActivityTime: message.editedOn,
+    );
+    addEntity(inboxItemKey, inboxItem);
+
+    // update inbox order
+    _reorderUserInbox(inboxItemKey);
+
+    // update message entity
     String messageKey = generateMessageKey(message.id);
     if (!containsKey(messageKey)) return;
 
@@ -573,7 +610,41 @@ class UserGraph {
     addEntity(messageKey, messageEntity);
   }
 
-  void deleteMessage(DeleteMessage message, String archiveUser) {
+  void deleteMessage(DeleteMessage message, String username) {
+    String archiveUser = getUsernameFromMessageParams(
+      username,
+      to: message.to,
+      from: message.from,
+    );
+    bool self = username == archiveUser;
+    // if delete for everyone update inbox status too
+    if (message.everyone) {
+      // update inbox item entity
+      String inboxItemKey = generateInboxItemKey(archiveUser);
+
+      InboxItemEntity inboxItem;
+      InboxLastActivity activity = self
+          ? InboxLastActivity.selfDeleteAll
+          : InboxLastActivity.remoteDeleteAll;
+      if (!containsKey(inboxItemKey)) {
+        // create inbox item entity
+        inboxItem = InboxItemEntity(
+          messages: Queue<String>(),
+          activity: LatestActivity.empty(),
+        );
+      } else {
+        inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
+      }
+
+      inboxItem.activity.updateLatestActivity(
+        activity: activity,
+      );
+      addEntity(inboxItemKey, inboxItem);
+
+      // update inbox order
+      _reorderUserInbox(inboxItemKey);
+    }
+
     for (String messageId in message.id) {
       String messageKey = generateMessageKey(messageId);
       if (!containsKey(messageKey)) continue;
