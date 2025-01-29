@@ -573,7 +573,7 @@ class UserGraph {
       to: message.to,
       from: message.from,
     );
-    bool self = username == archiveUser;
+    bool self = username == message.from;
 
     // update inbox item entity
     String inboxItemKey = generateInboxItemKey(archiveUser);
@@ -616,7 +616,7 @@ class UserGraph {
       to: message.to,
       from: message.from,
     );
-    bool self = username == archiveUser;
+    bool self = username == message.from;
     // if delete for everyone update inbox status too
     if (message.everyone) {
       // update inbox item entity

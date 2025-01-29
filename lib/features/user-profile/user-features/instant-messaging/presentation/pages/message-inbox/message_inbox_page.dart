@@ -43,7 +43,7 @@ class MessageInboxPage extends StatelessWidget {
     final inboxItemEntity =
         graph.getValueByKey(inboxItemKey)! as InboxItemEntity;
 
-    String? inboxText = inboxItemEntity.activity.getActivityText(currentUser);
+    String? inboxText = inboxItemEntity.activity.getActivityText(username);
     String? inboxActivityTime = inboxItemEntity.activity.getActivityTime();
     if (inboxText == null) {
       final latestMessage = findFirstValidMessage(inboxItemEntity.messages);
@@ -98,7 +98,7 @@ class MessageInboxPage extends StatelessWidget {
             userKey: userKey,
           ),
           subtitle: TypingStatusWidgetWrapper.canHide(
-            username: getUsernameFromUserKey(userKey),
+            username: username,
             child: Text(inboxText!),
           ),
           trailing: inboxActivityTime == null ? null : Text(inboxActivityTime),
