@@ -71,7 +71,8 @@ class _UserLayoutState extends State<UserLayout> {
         Duration diff = now.difference(backgroundWhen!);
         backgroundWhen = null;
 
-        if (diff.inMinutes > 30) {
+        // refresh the whole app after 1 hour
+        if (diff.inMinutes > 60) {
           refreshApp();
         }
       }
