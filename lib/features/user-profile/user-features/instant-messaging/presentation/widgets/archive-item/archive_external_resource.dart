@@ -19,7 +19,7 @@ class _ArchiveExternalResource extends StatelessWidget {
     ChatMessage message = entity.message;
     bool self = username == message.from;
 
-    Widget type = Text(
+    Widget type = const Text(
       "GIF / STICKER 🖼️",
       style: TextStyle(
         fontWeight: FontWeight.w600,
@@ -45,7 +45,7 @@ class _ArchiveExternalResource extends StatelessWidget {
                 imageUrl: message.body,
                 placeholder: (context, url) => SizedBox(
                   height: constraints.maxWidth,
-                  child: Center(
+                  child: const Center(
                     child: SmallLoadingIndicator.small(),
                   ),
                 ),

@@ -49,7 +49,7 @@ class FriendWidget extends StatelessWidget {
             );
           },
           minVerticalPadding: Constants.padding * 0.75,
-          contentPadding: EdgeInsets.symmetric(
+          contentPadding: const EdgeInsets.symmetric(
             horizontal: Constants.padding,
           ),
           leading: shrink

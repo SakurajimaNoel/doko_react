@@ -210,7 +210,7 @@ class _UserLayoutState extends State<UserLayout> {
       body: Text(messagePreview(message, username)),
       trailing: Text(
         displayDateDifference(message.sendAt),
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: Constants.smallFontSize,
         ),
       ),
@@ -364,7 +364,7 @@ class _UserLayoutState extends State<UserLayout> {
                       onDestinationSelected: (index) =>
                           onDestinationSelected(index, profileEmpty),
                     )
-                  : SizedBox.shrink();
+                  : const SizedBox.shrink();
             }),
           ),
         );

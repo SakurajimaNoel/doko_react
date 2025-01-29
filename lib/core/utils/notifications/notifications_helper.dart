@@ -20,7 +20,7 @@ NiceInAppNotification createNewNotification({
     leading: leading == null
         ? null
         : Container(
-            margin: EdgeInsets.only(
+            margin: const EdgeInsets.only(
               right: Constants.gap * 0.5,
             ),
             child: leading,
@@ -30,10 +30,10 @@ NiceInAppNotification createNewNotification({
     trailing: trailing,
     backgroundColor: currTheme.surfaceContainer,
     displayDuration: Constants.notificationDuration,
-    showingAnimationDuration: Duration(
+    showingAnimationDuration: const Duration(
       milliseconds: 250,
     ),
-    closingAnimationDuration: Duration(
+    closingAnimationDuration: const Duration(
       milliseconds: 250,
     ),
     onTap: onTap,
@@ -44,11 +44,11 @@ NiceInAppNotification createNewNotification({
         ),
         spreadRadius: 0,
         blurRadius: 20,
-        offset: Offset(0, 2),
+        offset: const Offset(0, 2),
       ),
     ],
-    padding: EdgeInsets.all(Constants.padding),
-    margin: EdgeInsets.symmetric(
+    padding: const EdgeInsets.all(Constants.padding),
+    margin: const EdgeInsets.symmetric(
       vertical: Constants.padding * 0.5,
       horizontal: Constants.padding,
     ),
@@ -75,10 +75,10 @@ NiceToast createNewToast(
   return NiceToast(
     backgroundColor: backgroundColor,
     displayDuration: Constants.notificationDuration,
-    showingAnimationDuration: Duration(
+    showingAnimationDuration: const Duration(
       milliseconds: 250,
     ),
-    closingAnimationDuration: Duration(
+    closingAnimationDuration: const Duration(
       milliseconds: 250,
     ),
     dismissDirection: DismissDirection.up,
@@ -90,7 +90,7 @@ NiceToast createNewToast(
       ),
     ),
     niceToastPosition: NiceToastPosition.top,
-    margin: EdgeInsets.symmetric(
+    margin: const EdgeInsets.symmetric(
       vertical: Constants.padding * 0.5,
       horizontal: Constants.padding,
     ),
@@ -101,7 +101,7 @@ NiceToast createNewToast(
         ),
         spreadRadius: 0,
         blurRadius: 20,
-        offset: Offset(0, 2),
+        offset: const Offset(0, 2),
       ),
     ],
   );

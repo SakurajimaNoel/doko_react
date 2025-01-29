@@ -162,7 +162,9 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                           .watch<ArchiveMessageProvider>()
                           .selectedMessages;
 
-                      if (selectedMessages.isEmpty) return SizedBox.shrink();
+                      if (selectedMessages.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
 
                       return IconButton(
                         onPressed: () {
@@ -204,7 +206,7 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                         color: currTheme.error,
                         icon: Badge(
                           label: Text(selectedMessages.length.toString()),
-                          child: Icon(Icons.delete_forever),
+                          child: const Icon(Icons.delete_forever),
                         ),
                       );
                     },
@@ -229,7 +231,7 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
 
                         if (!graph.containsKey(archiveKey)) {
                           // check inbox if elements are present and show them before fetching archive messaging
-                          return SizedBox.shrink();
+                          return const SizedBox.shrink();
                         }
 
                         final archive =
@@ -246,11 +248,11 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                           reverse: true,
                           itemCount: messages.length,
                           cacheExtent: height * 2,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                             vertical: Constants.padding * 2,
                           ),
                           separatorBuilder: (context, index) {
-                            return SizedBox(
+                            return const SizedBox(
                               height: Constants.gap * 0.5,
                             );
                           },

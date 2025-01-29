@@ -176,7 +176,7 @@ class UserWidget extends StatelessWidget {
                         ),
                         spreadRadius: 0,
                         blurRadius: 10,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -233,7 +233,7 @@ class UserWidget extends StatelessWidget {
             ),
           );
         } else {
-          final emptyResource = StorageResource.empty();
+          final emptyResource = const StorageResource.empty();
 
           if (preview) {
             return LayoutBuilder(
@@ -251,7 +251,7 @@ class UserWidget extends StatelessWidget {
                         ),
                         spreadRadius: 0,
                         blurRadius: 10,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -387,7 +387,7 @@ class UserWidget extends StatelessWidget {
     if (profilePicture.bucketPath.isEmpty) {
       return CircleAvatar(
         radius: avtarRadius,
-        child: Icon(Icons.person),
+        child: const Icon(Icons.person),
       );
     }
 

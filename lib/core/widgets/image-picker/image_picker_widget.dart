@@ -40,7 +40,7 @@ class ImagePickerWidget extends StatelessWidget {
         picker = ImagePicker(),
         image = false,
         video = false,
-        recordLimit = Duration(seconds: 0),
+        recordLimit = const Duration(seconds: 0),
         mediaOnly = true;
 
   /// text used to trigger media selection
@@ -130,7 +130,7 @@ class ImagePickerWidget extends StatelessWidget {
         return Container(
           height: Constants.height * 15,
           width: width,
-          padding: EdgeInsets.all(Constants.padding),
+          padding: const EdgeInsets.all(Constants.padding),
           child: SingleChildScrollView(
             child: Wrap(
               alignment: WrapAlignment.spaceEvenly,
@@ -323,7 +323,7 @@ class _IconLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: TextStyle(
+      style: const TextStyle(
         fontWeight: FontWeight.w500,
         fontSize: Constants.smallFontSize,
       ),

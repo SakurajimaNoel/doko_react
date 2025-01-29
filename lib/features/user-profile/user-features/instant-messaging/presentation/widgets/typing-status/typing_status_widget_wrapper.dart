@@ -75,7 +75,7 @@ class _TypingStatusWidgetWrapperState extends State<TypingStatusWidgetWrapper> {
           );
         }
 
-        return widget.child != null ? widget.child! : SizedBox.shrink();
+        return widget.child != null ? widget.child! : const SizedBox.shrink();
       },
     );
   }

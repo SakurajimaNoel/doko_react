@@ -93,7 +93,9 @@ String formatDateToWeekDays(DateTime date) {
   // Get the current local date
   DateTime now = DateTime.now();
   DateTime today = DateTime(now.year, now.month, now.day);
-  DateTime yesterday = today.subtract(Duration(days: 1));
+  DateTime yesterday = today.subtract(const Duration(
+    days: 1,
+  ));
 
   // Start of the current week (assuming week starts on Monday)
   DateTime startOfWeek = today.subtract(Duration(days: today.weekday - 1));
@@ -110,8 +112,8 @@ String formatDateToWeekDays(DateTime date) {
   }
 
   // Check if the date is within the current week
-  if (localDate.isAfter(startOfWeek.subtract(Duration(seconds: 1))) &&
-      localDate.isBefore(startOfWeek.add(Duration(days: 7)))) {
+  if (localDate.isAfter(startOfWeek.subtract(const Duration(seconds: 1))) &&
+      localDate.isBefore(startOfWeek.add(const Duration(days: 7)))) {
     return _daysOfWeek[localDate.weekday - 1];
   } // Weekday name
 

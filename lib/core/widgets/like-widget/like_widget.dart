@@ -60,7 +60,7 @@ class LikeWidgetState extends State<LikeWidget>
     return TextButton(
       style: TextButton.styleFrom(
         minimumSize: Size.zero,
-        padding: EdgeInsets.all(Constants.padding * 0.125),
+        padding: const EdgeInsets.all(Constants.padding * 0.125),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       onPressed: () {

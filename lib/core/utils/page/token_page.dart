@@ -10,7 +10,7 @@ class TokenPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Get user tokens"),
+        title: const Text("Get user tokens"),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -25,7 +25,7 @@ class TokenPage extends StatelessWidget {
                   text: token.accessToken,
                 )).then((value) {});
               },
-              child: Text("access token"),
+              child: const Text("access token"),
             ),
           ),
           Center(
@@ -36,7 +36,7 @@ class TokenPage extends StatelessWidget {
                   text: token.idToken,
                 )).then((value) {});
               },
-              child: Text("id token"),
+              child: const Text("id token"),
             ),
           ),
         ],

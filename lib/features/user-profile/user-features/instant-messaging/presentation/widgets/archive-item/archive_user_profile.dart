@@ -19,7 +19,7 @@ class _ArchiveUserProfile extends StatelessWidget {
     ChatMessage message = entity.message;
     bool self = username == message.from;
 
-    Widget type = Text(
+    Widget type = const Text(
       "USER PROFILE",
       style: TextStyle(
         fontWeight: FontWeight.w600,

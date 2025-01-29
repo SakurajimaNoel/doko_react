@@ -24,7 +24,7 @@ class MessageArchiveProfilePage extends StatelessWidget {
         title: Text(username),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(Constants.padding),
+        padding: const EdgeInsets.all(Constants.padding),
         child: Column(
           spacing: Constants.gap * 1.5,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,7 +33,7 @@ class MessageArchiveProfilePage extends StatelessWidget {
               userKey: generateUserNodeKey(username),
             ),
             DefaultTextStyle.merge(
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: Constants.fontSize,
                 fontWeight: FontWeight.w500,
               ),
@@ -44,12 +44,12 @@ class MessageArchiveProfilePage extends StatelessWidget {
             Container(
               height: Constants.height * 20,
               width: double.infinity,
-              padding: EdgeInsets.all(Constants.padding),
+              padding: const EdgeInsets.all(Constants.padding),
               decoration: BoxDecoration(
                 color: currTheme.secondaryContainer,
                 borderRadius: BorderRadius.circular(Constants.radius),
               ),
-              child: Column(
+              child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Heading.left(

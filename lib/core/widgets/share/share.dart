@@ -68,7 +68,7 @@ class Share extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text("Use static method \"Share options\" to allow sharing.");
+    return const Text("Use static method \"Share options\" to allow sharing.");
   }
 }
 
@@ -337,7 +337,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                           ),
                         ),
                       ),
-                      SliverToBoxAdapter(
+                      const SliverToBoxAdapter(
                         child: SizedBox(
                           height: Constants.gap,
                         ),
@@ -357,7 +357,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                             );
                           },
                         ),
-                      SliverToBoxAdapter(
+                      const SliverToBoxAdapter(
                         child: SizedBox(
                           height: Constants.gap * 0.5,
                         ),
@@ -389,11 +389,11 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                   },
                                 )
                           : userFriends.items.isEmpty
-                              ? SliverToBoxAdapter(
+                              ? const SliverToBoxAdapter(
                                   child: Center(
                                     child: Text(
                                       "You don't have friends right now.",
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -408,7 +408,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                         context, index, displayFriends);
                                   },
                                 ),
-                      SliverToBoxAdapter(
+                      const SliverToBoxAdapter(
                         child: SizedBox(
                           height: Constants.gap,
                         ),
@@ -462,7 +462,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                             Constants.buttonHeight,
                           ),
                         ),
-                        child: Text("More share options."),
+                        child: const Text("More share options."),
                       )
                     : FilledButton(
                         onPressed: selectedUsers.isEmpty

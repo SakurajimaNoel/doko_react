@@ -24,7 +24,7 @@ class _ArchivePost extends StatelessWidget {
     ChatMessage message = entity.message;
     bool self = username == message.from;
 
-    Widget type = Text(
+    Widget type = const Text(
       "POST",
       style: TextStyle(
         fontWeight: FontWeight.w600,
@@ -48,7 +48,7 @@ class _ArchivePost extends StatelessWidget {
                 ),
                 spreadRadius: 0,
                 blurRadius: 10,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -65,7 +65,7 @@ class _ArchivePost extends StatelessWidget {
                 );
               },
               child: Padding(
-                padding: EdgeInsets.all(Constants.padding * 0.5),
+                padding: const EdgeInsets.all(Constants.padding * 0.5),
                 child: PostPreviewWidget(
                   postKey: generatePostNodeKey(message.body),
                 ),

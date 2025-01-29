@@ -48,7 +48,7 @@ class PostPreviewWidget extends StatelessWidget {
             builder: (context, constraints) {
               return SizedBox(
                 height: constraints.maxWidth,
-                child: Center(
+                child: const Center(
                   child: SmallLoadingIndicator.small(),
                 ),
               );
@@ -93,7 +93,7 @@ class PostPreviewWidget extends StatelessWidget {
                                   state.nodeId == post.id);
                         },
                         builder: (context, state) {
-                          if (shrink) return SizedBox.shrink();
+                          if (shrink) return const SizedBox.shrink();
 
                           return Column(
                             mainAxisSize: MainAxisSize.min,
@@ -103,13 +103,13 @@ class PostPreviewWidget extends StatelessWidget {
                             children: [
                               Text(
                                 "${displayNumberFormat(post.likesCount)} Like${post.likesCount > 1 ? "s" : ""}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: Constants.smallFontSize,
                                 ),
                               ),
                               Text(
                                 "${displayNumberFormat(post.commentsCount)} Comment${post.commentsCount > 1 ? "s" : ""}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: Constants.smallFontSize,
                                 ),
                               ),

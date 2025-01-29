@@ -114,13 +114,13 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           icon: const Icon(Icons.share),
           style: FilledButton.styleFrom(
             minimumSize: Size.zero,
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               vertical: Constants.padding * 0.5,
               horizontal: Constants.padding * 0.75,
             ),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          label: Text("Share"),
+          label: const Text("Share"),
         ),
       ];
     }
@@ -131,7 +131,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           context.pushNamed(RouterConstants.settings);
         },
         color: currTheme.onPrimaryContainer,
-        icon: Icon(
+        icon: const Icon(
           Icons.settings,
         ),
         tooltip: "Settings",
@@ -160,7 +160,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           FilledButton.tonalIcon(
             onPressed: handleUserProfileShare,
             icon: const Icon(Icons.share),
-            label: Text("Share"),
+            label: const Text("Share"),
           ),
           ElevatedButton(
             onPressed: () {
@@ -168,7 +168,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 RouterConstants.token,
               );
             },
-            child: Text("Token"),
+            child: const Text("Token"),
           ),
         ],
       );
@@ -363,7 +363,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                         ),
                                       ),
                                 Container(
-                                  padding: EdgeInsets.only(
+                                  padding: const EdgeInsets.only(
                                     top: Constants.padding * 2,
                                     bottom: Constants.padding,
                                     left: Constants.padding,
@@ -412,7 +412,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                             ),
                           ),
                           Container(
-                            padding: EdgeInsets.all(Constants.padding),
+                            padding: const EdgeInsets.all(Constants.padding),
                             child: Stack(
                               fit: StackFit.loose,
                               children: [
@@ -494,7 +494,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         ),
                         actions: [
                           Padding(
-                            padding: EdgeInsets.only(
+                            padding: const EdgeInsets.only(
                               right: Constants.padding,
                             ),
                             child: Row(

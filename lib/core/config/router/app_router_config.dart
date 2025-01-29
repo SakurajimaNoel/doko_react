@@ -93,14 +93,14 @@ class AppRouterConfig {
         path: "/error",
         name: RouterConstants.error,
         builder: (context, state) {
-          return AuthErrorPage();
+          return const AuthErrorPage();
         },
       ),
       GoRoute(
         path: "/error/graph",
         name: RouterConstants.graphError,
         builder: (context, state) {
-          return GraphErrorPage();
+          return const GraphErrorPage();
         },
       ),
       // loading
@@ -238,14 +238,14 @@ class AppRouterConfig {
                     parentNavigatorKey: rootNavigatorKey,
                     path: "message-inbox",
                     name: RouterConstants.messageInbox,
-                    builder: (context, state) => MessageInboxPage(),
+                    builder: (context, state) => const MessageInboxPage(),
                     routes: [
                       GoRoute(
                         parentNavigatorKey: rootNavigatorKey,
                         path: "search",
                         name: RouterConstants.messageInboxSearch,
                         builder: (context, state) {
-                          return SearchPage.message();
+                          return const SearchPage.message();
                         },
                       ),
                       GoRoute(

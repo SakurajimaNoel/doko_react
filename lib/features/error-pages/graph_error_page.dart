@@ -13,7 +13,7 @@ class GraphErrorPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Doki"),
+        title: const Text("Doki"),
       ),
       body: LayoutBuilder(builder: (context, constraints) {
         return SingleChildScrollView(
@@ -37,7 +37,7 @@ class GraphErrorPage extends StatelessWidget {
                   onPressed: () {
                     context.read<UserBloc>().add(UserAuthenticatedEvent());
                   },
-                  child: Text("Try again."),
+                  child: const Text("Try again."),
                 )
               ],
             ),

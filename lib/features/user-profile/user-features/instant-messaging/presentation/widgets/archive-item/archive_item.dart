@@ -91,7 +91,7 @@ class ArchiveItem extends StatelessWidget {
       showDragHandle: true,
       builder: (BuildContext context) {
         return Container(
-          padding: EdgeInsets.only(
+          padding: const EdgeInsets.only(
             bottom: Constants.padding,
           ),
           constraints: BoxConstraints(
@@ -104,8 +104,8 @@ class ArchiveItem extends StatelessWidget {
               spacing: Constants.gap * 0.5,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
+                const Padding(
+                  padding: EdgeInsets.symmetric(
                     horizontal: Constants.padding,
                   ),
                   child: Heading.left(
@@ -361,7 +361,7 @@ class _AddDayToast extends StatelessWidget {
         ),
         Center(
           child: Container(
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               vertical: Constants.gap * 0.5,
               horizontal: Constants.gap * 0.75,
             ),
@@ -446,7 +446,7 @@ class _EditMessageState extends State<_EditMessage> {
     final width = MediaQuery.sizeOf(context).width;
 
     return AlertDialog(
-      title: Text("Edit message"),
+      title: const Text("Edit message"),
       content: SizedBox(
         width: width,
         child: TextField(
@@ -471,7 +471,7 @@ class _EditMessageState extends State<_EditMessage> {
           onPressed: () {
             context.pop();
           },
-          child: Text("Cancel"),
+          child: const Text("Cancel"),
         ),
         TextButton(
           onPressed: () {
@@ -512,7 +512,7 @@ class _EditMessageState extends State<_EditMessage> {
 
             context.pop();
           },
-          child: Text("Edit"),
+          child: const Text("Edit"),
         ),
       ],
     );

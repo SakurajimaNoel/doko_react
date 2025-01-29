@@ -137,11 +137,11 @@ class _PendingIncomingRequestState extends State<PendingIncomingRequest>
                       graph.getValueByKey(graphKey)! as Nodes;
 
                   if (pendingRequest.items.isEmpty) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(
                         horizontal: Constants.padding,
                       ),
-                      child: const CustomScrollView(
+                      child: CustomScrollView(
                         slivers: [
                           SliverFillRemaining(
                             child: Center(

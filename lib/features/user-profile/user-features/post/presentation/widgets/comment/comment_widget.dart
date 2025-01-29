@@ -73,7 +73,7 @@ class _CommentWidgetState extends State<CommentWidget> {
             builder: (context, constraints) {
               return SizedBox(
                 height: constraints.maxWidth,
-                child: Center(
+                child: const Center(
                   child: SmallLoadingIndicator.small(),
                 ),
               );
@@ -104,7 +104,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                       bool superShrink = min(constraints.maxWidth, width) < 280;
                       double shrinkFactor = shrink ? 0.75 : 1;
 
-                      if (superShrink) return SizedBox.shrink();
+                      if (superShrink) return const SizedBox.shrink();
 
                       return Text(
                         key: ValueKey("date-diff-$shrink"),
@@ -122,7 +122,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                 ],
               ),
               if (comment.media.bucketPath.isNotEmpty) ...[
-                SizedBox(
+                const SizedBox(
                   height: Constants.gap * 0.5,
                 ),
                 Container(
@@ -145,14 +145,14 @@ class _CommentWidgetState extends State<CommentWidget> {
                 )
               ],
               if (comment.content.isNotEmpty) ...[
-                SizedBox(
+                const SizedBox(
                   height: Constants.gap * 0.5,
                 ),
                 _CommentContent(
                   content: comment.content,
                 ),
               ],
-              SizedBox(
+              const SizedBox(
                 height: Constants.gap * 0.5,
               ),
               _CommentActions(
@@ -191,7 +191,7 @@ class _CommentWrapper extends StatelessWidget {
             margin: EdgeInsets.only(
               left: Constants.padding * shrinkFactor,
             ),
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
               top: Constants.padding * 0.75,
             ),
             child: child,
@@ -204,7 +204,7 @@ class _CommentWrapper extends StatelessWidget {
       margin: const EdgeInsets.symmetric(
         horizontal: Constants.padding,
       ),
-      padding: EdgeInsets.only(
+      padding: const EdgeInsets.only(
         left: Constants.padding * 0.75,
         right: Constants.padding * 0.75,
         bottom: Constants.padding * 0.5,
@@ -416,7 +416,7 @@ class _CommentActionsState extends State<_CommentActions> {
                       },
                       style: TextButton.styleFrom(
                         minimumSize: Size.zero,
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: Constants.padding,
                           vertical: Constants.padding * 0.5,
                         ),
@@ -427,7 +427,7 @@ class _CommentActionsState extends State<_CommentActions> {
                           fontSize: Constants.smallFontSize,
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         "Reply",
                       ),
                     ),
@@ -439,7 +439,7 @@ class _CommentActionsState extends State<_CommentActions> {
                     final width = MediaQuery.sizeOf(context).width;
                     bool shrink = width < 250;
 
-                    if (shrink) return SizedBox.shrink();
+                    if (shrink) return const SizedBox.shrink();
 
                     return Text(
                       "${displayNumberFormat(comment.commentsCount)} Repl${comment.commentsCount > 1 ? "ies" : "y"}",
@@ -568,7 +568,7 @@ class _CommentRepliesState extends State<_CommentReplies> {
                                   },
                             style: TextButton.styleFrom(
                               minimumSize: Size.zero,
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: Constants.padding,
                                 vertical: Constants.padding * 0.5,
                               ),
@@ -580,10 +580,10 @@ class _CommentRepliesState extends State<_CommentReplies> {
                               ),
                             ),
                             child: loading
-                                ? SmallLoadingIndicator.small()
+                                ? const SmallLoadingIndicator.small()
                                 : comment.showReplies
-                                    ? Text("View more replies")
-                                    : Text("View replies"),
+                                    ? const Text("View more replies")
+                                    : const Text("View replies"),
                           ),
                   )
               ],

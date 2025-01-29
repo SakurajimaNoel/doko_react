@@ -15,13 +15,13 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> settingsWidgets = [
-      ThemeSettings(),
-      ApplicationSettings(),
-      AccountSettings(),
+      const ThemeSettings(),
+      const ApplicationSettings(),
+      const AccountSettings(),
     ];
 
     // to add separator after last item
-    settingsWidgets.add(SizedBox.shrink());
+    settingsWidgets.add(const SizedBox.shrink());
 
     return Scaffold(
       appBar: AppBar(
@@ -34,7 +34,7 @@ class _SettingsPageState extends State<SettingsPage> {
           return settingsWidgets[index];
         },
         separatorBuilder: (BuildContext context, int index) {
-          return Divider(
+          return const Divider(
             height: Constants.gap * 2,
           );
         },

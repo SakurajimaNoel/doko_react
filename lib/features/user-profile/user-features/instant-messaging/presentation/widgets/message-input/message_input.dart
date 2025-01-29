@@ -211,7 +211,7 @@ class _MessageInputState extends State<MessageInput> {
                         controller.clear();
                         setState(() {});
                       },
-                      child: Text("Send"),
+                      child: const Text("Send"),
                     ),
                   ],
                 ),

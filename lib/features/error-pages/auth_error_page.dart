@@ -13,7 +13,7 @@ class AuthErrorPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Doki"),
+        title: const Text("Doki"),
       ),
       body: LayoutBuilder(builder: (context, constraints) {
         return SingleChildScrollView(
@@ -37,7 +37,7 @@ class AuthErrorPage extends StatelessWidget {
                     onPressed: () {
                       context.read<UserBloc>().add(UserInitEvent());
                     },
-                    child: Text("Go to login page."))
+                    child: const Text("Go to login page."))
               ],
             ),
           ),

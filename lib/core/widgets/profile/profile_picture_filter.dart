@@ -22,7 +22,7 @@ class ProfilePictureFilter extends StatelessWidget {
     if (preview) {
       return Container(
         alignment: Alignment.bottomLeft,
-        padding: EdgeInsets.all(Constants.padding),
+        padding: const EdgeInsets.all(Constants.padding),
         decoration: BoxDecoration(
           gradient: LinearGradient(
               begin: Alignment.topCenter,

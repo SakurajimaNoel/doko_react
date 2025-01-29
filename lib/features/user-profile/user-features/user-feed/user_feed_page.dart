@@ -48,7 +48,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
               context.pushNamed(RouterConstants.messageInbox);
             },
             color: currTheme.primary,
-            icon: Badge(
+            icon: const Badge(
               label: Text("99+"),
               child: Icon(
                 Icons.chat,
@@ -86,7 +86,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
         return Container(
           height: Constants.height * 15,
           width: width,
-          padding: EdgeInsets.all(Constants.padding),
+          padding: const EdgeInsets.all(Constants.padding),
           child: SingleChildScrollView(
             child: Wrap(
               alignment: WrapAlignment.spaceEvenly,

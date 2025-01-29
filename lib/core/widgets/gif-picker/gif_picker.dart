@@ -42,11 +42,11 @@ class GifPicker extends StatelessWidget {
             },
       style: IconButton.styleFrom(
         minimumSize: Size.zero,
-        padding: EdgeInsets.all(Constants.padding * 0.5),
+        padding: const EdgeInsets.all(Constants.padding * 0.5),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       color: currTheme.primary,
-      icon: Icon(
+      icon: const Icon(
         Icons.gif_box_outlined,
       ),
     );

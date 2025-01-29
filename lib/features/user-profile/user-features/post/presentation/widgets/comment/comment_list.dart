@@ -87,7 +87,7 @@ class _CommentListState extends State<CommentList> {
         bool isEmpty = post.comments.items.isEmpty;
 
         if (isEmpty) {
-          return SliverToBoxAdapter(
+          return const SliverToBoxAdapter(
             child: SizedBox(
               height: Constants.height * 5,
               child: Center(

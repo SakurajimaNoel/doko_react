@@ -118,7 +118,7 @@ class CommentInput extends StatelessWidget {
                   final commentProvider = context.watch<PostCommentProvider>();
 
                   if (!commentProvider.isReply) {
-                    return SizedBox.shrink();
+                    return const SizedBox.shrink();
                   }
 
                   return Container(
@@ -149,8 +149,8 @@ class CommentInput extends StatelessWidget {
                                     },
                               style: IconButton.styleFrom(
                                 minimumSize: Size.zero,
-                                padding:
-                                    EdgeInsets.all(Constants.padding * 0.5),
+                                padding: const EdgeInsets.all(
+                                    Constants.padding * 0.5),
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
                               iconSize: Constants.width * 1.25,
@@ -182,16 +182,16 @@ class CommentInput extends StatelessWidget {
                 constraints: BoxConstraints(
                   maxHeight: height / 3.5,
                 ),
-                child: SingleChildScrollView(
+                child: const SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const _CommentMedia(),
-                      const _CommentMentionOverlay(),
-                      const SizedBox(
+                      _CommentMedia(),
+                      _CommentMentionOverlay(),
+                      SizedBox(
                         height: Constants.gap * 0.25,
                       ),
-                      const _CommentInputActions(),
+                      _CommentInputActions(),
                     ],
                   ),
                 ),
@@ -379,7 +379,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                   child: Center(
                     child: Text(
                       "No user found with username '${state.query}'.",
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: Constants.fontSize,
                       ),
                     ),
@@ -419,7 +419,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                 const SizedBox(
                   height: Constants.gap,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: Constants.height,
                   child: Center(
                     child: SmallLoadingIndicator.small(),
@@ -561,7 +561,7 @@ class _CommentMedia extends StatelessWidget {
       final media = commentInputProvider.media;
 
       if (media == null) {
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
       }
 
       return ConstrainedBox(
@@ -599,7 +599,7 @@ class _CommentMedia extends StatelessWidget {
                           commentInputProvider.removeMedia();
                         },
                   color: currTheme.onError,
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.delete,
                   ),
                 );
@@ -699,7 +699,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
           bool adding = state is NodeCreateLoading;
 
           if (!adding && !showMore) {
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           }
 
           return Row(
@@ -747,11 +747,11 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                       },
                 style: IconButton.styleFrom(
                   minimumSize: Size.zero,
-                  padding: EdgeInsets.all(Constants.padding * 0.5),
+                  padding: const EdgeInsets.all(Constants.padding * 0.5),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 color: currTheme.primary,
-                icon: Icon(
+                icon: const Icon(
                   Icons.collections_outlined,
                 ),
               ),
@@ -785,7 +785,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                           ? const Icon(Icons.reply)
                           : const Icon(Icons.add),
                   label: adding
-                      ? SmallLoadingIndicator.small()
+                      ? const SmallLoadingIndicator.small()
                       : commentProvider.isReply
                           ? const Text("Reply")
                           : const Text("Add"),

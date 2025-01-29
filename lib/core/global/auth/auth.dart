@@ -20,7 +20,7 @@ Future<String> getUsername() async {
         (attribute) =>
             attribute.userAttributeKey ==
             AuthUserAttributeKey.preferredUsername, orElse: () {
-      return AuthUserAttribute(
+      return const AuthUserAttribute(
         userAttributeKey: AuthUserAttributeKey.preferredUsername,
         value: "",
       );
@@ -51,7 +51,7 @@ Future<bool> addUsername(String username) async {
 Future<void> refreshAuthSession() async {
   try {
     await Amplify.Auth.fetchAuthSession(
-      options: FetchAuthSessionOptions(
+      options: const FetchAuthSessionOptions(
         forceRefresh: true,
       ),
     );

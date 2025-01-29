@@ -61,7 +61,7 @@ class PostWidget extends StatelessWidget {
             builder: (context, constraints) {
               return SizedBox(
                 height: constraints.maxWidth,
-                child: Center(
+                child: const Center(
                   child: SmallLoadingIndicator.small(),
                 ),
               );
@@ -468,7 +468,7 @@ class _PostActionState extends State<_PostAction> {
                       ),
                     ],
                   ),
-                  Divider(
+                  const Divider(
                     thickness: Constants.dividerThickness * 0.75,
                   ),
                   Row(

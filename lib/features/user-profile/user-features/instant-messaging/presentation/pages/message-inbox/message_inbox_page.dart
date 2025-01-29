@@ -75,7 +75,7 @@ class MessageInboxPage extends StatelessWidget {
           selectedColor: currTheme.onPrimaryContainer,
           selected: selected,
           dense: true,
-          contentPadding: EdgeInsets.symmetric(
+          contentPadding: const EdgeInsets.symmetric(
             horizontal: Constants.padding,
           ),
           leading: selected
@@ -111,13 +111,13 @@ class MessageInboxPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Message Inbox"),
+        title: const Text("Message Inbox"),
         actions: [
           IconButton(
             onPressed: () {
               context.pushNamed(RouterConstants.messageInboxSearch);
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.search,
             ),
           ),
@@ -134,7 +134,7 @@ class MessageInboxPage extends StatelessWidget {
           final inboxKey = generateInboxKey();
 
           if (!graph.containsKey(inboxKey)) {
-            return Column(
+            return const Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -162,14 +162,14 @@ class MessageInboxPage extends StatelessWidget {
               );
 
           return ListView.separated(
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               vertical: Constants.padding,
             ),
             itemBuilder: (BuildContext context, int index) {
               return buildItems(context, index, items);
             },
             separatorBuilder: (BuildContext context, int index) {
-              return SizedBox(
+              return const SizedBox(
                 height: Constants.gap,
               );
             },

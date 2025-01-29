@@ -37,7 +37,7 @@ class _SignOutButtonState extends State<SignOutButton> {
             style: FilledButton.styleFrom(
               backgroundColor: currTheme.error,
               minimumSize: Size.zero,
-              padding: EdgeInsets.symmetric(
+              padding: const EdgeInsets.symmetric(
                 vertical: Constants.padding * 0.5,
                 horizontal: Constants.padding * 0.75,
               ),

@@ -77,9 +77,9 @@ class _PostPageState extends State<PostPage> {
           if (loading) {
             return Scaffold(
               appBar: AppBar(
-                title: Text("Post"),
+                title: const Text("Post"),
               ),
-              body: Center(
+              body: const Center(
                 child: CircularProgressIndicator(),
               ),
             );
@@ -88,7 +88,7 @@ class _PostPageState extends State<PostPage> {
           if (postError) {
             return Scaffold(
               appBar: AppBar(
-                title: Text("Post"),
+                title: const Text("Post"),
               ),
               body: Center(
                 child: StyledText.error(state.message),
@@ -162,7 +162,7 @@ class _PostPageState extends State<PostPage> {
                             ),
                           ] else
                             commentsLoading
-                                ? SliverToBoxAdapter(
+                                ? const SliverToBoxAdapter(
                                     child: SizedBox(
                                       height: Constants.height * 5,
                                       child: Center(

@@ -57,11 +57,11 @@ class _ArchiveTextState extends State<_ArchiveText> {
                     ),
                     spreadRadius: 0,
                     blurRadius: 10,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              padding: EdgeInsets.all(
+              padding: const EdgeInsets.all(
                 Constants.padding * 0.75,
               ),
               child: _ArchiveTextBubble(
