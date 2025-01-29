@@ -16,7 +16,6 @@ NiceInAppNotification createNewNotification({
   final currTheme = Theme.of(context).colorScheme;
 
   return NiceInAppNotification(
-    vibrate: false,
     leading: leading == null
         ? null
         : Container(
@@ -43,7 +42,7 @@ NiceInAppNotification createNewNotification({
           alpha: 0.5,
         ),
         spreadRadius: 0,
-        blurRadius: 20,
+        blurRadius: 10,
         offset: const Offset(0, 2),
       ),
     ],
@@ -82,7 +81,6 @@ NiceToast createNewToast(
       milliseconds: 250,
     ),
     dismissDirection: DismissDirection.up,
-    vibrate: false,
     message: Text(
       message,
       style: TextStyle(
@@ -100,7 +98,7 @@ NiceToast createNewToast(
           alpha: 0.5,
         ),
         spreadRadius: 0,
-        blurRadius: 20,
+        blurRadius: 10,
         offset: const Offset(0, 2),
       ),
     ],

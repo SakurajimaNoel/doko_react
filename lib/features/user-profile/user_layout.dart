@@ -25,8 +25,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:vibration/vibration.dart';
-import 'package:vibration/vibration_presets.dart';
 
 import 'bloc/real-time/real_time_bloc.dart';
 
@@ -191,9 +189,7 @@ class _UserLayoutState extends State<UserLayout> {
     if (routeName == RouterConstants.messageArchive &&
         pathParams["username"] == getUsernameFromUserKey(userKey)) {
       // gentle remainder
-      Vibration.vibrate(
-        preset: VibrationPreset.gentleReminder,
-      );
+      HapticFeedback.vibrate();
       return;
     }
 
@@ -209,7 +205,7 @@ class _UserLayoutState extends State<UserLayout> {
       ),
       body: Text(messagePreview(message, username)),
       trailing: Text(
-        displayDateDifference(message.sendAt),
+        formatDateTimeToTimeString(message.sendAt),
         style: const TextStyle(
           fontSize: Constants.smallFontSize,
         ),

@@ -26,11 +26,11 @@ final class RealTimeTypingStatusState extends RealTimeState {
   RealTimeTypingStatusState({
     required this.archiveUser,
     required this.typing,
-  });
+  }) : statusAt = DateTime.now();
 
   final String archiveUser;
   final bool typing;
-  final DateTime statusAt = DateTime.now();
+  final DateTime statusAt;
 
   @override
   List<Object?> get props => [archiveUser, statusAt, typing];

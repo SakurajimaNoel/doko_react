@@ -12,7 +12,6 @@ import 'package:doko_react/features/user-profile/user-features/instant-messaging
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vibration/vibration.dart';
 
 class MessageInput extends StatefulWidget {
   const MessageInput({
@@ -198,10 +197,7 @@ class _MessageInputState extends State<MessageInput> {
                         );
                         client.sendMessage(message);
 
-                        Vibration.vibrate(
-                          pattern: [0, 100],
-                          intensities: [0, 64],
-                        );
+                        HapticFeedback.vibrate();
                         // fire bloc event
                         realTimeBloc.add(RealTimeNewMessageEvent(
                           message: message,
