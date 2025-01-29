@@ -34,10 +34,39 @@ class MessageArchivePage extends StatefulWidget {
 
 class _MessageArchivePageState extends State<MessageArchivePage> {
   final FocusNode focusNode = FocusNode();
+  final ScrollController controller = ScrollController();
+  bool show = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller.addListener(handleScroll);
+  }
+
+  void handleScroll() {
+    final height = MediaQuery.sizeOf(context).height;
+
+    if (controller.offset > height) {
+      if (!show) {
+        setState(() {
+          show = true;
+        });
+      }
+    } else {
+      if (show) {
+        setState(() {
+          show = false;
+        });
+      }
+    }
+  }
 
   @override
   void dispose() {
     focusNode.dispose();
+    controller.removeListener(handleScroll);
+    controller.dispose();
     super.dispose();
   }
 
@@ -103,6 +132,24 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
               context.pop();
             },
             child: Scaffold(
+              floatingActionButtonLocation: const CustomFABLocation(
+                offsetY: Constants.height * 2,
+              ),
+              floatingActionButton: show
+                  ? FloatingActionButton(
+                      onPressed: () {
+                        controller.animateTo(
+                          0,
+                          duration: const Duration(
+                            milliseconds: 250,
+                          ),
+                          curve: Curves.fastOutSlowIn,
+                        );
+                      },
+                      shape: const CircleBorder(),
+                      child: const Icon(Icons.arrow_downward),
+                    )
+                  : null,
               appBar: AppBar(
                 toolbarHeight: Constants.height * 5,
                 backgroundColor: currTheme.surfaceContainer,
@@ -245,11 +292,13 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                               growable: false,
                             );
                         return ListView.separated(
+                          controller: controller,
                           reverse: true,
                           itemCount: messages.length,
                           cacheExtent: height * 2,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: Constants.padding * 2,
+                          padding: const EdgeInsets.only(
+                            top: Constants.padding * 2,
+                            bottom: Constants.padding * 1,
                           ),
                           separatorBuilder: (context, index) {
                             return const SizedBox(
@@ -273,5 +322,18 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
         },
       ),
     );
+  }
+}
+
+class CustomFABLocation extends FloatingActionButtonLocation {
+  final double offsetY;
+
+  const CustomFABLocation({this.offsetY = 16}); // Default: move up by 16 pixels
+
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    final Offset standard =
+        FloatingActionButtonLocation.endTop.getOffset(scaffoldGeometry);
+    return Offset(standard.dx, standard.dy + offsetY);
   }
 }
