@@ -37,6 +37,11 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
       from: message.from,
     );
 
+    emit(RealTimeTypingStatusState(
+      archiveUser: archiveUser,
+      typing: false,
+    ));
+
     emit(RealTimeNewMessageState(
       id: message.id,
       archiveUser: archiveUser,
@@ -49,17 +54,6 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
       archiveUser: event.status.from,
       typing: true,
     ));
-
-    // await Future.delayed(
-    //   Duration(
-    //     seconds: 4,
-    //   ),
-    // );
-    //
-    // emit(RealTimeTypingStatusState(
-    //   archiveUser: event.status.from,
-    //   typing: false,
-    // ));
   }
 
   FutureOr<void> _handleRealTimeTypingStatusEndEvent(
