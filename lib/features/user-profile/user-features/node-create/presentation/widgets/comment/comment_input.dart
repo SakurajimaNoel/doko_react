@@ -7,7 +7,6 @@ import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/text-controller/mention_text_controller.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/gif-picker/gif_picker.dart';
-import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -312,7 +311,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
       color: currTheme.surfaceContainer,
       child: BlocBuilder<PostBloc, PostState>(
         buildWhen: (previousState, state) {
-          return state is CommentSearchState;
+          return state is CommentSearchState || state is PostInitial;
         },
         builder: (context, state) {
           bool initial = state is PostInitial;
@@ -328,9 +327,12 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                 SizedBox(
                   height: height,
                   child: const Center(
-                    child: Heading(
+                    child: Text(
                       "Type to search users",
-                      size: Constants.fontSize,
+                      style: TextStyle(
+                        fontSize: Constants.fontSize,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
@@ -345,7 +347,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                 SizedBox(
                   height: height,
                   child: const Center(
-                    child: SmallLoadingIndicator(),
+                    child: SmallLoadingIndicator.small(),
                   ),
                 ),
               ],
@@ -462,15 +464,19 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                 ),
                 decoration: BoxDecoration(
                   color: currTheme.surfaceContainer,
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: BorderRadius.circular(Constants.radius),
                   boxShadow: [
                     BoxShadow(
                       offset: const Offset(0, 2),
-                      blurRadius: 16,
-                      color: currTheme.shadow,
+                      color: currTheme.shadow.withValues(
+                        alpha: 0.5,
+                      ),
+                      spreadRadius: 0,
+                      blurRadius: 10,
                     ),
                   ],
                 ),
+                clipBehavior: Clip.antiAlias,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.symmetric(
