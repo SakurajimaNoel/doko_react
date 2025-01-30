@@ -474,7 +474,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                     .read<WebsocketClientProvider>()
                                     .client;
 
-                                if (client == null || !client.isActive) {
+                                if (client == null || client.isNotActive) {
                                   showError(context, "You are offline.");
                                   return;
                                 }

@@ -85,3 +85,36 @@ final class UserToUserActionGetUserByUsernameEvent
   final String username;
   final String currentUser;
 }
+
+final class UserToUserActionUserSendFriendRequestRemoteEvent
+    extends UserToUserActionEvent {
+  const UserToUserActionUserSendFriendRequestRemoteEvent({
+    required this.username,
+    required this.request,
+  });
+
+  final String username;
+  final UserSendFriendRequest request;
+}
+
+final class UserToUserActionUserAcceptsFriendRequestRemoteEvent
+    extends UserToUserActionEvent {
+  const UserToUserActionUserAcceptsFriendRequestRemoteEvent({
+    required this.username,
+    required this.request,
+  });
+
+  final String username;
+  final UserAcceptFriendRequest request;
+}
+
+final class UserToUserActionUserRemovesFriendRelationRemoteEvent
+    extends UserToUserActionEvent {
+  const UserToUserActionUserRemovesFriendRelationRemoteEvent({
+    required this.username,
+    required this.relation,
+  });
+
+  final String username;
+  final UserRemovesFriendRelation relation;
+}

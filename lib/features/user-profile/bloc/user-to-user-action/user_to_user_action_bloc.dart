@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/graphql/graphql_constants.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/core/utils/relation/user_to_user_relation.dart';
@@ -52,6 +53,122 @@ class UserToUserActionBloc
         _handleUserToUserActionUserRefreshEvent);
     on<UserToUserActionGetUserByUsernameEvent>(
         _handleUserToUserActionGetUserByUsernameEvent);
+
+    on<UserToUserActionUserSendFriendRequestRemoteEvent>(
+        _handleUserToUserActionUserSendFriendRequestRemoteEvent);
+    on<UserToUserActionUserAcceptsFriendRequestRemoteEvent>(
+        _handleUserToUserActionUserAcceptsFriendRequestRemoteEvent);
+    on<UserToUserActionUserRemovesFriendRelationRemoteEvent>(
+        _handleUserToUserActionUserRemovesFriendRelationRemoteEvent);
+  }
+
+  FutureOr<void> _handleUserToUserActionUserRemovesFriendRelationRemoteEvent(
+      UserToUserActionUserRemovesFriendRelationRemoteEvent event,
+      Emitter<UserToUserActionState> emit) {
+    // remove from pending and friend list
+    String friendUsername = event.username == event.relation.from
+        ? event.relation.to
+        : event.relation.from;
+    graph.removeFriend(event.username, friendUsername);
+
+    emit(UserToUserActionUserRelationState(
+      username: friendUsername,
+      relation: UserToUserRelation.unrelated,
+    ));
+
+    emit(UserToUserActionUpdateUserPendingFriendsListState(
+      currentUsername: event.username,
+      username: friendUsername,
+    ));
+
+    emit(UserToUserActionUpdateUserAcceptedFriendsListState(
+      currentUsername: event.username,
+      username: friendUsername,
+    ));
+  }
+
+  FutureOr<void> _handleUserToUserActionUserAcceptsFriendRequestRemoteEvent(
+      UserToUserActionUserAcceptsFriendRequestRemoteEvent event,
+      Emitter<UserToUserActionState> emit) {
+    // add user to accepted friend list and remove from pending user list
+    String friendUsername = event.username == event.request.from
+        ? event.request.to
+        : event.request.from;
+    UserRelationInfo info = UserRelationInfo(
+      requestedBy: event.request.requestedBy,
+      status: event.request.status,
+      addedOn: event.request.addedOn,
+    );
+
+    graph.addFriendToUser(
+      event.username,
+      friendUsername: friendUsername,
+      relationInfo: info,
+    );
+
+    emit(UserToUserActionUserRelationState(
+      username: friendUsername,
+      relation: UserToUserRelation.friends,
+    ));
+
+    emit(UserToUserActionUpdateUserPendingFriendsListState(
+      currentUsername: event.username,
+      username: friendUsername,
+    ));
+
+    emit(UserToUserActionUpdateUserAcceptedFriendsListState(
+      currentUsername: event.username,
+      username: friendUsername,
+    ));
+  }
+
+  FutureOr<void> _handleUserToUserActionUserSendFriendRequestRemoteEvent(
+      UserToUserActionUserSendFriendRequestRemoteEvent event,
+      Emitter<UserToUserActionState> emit) {
+    // add user to pending user list and remove from user's friend list if present
+    // is user exists update user relation info otherwise ignore it
+    // call sendRequest or receiveRequest based on request
+    String friendUsername = event.username == event.request.from
+        ? event.request.to
+        : event.request.from;
+    UserRelationInfo info = UserRelationInfo(
+      requestedBy: event.request.requestedBy,
+      status: event.request.status,
+      addedOn: event.request.addedOn,
+    );
+
+    UserToUserRelation relation = event.username == info.requestedBy
+        ? UserToUserRelation.outgoingReq
+        : UserToUserRelation.incomingReq;
+
+    if (relation == UserToUserRelation.outgoingReq) {
+      graph.sendRequest(
+        event.username,
+        friendUsername: friendUsername,
+        relationInfo: info,
+      );
+    } else {
+      graph.receiveRequest(
+        event.username,
+        friendUsername: friendUsername,
+        relationInfo: info,
+      );
+    }
+
+    emit(UserToUserActionUserRelationState(
+      username: friendUsername,
+      relation: relation,
+    ));
+
+    emit(UserToUserActionUpdateUserPendingFriendsListState(
+      currentUsername: event.username,
+      username: friendUsername,
+    ));
+
+    emit(UserToUserActionUpdateUserAcceptedFriendsListState(
+      currentUsername: event.username,
+      username: friendUsername,
+    ));
   }
 
   FutureOr<void> _handleUserToUserUpdateProfileEvent(

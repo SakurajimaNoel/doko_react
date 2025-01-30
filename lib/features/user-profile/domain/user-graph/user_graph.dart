@@ -4,7 +4,6 @@ import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
-import 'package:doko_react/core/utils/relation/user_to_user_relation.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
@@ -173,23 +172,39 @@ class UserGraph {
       String friendUsername, UserRelationInfo? relationInfo) {
     String key = generateUserNodeKey(friendUsername);
 
-    final friend = getValueByKey(key)! as UserEntity;
-    friend.updateRelationInfo(relationInfo);
+    final friend = getValueByKey(key);
+    if (friend is UserEntity) {
+      friend.updateRelationInfo(relationInfo);
+    }
   }
 
-  void sendRequest(String friendUsername, UserRelationInfo? relationInfo) {
+  void sendRequest(
+    String username, {
+    required String friendUsername,
+    UserRelationInfo? relationInfo,
+  }) {
     // add to outgoing req
-    addOutgoingRequest(friendUsername);
+    _addOutgoingRequest(friendUsername);
     _updateFriendRelation(friendUsername, relationInfo);
+
+    // remove from friend list
+    _removeFromFriendList(username, friendUsername);
   }
 
-  void receiveRequest(String friendUsername, UserRelationInfo? relationInfo) {
+  void receiveRequest(
+    String username, {
+    required String friendUsername,
+    UserRelationInfo? relationInfo,
+  }) {
     // add to incoming req
-    addIncomingRequest(friendUsername);
+    _addIncomingRequest(friendUsername);
     _updateFriendRelation(friendUsername, relationInfo);
+
+    // remove from friend list
+    _removeFromFriendList(username, friendUsername);
   }
 
-  // newly added friend when accepting request
+  // newly added friend when accepting request or when remote accepting request
   void addFriendToUser(
     String username, {
     required String friendUsername,
@@ -212,47 +227,24 @@ class UserGraph {
     }
 
     final friend = getValueByKey(friendKey)!;
-    if (friend is! CompleteUserEntity) return;
-
-    // update friend
-    friend.friends.addItem(key);
-    friend.updateFriendsCount(friend.friendsCount + 1);
+    if (friend is CompleteUserEntity) {
+      // update friend
+      friend.friends.addItem(key);
+      friend.updateFriendsCount(friend.friendsCount + 1);
+    }
   }
 
   // remove friend
   void removeFriend(String username, String friendUsername) {
-    String userKey = generateUserNodeKey(username);
-    String friendKey = generateUserNodeKey(friendUsername);
-
-    /// see if existing friends than remove
-    /// using prevRelationInfo because of optimistic update
-    bool friends = getUserToUserRelation(
-          (getValueByKey(friendKey)! as UserEntity).prevRelationInfo,
-          currentUsername: username,
-        ) ==
-        UserToUserRelation.friends;
-
     // remove from incoming and outgoing if present
     _removeIncomingRequest(friendUsername);
     _removeOutgoingRequest(friendUsername);
+    _removeFromFriendList(username, friendUsername);
 
     _updateFriendRelation(friendUsername, null);
-
-    // remove friend from friend list
-    final user = getValueByKey(userKey)!;
-    if (user is CompleteUserEntity) {
-      user.friends.removeItem(friendKey);
-      if (friends) user.updateFriendsCount(user.friendsCount - 1);
-    }
-
-    final friend = getValueByKey(friendKey)!;
-    if (friend is! CompleteUserEntity) return;
-
-    friend.friends.removeItem(userKey);
-    if (friends) friend.updateFriendsCount(friend.friendsCount - 1);
   }
 
-  void addOutgoingRequest(String friendUsername) {
+  void _addOutgoingRequest(String friendUsername) {
     String key = generateUserNodeKey(friendUsername);
 
     // if user is not present user widget will handle fetching of user
@@ -266,7 +258,7 @@ class UserGraph {
     }
   }
 
-  void addIncomingRequest(String friendUsername) {
+  void _addIncomingRequest(String friendUsername) {
     String key = generateUserNodeKey(friendUsername);
 
     // if user is not present user widget will handle fetching of user
@@ -277,6 +269,28 @@ class UserGraph {
 
     if (incomingReq is Nodes) {
       incomingReq.addItem(key);
+    }
+  }
+
+  void _removeFromFriendList(String username, String friendUsername) {
+    String userKey = generateUserNodeKey(username);
+    String friendKey = generateUserNodeKey(friendUsername);
+
+    final userEntity = getValueByKey(userKey);
+    final friendEntity = getValueByKey(friendKey);
+
+    if (userEntity is CompleteUserEntity) {
+      if (userEntity.friends.items.contains(friendKey)) {
+        userEntity.updateFriendsCount(userEntity.friendsCount - 1);
+      }
+      userEntity.friends.removeItem(friendKey);
+    }
+
+    if (friendEntity is CompleteUserEntity) {
+      if (friendEntity.friends.items.contains(userKey)) {
+        friendEntity.updateFriendsCount(friendEntity.friendsCount - 1);
+      }
+      friendEntity.friends.removeItem(userKey);
     }
   }
 

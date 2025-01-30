@@ -58,7 +58,7 @@ class ArchiveItem extends StatelessWidget {
       required bool everyone,
     }) {
       final client = context.read<WebsocketClientProvider>().client;
-      if (client == null || !client.isActive) {
+      if (client == null || client.isNotActive) {
         showError(context, "You are not connected.");
       }
 
@@ -483,7 +483,7 @@ class _EditMessageState extends State<_EditMessage> {
             }
 
             final client = context.read<WebsocketClientProvider>().client;
-            if (client == null || !client.isActive) {
+            if (client == null || client.isNotActive) {
               showError(context, "You are not connected.");
             }
 

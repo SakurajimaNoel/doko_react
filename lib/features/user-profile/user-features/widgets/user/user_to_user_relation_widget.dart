@@ -1,6 +1,8 @@
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/relation/user_to_user_relation.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -124,16 +126,71 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
             state.username == username);
       },
       listener: (BuildContext context, UserToUserActionState state) {
+        if (state is! UserToUserActionUserRelationState) return;
+        UserToUserRelation relation = state.relation;
+        if ((relation == UserToUserRelation.optimisticFriends) ||
+            (relation == UserToUserRelation.optimisticOutgoingReq) ||
+            (relation == UserToUserRelation.optimisticUnrelated)) {
+          return;
+        }
+
+        // don't send notification back when user doesn't trigger it
+        if (!updating) return;
+
+        final client = context.read<WebsocketClientProvider>().client;
+        if (client == null || client.isNotActive) return;
+
+        final user = graph.getValueByKey(graphKey);
+        DateTime addedOn = DateTime.now();
+
+        if (user is UserEntity) {
+          addedOn = user.relationInfo?.addedOn ?? addedOn;
+        }
+
+        // send update to other connected clients
+        if (relation == UserToUserRelation.friends) {
+          // accepted friend req
+          UserAcceptFriendRequest req = UserAcceptFriendRequest(
+            from: currentUsername,
+            to: username,
+            addedOn: addedOn,
+          );
+          client.userAcceptFriendRequest(req);
+        }
+
+        if (relation == UserToUserRelation.outgoingReq) {
+          UserSendFriendRequest req = UserSendFriendRequest(
+            from: currentUsername,
+            to: username,
+            addedOn: addedOn,
+          );
+          client.userSendFriendRequest(req);
+        }
+
+        if (relation == UserToUserRelation.unrelated) {
+          UserRemovesFriendRelation relation = UserRemovesFriendRelation(
+            from: currentUsername,
+            to: username,
+          );
+          client.userRemovesFriendRelation(relation);
+        }
+
         updating = false;
       },
       buildWhen: (previousState, state) {
         return (state is UserToUserActionUserRelationState &&
                 state.username == username) ||
             (state is UserToUserActionUserRefreshState &&
+                state.username == username) ||
+            (state is UserToUserActionUserDataFetchedState &&
                 state.username == username);
       },
       builder: (context, state) {
+        if (!graph.containsKey(graphKey)) {
+          return const SizedBox.shrink();
+        }
         final user = graph.getValueByKey(graphKey)! as UserEntity;
+
         final status = getUserToUserRelation(
           user.relationInfo,
           currentUsername: currentUsername,

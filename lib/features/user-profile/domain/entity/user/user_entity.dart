@@ -19,7 +19,7 @@ class UserEntity extends GraphEntity {
     required this.name,
     required this.profilePicture,
     required this.relationInfo,
-  }) : prevRelationInfo = relationInfo;
+  });
 
   final String userId;
   final String username;
@@ -27,11 +27,8 @@ class UserEntity extends GraphEntity {
   StorageResource profilePicture;
   UserRelationInfo? relationInfo;
 
-  UserRelationInfo? prevRelationInfo;
-
   // used to update user to user relation info
   void updateRelationInfo(UserRelationInfo? currentRelationInfo) {
-    prevRelationInfo = relationInfo;
     relationInfo = currentRelationInfo;
   }
 

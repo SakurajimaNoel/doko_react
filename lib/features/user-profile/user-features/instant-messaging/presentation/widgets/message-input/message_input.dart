@@ -94,7 +94,7 @@ class _MessageInputState extends State<MessageInput> {
 
     Widget gifPicker = GifPicker(
       handleSelection: (String gifURL) {
-        if (client == null || !client.isActive) {
+        if (client == null || client.isNotActive) {
           showError(context, "You are not connected.");
           return;
         }
@@ -183,7 +183,7 @@ class _MessageInputState extends State<MessageInput> {
                         final messageBody = controller.text.trim();
                         if (messageBody.isEmpty) return;
 
-                        if (client == null || !client.isActive) {
+                        if (client == null || client.isNotActive) {
                           showError(context, "You are offline.");
                           return;
                         }

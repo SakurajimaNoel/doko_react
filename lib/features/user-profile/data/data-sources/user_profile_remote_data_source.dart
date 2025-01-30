@@ -131,7 +131,11 @@ class UserProfileRemoteDataSource {
       UserRelationInfo? relationInfo = UserEntity.getRelationInfo(res[0]);
       UserGraph graph = UserGraph();
 
-      graph.sendRequest(relationDetails.username, relationInfo);
+      graph.sendRequest(
+        relationDetails.currentUsername,
+        friendUsername: relationDetails.username,
+        relationInfo: relationInfo,
+      );
 
       return true;
     } catch (_) {

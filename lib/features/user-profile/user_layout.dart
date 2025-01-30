@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
@@ -77,6 +78,7 @@ class _UserLayoutState extends State<UserLayout> {
     });
 
     final realTimeBloc = context.read<RealTimeBloc>();
+    final userToUserActionBloc = context.read<UserToUserActionBloc>();
 
     // create websocket client
     client = Client(
@@ -165,6 +167,39 @@ class _UserLayoutState extends State<UserLayout> {
           );
         }
       },
+      onUserSendFriendRequest: (UserSendFriendRequest request) {
+        safePrint(request.toJson());
+        // show notification if valid
+        if (request.to == username) {
+          showNewFriendRequestNotification(request);
+        }
+
+        userToUserActionBloc
+            .add(UserToUserActionUserSendFriendRequestRemoteEvent(
+          username: username,
+          request: request,
+        ));
+      },
+      onUserAcceptFriendRequest: (UserAcceptFriendRequest request) {
+        safePrint(request.toJson());
+        // show notification if valid
+        if (request.to == username) {
+          showAcceptedFriendNotification(request);
+        }
+
+        userToUserActionBloc
+            .add(UserToUserActionUserAcceptsFriendRequestRemoteEvent(
+          username: username,
+          request: request,
+        ));
+      },
+      onUserRemovesFriendRelation: (UserRemovesFriendRelation relation) {
+        userToUserActionBloc
+            .add(UserToUserActionUserRemovesFriendRelationRemoteEvent(
+          username: username,
+          relation: relation,
+        ));
+      },
     );
 
     connectWS();
@@ -180,6 +215,66 @@ class _UserLayoutState extends State<UserLayout> {
 
     showSuccess(context, "Connected to websocket server.");
     context.read<WebsocketClientProvider>().addClient(client);
+  }
+
+  void showNewFriendRequestNotification(UserSendFriendRequest request) {
+    final userKey = generateUserNodeKey(request.from);
+    final notification = createNewNotification(
+      context: context,
+      leading: UserWidget.avtar(
+        userKey: userKey,
+      ),
+      title: UserWidget.infoSmall(
+        userKey: userKey,
+      ),
+      body: Text("@${request.from} has send you a friend request."),
+      trailing: Text(
+        formatDateTimeToTimeString(request.addedOn),
+        style: const TextStyle(
+          fontSize: Constants.smallFontSize,
+        ),
+      ),
+      onTap: () {
+        context.pushNamed(
+          RouterConstants.userProfile,
+          pathParameters: {
+            "username": getUsernameFromUserKey(userKey),
+          },
+        );
+      },
+    );
+
+    showNotification(notification);
+  }
+
+  void showAcceptedFriendNotification(UserAcceptFriendRequest request) {
+    final userKey = generateUserNodeKey(request.from);
+    final notification = createNewNotification(
+      context: context,
+      leading: UserWidget.avtar(
+        userKey: userKey,
+      ),
+      title: UserWidget.infoSmall(
+        userKey: userKey,
+      ),
+      body: Text("@${request.from} has accepted your friend request."),
+      trailing: Text(
+        formatDateTimeToTimeString(DateTime.now()),
+        style: const TextStyle(
+          fontSize: Constants.smallFontSize,
+        ),
+      ),
+      onTap: () {
+        context.pushNamed(
+          RouterConstants.userProfile,
+          pathParameters: {
+            "username": getUsernameFromUserKey(userKey),
+          },
+        );
+      },
+    );
+
+    showNotification(notification);
   }
 
   void showNewMessageNotification(ChatMessage message, String userKey) {
