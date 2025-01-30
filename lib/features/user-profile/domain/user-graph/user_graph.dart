@@ -183,6 +183,12 @@ class UserGraph {
     _updateFriendRelation(friendUsername, relationInfo);
   }
 
+  void receiveRequest(String friendUsername, UserRelationInfo? relationInfo) {
+    // add to incoming req
+    addIncomingRequest(friendUsername);
+    _updateFriendRelation(friendUsername, relationInfo);
+  }
+
   // newly added friend when accepting request
   void addFriendToUser(
     String username, {
@@ -192,8 +198,9 @@ class UserGraph {
     String key = generateUserNodeKey(username);
     String friendKey = generateUserNodeKey(friendUsername);
 
-    // remove from incoming req
+    // remove from pending req
     _removeIncomingRequest(friendUsername);
+    _removeOutgoingRequest(friendUsername);
 
     _updateFriendRelation(friendUsername, relationInfo);
 
@@ -248,8 +255,8 @@ class UserGraph {
   void addOutgoingRequest(String friendUsername) {
     String key = generateUserNodeKey(friendUsername);
 
-    // Todo: handle adding user if not present
-    if (!containsKey(key)) return;
+    // if user is not present user widget will handle fetching of user
+    // if (!containsKey(key)) return;
 
     String outgoingReqKey = generatePendingOutgoingReqKey();
     final outgoingReq = getValueByKey(outgoingReqKey);
@@ -262,8 +269,8 @@ class UserGraph {
   void addIncomingRequest(String friendUsername) {
     String key = generateUserNodeKey(friendUsername);
 
-    // Todo: handle adding user if not present
-    if (!containsKey(key)) return;
+    // if user is not present user widget will handle fetching of user
+    // if (!containsKey(key)) return;
 
     String incomingReqKey = generatePendingIncomingReqKey();
     final incomingReq = getValueByKey(incomingReqKey);
