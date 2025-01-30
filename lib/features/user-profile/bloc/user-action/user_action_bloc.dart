@@ -256,6 +256,11 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         currentUsername: details.currentUsername,
         username: details.username,
       ));
+
+      emit(UserActionUpdateUserAcceptedFriendsListState(
+        currentUsername: details.currentUsername,
+        username: details.username,
+      ));
     } catch (_) {
       // optimistic failure
       user.updateRelationInfo(initRelation);
@@ -385,6 +390,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         currentUsername: details.currentUsername,
         username: details.username,
       ));
+
       emit(UserActionUpdateUserAcceptedFriendsListState(
         currentUsername: details.currentUsername,
         username: details.username,
