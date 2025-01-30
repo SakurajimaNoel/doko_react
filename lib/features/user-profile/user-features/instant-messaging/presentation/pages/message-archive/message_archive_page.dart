@@ -137,6 +137,7 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
               ),
               floatingActionButton: show
                   ? FloatingActionButton(
+                      mini: true,
                       onPressed: () {
                         controller.animateTo(
                           0,
