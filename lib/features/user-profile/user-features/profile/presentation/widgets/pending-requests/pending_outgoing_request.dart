@@ -4,7 +4,7 @@ import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
-import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/friend_widget.dart';
@@ -128,9 +128,10 @@ class _PendingOutgoingRequestState extends State<PendingOutgoingRequest>
                       refresh: true,
                     ));
               },
-              child: BlocBuilder<UserActionBloc, UserActionState>(
+              child: BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
                 buildWhen: (previousState, state) {
-                  return state is UserActionUpdateUserPendingFriendsListState;
+                  return state
+                      is UserToUserActionUpdateUserPendingFriendsListState;
                 },
                 builder: (context, state) {
                   final Nodes pendingRequest =

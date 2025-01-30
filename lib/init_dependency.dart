@@ -23,6 +23,7 @@ import "package:doko_react/features/complete-profile/domain/use-case/complete-pr
 import "package:doko_react/features/complete-profile/domain/use-case/username-use-case/username_use_case.dart";
 import "package:doko_react/features/complete-profile/presentation/bloc/complete_profile_bloc.dart";
 import "package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart";
+import "package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart";
 import "package:doko_react/features/user-profile/data/data-sources/user_profile_remote_data_source.dart";
 import "package:doko_react/features/user-profile/data/repository/user_profile_repository_impl.dart";
 import "package:doko_react/features/user-profile/domain/repository/user_profile_repository.dart";
@@ -95,6 +96,7 @@ Future<void> initDependency() async {
   _initCompleteProfile();
   _initProfile();
   _initUserAction();
+  _initUserToUserAction();
   _initNodeCreate();
   _initPost();
 }
@@ -179,6 +181,41 @@ void _initNodeCreate() {
   );
 }
 
+void _initUserToUserAction() {
+  serviceLocator.registerFactory<UserCreateFriendRelationUseCase>(
+    () => UserCreateFriendRelationUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UserAcceptFriendRelationUseCase>(
+    () => UserAcceptFriendRelationUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UserRemoveFriendRelationUseCase>(
+    () => UserRemoveFriendRelationUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UserGetUseCase>(
+    () => UserGetUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UserToUserActionBloc>(
+    () => UserToUserActionBloc(
+      userCreateFriendRelationUseCase: serviceLocator(),
+      userRemoveFriendRelationUseCase: serviceLocator(),
+      userAcceptFriendRelationUseCase: serviceLocator(),
+      userGetUseCase: serviceLocator(),
+    ),
+  );
+}
+
 void _initUserAction() {
   serviceLocator.registerFactory<UserProfileRemoteDataSource>(
     () => UserProfileRemoteDataSource(
@@ -204,24 +241,6 @@ void _initUserAction() {
     ),
   );
 
-  serviceLocator.registerFactory<UserCreateFriendRelationUseCase>(
-    () => UserCreateFriendRelationUseCase(
-      profileRepository: serviceLocator(),
-    ),
-  );
-
-  serviceLocator.registerFactory<UserAcceptFriendRelationUseCase>(
-    () => UserAcceptFriendRelationUseCase(
-      profileRepository: serviceLocator(),
-    ),
-  );
-
-  serviceLocator.registerFactory<UserRemoveFriendRelationUseCase>(
-    () => UserRemoveFriendRelationUseCase(
-      profileRepository: serviceLocator(),
-    ),
-  );
-
   serviceLocator.registerFactory<CommentAddLikeUseCase>(
     () => CommentAddLikeUseCase(
       profileRepository: serviceLocator(),
@@ -230,12 +249,6 @@ void _initUserAction() {
 
   serviceLocator.registerFactory<CommentRemoveLikeUseCase>(
     () => CommentRemoveLikeUseCase(
-      profileRepository: serviceLocator(),
-    ),
-  );
-
-  serviceLocator.registerFactory<UserGetUseCase>(
-    () => UserGetUseCase(
       profileRepository: serviceLocator(),
     ),
   );
@@ -256,12 +269,8 @@ void _initUserAction() {
     () => UserActionBloc(
       postAddLikeUseCase: serviceLocator(),
       postRemoveLikeUseCase: serviceLocator(),
-      userCreateFriendRelationUseCase: serviceLocator(),
-      userRemoveFriendRelationUseCase: serviceLocator(),
-      userAcceptFriendRelationUseCase: serviceLocator(),
       commentAddLikeUseCase: serviceLocator(),
       commentRemoveLikeUseCase: serviceLocator(),
-      userGetUseCase: serviceLocator(),
       postGetUseCase: serviceLocator(),
       commentGetUseCase: serviceLocator(),
     ),

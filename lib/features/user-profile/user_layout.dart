@@ -14,7 +14,7 @@ import 'package:doko_react/core/utils/instant-messaging/message_preview.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/notifications/notifications_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
-import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
@@ -316,9 +316,9 @@ class _UserLayoutState extends State<UserLayout> {
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
 
-    return BlocBuilder<UserActionBloc, UserActionState>(
+    return BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
       buildWhen: (previousState, state) {
-        return state is UserActionUpdateProfile;
+        return state is UserToUserActionUpdateProfileState;
       },
       builder: (context, state) {
         final username =

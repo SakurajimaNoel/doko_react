@@ -11,7 +11,7 @@ import 'package:doko_react/core/validation/input_validation/input_validation.dar
 import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
-import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
@@ -73,7 +73,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       String key = generateUserNodeKey(user.username);
 
       final tempUser = graph.getValueByKey(key)! as CompleteUserEntity;
-      context.read<UserActionBloc>().add(UserActionUpdateEvent(
+      context.read<UserToUserActionBloc>().add(UserToUserUpdateProfileEvent(
             name: tempUser.name,
             bio: tempUser.bio,
             profilePicture: tempUser.profilePicture.bucketPath,

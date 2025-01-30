@@ -4,7 +4,7 @@ import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
-import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
@@ -141,7 +141,9 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
               final user = graph.getValueByKey(graphKey)! as CompleteUserEntity;
               final Nodes userFriends = user.friends;
 
-              context.read<UserActionBloc>().add(UserActionFriendLoadEvent(
+              context
+                  .read<UserToUserActionBloc>()
+                  .add(UserToUserActionFriendLoadEvent(
                     friendsCount: userFriends.items.length,
                     username: username,
                   ));
@@ -199,11 +201,11 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
                     showToastError(state.message);
                   }
                 },
-                child: BlocBuilder<UserActionBloc, UserActionState>(
+                child: BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
                   buildWhen: (previousState, state) {
-                    return (state is UserActionLoadFriends &&
+                    return (state is UserToUserActionLoadFriendsState &&
                             state.username == username) ||
-                        (state is UserActionUpdateUserAcceptedFriendsListState &&
+                        (state is UserToUserActionUpdateUserAcceptedFriendsListState &&
                             (self || state.username == username));
                   },
                   builder: (context, state) {

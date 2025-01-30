@@ -7,7 +7,7 @@ import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
-import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:flutter/material.dart';
@@ -138,19 +138,21 @@ class UserWidget extends StatelessWidget {
     final UserGraph graph = UserGraph();
     if (!graph.containsKey(userKey)) {
       // send a req to fetch this user
-      context.read<UserActionBloc>().add(UserActionGetUserByUsernameEvent(
+      context
+          .read<UserToUserActionBloc>()
+          .add(UserToUserActionGetUserByUsernameEvent(
             username: username,
             currentUser: currentUser,
           ));
     }
 
-    return BlocBuilder<UserActionBloc, UserActionState>(
+    return BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
       buildWhen: (previousState, state) {
-        return (state is UserActionUpdateProfile &&
+        return (state is UserToUserActionUpdateProfileState &&
                 userKey == currentUserKey) ||
-            (state is UserActionUserRefreshState &&
+            (state is UserToUserActionUserRefreshState &&
                 state.username == username) ||
-            (state is UserActionUserDataFetchedState &&
+            (state is UserToUserActionUserDataFetchedState &&
                 state.username == username);
       },
       builder: (context, state) {
@@ -411,14 +413,14 @@ class UserWidget extends StatelessWidget {
   }
 
   Widget userPreviewInfo(
-      UserEntity? user, ColorScheme currTheme, String usename) {
+      UserEntity? user, ColorScheme currTheme, String username) {
     if (user == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Heading.left(
-            "@$usename",
+            "@$username",
             color: currTheme.onPrimary,
             size: Constants.heading3,
           )

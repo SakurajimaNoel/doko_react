@@ -9,6 +9,7 @@ import 'package:doko_react/core/global/provider/websocket-client/websocket_clien
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -53,6 +54,10 @@ void main() async {
           ),
           BlocProvider(
             create: (BuildContext context) => serviceLocator<UserActionBloc>(),
+          ),
+          BlocProvider(
+            create: (BuildContext context) =>
+                serviceLocator<UserToUserActionBloc>(),
           ),
           BlocProvider(
             create: (BuildContext context) => RealTimeBloc(),

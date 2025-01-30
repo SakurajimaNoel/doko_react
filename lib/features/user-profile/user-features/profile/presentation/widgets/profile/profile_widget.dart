@@ -14,6 +14,7 @@ import 'package:doko_react/core/widgets/share/share.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/public/sign-out-button/sign_out_button.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
@@ -191,9 +192,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   Widget userProfileInfo(String key) {
     var currTheme = Theme.of(context).colorScheme;
 
-    return BlocBuilder<UserActionBloc, UserActionState>(
+    return BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
       buildWhen: (previousState, state) {
-        return (state is UserActionUpdateUserAcceptedFriendsListState &&
+        return (state is UserToUserActionUpdateUserAcceptedFriendsListState &&
                 (self || state.username == username)) ||
             (self && state is UserActionNewPostState);
       },
@@ -254,7 +255,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   }
 
   Future<void> handleUserRefreshEvent() async {
-    context.read<UserActionBloc>().add(UserActionUserRefreshEvent(
+    context.read<UserToUserActionBloc>().add(UserToUserActionUserRefreshEvent(
           username: username,
         ));
   }
@@ -288,16 +289,16 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               userDetails: details,
             ),
           ),
-        child: BlocConsumer<UserActionBloc, UserActionState>(
+        child: BlocConsumer<UserToUserActionBloc, UserToUserActionState>(
           listenWhen: (previousState, state) {
-            return state is UserActionUserRefreshState &&
+            return state is UserToUserActionUserRefreshState &&
                 state.username == username;
           },
           listener: (context, state) {
             latestFetch = DateTime.now();
           },
           buildWhen: (previousState, state) {
-            return state is UserActionUserRefreshState &&
+            return state is UserToUserActionUserRefreshState &&
                 state.username == username;
           },
           builder: (context, state) {
@@ -507,7 +508,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           background:
                               BlocBuilder<UserActionBloc, UserActionState>(
                             buildWhen: (previousState, state) {
-                              return (self && state is UserActionUpdateProfile);
+                              return (self &&
+                                  state is UserToUserActionUpdateProfileState);
                             },
                             builder: (context, state) {
                               final user = graph.getValueByKey(key)!
@@ -558,7 +560,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           padding: const EdgeInsets.all(Constants.padding),
                           child: BlocBuilder<UserActionBloc, UserActionState>(
                             buildWhen: (previousState, state) {
-                              return (self && state is UserActionUpdateProfile);
+                              return (self &&
+                                  state is UserToUserActionUpdateProfileState);
                             },
                             builder: (context, state) {
                               final user = graph.getValueByKey(key)!

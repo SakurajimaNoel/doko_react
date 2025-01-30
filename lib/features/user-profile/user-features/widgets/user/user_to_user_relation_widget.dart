@@ -2,7 +2,7 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/relation/user_to_user_relation.dart';
-import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:flutter/material.dart';
@@ -67,9 +67,9 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
     if (updating || disabled) return;
     updating = true;
 
-    final userActionBloc = context.read<UserActionBloc>();
+    final userToUserActionBloc = context.read<UserToUserActionBloc>();
 
-    userActionBloc.add(UserActionCreateFriendRelationEvent(
+    userToUserActionBloc.add(UserToUserActionCreateFriendRelationEvent(
       currentUsername: currentUsername,
       username: username,
     ));
@@ -80,8 +80,8 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
     if (updating || disabled) return;
     updating = true;
 
-    final userActionBloc = context.read<UserActionBloc>();
-    userActionBloc.add(UserActionAcceptFriendRelationEvent(
+    final userToUserActionBloc = context.read<UserToUserActionBloc>();
+    userToUserActionBloc.add(UserToUserActionAcceptFriendRelationEvent(
       currentUsername: currentUsername,
       username: username,
       requestedBy: user.relationInfo!.requestedBy,
@@ -93,8 +93,8 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
     if (updating || disabled) return;
     updating = true;
 
-    final userActionBloc = context.read<UserActionBloc>();
-    userActionBloc.add(UserActionRemoveFriendRelationEvent(
+    final userToUserActionBloc = context.read<UserToUserActionBloc>();
+    userToUserActionBloc.add(UserToUserActionRemoveFriendRelationEvent(
       currentUsername: currentUsername,
       username: username,
       requestedBy: user.relationInfo!.requestedBy,
@@ -118,18 +118,19 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
       return const SizedBox.shrink();
     }
 
-    return BlocConsumer<UserActionBloc, UserActionState>(
+    return BlocConsumer<UserToUserActionBloc, UserToUserActionState>(
       listenWhen: (previousState, state) {
-        return (state is UserActionUserRelationState &&
+        return (state is UserToUserActionUserRelationState &&
             state.username == username);
       },
-      listener: (BuildContext context, UserActionState state) {
+      listener: (BuildContext context, UserToUserActionState state) {
         updating = false;
       },
       buildWhen: (previousState, state) {
-        return (state is UserActionUserRelationState &&
+        return (state is UserToUserActionUserRelationState &&
                 state.username == username) ||
-            (state is UserActionUserRefreshState && state.username == username);
+            (state is UserToUserActionUserRefreshState &&
+                state.username == username);
       },
       builder: (context, state) {
         final user = graph.getValueByKey(graphKey)! as UserEntity;
@@ -139,7 +140,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
         );
 
         bool disabled = false;
-        if (state is UserActionUserRelationState) {
+        if (state is UserToUserActionUserRelationState) {
           disabled = (state.relation == UserToUserRelation.optimisticFriends) ||
               (state.relation == UserToUserRelation.optimisticOutgoingReq) ||
               (state.relation == UserToUserRelation.optimisticUnrelated);
