@@ -68,16 +68,46 @@ class _CommentWidgetState extends State<CommentWidget> {
             state.commentId == commentId;
       },
       builder: (context, state) {
+        bool isError =
+            state is UserActionCommentDataFetchedState && !state.success;
+
         if (!graph.containsKey(widget.commentKey)) {
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              return SizedBox(
-                height: constraints.maxWidth,
-                child: const Center(
-                  child: SmallLoadingIndicator.small(),
-                ),
-              );
-            },
+          return _CommentWrapper(
+            isReply: widget.isReply,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SizedBox(
+                  height: constraints.maxWidth,
+                  child: Center(
+                    child: isError
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            spacing: Constants.gap * 0.25,
+                            children: [
+                              const StyledText.error(
+                                "Error loading comment.",
+                                size: Constants.smallFontSize * 1.125,
+                              ),
+                              TextButton.icon(
+                                onPressed: () {
+                                  context
+                                      .read<UserActionBloc>()
+                                      .add(UserActionGetCommentByIdEvent(
+                                        username: username,
+                                        commentId: commentId,
+                                      ));
+                                },
+                                label: const Text("Retry"),
+                                icon: const Icon(Icons.refresh),
+                              ),
+                            ],
+                          )
+                        : const SmallLoadingIndicator.small(),
+                  ),
+                );
+              },
+            ),
           );
         }
 

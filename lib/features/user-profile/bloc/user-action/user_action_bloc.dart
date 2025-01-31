@@ -21,7 +21,6 @@ part 'user_action_state.dart';
 
 class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final UserGraph graph = UserGraph();
-  final Set<String> getUserRequest = HashSet();
   final Set<String> getNodeRequest = HashSet();
   final Set<String> nodeLikeActionRequest = HashSet();
   final Set<String> userToUserRelation = HashSet(); // currentUser@remoteUser
@@ -496,8 +495,15 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       getNodeRequest.remove(event.postId);
       emit(UserActionPostDataFetchedState(
         postId: event.postId,
+        success: true,
       ));
-    } catch (_) {}
+    } catch (_) {
+      emit(UserActionPostDataFetchedState(
+        postId: event.postId,
+        success: false,
+      ));
+    }
+    getNodeRequest.remove(event.postId);
   }
 
   FutureOr<void> _handleUserActionGetCommentByIdEvent(
@@ -515,10 +521,16 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         nodeId: event.commentId,
       ));
 
-      getNodeRequest.remove(event.commentId);
       emit(UserActionCommentDataFetchedState(
         commentId: event.commentId,
+        success: true,
       ));
-    } catch (_) {}
+    } catch (_) {
+      emit(UserActionCommentDataFetchedState(
+        commentId: event.commentId,
+        success: false,
+      ));
+    }
+    getNodeRequest.remove(event.commentId);
   }
 }

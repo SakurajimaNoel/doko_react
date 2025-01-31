@@ -182,24 +182,28 @@ class UserActionPostRefreshState extends UserActionState {
 class UserActionPostDataFetchedState extends UserActionState {
   UserActionPostDataFetchedState({
     required this.postId,
+    required this.success,
   }) : now = DateTime.now();
 
   final String postId;
   final DateTime now;
+  final bool success;
 
   @override
-  List<Object?> get props => [postId, now];
+  List<Object?> get props => [postId, now, success];
 }
 
 // comment data fetched for streaming
 class UserActionCommentDataFetchedState extends UserActionState {
   UserActionCommentDataFetchedState({
     required this.commentId,
+    required this.success,
   }) : now = DateTime.now();
 
   final String commentId;
   final DateTime now;
+  final bool success;
 
   @override
-  List<Object?> get props => [commentId, now];
+  List<Object?> get props => [commentId, now, success];
 }
