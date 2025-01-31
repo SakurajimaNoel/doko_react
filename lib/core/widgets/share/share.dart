@@ -329,7 +329,13 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                   ),
                                 ),
                               ),
-                              if (searching) const SmallLoadingIndicator(),
+                              if (searching)
+                                const Padding(
+                                  padding: EdgeInsets.only(
+                                    right: Constants.padding * 0.125,
+                                  ),
+                                  child: SmallLoadingIndicator(),
+                                ),
                               if (!searching && state is! ProfileInitial)
                                 Icon(
                                   Icons.check,
@@ -581,19 +587,24 @@ class _ShareUserWidget extends StatelessWidget {
               spacing: Constants.gap * 0.5,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                UserWidget.avtarLarge(
+                UserWidgetNew.avtarLarge(
                   userKey: userKey,
                 ),
-                DefaultTextStyle.merge(
-                  style: TextStyle(
-                    color: isSelected
-                        ? currTheme.onPrimaryContainer
-                        : currTheme.onSurface,
-                  ),
-                  child: UserWidget.infoShare(
-                    userKey: userKey,
-                  ),
-                ),
+                Column(
+                  spacing: Constants.gap * 0.125,
+                  children: [
+                    UserWidgetNew.nameSmall(
+                      userKey: userKey,
+                      trim: 12,
+                      baseFontSize: Constants.fontSize,
+                    ),
+                    UserWidgetNew.usernameSmall(
+                      userKey: userKey,
+                      trim: 12,
+                      baseFontSize: Constants.smallFontSize,
+                    ),
+                  ],
+                )
               ],
             ),
           ),
