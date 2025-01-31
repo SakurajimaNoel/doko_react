@@ -384,7 +384,7 @@ class _PostCaptionState extends State<_PostCaption> {
                   text: " $buttonText",
                   style: TextStyle(
                     color: currTheme.outline,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.bold,
                     fontSize: Constants.smallFontSize,
                   ),
                   recognizer: TapGestureRecognizer()

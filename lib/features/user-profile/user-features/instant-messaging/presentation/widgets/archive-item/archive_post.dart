@@ -27,7 +27,7 @@ class _ArchivePost extends StatelessWidget {
     Widget type = const Text(
       "POST",
       style: TextStyle(
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.bold,
         fontSize: Constants.smallFontSize,
       ),
     );

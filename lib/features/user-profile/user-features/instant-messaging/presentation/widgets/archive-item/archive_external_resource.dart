@@ -22,7 +22,7 @@ class _ArchiveExternalResource extends StatelessWidget {
     Widget type = const Text(
       "GIF / STICKER 🖼️",
       style: TextStyle(
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.bold,
         fontSize: Constants.smallFontSize,
       ),
     );

@@ -22,7 +22,7 @@ class _ArchiveUserProfile extends StatelessWidget {
     Widget type = const Text(
       "USER PROFILE",
       style: TextStyle(
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.bold,
         fontSize: Constants.smallFontSize,
       ),
     );
@@ -32,7 +32,7 @@ class _ArchiveUserProfile extends StatelessWidget {
       crossAxisAlignment:
           self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
-        UserWidget.preview(
+        UserWidgetNew.preview(
           userKey: generateUserNodeKey(message.body),
         ),
         Row(

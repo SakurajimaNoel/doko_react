@@ -261,7 +261,7 @@ class _CommentContentState extends State<_CommentContent> {
             text: item,
             style: TextStyle(
               color: currTheme.primary,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.bold,
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
@@ -290,7 +290,7 @@ class _CommentContentState extends State<_CommentContent> {
         text: " $buttonText",
         style: TextStyle(
           color: currTheme.outline,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.bold,
           fontSize: Constants.smallFontSize,
         ),
         recognizer: TapGestureRecognizer()

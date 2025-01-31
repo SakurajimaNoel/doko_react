@@ -28,7 +28,7 @@ class Heading extends StatelessWidget {
       textAlign: centred ? TextAlign.center : TextAlign.left,
       style: TextStyle(
         fontSize: size ?? Constants.heading1,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.bold,
         color: color,
       ),
     );

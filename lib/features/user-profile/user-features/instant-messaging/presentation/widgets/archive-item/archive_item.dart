@@ -219,7 +219,7 @@ class ArchiveItem extends StatelessWidget {
 
     TextStyle metaDataStyle = TextStyle(
       fontSize: Constants.smallFontSize,
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.bold,
       color: self
           ? archiveProvider.selfTextColor.withValues(
               alpha: 0.5,

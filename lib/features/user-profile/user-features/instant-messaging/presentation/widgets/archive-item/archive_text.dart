@@ -261,7 +261,7 @@ class _ArchiveTextBubbleState extends State<_ArchiveTextBubble> {
               text: " $buttonText",
               style: TextStyle(
                 color: textColor,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.bold,
                 fontSize: Constants.fontSize,
               ),
               recognizer: TapGestureRecognizer()
