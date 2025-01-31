@@ -34,15 +34,17 @@ class _VideoPlayerState extends State<VideoPlayer> {
   Timer? timer; // to get current video aspect ratio
 
   // video player
-  late final player = Player();
-  late final controller = VideoController(player);
+  late Player player;
+  late VideoController controller;
+  bool loaded = false;
 
   @override
   void initState() {
     super.initState();
 
     preferences = context.read<PreferencesBloc>();
-
+    player = Player();
+    controller = VideoController(player);
     player
         .open(
       Media(path),
@@ -90,6 +92,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
         }
       }
 
+      loaded = true;
       final timer = this.timer;
       if (timer != null) timer.cancel();
     } on Exception {
@@ -132,6 +135,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
       },
       child: MaterialVideoControlsTheme(
         normal: MaterialVideoControlsThemeData(
+          speedUpOnLongPress: true,
           seekBarPositionColor: currTheme.primary,
           seekBarThumbColor: currTheme.primary,
           seekBarColor: currTheme.onPrimary,
@@ -140,20 +144,53 @@ class _VideoPlayerState extends State<VideoPlayer> {
           seekBarThumbSize: 0,
           seekBarHeight: seekBarHeight,
         ),
-        fullscreen: const MaterialVideoControlsThemeData(),
+        fullscreen: MaterialVideoControlsThemeData(
+          speedUpOnLongPress: true,
+          speedUpFactor: 2,
+          seekBarPositionColor: currTheme.primary,
+          seekBarThumbColor: currTheme.primary,
+          seekBarColor: currTheme.onPrimary,
+          seekBarBufferColor:
+              currTheme.onSecondaryContainer.withValues(alpha: 0.25),
+          seekBarThumbSize: 0,
+          seekBarHeight: seekBarHeight,
+        ),
         child: Video(
+          onEnterFullscreen: () async {
+            Timer(
+                const Duration(
+                  milliseconds: 500,
+                ), () {
+              controller.player.play();
+            });
+          },
+          onExitFullscreen: () async {
+            controller.player.play();
+          },
           fill: currTheme.surfaceContainer,
           resumeUponEnteringForegroundMode: true,
           controller: controller,
           fit: BoxFit.contain,
           aspectRatio: ratio,
           controls: (VideoState state) {
-            return Column(
+            bool fullScreen = state.isFullscreen();
+
+            Widget child = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MaterialPlayOrPauseButton(
-                  iconColor: primary,
-                  iconSize: Constants.width,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    MaterialPlayOrPauseButton(
+                      iconColor: primary,
+                      iconSize: Constants.width,
+                    ),
+                    if (fullScreen)
+                      MaterialFullscreenButton(
+                        iconColor: primary,
+                        iconSize: Constants.width * 1.125,
+                      ),
+                  ],
                 ),
                 const Spacer(),
                 Stack(
@@ -202,6 +239,38 @@ class _VideoPlayerState extends State<VideoPlayer> {
                   ],
                 ),
               ],
+            );
+
+            return Material(
+              color: Colors.transparent,
+              child: GestureDetector(
+                onLongPress: !fullScreen
+                    ? null
+                    : () {
+                        controller.player.setRate(2.0);
+                      },
+                onLongPressEnd: !fullScreen
+                    ? null
+                    : (_) {
+                        controller.player.setRate(1.0);
+                      },
+                child: InkWell(
+                  onTap: () {
+                    if (!loaded) return;
+
+                    if (!fullScreen) {
+                      state.toggleFullscreen();
+                    } else {
+                      controller.player.playOrPause();
+                    }
+                  },
+                  child: fullScreen
+                      ? SafeArea(
+                          child: child,
+                        )
+                      : child,
+                ),
+              ),
             );
           },
           key: Key(path),
