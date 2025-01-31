@@ -88,6 +88,7 @@ class _CommentWidgetState extends State<CommentWidget> {
           isReply: widget.isReply,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: Constants.gap * 0.5,
             children: [
               LayoutBuilder(builder: (context, constraints) {
                 final width = MediaQuery.sizeOf(context).width;
@@ -124,10 +125,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                   ],
                 );
               }),
-              if (comment.media.bucketPath.isNotEmpty) ...[
-                const SizedBox(
-                  height: Constants.gap * 0.5,
-                ),
+              if (comment.media.bucketPath.isNotEmpty)
                 Container(
                   alignment: AlignmentDirectional.topStart,
                   // height: height,
@@ -145,19 +143,11 @@ class _CommentWidgetState extends State<CommentWidget> {
                     width: double.infinity,
                     // height: height,
                   ),
-                )
-              ],
-              if (comment.content.isNotEmpty) ...[
-                const SizedBox(
-                  height: Constants.gap * 0.5,
                 ),
+              if (comment.content.isNotEmpty)
                 _CommentContent(
                   content: comment.content,
                 ),
-              ],
-              const SizedBox(
-                height: Constants.gap * 0.5,
-              ),
               _CommentActions(
                 commentId: commentId,
                 isReply: widget.isReply,
