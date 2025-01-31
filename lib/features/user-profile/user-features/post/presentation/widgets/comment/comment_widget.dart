@@ -128,7 +128,10 @@ class _CommentWidgetState extends State<CommentWidget> {
               if (comment.media.bucketPath.isNotEmpty)
                 Container(
                   alignment: AlignmentDirectional.topStart,
-                  // height: height,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(Constants.radius),
+                  ),
+                  clipBehavior: Clip.antiAlias,
                   child: CachedNetworkImage(
                     cacheKey: comment.media.bucketPath,
                     fit: BoxFit.contain,
@@ -197,15 +200,22 @@ class _CommentWrapper extends StatelessWidget {
       margin: const EdgeInsets.symmetric(
         horizontal: Constants.padding,
       ),
-      padding: const EdgeInsets.only(
-        left: Constants.padding * 0.75,
-        right: Constants.padding * 0.75,
-        bottom: Constants.padding * 0.5,
-        top: Constants.padding * 0.75,
+      padding: const EdgeInsets.all(
+        Constants.padding * 0.75,
       ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(Constants.radius * 0.5),
+        borderRadius: BorderRadius.circular(Constants.radius),
         color: currTheme.surfaceContainer,
+        boxShadow: [
+          BoxShadow(
+            color: currTheme.shadow.withValues(
+              alpha: 0.25,
+            ),
+            spreadRadius: 0,
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: child,
     );

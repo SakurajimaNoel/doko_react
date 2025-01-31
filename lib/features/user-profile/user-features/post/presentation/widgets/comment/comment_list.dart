@@ -114,7 +114,7 @@ class _CommentListState extends State<CommentList> {
               itemBuilder: buildCommentItems,
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(
-                  height: Constants.gap,
+                  height: Constants.gap * 1.5,
                 );
               },
             );
