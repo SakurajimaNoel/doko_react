@@ -61,7 +61,8 @@ class PostPreviewWidget extends StatelessWidget {
         return LayoutBuilder(
           builder: (context, constraints) {
             final width = constraints.maxWidth;
-            bool shrink = width < 235;
+            bool shrink = width < 220;
+            bool superShrink = width < 175;
             double shrinkFactor = shrink ? 0.75 : 1;
 
             return Column(
@@ -74,13 +75,14 @@ class PostPreviewWidget extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    UserWidget.avtarSmall(
+                    UserWidgetNew.avtarSmall(
                       userKey: post.createdBy,
                     ),
                     SizedBox(
-                      width: shrink ? width / 1.5 : null,
-                      child: UserWidget.infoSmall(
+                      child: UserWidgetNew.infoSmall(
                         userKey: post.createdBy,
+                        trim: superShrink ? 12 : 16,
+                        baseFontSize: Constants.smallFontSize,
                       ),
                     ),
                     if (!shrink) ...[
@@ -98,20 +100,40 @@ class PostPreviewWidget extends StatelessWidget {
                           return Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.start,
-                            spacing: Constants.gap * 0.25,
+                            spacing: Constants.gap * 0.125,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text(
-                                "${displayNumberFormat(post.likesCount)} Like${post.likesCount > 1 ? "s" : ""}",
-                                style: const TextStyle(
-                                  fontSize: Constants.smallFontSize,
-                                ),
+                              Row(
+                                spacing: Constants.gap * 0.25,
+                                children: [
+                                  Text(
+                                    displayNumberFormat(
+                                        post.likesCount + 1231231),
+                                    style: const TextStyle(
+                                      fontSize: Constants.smallFontSize * 0.875,
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.thumb_up,
+                                    size: Constants.iconButtonSize * 0.25,
+                                  )
+                                ],
                               ),
-                              Text(
-                                "${displayNumberFormat(post.commentsCount)} Comment${post.commentsCount > 1 ? "s" : ""}",
-                                style: const TextStyle(
-                                  fontSize: Constants.smallFontSize,
-                                ),
+                              Row(
+                                spacing: Constants.gap * 0.25,
+                                children: [
+                                  Text(
+                                    displayNumberFormat(
+                                        post.commentsCount + 123123),
+                                    style: const TextStyle(
+                                      fontSize: Constants.smallFontSize * 0.875,
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.comment_rounded,
+                                    size: Constants.iconButtonSize * 0.25,
+                                  )
+                                ],
                               ),
                             ],
                           );
