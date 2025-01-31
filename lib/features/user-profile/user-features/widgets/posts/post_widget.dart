@@ -105,22 +105,27 @@ class PostWidget extends StatelessWidget {
                   child: LayoutBuilder(builder: (context, constraints) {
                     bool shrink =
                         constraints.maxWidth < Constants.postMetadataWidth;
-                    double shrinkFactor = shrink ? 0.75 : 1;
+                    double shrinkFactor = shrink ? 0.875 : 1;
 
                     bool superShrink = constraints.maxWidth < 250;
+                    double baseFontSize = Constants.smallFontSize * 1.125;
 
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         if (!shrink)
-                          UserWidget(
+                          UserWidgetNew(
                             userKey: post.createdBy,
+                            baseFontSize: baseFontSize,
+                            trim: 20,
                           )
                         else
-                          UserWidget.small(
+                          UserWidgetNew.small(
                             key: ValueKey("${post.createdBy}-with-small-size"),
                             userKey: post.createdBy,
+                            baseFontSize: baseFontSize,
+                            trim: 16,
                           ),
                         if (!superShrink)
                           Text(
