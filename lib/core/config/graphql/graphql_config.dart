@@ -23,6 +23,9 @@ class GraphqlConfig {
         cache: GraphQLCache(
           store: HiveStore(),
         ),
+        queryRequestTimeout: const Duration(
+          seconds: 30,
+        ),
       );
     }
 
