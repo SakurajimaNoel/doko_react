@@ -46,9 +46,11 @@ final class LoadMoreProfilePostEvent extends ProfileEvent {
 final class GetUserFriendsEvent extends ProfileEvent {
   GetUserFriendsEvent({
     required this.userDetails,
+    this.isCommentSearch = false,
   });
 
   final GetProfileInput userDetails;
+  final bool isCommentSearch;
 }
 
 final class GetUserFriendsRefreshEvent extends ProfileEvent {
@@ -123,4 +125,13 @@ final class PendingOutgoingRequestMore extends ProfileEvent {
 
   final String username;
   final String cursor;
+}
+
+// comment search
+class CommentMentionSearchEvent extends ProfileEvent {
+  CommentMentionSearchEvent({
+    required this.searchDetails,
+  });
+
+  final UserSearchInput searchDetails;
 }

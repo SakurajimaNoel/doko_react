@@ -18,4 +18,6 @@ abstract class ProfileRepository {
   Future<bool> getUserPendingOutgoingRequests(UserProfileNodesInput details);
 
   Future<bool> getUserPendingIncomingRequests(UserProfileNodesInput details);
+
+  Future<List<String>> searchUserByUsername(UserSearchInput searchDetails);
 }

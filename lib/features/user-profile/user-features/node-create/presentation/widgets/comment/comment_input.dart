@@ -18,9 +18,9 @@ import 'package:doko_react/features/user-profile/user-features/node-create/domai
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/bloc/node_create_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/provider/comment_input_provider.dart';
-import 'package:doko_react/features/user-profile/user-features/post/presentation/bloc/post_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/post/presentation/provider/post_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +39,9 @@ class CommentInput extends StatelessWidget {
     final currTheme = Theme.of(context).colorScheme;
     final height = MediaQuery.sizeOf(context).height;
 
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
     return ChangeNotifierProvider(
       create: (BuildContext context) {
         return CommentInputProvider(
@@ -48,10 +51,18 @@ class CommentInput extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => serviceLocator<PostBloc>(),
-          ),
-          BlocProvider(
             create: (context) => serviceLocator<NodeCreateBloc>(),
+          ),
+          // when user types only @ than shows user friends
+          BlocProvider(
+            create: (context) => serviceLocator<ProfileBloc>()
+              ..add(GetUserFriendsEvent(
+                userDetails: GetProfileInput(
+                  username: username,
+                  currentUsername: username,
+                ),
+                isCommentSearch: true,
+              )),
           ),
         ],
         child: BlocListener<NodeCreateBloc, NodeCreateState>(
@@ -291,7 +302,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
         username: username,
         query: mentionString,
       );
-      context.read<PostBloc>().add(CommentMentionSearchEvent(
+      context.read<ProfileBloc>().add(CommentMentionSearchEvent(
             searchDetails: searchDetails,
           ));
 
@@ -309,14 +320,17 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
 
     return Material(
       color: currTheme.surfaceContainer,
-      child: BlocBuilder<PostBloc, PostState>(
+      child: BlocBuilder<ProfileBloc, ProfileState>(
         buildWhen: (previousState, state) {
-          return state is CommentSearchState || state is PostInitial;
+          return state is CommentSearchState ||
+              state is ProfileInitial ||
+              state is ProfileLoading;
         },
         builder: (context, state) {
-          bool initial = state is PostInitial;
+          bool initial = state is ProfileInitial;
           bool loading =
-              state is CommentSearchLoading && userSearchResults.isEmpty;
+              (state is CommentSearchLoading || state is ProfileLoading) &&
+                  userSearchResults.isEmpty;
           bool error = state is CommentSearchErrorState;
           bool searchResult = state is CommentSearchSuccessState;
 

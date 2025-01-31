@@ -162,3 +162,38 @@ final class PendingRequestLoadError extends PendingRequestLoadResponse {
   @override
   List<Object?> get props => [message];
 }
+
+// comment search state
+final class CommentSearchState extends ProfileState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class CommentSearchLoading extends CommentSearchState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class CommentSearchSuccessState extends CommentSearchState {
+  CommentSearchSuccessState({
+    required this.searchResults,
+    required this.query,
+  });
+
+  final String query;
+  final List<String> searchResults;
+
+  @override
+  List<Object?> get props => [searchResults, query];
+}
+
+final class CommentSearchErrorState extends ProfileState {
+  CommentSearchErrorState({
+    required this.message,
+  });
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
+}

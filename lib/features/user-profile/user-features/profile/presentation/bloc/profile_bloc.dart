@@ -12,12 +12,13 @@ import 'package:doko_react/features/user-profile/user-features/profile/domain/us
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/profile_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-friends-use-case/user_friends_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-post-use-case/user_post_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/comments_mention_search_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/user_friend_search_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/user_search_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meta/meta.dart';
 
 part 'profile_event.dart';
 part 'profile_state.dart';
@@ -32,6 +33,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final UserFriendsSearchUseCase _userFriendsSearchUseCase;
   final PendingIncomingRequestUseCase _pendingIncomingRequestUseCase;
   final PendingOutgoingRequestUseCase _pendingOutgoingRequestUseCase;
+  final CommentsMentionSearchUseCase _commentsMentionSearchUseCase;
 
   ProfileBloc({
     required ProfileUseCase profileUseCase,
@@ -42,6 +44,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required UserFriendsSearchUseCase userFriendsSearchUseCase,
     required PendingIncomingRequestUseCase pendingIncomingRequestUseCase,
     required PendingOutgoingRequestUseCase pendingOutgoingRequestUseCase,
+    required CommentsMentionSearchUseCase commentMentionSearchUseCase,
   })  : _profileUseCase = profileUseCase,
         _editProfileUseCase = editProfileUseCase,
         _userPostUseCase = userPostUseCase,
@@ -50,6 +53,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         _userFriendsSearchUseCase = userFriendsSearchUseCase,
         _pendingIncomingRequestUseCase = pendingIncomingRequestUseCase,
         _pendingOutgoingRequestUseCase = pendingOutgoingRequestUseCase,
+        _commentsMentionSearchUseCase = commentMentionSearchUseCase,
         super(ProfileInitial()) {
     on<GetUserProfileEvent>(_handleGetUserProfileEvent);
     on<EditUserProfileEvent>(_handleEditUserProfileEvent);
@@ -78,6 +82,52 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<PendingOutgoingRequestInitial>(_handlePendingOutgoingRequestInitial);
     on<PendingIncomingRequestMore>(_handlePendingIncomingRequestMore);
     on<PendingOutgoingRequestMore>(_handlePendingOutgoingRequestMore);
+    on<CommentMentionSearchEvent>(_handleCommentMentionSearchEvent);
+  }
+
+  FutureOr<void> _handleCommentMentionSearchEvent(
+      CommentMentionSearchEvent event, Emitter<ProfileState> emit) async {
+    try {
+      if (event.searchDetails.query.isEmpty) {
+        final username = event.searchDetails.username;
+        final userKey = generateUserNodeKey(username);
+        final user = graph.getValueByKey(userKey);
+
+        if (user is CompleteUserEntity && user.friends.isNotEmpty) {
+          emit(CommentSearchSuccessState(
+            query: event.searchDetails.query,
+            searchResults: user.friends.items.toList(),
+          ));
+          return;
+        }
+
+        if (user is CompleteUserEntity && user.friends.isEmpty) {
+          // not yet fetched
+          emit(CommentSearchLoading());
+          return;
+        }
+
+        emit(ProfileInitial());
+        return;
+      }
+
+      emit(CommentSearchLoading());
+      final searchResults =
+          await _commentsMentionSearchUseCase(event.searchDetails);
+
+      emit(CommentSearchSuccessState(
+        query: event.searchDetails.query,
+        searchResults: searchResults,
+      ));
+    } on ApplicationException catch (e) {
+      emit(CommentSearchErrorState(
+        message: e.reason,
+      ));
+    } catch (_) {
+      emit(CommentSearchErrorState(
+        message: Constants.errorMessage,
+      ));
+    }
   }
 
   FutureOr<void> _handleGetUserProfileEvent(
@@ -157,13 +207,24 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   FutureOr<void> _handleGetUserFriendsEvent(
       GetUserFriendsEvent event, Emitter<ProfileState> emit) async {
     try {
+      bool isCommentSearch = event.isCommentSearch;
       final userKey = generateUserNodeKey(event.userDetails.username);
       if (graph.containsKey(userKey)) {
         // check if user exists
         final user = graph.getValueByKey(userKey)!;
 
         if (user is CompleteUserEntity && user.friends.isNotEmpty) {
-          emit(ProfileSuccess());
+          if (isCommentSearch) {
+            add(CommentMentionSearchEvent(
+              searchDetails: UserSearchInput(
+                username: event.userDetails.currentUsername,
+                query: "",
+              ),
+            ));
+          } else {
+            emit(ProfileSuccess());
+          }
+
           return;
         }
 
@@ -190,7 +251,17 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         cursor: "",
         currentUsername: event.userDetails.currentUsername,
       ));
-      emit(ProfileSuccess());
+
+      if (isCommentSearch) {
+        add(CommentMentionSearchEvent(
+          searchDetails: UserSearchInput(
+            username: event.userDetails.currentUsername,
+            query: "",
+          ),
+        ));
+      } else {
+        emit(ProfileSuccess());
+      }
     } on ApplicationException catch (e) {
       emit(ProfileError(
         message: e.reason,

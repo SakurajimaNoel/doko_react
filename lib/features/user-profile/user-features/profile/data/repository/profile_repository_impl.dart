@@ -54,4 +54,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
   Future<bool> getUserPendingOutgoingRequests(UserProfileNodesInput details) {
     return _remoteDataSource.getUserPendingOutgoingFriendRequests(details);
   }
+
+  @override
+  Future<List<String>> searchUserByUsername(UserSearchInput searchDetails) {
+    return _remoteDataSource.searchUserByUsername(searchDetails);
+  }
 }

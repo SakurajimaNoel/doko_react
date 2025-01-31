@@ -46,7 +46,6 @@ import "package:doko_react/features/user-profile/user-features/node-create/prese
 import "package:doko_react/features/user-profile/user-features/post/data/data-source/post_remote_data_source.dart";
 import "package:doko_react/features/user-profile/user-features/post/data/repository/post_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/post/domain/repository/post_repository.dart";
-import "package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/comments_mention_search_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/comments_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/replies_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/post/domain/use-case/post-use-case/post_use_case.dart";
@@ -60,6 +59,7 @@ import "package:doko_react/features/user-profile/user-features/profile/domain/us
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/profile_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-friends-use-case/user_friends_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-post-use-case/user_post_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/comments_mention_search_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/user_friend_search_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/user_search_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart";
@@ -132,18 +132,11 @@ void _initPost() {
     ),
   );
 
-  serviceLocator.registerFactory<CommentsMentionSearchUseCase>(
-    () => CommentsMentionSearchUseCase(
-      postRepository: serviceLocator(),
-    ),
-  );
-
   serviceLocator.registerFactory<PostBloc>(
     () => PostBloc(
       postUseCase: serviceLocator(),
       commentsUseCase: serviceLocator(),
       repliesUseCase: serviceLocator(),
-      commentMentionSearchUseCase: serviceLocator(),
     ),
   );
 }
@@ -338,6 +331,12 @@ void _initProfile() {
     ),
   );
 
+  serviceLocator.registerFactory<CommentsMentionSearchUseCase>(
+    () => CommentsMentionSearchUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
+  );
+
   serviceLocator.registerFactory<ProfileBloc>(
     () => ProfileBloc(
       profileUseCase: serviceLocator(),
@@ -348,6 +347,7 @@ void _initProfile() {
       userFriendsSearchUseCase: serviceLocator(),
       pendingIncomingRequestUseCase: serviceLocator(),
       pendingOutgoingRequestUseCase: serviceLocator(),
+      commentMentionSearchUseCase: serviceLocator(),
     ),
   );
 }

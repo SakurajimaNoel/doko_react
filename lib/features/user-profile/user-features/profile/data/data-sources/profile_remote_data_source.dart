@@ -466,4 +466,46 @@ class ProfileRemoteDataSource {
       rethrow;
     }
   }
+
+  Future<List<String>> searchUserByUsername(
+      UserSearchInput searchDetails) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.searchUsersByUsername()),
+          variables: GraphqlQueries.searchUsersByUsernameVariables(
+            query: searchDetails.query,
+            searchDetails.username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+            reason: result.exception?.graphqlErrors.toString() ??
+                "Error getting users right now.");
+      }
+
+      List? res = result.data?["users"];
+
+      if (res == null || res.isEmpty) {
+        // no search results found
+        return [];
+      }
+
+      var userFutures = (res)
+          .map((user) => UserEntity.createEntity(
+                map: user,
+              ))
+          .toList();
+
+      List<UserEntity> users = await Future.wait(userFutures);
+      final UserGraph graph = UserGraph();
+
+      return graph.addUserSearchEntry(users);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

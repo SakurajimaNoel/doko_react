@@ -35,14 +35,6 @@ class LoadCommentReplyEvent extends PostEvent {
   final GetCommentsInput details;
 }
 
-class CommentMentionSearchEvent extends PostEvent {
-  CommentMentionSearchEvent({
-    required this.searchDetails,
-  });
-
-  final UserSearchInput searchDetails;
-}
-
 class PostRefreshEvent extends PostEvent {
   PostRefreshEvent({required this.details});
 
