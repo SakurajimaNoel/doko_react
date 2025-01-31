@@ -11,6 +11,6 @@ class CommentGetUseCase extends UseCases<bool, GetNodeInput> {
 
   @override
   FutureOr<bool> call(GetNodeInput params) async {
-    return profileRepository.getPostById(params.nodeId, params.username);
+    return profileRepository.getCommentById(params.nodeId, params.username);
   }
 }
