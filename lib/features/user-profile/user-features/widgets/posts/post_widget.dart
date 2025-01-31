@@ -56,13 +56,40 @@ class PostWidget extends StatelessWidget {
       },
       builder: (context, state) {
         bool postExists = graph.containsKey(postKey);
+        bool isError =
+            state is UserActionPostDataFetchedState && !state.success;
+
         if (!postExists) {
           return LayoutBuilder(
             builder: (context, constraints) {
               return SizedBox(
                 height: constraints.maxWidth,
-                child: const Center(
-                  child: SmallLoadingIndicator.small(),
+                child: Center(
+                  child: isError
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: Constants.gap * 0.25,
+                          children: [
+                            const StyledText.error(
+                              "Error loading post.",
+                              size: Constants.smallFontSize * 1.125,
+                            ),
+                            TextButton.icon(
+                              onPressed: () {
+                                context
+                                    .read<UserActionBloc>()
+                                    .add(UserActionGetPostByIdEvent(
+                                      username: username,
+                                      postId: getPostIdFromPostKey(postKey),
+                                    ));
+                              },
+                              label: const Text("Retry"),
+                              icon: const Icon(Icons.refresh),
+                            ),
+                          ],
+                        )
+                      : const SmallLoadingIndicator.small(),
                 ),
               );
             },

@@ -2,6 +2,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -42,14 +43,40 @@ class PostPreviewWidget extends StatelessWidget {
       },
       builder: (context, state) {
         bool postExists = graph.containsKey(postKey);
+        bool isError =
+            state is UserActionPostDataFetchedState && !state.success;
 
         if (!postExists) {
           return LayoutBuilder(
             builder: (context, constraints) {
               return SizedBox(
                 height: constraints.maxWidth,
-                child: const Center(
-                  child: SmallLoadingIndicator.small(),
+                child: Center(
+                  child: isError
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: Constants.gap * 0.25,
+                          children: [
+                            const StyledText.error(
+                              "Error loading post.",
+                              size: Constants.smallFontSize * 1.125,
+                            ),
+                            TextButton.icon(
+                              onPressed: () {
+                                context
+                                    .read<UserActionBloc>()
+                                    .add(UserActionGetPostByIdEvent(
+                                      username: username,
+                                      postId: getPostIdFromPostKey(postKey),
+                                    ));
+                              },
+                              label: const Text("Retry"),
+                              icon: const Icon(Icons.refresh),
+                            ),
+                          ],
+                        )
+                      : const SmallLoadingIndicator.small(),
                 ),
               );
             },
@@ -107,8 +134,7 @@ class PostPreviewWidget extends StatelessWidget {
                                 spacing: Constants.gap * 0.25,
                                 children: [
                                   Text(
-                                    displayNumberFormat(
-                                        post.likesCount + 1231231),
+                                    displayNumberFormat(post.likesCount),
                                     style: const TextStyle(
                                       fontSize: Constants.smallFontSize * 0.875,
                                     ),
@@ -123,8 +149,7 @@ class PostPreviewWidget extends StatelessWidget {
                                 spacing: Constants.gap * 0.25,
                                 children: [
                                   Text(
-                                    displayNumberFormat(
-                                        post.commentsCount + 123123),
+                                    displayNumberFormat(post.commentsCount),
                                     style: const TextStyle(
                                       fontSize: Constants.smallFontSize * 0.875,
                                     ),
