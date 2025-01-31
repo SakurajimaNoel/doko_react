@@ -28,7 +28,7 @@ class CompleteProfileRemoteDataSource {
       if (result.hasException) {
         throw ApplicationException(
             reason: result.exception?.graphqlErrors.toString() ??
-                "Problem fetching data source.");
+                "Problem checking username availability.");
       }
 
       List? res = result.data?["users"];

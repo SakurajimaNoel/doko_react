@@ -37,8 +37,8 @@ class ProfileRemoteDataSource {
 
       if (result.hasException) {
         throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Problem fetching data source.");
+          reason: "Problem getting \"@$username's\" profile.",
+        );
       }
 
       List? res = result.data?["users"];
@@ -108,9 +108,9 @@ class ProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Can't edit user profile right now.");
+        throw const ApplicationException(
+          reason: "Can't edit user profile right now.",
+        );
       }
 
       // check if user data is present
@@ -153,17 +153,16 @@ class ProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Can't fetch more user posts");
+        throw const ApplicationException(
+          reason: "Can't fetch more user posts",
+        );
       }
 
       Map? res = result.data?["postsConnection"];
 
       if (res == null || res.isEmpty) {
-        throw ApplicationException(
-          reason: result.exception?.graphqlErrors.toString() ??
-              Constants.errorMessage,
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
         );
       }
 
@@ -206,17 +205,15 @@ class ProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Can't fetch more user friends");
+        throw const ApplicationException(
+            reason: "Can't fetch more user friends");
       }
 
       Map? res = result.data?["users"][0]["friendsConnection"];
 
       if (res == null || res.isEmpty) {
-        throw ApplicationException(
-          reason: result.exception?.graphqlErrors.toString() ??
-              Constants.errorMessage,
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
         );
       }
 
@@ -269,9 +266,7 @@ class ProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Can't search right now.");
+        throw const ApplicationException(reason: "Can't search right now.");
       }
 
       List? res = result.data?["users"];
@@ -330,9 +325,7 @@ class ProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Can't search right now.");
+        throw const ApplicationException(reason: "Can't search right now.");
       }
 
       List? res = result.data?["users"];
@@ -373,17 +366,15 @@ class ProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Can't fetch user pending incoming requests.");
+        throw const ApplicationException(
+            reason: "Can't fetch user pending incoming requests.");
       }
 
       Map? res = result.data?["users"][0]["friendsConnection"];
 
       if (res == null || res.isEmpty) {
-        throw ApplicationException(
-          reason: result.exception?.graphqlErrors.toString() ??
-              Constants.errorMessage,
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
         );
       }
 
@@ -434,17 +425,15 @@ class ProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Can't fetch user pending outgoing requests.");
+        throw const ApplicationException(
+            reason: "Can't fetch user pending outgoing requests.");
       }
 
       Map? res = result.data?["users"][0]["friendsConnection"];
 
       if (res == null || res.isEmpty) {
-        throw ApplicationException(
-          reason: result.exception?.graphqlErrors.toString() ??
-              Constants.errorMessage,
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
         );
       }
 

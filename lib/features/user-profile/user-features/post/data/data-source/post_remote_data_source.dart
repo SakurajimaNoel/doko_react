@@ -204,7 +204,7 @@ class PostRemoteDataSource {
       if (result.hasException) {
         throw ApplicationException(
             reason: result.exception?.graphqlErrors.toString() ??
-                "Error loading users right now.");
+                "Error getting users right now.");
       }
 
       List? res = result.data?["users"];

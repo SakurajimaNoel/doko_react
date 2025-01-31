@@ -32,9 +32,8 @@ class UserProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-          reason: result.exception?.graphqlErrors.toString() ??
-              "Problem adding user like",
+        throw const ApplicationException(
+          reason: "Problem adding user like",
         );
       }
 
@@ -74,9 +73,8 @@ class UserProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-          reason: result.exception?.graphqlErrors.toString() ??
-              "Problem removing user like",
+        throw const ApplicationException(
+          reason: "Problem removing user like",
         );
       }
 
@@ -116,8 +114,7 @@ class UserProfileRemoteDataSource {
 
       if (result.hasException) {
         throw ApplicationException(
-          reason: result.exception?.graphqlErrors.toString() ??
-              "Can't send friend request to ${relationDetails.username}.",
+          reason: "Can't send friend request to ${relationDetails.username}.",
         );
       }
 
@@ -156,8 +153,7 @@ class UserProfileRemoteDataSource {
 
       if (result.hasException) {
         throw ApplicationException(
-          reason: result.exception?.graphqlErrors.toString() ??
-              "Can't accept friend request of ${relationDetails.username}.",
+          reason: "Can't accept friend request of ${relationDetails.username}.",
         );
       }
 
@@ -195,9 +191,8 @@ class UserProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-          reason: result.exception?.graphqlErrors.toString() ??
-              Constants.errorMessage,
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
         );
       }
 
@@ -233,9 +228,8 @@ class UserProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-          reason: result.exception?.graphqlErrors.toString() ??
-              "Problem adding user like",
+        throw const ApplicationException(
+          reason: "Problem adding user like",
         );
       }
 
@@ -275,9 +269,8 @@ class UserProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-          reason: result.exception?.graphqlErrors.toString() ??
-              "Problem removing user like",
+        throw const ApplicationException(
+          reason: "Problem removing user like",
         );
       }
 
@@ -355,9 +348,7 @@ class UserProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Problem loading post.");
+        throw const ApplicationException(reason: "Problem loading post.");
       }
 
       List? res = result.data?["posts"];
@@ -403,9 +394,7 @@ class UserProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Problem loading comment.");
+        throw const ApplicationException(reason: "Problem loading comment.");
       }
 
       List? res = result.data?["comments"];
