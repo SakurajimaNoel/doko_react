@@ -49,60 +49,50 @@ class _PostPageState extends State<PostPage> {
   Widget build(BuildContext context) {
     final scrollCacheHeight = MediaQuery.sizeOf(context).height;
 
-    return BlocProvider(
-      create: (context) => serviceLocator<PostBloc>()
-        ..add(PostLoadEvent(
-          details: GetNodeInput(
-            nodeId: widget.postId,
-            username: username,
-          ),
-        )),
-      child: BlocConsumer<PostBloc, PostState>(
-        listenWhen: (previousState, state) {
-          return state is LoadErrorState;
-        },
-        listener: (context, state) {
-          if (state is LoadErrorState) showError(context, state.message);
-        },
-        buildWhen: (previousState, state) {
-          return state is PostInitial;
-        },
-        builder: (context, state) {
-          bool loading = state is PostLoadingState;
-          bool commentsLoading = state is CommentLoadingState;
-
-          bool postError = state is PostErrorState;
-          bool commentError = state is CommentErrorState;
-
-          if (loading) {
-            return Scaffold(
-              appBar: AppBar(
-                title: const Text("Post"),
-              ),
-              body: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
-
-          if (postError) {
-            return Scaffold(
-              appBar: AppBar(
-                title: const Text("Post"),
-              ),
-              body: Center(
-                child: StyledText.error(state.message),
-              ),
-            );
-          }
-
-          final PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
-
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(post.caption.isNotEmpty ? post.caption : "Post"),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Post"),
+      ),
+      body: BlocProvider(
+        create: (context) => serviceLocator<PostBloc>()
+          ..add(PostLoadEvent(
+            details: GetNodeInput(
+              nodeId: widget.postId,
+              username: username,
             ),
-            body: ChangeNotifierProvider(
+          )),
+        child: BlocConsumer<PostBloc, PostState>(
+          listenWhen: (previousState, state) {
+            return state is LoadErrorState;
+          },
+          listener: (context, state) {
+            if (state is LoadErrorState) showError(context, state.message);
+          },
+          buildWhen: (previousState, state) {
+            return state is PostInitial;
+          },
+          builder: (context, state) {
+            bool loading = state is PostLoadingState;
+            bool commentsLoading = state is CommentLoadingState;
+
+            bool postError = state is PostErrorState;
+            bool commentError = state is CommentErrorState;
+
+            if (loading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            if (postError) {
+              return Center(
+                child: StyledText.error(state.message),
+              );
+            }
+
+            final PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
+
+            return ChangeNotifierProvider(
               create: (BuildContext context) {
                 return PostCommentProvider(
                   focusNode: FocusNode(),
@@ -205,9 +195,9 @@ class _PostPageState extends State<PostPage> {
                   const CommentInput(),
                 ],
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
