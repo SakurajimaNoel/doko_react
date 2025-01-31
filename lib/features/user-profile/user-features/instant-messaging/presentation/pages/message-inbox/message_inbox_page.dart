@@ -32,6 +32,8 @@ class MessageInboxPage extends StatelessWidget {
   }
 
   Widget buildItems(BuildContext context, int index, List<String> items) {
+    final currTheme = Theme.of(context).colorScheme;
+
     UserGraph graph = UserGraph();
     final currentUser =
         (context.read<UserBloc>().state as UserCompleteState).username;
@@ -52,58 +54,46 @@ class MessageInboxPage extends StatelessWidget {
           : messagePreview(latestMessage.message, currentUser);
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool shrink = constraints.maxWidth < 320;
-        final currTheme = Theme.of(context).colorScheme;
-        // bool superShrink = constraints.maxWidth < 290;
-
-        // double shrinkFactor = shrink ? 0.75 : 1;
-        bool selected = false;
-
-        return ListTile(
-          isThreeLine: true,
-          onTap: () {
-            context.pushNamed(
-              RouterConstants.messageArchive,
-              pathParameters: {
-                "username": username,
-              },
-            );
+    bool selected = false;
+    return ListTile(
+      onTap: () {
+        context.pushNamed(
+          RouterConstants.messageArchive,
+          pathParameters: {
+            "username": username,
           },
-          selectedTileColor: currTheme.primaryContainer,
-          selectedColor: currTheme.onPrimaryContainer,
-          selected: selected,
-          dense: true,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: Constants.padding,
-          ),
-          leading: selected
-              ? CircleAvatar(
-                  backgroundColor: currTheme.onPrimaryContainer,
-                  child: Icon(
-                    Icons.check,
-                    color: currTheme.primaryContainer,
-                  ),
-                )
-              : shrink
-                  ? UserWidget.avtarSmall(
-                      key: ValueKey("$userKey-small-avtar"),
-                      userKey: userKey,
-                    )
-                  : UserWidget.avtar(
-                      userKey: userKey,
-                    ),
-          title: UserWidget.info(
-            userKey: userKey,
-          ),
-          subtitle: TypingStatusWidgetWrapper.canHide(
-            username: username,
-            child: Text(inboxText!),
-          ),
-          trailing: inboxActivityTime == null ? null : Text(inboxActivityTime),
         );
       },
+      selectedTileColor: currTheme.primaryContainer,
+      selectedColor: currTheme.onPrimaryContainer,
+      selected: selected,
+      dense: true,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: Constants.padding,
+      ),
+      minVerticalPadding: Constants.padding * 0.5,
+      leading: selected
+          ? CircleAvatar(
+              backgroundColor: currTheme.onPrimaryContainer,
+              child: Icon(
+                Icons.check,
+                color: currTheme.primaryContainer,
+              ),
+            )
+          : UserWidget.avtar(
+              userKey: userKey,
+            ),
+      title: UserWidget.name(
+        userKey: userKey,
+        bold: true,
+        baseFontSize: Constants.smallFontSize * 1.125,
+        trim: 20,
+      ),
+      subtitle: TypingStatusWidgetWrapper.canHide(
+        username: username,
+        child: Text(inboxText),
+      ),
+      trailing: inboxActivityTime == null ? null : Text(inboxActivityTime),
     );
   }
 
@@ -162,8 +152,9 @@ class MessageInboxPage extends StatelessWidget {
               );
 
           return ListView.separated(
-            padding: const EdgeInsets.symmetric(
-              vertical: Constants.padding,
+            padding: const EdgeInsets.only(
+              bottom: Constants.padding,
+              top: Constants.padding * 0.5,
             ),
             itemBuilder: (BuildContext context, int index) {
               return buildItems(context, index, items);

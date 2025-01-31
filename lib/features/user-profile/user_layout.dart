@@ -224,8 +224,11 @@ class _UserLayoutState extends State<UserLayout> {
       leading: UserWidget.avtar(
         userKey: userKey,
       ),
-      title: UserWidget.infoSmall(
+      title: UserWidget.name(
         userKey: userKey,
+        baseFontSize: Constants.smallFontSize * 1.125,
+        trim: 20,
+        bold: true,
       ),
       body: Text("@${request.from} has send you a friend request."),
       trailing: Text(
@@ -254,8 +257,11 @@ class _UserLayoutState extends State<UserLayout> {
       leading: UserWidget.avtar(
         userKey: userKey,
       ),
-      title: UserWidget.infoSmall(
+      title: UserWidget.name(
         userKey: userKey,
+        baseFontSize: Constants.smallFontSize * 1.125,
+        trim: 20,
+        bold: true,
       ),
       body: Text("@${request.from} has accepted your friend request."),
       trailing: Text(
@@ -295,8 +301,11 @@ class _UserLayoutState extends State<UserLayout> {
       leading: UserWidget.avtar(
         userKey: userKey,
       ),
-      title: UserWidget.infoSmall(
+      title: UserWidget.name(
         userKey: userKey,
+        baseFontSize: Constants.smallFontSize * 1.125,
+        trim: 20,
+        bold: true,
       ),
       body: Text(messagePreview(message, username)),
       trailing: Text(

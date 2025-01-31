@@ -66,7 +66,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
           child: Column(
             spacing: Constants.gap * 2,
             children: [
-              UserWidgetNew.preview(
+              UserWidget.preview(
                 userKey: generateUserNodeKey(username),
               ),
             ],

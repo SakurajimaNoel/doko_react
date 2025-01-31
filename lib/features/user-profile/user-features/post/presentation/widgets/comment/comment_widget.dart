@@ -89,38 +89,41 @@ class _CommentWidgetState extends State<CommentWidget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  UserWidget.small(
-                    userKey: comment.commentBy,
-                    key: ValueKey(comment.id),
-                  ),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final width = MediaQuery.sizeOf(context).width;
-                      bool shrink = min(constraints.maxWidth, width) < 320;
-                      bool superShrink = min(constraints.maxWidth, width) < 280;
-                      double shrinkFactor = shrink ? 0.75 : 1;
+              LayoutBuilder(builder: (context, constraints) {
+                final width = MediaQuery.sizeOf(context).width;
+                bool shrink = min(constraints.maxWidth, width) < 275;
+                bool superShrink = min(constraints.maxWidth, width) < 225;
 
-                      if (superShrink) return const SizedBox.shrink();
+                // double shrinkFactor = shrink ? 0.875 : 1;
+                double baseFontSize = shrink
+                    ? Constants.smallFontSize
+                    : Constants.smallFontSize * 1.125;
 
-                      return Text(
-                        key: ValueKey("date-diff-$shrink"),
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    UserWidget.small(
+                      userKey: comment.commentBy,
+                      key: ValueKey(comment.id),
+                      trim: 16,
+                      baseFontSize: baseFontSize,
+                    ),
+                    if (superShrink)
+                      const SizedBox.shrink()
+                    else
+                      Text(
                         displayDateDifference(
                           comment.createdOn,
                           small: shrink,
                         ),
-                        style: TextStyle(
-                          fontSize:
-                              Constants.smallFontSize * 0.9 * shrinkFactor,
+                        style: const TextStyle(
+                          fontSize: Constants.smallFontSize * 0.875,
                         ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                      ),
+                  ],
+                );
+              }),
               if (comment.media.bucketPath.isNotEmpty) ...[
                 const SizedBox(
                   height: Constants.gap * 0.5,

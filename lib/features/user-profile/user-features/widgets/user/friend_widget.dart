@@ -18,6 +18,8 @@ class FriendWidget extends StatelessWidget {
   }) : showMessageOption = true;
 
   final String userKey;
+
+  /// used with inbox search widgets
   final bool showMessageOption;
 
   @override
@@ -27,7 +29,7 @@ class FriendWidget extends StatelessWidget {
         bool shrink = constraints.maxWidth < 320;
         bool superShrink = constraints.maxWidth < 290;
 
-        double shrinkFactor = shrink ? 0.75 : 1;
+        double shrinkFactor = shrink ? 0.875 : 1;
 
         return ListTile(
           onTap: () {
@@ -48,7 +50,7 @@ class FriendWidget extends StatelessWidget {
               },
             );
           },
-          minVerticalPadding: Constants.padding * 0.75,
+          minVerticalPadding: Constants.padding * 0.25,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: Constants.padding,
           ),
@@ -71,14 +73,18 @@ class FriendWidget extends StatelessWidget {
                         key: ValueKey("${userKey}_relation"),
                       ),
                     ),
-          title: shrink
-              ? UserWidget.infoSmall(
-                  key: ValueKey("$userKey-user-info-small"),
-                  userKey: userKey,
-                )
-              : UserWidget.info(
-                  userKey: userKey,
-                ),
+          title: UserWidget.name(
+            userKey: userKey,
+            baseFontSize:
+                Constants.smallFontSize * (shrink && !superShrink ? 1 : 1.125),
+            trim: shrink ? 20 : 30,
+          ),
+          subtitle: UserWidget.usernameSmall(
+            userKey: userKey,
+            baseFontSize:
+                Constants.smallFontSize * (shrink && !superShrink ? 1 : 1.125),
+            trim: shrink && !superShrink ? 16 : 20,
+          ),
         );
       },
     );

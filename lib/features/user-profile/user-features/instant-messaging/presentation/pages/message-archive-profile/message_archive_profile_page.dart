@@ -29,7 +29,7 @@ class MessageArchiveProfilePage extends StatelessWidget {
           spacing: Constants.gap * 1.5,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            UserWidgetNew.preview(
+            UserWidget.preview(
               userKey: generateUserNodeKey(username),
             ),
             DefaultTextStyle.merge(

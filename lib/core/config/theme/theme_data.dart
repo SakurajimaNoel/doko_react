@@ -8,8 +8,8 @@ class GlobalThemeData {
       useMaterial3: true,
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: <TargetPlatform, PageTransitionsBuilder>{
-          TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
-          TargetPlatform.iOS: FadeUpwardsPageTransitionsBuilder(),
+          // TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+          // TargetPlatform.iOS: FadeUpwardsPageTransitionsBuilder(),
         },
       ),
     );

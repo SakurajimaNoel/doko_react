@@ -32,7 +32,7 @@ class _ArchiveUserProfile extends StatelessWidget {
       crossAxisAlignment:
           self ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
-        UserWidgetNew.preview(
+        UserWidget.preview(
           userKey: generateUserNodeKey(message.body),
         ),
         Row(

@@ -191,6 +191,7 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                                 width: constraints.maxWidth * infoFactor,
                                 child: UserWidget.info(
                                   userKey: generateUserNodeKey(widget.username),
+                                  baseFontSize: Constants.smallFontSize * 1.125,
                                 ),
                               ),
                             ],

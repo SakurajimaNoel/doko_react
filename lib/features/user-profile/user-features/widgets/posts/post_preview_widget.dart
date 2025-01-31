@@ -75,11 +75,11 @@ class PostPreviewWidget extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    UserWidgetNew.avtarSmall(
+                    UserWidget.avtarSmall(
                       userKey: post.createdBy,
                     ),
                     SizedBox(
-                      child: UserWidgetNew.infoSmall(
+                      child: UserWidget.infoSmall(
                         userKey: post.createdBy,
                         trim: superShrink ? 12 : 16,
                         baseFontSize: Constants.smallFontSize,

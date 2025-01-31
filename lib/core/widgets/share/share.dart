@@ -587,18 +587,18 @@ class _ShareUserWidget extends StatelessWidget {
               spacing: Constants.gap * 0.5,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                UserWidgetNew.avtarLarge(
+                UserWidget.avtarLarge(
                   userKey: userKey,
                 ),
                 Column(
                   spacing: Constants.gap * 0.125,
                   children: [
-                    UserWidgetNew.nameSmall(
+                    UserWidget.nameSmall(
                       userKey: userKey,
                       trim: 12,
                       baseFontSize: Constants.fontSize,
                     ),
-                    UserWidgetNew.usernameSmall(
+                    UserWidget.usernameSmall(
                       userKey: userKey,
                       trim: 12,
                       baseFontSize: Constants.smallFontSize,

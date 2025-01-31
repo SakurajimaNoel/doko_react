@@ -115,13 +115,13 @@ class PostWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         if (!shrink)
-                          UserWidgetNew(
+                          UserWidget(
                             userKey: post.createdBy,
                             baseFontSize: baseFontSize,
                             trim: 20,
                           )
                         else
-                          UserWidgetNew.small(
+                          UserWidget.small(
                             key: ValueKey("${post.createdBy}-with-small-size"),
                             userKey: post.createdBy,
                             baseFontSize: baseFontSize,
