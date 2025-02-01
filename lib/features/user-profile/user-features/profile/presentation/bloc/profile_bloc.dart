@@ -93,7 +93,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         final userKey = generateUserNodeKey(username);
         final user = graph.getValueByKey(userKey);
 
-        if (user is CompleteUserEntity && user.friends.isNotEmpty) {
+        // this will check if user has friends fetched and user has friends
+        if (user is CompleteUserEntity &&
+            user.friends.isNotEmpty &&
+            user.friends.items.isNotEmpty) {
           emit(CommentSearchSuccessState(
             query: event.searchDetails.query,
             searchResults: user.friends.items.toList(),
