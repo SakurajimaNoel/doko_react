@@ -505,8 +505,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           ),
                         ],
                         flexibleSpace: FlexibleSpaceBar(
-                          background:
-                              BlocBuilder<UserActionBloc, UserActionState>(
+                          background: BlocBuilder<UserToUserActionBloc,
+                              UserToUserActionState>(
                             buildWhen: (previousState, state) {
                               return (self &&
                                   state is UserToUserActionUpdateProfileState);
@@ -514,6 +514,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                             builder: (context, state) {
                               final user = graph.getValueByKey(key)!
                                   as CompleteUserEntity;
+                              int nameLength = user.name.length;
                               return Stack(
                                 fit: StackFit.expand,
                                 children: [
@@ -546,7 +547,13 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                     child: Heading.left(
                                       user.name,
                                       color: currTheme.onSurface,
-                                      size: Constants.heading2,
+                                      size: nameLength <= 15
+                                          ? Constants.heading2
+                                          : nameLength <= 20
+                                              ? Constants.heading3
+                                              : nameLength <= 25
+                                                  ? Constants.heading4
+                                                  : Constants.fontSize * 1.25,
                                     ),
                                   ),
                                 ],
