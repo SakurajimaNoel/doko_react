@@ -3,6 +3,7 @@ import 'dart:collection';
 
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/graphql/graphql_constants.dart';
+import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/core/utils/relation/user_to_user_relation.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -60,6 +61,37 @@ class UserToUserActionBloc
         _handleUserToUserActionUserAcceptsFriendRequestRemoteEvent);
     on<UserToUserActionUserRemovesFriendRelationRemoteEvent>(
         _handleUserToUserActionUserRemovesFriendRelationRemoteEvent);
+    on<UserToUserUpdateProfileRemoteEvent>(
+        _handleUserToUserUpdateProfileRemoteEvent);
+  }
+
+  FutureOr<void> _handleUserToUserUpdateProfileRemoteEvent(
+      UserToUserUpdateProfileRemoteEvent event,
+      Emitter<UserToUserActionState> emit) async {
+    String userKey = generateUserNodeKey(event.username);
+    final user = graph.getValueByKey(userKey);
+
+    if (user is UserEntity) {
+      if (user.profilePicture.bucketPath != event.profilePicture) {
+        StorageResource profilePicture =
+            await StorageResource.createStorageResource(event.profilePicture);
+        user.profilePicture = profilePicture;
+      }
+
+      user.name = event.name;
+    }
+    if (user is CompleteUserEntity) {
+      user.bio = event.bio;
+    }
+
+    emit(
+      UserToUserActionUpdateProfileState(
+        username: event.username,
+        name: event.name,
+        bio: event.bio,
+        profilePicture: event.profilePicture,
+      ),
+    );
   }
 
   FutureOr<void> _handleUserToUserActionUserRemovesFriendRelationRemoteEvent(
@@ -175,6 +207,7 @@ class UserToUserActionBloc
       UserToUserUpdateProfileEvent event, Emitter<UserToUserActionState> emit) {
     emit(
       UserToUserActionUpdateProfileState(
+        username: event.username,
         name: event.name,
         bio: event.bio,
         profilePicture: event.profilePicture,

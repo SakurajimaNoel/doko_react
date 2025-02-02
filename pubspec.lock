@@ -310,7 +310,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "54523300d15603e08b7b235655a10ae7441b8810"
+      resolved-ref: "359705295330f629cadc5ce091b74e609720cdd3"
       url: "https://github.com/rohan031/doki_websocket_client.git"
     source: git
     version: "1.3.0"
@@ -342,10 +342,10 @@ packages:
     dependency: transitive
     description:
       name: extended_image_library
-      sha256: "9a94ec9314aa206cfa35f16145c3cd6e2c924badcc670eaaca8a3a8063a68cd7"
+      sha256: e61dafd94400fff6ef7ed1523d445ff3af137f198f3228e4a3107bc5b4bec5d1
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.5"
+    version: "4.0.6"
   fake_async:
     dependency: transitive
     description:

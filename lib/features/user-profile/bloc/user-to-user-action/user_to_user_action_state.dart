@@ -11,6 +11,7 @@ final class UserToUserActionInitial extends UserToUserActionState {
 
 class UserToUserActionUpdateProfileState extends UserToUserActionState {
   const UserToUserActionUpdateProfileState({
+    required this.username,
     required this.name,
     required this.bio,
     required this.profilePicture,
@@ -19,9 +20,10 @@ class UserToUserActionUpdateProfileState extends UserToUserActionState {
   final String name;
   final String bio;
   final String profilePicture;
+  final String username;
 
   @override
-  List<Object?> get props => [name, bio, profilePicture];
+  List<Object?> get props => [name, bio, profilePicture, username];
 }
 
 class UserToUserActionLoadFriendsState extends UserToUserActionState {

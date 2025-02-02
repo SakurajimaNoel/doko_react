@@ -6,6 +6,7 @@ sealed class UserToUserActionEvent {
 
 final class UserToUserUpdateProfileEvent extends UserToUserActionEvent {
   const UserToUserUpdateProfileEvent({
+    required this.username,
     required this.name,
     required this.bio,
     required this.profilePicture,
@@ -14,6 +15,7 @@ final class UserToUserUpdateProfileEvent extends UserToUserActionEvent {
   final String name;
   final String bio;
   final String profilePicture;
+  final String username;
 }
 
 final class UserToUserActionFriendLoadEvent extends UserToUserActionEvent {
@@ -117,4 +119,19 @@ final class UserToUserActionUserRemovesFriendRelationRemoteEvent
 
   final String username;
   final UserRemovesFriendRelation relation;
+}
+
+// update user profile remote event
+final class UserToUserUpdateProfileRemoteEvent extends UserToUserActionEvent {
+  const UserToUserUpdateProfileRemoteEvent({
+    required this.username,
+    required this.name,
+    required this.bio,
+    required this.profilePicture,
+  });
+
+  final String name;
+  final String bio;
+  final String profilePicture;
+  final String username;
 }

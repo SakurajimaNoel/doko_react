@@ -307,7 +307,7 @@ class UserWidget extends StatelessWidget {
     return BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
       buildWhen: (previousState, state) {
         return (state is UserToUserActionUpdateProfileState &&
-                userKey == currentUserKey) ||
+                state.username == profileUsername) ||
             (state is UserToUserActionUserRefreshState &&
                 state.username == profileUsername) ||
             (state is UserToUserActionUserDataFetchedState &&

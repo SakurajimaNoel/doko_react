@@ -508,8 +508,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           background: BlocBuilder<UserToUserActionBloc,
                               UserToUserActionState>(
                             buildWhen: (previousState, state) {
-                              return (self &&
-                                  state is UserToUserActionUpdateProfileState);
+                              return (state
+                                      is UserToUserActionUpdateProfileState &&
+                                  state.username == username);
                             },
                             builder: (context, state) {
                               final user = graph.getValueByKey(key)!
@@ -568,8 +569,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           child: BlocBuilder<UserToUserActionBloc,
                               UserToUserActionState>(
                             buildWhen: (previousState, state) {
-                              return (self &&
-                                  state is UserToUserActionUpdateProfileState);
+                              return (state
+                                      is UserToUserActionUpdateProfileState &&
+                                  state.username == username);
                             },
                             builder: (context, state) {
                               final user = graph.getValueByKey(key)!

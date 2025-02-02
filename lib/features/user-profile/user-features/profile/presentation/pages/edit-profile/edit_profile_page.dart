@@ -1,9 +1,12 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doki_websocket_client/doki_websocket_client.dart'
+    hide ValueSetter;
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
+import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
@@ -74,10 +77,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       final tempUser = graph.getValueByKey(key)! as CompleteUserEntity;
       context.read<UserToUserActionBloc>().add(UserToUserUpdateProfileEvent(
+            username: user.username,
             name: tempUser.name,
             bio: tempUser.bio,
             profilePicture: tempUser.profilePicture.bucketPath,
           ));
+
+      // end to remote users
+      final client = context.read<WebsocketClientProvider>().client;
+      if (client != null && client.isActive) {
+        // ignore if client is null
+        UserUpdateProfile payload = UserUpdateProfile(
+          from: user.username,
+          bio: tempUser.bio,
+          name: tempUser.name,
+          profilePicture: tempUser.profilePicture.bucketPath,
+        );
+        client.userUpdateProfile(payload);
+      }
 
       context.pop();
       return;
