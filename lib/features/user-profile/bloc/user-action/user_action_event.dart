@@ -3,19 +3,6 @@ part of 'user_action_bloc.dart';
 @immutable
 sealed class UserActionEvent {}
 
-// user to user action
-// final class UserActionUpdateEvent extends UserActionEvent {
-//   UserActionUpdateEvent({
-//     required this.name,
-//     required this.bio,
-//     required this.profilePicture,
-//   });
-//
-//   final String name;
-//   final String bio;
-//   final String profilePicture;
-// }
-
 // user to post action
 final class UserActionPostLikeActionEvent extends UserActionEvent {
   UserActionPostLikeActionEvent({
@@ -44,71 +31,22 @@ final class UserActionPostLoadEvent extends UserActionEvent {
 final class UserActionNewPostEvent extends UserActionEvent {
   UserActionNewPostEvent({
     required this.postId,
+    required this.username,
   });
 
+  final String username;
   final String postId;
 }
 
-// user to user action
-// final class UserActionFriendLoadEvent extends UserActionEvent {
-//   UserActionFriendLoadEvent({
-//     required this.friendsCount,
-//     required this.username,
-//   });
-//
-//   final int friendsCount;
-//   final String username;
-// }
+final class UserActionNewPostRemoteEvent extends UserActionEvent {
+  UserActionNewPostRemoteEvent({
+    required this.postId,
+    required this.username,
+  });
 
-// user to user action
-// final class UserActionCreateFriendRelationEvent extends UserActionEvent {
-//   UserActionCreateFriendRelationEvent({
-//     required this.currentUsername,
-//     required this.username,
-//   });
-//
-//   final String currentUsername;
-//   final String username;
-// }
-
-// user to user action
-// final class UserActionAcceptFriendRelationEvent extends UserActionEvent {
-//   UserActionAcceptFriendRelationEvent({
-//     required this.currentUsername,
-//     required this.username,
-//     required this.requestedBy,
-//   });
-//
-//   final String currentUsername;
-//   final String username;
-//
-//   // requested by and username will be equal
-//   final String requestedBy;
-// }
-
-// user to user action
-// final class UserActionRemoveFriendRelationEvent extends UserActionEvent {
-//   UserActionRemoveFriendRelationEvent({
-//     required this.currentUsername,
-//     required this.username,
-//     required this.requestedBy,
-//   });
-//
-//   final String currentUsername;
-//   final String username;
-//
-//   // requested by value is ambiguous
-//   final String requestedBy;
-// }
-
-// user to user action
-// final class UserActionUserRefreshEvent extends UserActionEvent {
-//   UserActionUserRefreshEvent({
-//     required this.username,
-//   });
-//
-//   final String username;
-// }
+  final String username;
+  final String postId;
+}
 
 // user to comment action
 final class UserActionCommentLikeActionEvent extends UserActionEvent {
@@ -148,17 +86,6 @@ final class UserActionPostRefreshEvent extends UserActionEvent {
 
   final String postId;
 }
-
-// fetch user by username for new messages
-// final class UserActionGetUserByUsernameEvent extends UserActionEvent {
-//   UserActionGetUserByUsernameEvent({
-//     required this.username,
-//     required this.currentUser,
-//   });
-//
-//   final String username;
-//   final String currentUser;
-// }
 
 // fetch post by postId for new messages
 final class UserActionGetPostByIdEvent extends UserActionEvent {

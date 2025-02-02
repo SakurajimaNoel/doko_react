@@ -28,6 +28,7 @@ import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 import 'bloc/real-time/real_time_bloc.dart';
+import 'bloc/user-action/user_action_bloc.dart';
 
 class UserLayout extends StatefulWidget {
   const UserLayout(this.navigationShell, {super.key});
@@ -82,135 +83,143 @@ class _UserLayoutState extends State<UserLayout> {
 
     // create websocket client
     client = Client(
-        url: Uri.parse(dotenv.env["WEBSOCKET_ENDPOINT"]!),
-        getToken: () async {
-          final token = await getUserToken();
-          return token.idToken;
-        },
-        onChatMessageReceived: (ChatMessage message) {
-          String remoteUser = getUsernameFromMessageParams(
-            username,
-            to: message.to,
-            from: message.from,
-          );
+      url: Uri.parse(dotenv.env["WEBSOCKET_ENDPOINT"]!),
+      getToken: () async {
+        final token = await getUserToken();
+        return token.idToken;
+      },
+      onChatMessageReceived: (ChatMessage message) {
+        String remoteUser = getUsernameFromMessageParams(
+          username,
+          to: message.to,
+          from: message.from,
+        );
 
-          if (remoteUser == message.from && username != remoteUser) {
-            showNewMessageNotification(
-                message, generateUserNodeKey(message.from));
-          }
+        if (remoteUser == message.from && username != remoteUser) {
+          showNewMessageNotification(
+              message, generateUserNodeKey(message.from));
+        }
 
-          realTimeBloc.add(RealTimeNewMessageEvent(
-            message: message,
-            username: username,
-          ));
-        },
-        onTypingStatusReceived: (TypingStatus status) {
-          realTimeBloc.add(RealTimeTypingStatusEvent(
-            status: status,
-          ));
-        },
-        onEditMessageReceived: (EditMessage message) {
-          realTimeBloc.add(RealTimeEditMessageEvent(
-            message: message,
-            username: username,
-          ));
-        },
-        onDeleteMessageReceived: (DeleteMessage message) {
-          realTimeBloc.add(RealTimeDeleteMessageEvent(
-            message: message,
-            username: username,
-          ));
-        },
-        onReconnectSuccess: () {
-          /// find latest message from inbox and fetch based on that
-          showSuccess(context, "Reconnected to websocket server.");
-        },
-        onConnectionClosure: (retry) async {
-          StreamSubscription<FGBGType>? fgBgSubscription;
-          StreamSubscription<InternetConnectionStatus>? internetSubscription;
+        realTimeBloc.add(RealTimeNewMessageEvent(
+          message: message,
+          username: username,
+        ));
+      },
+      onTypingStatusReceived: (TypingStatus status) {
+        realTimeBloc.add(RealTimeTypingStatusEvent(
+          status: status,
+        ));
+      },
+      onEditMessageReceived: (EditMessage message) {
+        realTimeBloc.add(RealTimeEditMessageEvent(
+          message: message,
+          username: username,
+        ));
+      },
+      onDeleteMessageReceived: (DeleteMessage message) {
+        realTimeBloc.add(RealTimeDeleteMessageEvent(
+          message: message,
+          username: username,
+        ));
+      },
+      onReconnectSuccess: () {
+        /// find latest message from inbox and fetch based on that
+        showSuccess(context, "Reconnected to websocket server.");
+      },
+      onConnectionClosure: (retry) async {
+        StreamSubscription<FGBGType>? fgBgSubscription;
+        StreamSubscription<InternetConnectionStatus>? internetSubscription;
 
-          void cancelSubscriptions() {
-            internetSubscription?.cancel();
-            fgBgSubscription?.cancel();
-          }
+        void cancelSubscriptions() {
+          internetSubscription?.cancel();
+          fgBgSubscription?.cancel();
+        }
 
-          Future<void> handleReconnection() async {
-            bool isConnected = await connectionChecker.hasConnection;
-            if (isConnected) {
-              retry();
-              cancelSubscriptions();
-            } else {
-              if (!mounted) return;
-              showError(context, "No internet connection.");
-
-              // Listen for internet connection changes
-              internetSubscription = connectionChecker.onStatusChange.listen(
-                (InternetConnectionStatus status) {
-                  if (status == InternetConnectionStatus.connected) {
-                    retry();
-                    cancelSubscriptions();
-                  }
-                },
-              );
-            }
-          }
-
-          if (isForeground) {
-            await handleReconnection();
+        Future<void> handleReconnection() async {
+          bool isConnected = await connectionChecker.hasConnection;
+          if (isConnected) {
+            retry();
+            cancelSubscriptions();
           } else {
-            fgBgSubscription = FGBGEvents.instance.stream.listen(
-              (event) async {
-                if (event == FGBGType.foreground) {
-                  await handleReconnection();
+            if (!mounted) return;
+            showError(context, "No internet connection.");
+
+            // Listen for internet connection changes
+            internetSubscription = connectionChecker.onStatusChange.listen(
+              (InternetConnectionStatus status) {
+                if (status == InternetConnectionStatus.connected) {
+                  retry();
+                  cancelSubscriptions();
                 }
               },
             );
           }
-        },
-        onUserSendFriendRequest: (UserSendFriendRequest request) {
-          safePrint(request.toJson());
-          // show notification if valid
-          if (request.to == username) {
-            showNewFriendRequestNotification(request);
-          }
+        }
 
-          userToUserActionBloc
-              .add(UserToUserActionUserSendFriendRequestRemoteEvent(
-            username: username,
-            request: request,
-          ));
-        },
-        onUserAcceptFriendRequest: (UserAcceptFriendRequest request) {
-          safePrint(request.toJson());
-          // show notification if valid
-          if (request.to == username) {
-            showAcceptedFriendNotification(request);
-          }
+        if (isForeground) {
+          await handleReconnection();
+        } else {
+          fgBgSubscription = FGBGEvents.instance.stream.listen(
+            (event) async {
+              if (event == FGBGType.foreground) {
+                await handleReconnection();
+              }
+            },
+          );
+        }
+      },
+      onUserSendFriendRequest: (UserSendFriendRequest request) {
+        safePrint(request.toJson());
+        // show notification if valid
+        if (request.to == username) {
+          showNewFriendRequestNotification(request);
+        }
 
-          userToUserActionBloc
-              .add(UserToUserActionUserAcceptsFriendRequestRemoteEvent(
-            username: username,
-            request: request,
-          ));
-        },
-        onUserRemovesFriendRelation: (UserRemovesFriendRelation relation) {
-          userToUserActionBloc
-              .add(UserToUserActionUserRemovesFriendRelationRemoteEvent(
-            username: username,
-            relation: relation,
-          ));
-        },
-        onUserUpdateProfile: (UserUpdateProfile payload) {
-          context
-              .read<UserToUserActionBloc>()
-              .add(UserToUserUpdateProfileRemoteEvent(
-                username: payload.from,
-                name: payload.name,
-                bio: payload.bio,
-                profilePicture: payload.profilePicture,
+        userToUserActionBloc
+            .add(UserToUserActionUserSendFriendRequestRemoteEvent(
+          username: username,
+          request: request,
+        ));
+      },
+      onUserAcceptFriendRequest: (UserAcceptFriendRequest request) {
+        safePrint(request.toJson());
+        // show notification if valid
+        if (request.to == username) {
+          showAcceptedFriendNotification(request);
+        }
+
+        userToUserActionBloc
+            .add(UserToUserActionUserAcceptsFriendRequestRemoteEvent(
+          username: username,
+          request: request,
+        ));
+      },
+      onUserRemovesFriendRelation: (UserRemovesFriendRelation relation) {
+        userToUserActionBloc
+            .add(UserToUserActionUserRemovesFriendRelationRemoteEvent(
+          username: username,
+          relation: relation,
+        ));
+      },
+      onUserUpdateProfile: (UserUpdateProfile payload) {
+        context
+            .read<UserToUserActionBloc>()
+            .add(UserToUserUpdateProfileRemoteEvent(
+              username: payload.from,
+              name: payload.name,
+              bio: payload.bio,
+              profilePicture: payload.profilePicture,
+            ));
+      },
+      onUserCreateRootNode: (UserCreateRootNode payload) {
+        if (payload.nodeType == NodeType.post) {
+          context.read<UserActionBloc>().add(UserActionNewPostRemoteEvent(
+                postId: payload.id,
+                username: username,
               ));
-        },
-        onUserCreateRootNode: (UserCreateRootNode payload) {});
+        }
+      },
+    );
 
     connectWS();
   }

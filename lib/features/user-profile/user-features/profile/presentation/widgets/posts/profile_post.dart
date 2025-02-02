@@ -85,9 +85,6 @@ class _ProfilePostState extends State<ProfilePost> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUsername =
-        (context.read<UserBloc>().state as UserCompleteState).username;
-
     return BlocListener<ProfileBloc, ProfileState>(
       listenWhen: (previousState, state) {
         return state is ProfilePostLoadResponse;
@@ -111,7 +108,7 @@ class _ProfilePostState extends State<ProfilePost> {
       child: BlocBuilder<UserActionBloc, UserActionState>(
         buildWhen: (previousState, state) {
           return (state is UserActionLoadPosts && state.username == username) ||
-              (state is UserActionNewPostState && username == currentUsername);
+              (state is UserActionNewPostState && state.username == username);
         },
         builder: (context, state) {
           final Nodes userPost = user.posts;

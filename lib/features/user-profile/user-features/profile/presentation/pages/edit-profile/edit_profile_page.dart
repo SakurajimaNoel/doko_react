@@ -83,7 +83,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             profilePicture: tempUser.profilePicture.bucketPath,
           ));
 
-      // end to remote users
+      // send to remote users
       final client = context.read<WebsocketClientProvider>().client;
       if (client != null && client.isActive) {
         // ignore if client is null

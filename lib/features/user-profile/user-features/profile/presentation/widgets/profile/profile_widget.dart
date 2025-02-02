@@ -191,48 +191,55 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
   Widget userProfileInfo(String key) {
     var currTheme = Theme.of(context).colorScheme;
+    final user = graph.getValueByKey(key)! as CompleteUserEntity;
 
-    return BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
-      buildWhen: (previousState, state) {
-        return (state is UserToUserActionUpdateUserAcceptedFriendsListState &&
-                (self || state.username == username)) ||
-            (self && state is UserActionNewPostState);
-      },
-      builder: (context, state) {
-        final user = graph.getValueByKey(key)! as CompleteUserEntity;
-
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Material(
-              shape: Border(
-                bottom: BorderSide(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Material(
+          shape: Border(
+            bottom: BorderSide(
+              color: currTheme.primary,
+              width: Constants.sliverBorder * 3,
+            ),
+          ),
+          child: SizedBox(
+            height: double.infinity,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_view_month,
                   color: currTheme.primary,
-                  width: Constants.sliverBorder * 3,
                 ),
-              ),
-              child: SizedBox(
-                height: double.infinity,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_view_month,
-                      color: currTheme.primary,
-                    ),
-                    const SizedBox(
-                      width: Constants.gap * 0.5,
-                    ),
-                    Text(
+                const SizedBox(
+                  width: Constants.gap * 0.5,
+                ),
+                BlocBuilder<UserActionBloc, UserActionState>(
+                  buildWhen: (previousState, state) {
+                    return (state is UserActionNewPostState &&
+                        state.username == username);
+                  },
+                  builder: (context, state) {
+                    return Text(
                       "Posts: ${displayNumberFormat(user.postsCount)}",
                       style: TextStyle(
                         color: currTheme.primary,
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
-              ),
+              ],
             ),
-            TextButton.icon(
+          ),
+        ),
+        BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
+          buildWhen: (previousState, state) {
+            return (state
+                    is UserToUserActionUpdateUserAcceptedFriendsListState &&
+                (self || state.username == username));
+          },
+          builder: (context, state) {
+            return TextButton.icon(
               style: TextButton.styleFrom(
                 iconColor: currTheme.secondary,
                 foregroundColor: currTheme.secondary,
@@ -247,10 +254,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               },
               icon: const Icon(Icons.group),
               label: Text("Friends: ${displayNumberFormat(user.friendsCount)}"),
-            ),
-          ],
-        );
-      },
+            );
+          },
+        ),
+      ],
     );
   }
 

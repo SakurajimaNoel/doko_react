@@ -8,22 +8,6 @@ final class UserActionInitial extends UserActionState {
   List<Object?> get props => [];
 }
 
-// edit profile action
-// class UserActionUpdateProfile extends UserActionState {
-//   UserActionUpdateProfile({
-//     required this.name,
-//     required this.bio,
-//     required this.profilePicture,
-//   });
-//
-//   final String name;
-//   final String bio;
-//   final String profilePicture;
-//
-//   @override
-//   List<Object?> get props => [name, bio, profilePicture];
-// }
-
 // more post action
 class UserActionLoadPosts extends UserActionState {
   UserActionLoadPosts({
@@ -41,27 +25,15 @@ class UserActionLoadPosts extends UserActionState {
 class UserActionNewPostState extends UserActionState {
   UserActionNewPostState({
     required this.postId,
+    required this.username,
   });
 
   final String postId;
+  final String username;
 
   @override
-  List<Object?> get props => [postId];
+  List<Object?> get props => [postId, username];
 }
-
-// more friends action
-// class UserActionLoadFriends extends UserActionState {
-//   UserActionLoadFriends({
-//     required this.loadedFriendsCount,
-//     required this.username,
-//   });
-//
-//   final String username;
-//   final int loadedFriendsCount;
-//
-//   @override
-//   List<Object?> get props => [username, loadedFriendsCount];
-// }
 
 /// user post action state
 /// used when updating ui for post action
@@ -83,62 +55,6 @@ class UserActionNodeActionState extends UserActionState {
   @override
   List<Object?> get props => [nodeId, likesCount, userLike, commentsCount];
 }
-
-/// used in user to user relation widget
-/// in user friends list
-/// and self pending request
-// class UserActionUserRelationState extends UserActionState {
-//   UserActionUserRelationState({
-//     required this.username,
-//     required this.relation,
-//   });
-//
-//   final String username;
-//   final UserToUserRelation relation;
-//
-//   @override
-//   List<Object?> get props => [username, relation];
-// }
-
-// user friend list updates
-// class UserActionUpdateUserAcceptedFriendsListState extends UserActionState {
-//   UserActionUpdateUserAcceptedFriendsListState({
-//     required this.currentUsername,
-//     required this.username,
-//   });
-//
-//   final String currentUsername;
-//   final String username;
-//
-//   @override
-//   List<Object?> get props => [username, currentUsername];
-// }
-
-// class UserActionUpdateUserPendingFriendsListState extends UserActionState {
-//   UserActionUpdateUserPendingFriendsListState({
-//     required this.currentUsername,
-//     required this.username,
-//   });
-//
-//   final String currentUsername;
-//   final String username;
-//
-//   @override
-//   List<Object?> get props => [username, currentUsername];
-// }
-
-// user refresh state
-// class UserActionUserRefreshState extends UserActionState {
-//   UserActionUserRefreshState({
-//     required this.username,
-//   }) : now = DateTime.now();
-//
-//   final String username;
-//   final DateTime now;
-//
-//   @override
-//   List<Object?> get props => [username, now];
-// }
 
 // individual post related states
 class UserActionNewCommentState extends UserActionState {
@@ -164,19 +80,6 @@ class UserActionPostRefreshState extends UserActionState {
   @override
   List<Object?> get props => [nodeId, now];
 }
-
-// user data fetched for instant messaging
-// class UserActionUserDataFetchedState extends UserActionState {
-//   UserActionUserDataFetchedState({
-//     required this.username,
-//   }) : now = DateTime.now();
-//
-//   final String username;
-//   final DateTime now;
-//
-//   @override
-//   List<Object?> get props => [username, now];
-// }
 
 // post data fetched for instant messaging
 class UserActionPostDataFetchedState extends UserActionState {
