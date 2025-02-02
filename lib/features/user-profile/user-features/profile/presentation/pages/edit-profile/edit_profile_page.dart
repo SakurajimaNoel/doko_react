@@ -187,7 +187,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             labelText: "Name",
                             hintText: "Name...",
                           ),
-                          maxLength: 30,
+                          maxLength: Constants.nameLimit,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                         ),
                         const SizedBox(
@@ -207,7 +207,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           keyboardType: TextInputType.multiline,
                           maxLines: 5,
                           minLines: 5,
-                          maxLength: 160,
+                          maxLength: Constants.bioLimit,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                         ),
                       ],

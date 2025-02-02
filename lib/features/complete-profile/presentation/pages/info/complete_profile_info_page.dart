@@ -97,6 +97,7 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
                       Form(
                         key: formKey,
                         child: Column(
+                          spacing: Constants.gap * 1.25,
                           children: [
                             TextFormField(
                               enabled: false,
@@ -118,9 +119,6 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
                                 color: currTheme.onSurface,
                               ),
                             ),
-                            const SizedBox(
-                              height: Constants.gap * 1.25,
-                            ),
                             TextFormField(
                               controller: nameController,
                               validator: (value) {
@@ -131,14 +129,12 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
                               autovalidateMode:
                                   AutovalidateMode.onUserInteraction,
                               onChanged: (value) {},
+                              maxLength: Constants.nameLimit,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
                                 labelText: "Name*",
                                 hintText: "Name...",
                               ),
-                            ),
-                            const SizedBox(
-                              height: Constants.gap * 1.25,
                             ),
                             GestureDetector(
                               onTap: selectDate,

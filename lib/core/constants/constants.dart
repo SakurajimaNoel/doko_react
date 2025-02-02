@@ -6,6 +6,8 @@ class Constants {
   static const usernameLimit = 20;
   static final String usernameRegex =
       r"[\w][\w\d_.-]{2," + (usernameLimit - 1).toString() + r"}";
+  static const bioLimit = 256;
+  static const nameLimit = 30;
 
   static const String errorMessage = "Oops! Something went wrong.";
   static const Duration snackBarDuration = Duration(
