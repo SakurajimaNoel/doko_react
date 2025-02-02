@@ -25,14 +25,27 @@ class ProfilePictureFilter extends StatelessWidget {
         padding: const EdgeInsets.all(Constants.padding),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                currTheme.primary.withValues(
-                  alpha: 0.75,
-                ),
-              ]),
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [
+              0,
+              0.625,
+              0.75,
+              1,
+            ],
+            colors: [
+              Colors.transparent,
+              currTheme.primary.withValues(
+                alpha: 0.25,
+              ),
+              currTheme.primary.withValues(
+                alpha: 0.5,
+              ),
+              currTheme.primary.withValues(
+                alpha: 0.75,
+              ),
+            ],
+          ),
         ),
         child: child,
       );
