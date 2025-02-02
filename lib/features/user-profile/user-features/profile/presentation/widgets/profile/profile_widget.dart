@@ -565,7 +565,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                       SliverToBoxAdapter(
                         child: Padding(
                           padding: const EdgeInsets.all(Constants.padding),
-                          child: BlocBuilder<UserActionBloc, UserActionState>(
+                          child: BlocBuilder<UserToUserActionBloc,
+                              UserToUserActionState>(
                             buildWhen: (previousState, state) {
                               return (self &&
                                   state is UserToUserActionUpdateProfileState);
