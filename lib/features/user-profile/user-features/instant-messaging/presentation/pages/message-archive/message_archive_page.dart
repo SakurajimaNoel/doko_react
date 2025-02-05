@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
@@ -139,10 +141,15 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                   ? FloatingActionButton(
                       mini: true,
                       onPressed: () {
+                        // scroll duration in milliseconds
+                        final scrollDuration = min(
+                            ((controller.offset / 100) * 500) as int,
+                            Constants.maxScrollDuration);
+
                         controller.animateTo(
                           0,
-                          duration: const Duration(
-                            milliseconds: 250,
+                          duration: Duration(
+                            milliseconds: scrollDuration,
                           ),
                           curve: Curves.fastOutSlowIn,
                         );

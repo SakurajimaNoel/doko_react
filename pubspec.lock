@@ -310,7 +310,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "6e18898aa31da79d8e79570a9d61388a62b01f87"
+      resolved-ref: e1c6d4c129317b42181f0e327fc96faf8ba88014
       url: "https://github.com/rohan031/doki_websocket_client.git"
     source: git
     version: "2.0.0"
