@@ -155,7 +155,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
             to: username,
             addedOn: addedOn,
           );
-          client.userAcceptFriendRequest(req);
+          client.sendPayload(req);
         }
 
         if (relation == UserToUserRelation.outgoingReq) {
@@ -164,7 +164,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
             to: username,
             addedOn: addedOn,
           );
-          client.userSendFriendRequest(req);
+          client.sendPayload(req);
         }
 
         if (relation == UserToUserRelation.unrelated) {
@@ -172,7 +172,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
             from: currentUsername,
             to: username,
           );
-          client.userRemovesFriendRelation(relation);
+          client.sendPayload(relation);
         }
 
         updating = false;

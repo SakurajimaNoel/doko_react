@@ -70,7 +70,7 @@ class _PostPublishPageState extends State<PostPublishPage> {
                   id: widget.postDetails.postId,
                   nodeType: NodeType.post,
                 );
-                client.userCreateRootNode(payload);
+                client.sendPayload(payload);
               }
 
               context.goNamed(RouterConstants.userFeed);

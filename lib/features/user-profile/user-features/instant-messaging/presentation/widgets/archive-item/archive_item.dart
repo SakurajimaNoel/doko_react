@@ -1,8 +1,7 @@
 import 'dart:collection';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doki_websocket_client/doki_websocket_client.dart'
-    hide ValueGetter, ValueSetter;
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
@@ -73,7 +72,7 @@ class ArchiveItem extends StatelessWidget {
         everyone: everyone,
       );
 
-      bool result = client!.deleteMessage(deleteMessage);
+      bool result = client!.sendPayload(deleteMessage);
       if (result) {
         context.read<RealTimeBloc>().add(RealTimeDeleteMessageEvent(
               message: deleteMessage,
@@ -498,7 +497,7 @@ class _EditMessageState extends State<_EditMessage> {
               body: newBody,
             );
 
-            if (client!.editMessage(editedMessage)) {
+            if (client!.sendPayload(editedMessage)) {
               // success
               showSuccess(context, "Message edited.");
               context.read<RealTimeBloc>().add(RealTimeEditMessageEvent(

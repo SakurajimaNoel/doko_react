@@ -238,7 +238,7 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                             everyone: false,
                           );
 
-                          bool result = client!.deleteMessage(deleteMessage);
+                          bool result = client!.sendPayload(deleteMessage);
                           if (result) {
                             context
                                 .read<RealTimeBloc>()

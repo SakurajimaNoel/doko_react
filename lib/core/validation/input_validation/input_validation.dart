@@ -93,7 +93,7 @@ bool validateDate(String dateString) {
 }
 
 bool validateBio(String? bio) {
-  if (bio != null && bio.length > 160) {
+  if (bio != null && bio.length > Constants.bioLimit) {
     return false;
   }
 

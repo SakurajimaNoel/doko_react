@@ -55,7 +55,7 @@ class _MessageInputState extends State<MessageInput> {
     );
 
     throttle(() {
-      client!.sendTypingStatus(sendStatus);
+      client!.sendPayload(sendStatus);
     });
   }
 
@@ -106,7 +106,7 @@ class _MessageInputState extends State<MessageInput> {
           subject: MessageSubject.mediaExternal,
           body: gifURL,
         );
-        client.sendMessage(message);
+        client.sendPayload(message);
 
         // fire bloc event
         realTimeBloc.add(RealTimeNewMessageEvent(
@@ -195,7 +195,7 @@ class _MessageInputState extends State<MessageInput> {
                           subject: MessageSubject.text,
                           body: messageBody,
                         );
-                        client.sendMessage(message);
+                        client.sendPayload(message);
 
                         HapticFeedback.vibrate();
                         // fire bloc event

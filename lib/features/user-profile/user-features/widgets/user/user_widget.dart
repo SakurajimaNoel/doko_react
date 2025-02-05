@@ -287,7 +287,6 @@ class UserWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUser =
         (context.read<UserBloc>().state as UserCompleteState).username;
-    final currentUserKey = generateUserNodeKey(currentUser);
 
     // username for which this widget will be used
     final profileUsername = getUsernameFromUserKey(userKey);

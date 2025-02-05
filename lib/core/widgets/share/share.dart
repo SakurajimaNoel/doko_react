@@ -1,5 +1,4 @@
-import 'package:doki_websocket_client/doki_websocket_client.dart'
-    hide ValueSetter;
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
@@ -496,7 +495,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                     body: widget.nodeIdentifier,
                                   );
 
-                                  client.sendMessage(message);
+                                  client.sendPayload(message);
                                   // fire bloc event
                                   realTimeBloc.add(RealTimeNewMessageEvent(
                                     message: message,

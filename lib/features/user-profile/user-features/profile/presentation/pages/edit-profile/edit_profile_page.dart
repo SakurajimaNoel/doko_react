@@ -1,8 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:doki_websocket_client/doki_websocket_client.dart'
-    hide ValueSetter;
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
@@ -93,7 +92,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           name: tempUser.name,
           profilePicture: tempUser.profilePicture.bucketPath,
         );
-        client.userUpdateProfile(payload);
+        client.sendPayload(payload);
       }
 
       context.pop();

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
@@ -88,40 +87,6 @@ class _UserLayoutState extends State<UserLayout> {
         final token = await getUserToken();
         return token.idToken;
       },
-      onChatMessageReceived: (ChatMessage message) {
-        String remoteUser = getUsernameFromMessageParams(
-          username,
-          to: message.to,
-          from: message.from,
-        );
-
-        if (remoteUser == message.from && username != remoteUser) {
-          showNewMessageNotification(
-              message, generateUserNodeKey(message.from));
-        }
-
-        realTimeBloc.add(RealTimeNewMessageEvent(
-          message: message,
-          username: username,
-        ));
-      },
-      onTypingStatusReceived: (TypingStatus status) {
-        realTimeBloc.add(RealTimeTypingStatusEvent(
-          status: status,
-        ));
-      },
-      onEditMessageReceived: (EditMessage message) {
-        realTimeBloc.add(RealTimeEditMessageEvent(
-          message: message,
-          username: username,
-        ));
-      },
-      onDeleteMessageReceived: (DeleteMessage message) {
-        realTimeBloc.add(RealTimeDeleteMessageEvent(
-          message: message,
-          username: username,
-        ));
-      },
       onReconnectSuccess: () {
         /// find latest message from inbox and fetch based on that
         showSuccess(context, "Reconnected to websocket server.");
@@ -168,55 +133,88 @@ class _UserLayoutState extends State<UserLayout> {
           );
         }
       },
-      onUserSendFriendRequest: (UserSendFriendRequest request) {
-        safePrint(request.toJson());
-        // show notification if valid
-        if (request.to == username) {
-          showNewFriendRequestNotification(request);
-        }
+      payloadHandler: {
+        PayloadType.chatMessage: (ChatMessage message) {
+          String remoteUser = getUsernameFromMessageParams(
+            username,
+            to: message.to,
+            from: message.from,
+          );
 
-        userToUserActionBloc
-            .add(UserToUserActionUserSendFriendRequestRemoteEvent(
-          username: username,
-          request: request,
-        ));
-      },
-      onUserAcceptFriendRequest: (UserAcceptFriendRequest request) {
-        safePrint(request.toJson());
-        // show notification if valid
-        if (request.to == username) {
-          showAcceptedFriendNotification(request);
-        }
+          if (remoteUser == message.from && username != remoteUser) {
+            showNewMessageNotification(
+                message, generateUserNodeKey(message.from));
+          }
 
-        userToUserActionBloc
-            .add(UserToUserActionUserAcceptsFriendRequestRemoteEvent(
-          username: username,
-          request: request,
-        ));
-      },
-      onUserRemovesFriendRelation: (UserRemovesFriendRelation relation) {
-        userToUserActionBloc
-            .add(UserToUserActionUserRemovesFriendRelationRemoteEvent(
-          username: username,
-          relation: relation,
-        ));
-      },
-      onUserUpdateProfile: (UserUpdateProfile payload) {
-        context
-            .read<UserToUserActionBloc>()
-            .add(UserToUserUpdateProfileRemoteEvent(
-              username: payload.from,
-              name: payload.name,
-              bio: payload.bio,
-              profilePicture: payload.profilePicture,
-            ));
-      },
-      onUserCreateRootNode: (UserCreateRootNode payload) {
-        if (payload.nodeType == NodeType.post) {
-          context.read<UserActionBloc>().add(UserActionNewPostRemoteEvent(
-                postId: payload.id,
-                username: username,
+          realTimeBloc.add(RealTimeNewMessageEvent(
+            message: message,
+            username: username,
+          ));
+        },
+        PayloadType.typingStatus: (TypingStatus status) {
+          realTimeBloc.add(RealTimeTypingStatusEvent(
+            status: status,
+          ));
+        },
+        PayloadType.editMessage: (EditMessage message) {
+          realTimeBloc.add(RealTimeEditMessageEvent(
+            message: message,
+            username: username,
+          ));
+        },
+        PayloadType.deleteMessage: (DeleteMessage message) {
+          realTimeBloc.add(RealTimeDeleteMessageEvent(
+            message: message,
+            username: username,
+          ));
+        },
+        PayloadType.userSendFriendRequest: (UserSendFriendRequest request) {
+          if (request.to == username) {
+            showNewFriendRequestNotification(request);
+          }
+
+          userToUserActionBloc
+              .add(UserToUserActionUserSendFriendRequestRemoteEvent(
+            username: username,
+            request: request,
+          ));
+        },
+        PayloadType.userAcceptFriendRequest: (UserAcceptFriendRequest request) {
+          if (request.to == username) {
+            showAcceptedFriendNotification(request);
+          }
+
+          userToUserActionBloc
+              .add(UserToUserActionUserAcceptsFriendRequestRemoteEvent(
+            username: username,
+            request: request,
+          ));
+        },
+        PayloadType.userRemovesFriendRelation:
+            (UserRemovesFriendRelation relation) {
+          userToUserActionBloc
+              .add(UserToUserActionUserRemovesFriendRelationRemoteEvent(
+            username: username,
+            relation: relation,
+          ));
+        },
+        PayloadType.userUpdateProfile: (UserUpdateProfile payload) {
+          context
+              .read<UserToUserActionBloc>()
+              .add(UserToUserUpdateProfileRemoteEvent(
+                username: payload.from,
+                name: payload.name,
+                bio: payload.bio,
+                profilePicture: payload.profilePicture,
               ));
+        },
+        PayloadType.userCreateRootNode: (UserCreateRootNode payload) {
+          if (payload.nodeType == NodeType.post) {
+            context.read<UserActionBloc>().add(UserActionNewPostRemoteEvent(
+                  postId: payload.id,
+                  username: username,
+                ));
+          }
         }
       },
     );
