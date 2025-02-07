@@ -42,7 +42,7 @@ enum DokiNodeType {
 
   factory DokiNodeType.fromName(String name) {
     for (var node in DokiNodeType.values) {
-      if (node.toString() == name) return node;
+      if (node.name == name) return node;
     }
 
     return DokiNodeType.user;

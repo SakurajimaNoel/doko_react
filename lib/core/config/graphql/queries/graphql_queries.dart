@@ -1137,4 +1137,86 @@ class GraphqlQueries {
       }
     };
   }
+
+  // complete comment with replies
+  static String getCompleteCommentById() {
+    return """
+    query Comments(\$where: CommentWhere, \$likedByWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int) {
+      comments(where: \$where) {
+        id
+        createdOn
+        media
+        content
+        mentions {
+          username
+        }
+        likedByConnection {
+          totalCount
+        }
+        likedBy(where: \$likedByWhere2) {
+          username
+        }
+        commentBy {
+          id
+          username
+          name
+          profilePicture
+          friendsConnection(where: \$friendsConnectionWhere2) {
+            edges {
+              properties {
+                addedOn
+                requestedBy
+                status
+              }
+            }
+          }
+        }
+        commentsConnection(first: \$first) {
+          totalCount
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
+          edges {
+            node {
+              id
+              createdOn
+              media
+              content
+              mentions {
+                username
+              }
+              likedByConnection {
+                totalCount
+              }
+              likedBy(where: \$likedByWhere2) {
+                username
+              }
+            }
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> getCompleteCommentByIdVariables(
+    String commentId, {
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": commentId,
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
+      "first": GraphqlConstants.commentLimit,
+    };
+  }
 }

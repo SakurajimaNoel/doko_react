@@ -1,6 +1,6 @@
-import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
@@ -10,7 +10,7 @@ import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.da
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/widgets/comment/comment_input.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/bloc/root_node_bloc.dart';
-import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/root_node_provider.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/node_comment_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/widgets/comment/comment_list.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/post_widget.dart';
 import 'package:doko_react/init_dependency.dart';
@@ -76,7 +76,7 @@ class _PostPageState extends State<PostPage> {
             bool loading = state is RootNodeLoading;
             bool commentsLoading = state is CommentLoadingState;
 
-            bool postError = state is PostErrorState;
+            bool postError = state is RootNodeErrorState;
             bool commentError = state is CommentErrorState;
 
             if (loading) {
@@ -95,13 +95,13 @@ class _PostPageState extends State<PostPage> {
 
             return ChangeNotifierProvider(
               create: (BuildContext context) {
-                return RootNodeCommentProvider(
+                return NodeCommentProvider(
                   focusNode: FocusNode(),
                   rootNodeId: post.id,
                   rootNodeCreatedBy: getUsernameFromUserKey(post.createdBy),
                   targetByUser: getUsernameFromUserKey(post.createdBy),
                   commentTargetId: post.id,
-                  rootNodeType: NodeType.post,
+                  rootNodeType: DokiNodeType.post,
                 );
               },
               child: Column(

@@ -128,6 +128,10 @@ class PostRemoteDataSource {
     }
   }
 
+  Future<bool> getCommentWithReplies(GetNodeInput details) async {
+    return false;
+  }
+
   Future<bool> getCommentReplies(GetCommentsInput details) async {
     try {
       QueryResult result = await _client.query(

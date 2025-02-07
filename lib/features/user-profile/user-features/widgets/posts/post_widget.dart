@@ -14,7 +14,7 @@ import 'package:doko_react/core/widgets/video-player/video_player.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/root_node_provider.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/node_comment_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/provider/post_carousel_indicator_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/gestures.dart';
@@ -533,7 +533,7 @@ class _PostActionState extends State<_PostAction> {
                                   currentRoute == RouterConstants.userPost;
 
                               if (isPostPage) {
-                                context.read<RootNodeCommentProvider>()
+                                context.read<NodeCommentProvider>()
                                   ..focusNode.requestFocus()
                                   ..resetCommentTarget();
                                 return;

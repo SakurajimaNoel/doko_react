@@ -20,7 +20,7 @@ import 'package:doko_react/features/user-profile/user-features/node-create/prese
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/provider/comment_input_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
-import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/root_node_provider.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/node_comment_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +79,7 @@ class CommentInput extends StatelessWidget {
 
             // handle success
             final UserGraph graph = UserGraph();
-            final commentProvider = context.read<RootNodeCommentProvider>();
+            final commentProvider = context.read<NodeCommentProvider>();
 
             String commentId = state.nodeId;
             bool userLike;
@@ -125,8 +125,7 @@ class CommentInput extends StatelessWidget {
             children: [
               Builder(
                 builder: (context) {
-                  final commentProvider =
-                      context.watch<RootNodeCommentProvider>();
+                  final commentProvider = context.watch<NodeCommentProvider>();
 
                   if (!commentProvider.isReply) {
                     return const SizedBox.shrink();
@@ -232,7 +231,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
 
   late final commentController =
       context.read<CommentInputProvider>().commentController;
-  late final focusNode = context.read<RootNodeCommentProvider>().focusNode;
+  late final focusNode = context.read<NodeCommentProvider>().focusNode;
 
   List<String> userSearchResults = [];
 
@@ -517,7 +516,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
             if (adding) return;
 
             if (focusNode.hasFocus) {
-              context.read<RootNodeCommentProvider>().resetCommentTarget();
+              context.read<NodeCommentProvider>().resetCommentTarget();
               FocusScope.of(context).unfocus();
               return;
             }
@@ -653,7 +652,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
 
   void handleAddComment() {
     final commentInputProvider = context.read<CommentInputProvider>();
-    final commentProvider = context.read<RootNodeCommentProvider>();
+    final commentProvider = context.read<NodeCommentProvider>();
 
     CommentContentInput content =
         commentInputProvider.commentController.getCommentInput();
@@ -793,8 +792,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
               ),
               const Spacer(),
               Builder(builder: (context) {
-                final commentProvider =
-                    context.watch<RootNodeCommentProvider>();
+                final commentProvider = context.watch<NodeCommentProvider>();
 
                 return FilledButton.icon(
                   onPressed: adding

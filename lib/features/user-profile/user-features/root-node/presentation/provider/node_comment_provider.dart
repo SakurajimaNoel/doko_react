@@ -1,8 +1,8 @@
-import 'package:doki_websocket_client/doki_websocket_client.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:flutter/material.dart';
 
-class RootNodeCommentProvider extends ChangeNotifier {
-  RootNodeCommentProvider({
+class NodeCommentProvider extends ChangeNotifier {
+  NodeCommentProvider({
     required this.focusNode,
     required this.rootNodeId,
     required this.rootNodeCreatedBy,
@@ -17,7 +17,7 @@ class RootNodeCommentProvider extends ChangeNotifier {
   final String rootNodeId;
   final String rootNodeCreatedBy;
   // when navigating to comment page
-  final NodeType rootNodeType;
+  final DokiNodeType rootNodeType;
 
   // new comment or reply will be added to commentTargetId
   void updateCommentTarget(String targetId, String targetUser) {

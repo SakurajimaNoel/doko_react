@@ -68,11 +68,11 @@ class RootNodeBloc extends Bloc<RootNodeEvent, RootNodeState> {
       await _postUseCase(event.details);
       emit(PostAndCommentSuccessState());
     } on ApplicationException catch (e) {
-      emit(PostErrorState(
+      emit(RootNodeErrorState(
         message: e.reason,
       ));
     } catch (e) {
-      emit(PostErrorState(
+      emit(RootNodeErrorState(
         message: Constants.errorMessage,
       ));
     }

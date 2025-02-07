@@ -77,8 +77,8 @@ final class CommentReplyLoadSuccess extends CommentReplyState {
   List<Object?> get props => [loadedReplyCount];
 }
 
-final class PostErrorState extends RootNodeState {
-  PostErrorState({
+final class RootNodeErrorState extends RootNodeState {
+  RootNodeErrorState({
     required this.message,
   });
 
