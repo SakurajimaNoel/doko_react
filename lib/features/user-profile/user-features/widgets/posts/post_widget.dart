@@ -568,6 +568,16 @@ class _PostActionState extends State<_PostAction> {
                       ),
                       TextButton(
                         onPressed: () {
+                          String currentRoute =
+                              GoRouter.of(context).currentRouteName ?? "";
+                          bool isPostPage =
+                              currentRoute == RouterConstants.userPost;
+
+                          if (isPostPage) {
+                            // remove focus
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          }
+
                           Share.share(
                             context: context,
                             subject: MessageSubject.dokiPost,
