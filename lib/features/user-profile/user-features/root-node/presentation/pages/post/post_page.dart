@@ -1,3 +1,4 @@
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
@@ -7,10 +8,10 @@ import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bl
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/widgets/comment/comment_input.dart';
-import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
-import 'package:doko_react/features/user-profile/user-features/post/presentation/bloc/post_bloc.dart';
-import 'package:doko_react/features/user-profile/user-features/post/presentation/provider/post_provider.dart';
-import 'package:doko_react/features/user-profile/user-features/post/presentation/widgets/comment/comment_list.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/bloc/root_node_bloc.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/root_node_provider.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/widgets/comment/comment_list.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/post_widget.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
@@ -54,14 +55,14 @@ class _PostPageState extends State<PostPage> {
         title: const Text("Post"),
       ),
       body: BlocProvider(
-        create: (context) => serviceLocator<PostBloc>()
+        create: (context) => serviceLocator<RootNodeBloc>()
           ..add(PostLoadEvent(
             details: GetNodeInput(
               nodeId: widget.postId,
               username: username,
             ),
           )),
-        child: BlocConsumer<PostBloc, PostState>(
+        child: BlocConsumer<RootNodeBloc, RootNodeState>(
           listenWhen: (previousState, state) {
             return state is LoadErrorState;
           },
@@ -69,10 +70,10 @@ class _PostPageState extends State<PostPage> {
             if (state is LoadErrorState) showError(context, state.message);
           },
           buildWhen: (previousState, state) {
-            return state is PostInitial;
+            return state is RootNodeInitial;
           },
           builder: (context, state) {
-            bool loading = state is PostLoadingState;
+            bool loading = state is RootNodeLoading;
             bool commentsLoading = state is CommentLoadingState;
 
             bool postError = state is PostErrorState;
@@ -94,12 +95,13 @@ class _PostPageState extends State<PostPage> {
 
             return ChangeNotifierProvider(
               create: (BuildContext context) {
-                return PostCommentProvider(
+                return RootNodeCommentProvider(
                   focusNode: FocusNode(),
-                  postId: post.id,
-                  postCreatedBy: getUsernameFromUserKey(post.createdBy),
+                  rootNodeId: post.id,
+                  rootNodeCreatedBy: getUsernameFromUserKey(post.createdBy),
                   targetByUser: getUsernameFromUserKey(post.createdBy),
                   commentTargetId: post.id,
+                  rootNodeType: NodeType.post,
                 );
               },
               child: Column(
@@ -108,16 +110,17 @@ class _PostPageState extends State<PostPage> {
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: () async {
-                        Future postBloc = context.read<PostBloc>().stream.first;
+                        Future postBloc =
+                            context.read<RootNodeBloc>().stream.first;
 
-                        context.read<PostBloc>().add(PostRefreshEvent(
+                        context.read<RootNodeBloc>().add(PostRefreshEvent(
                               details: GetNodeInput(
                                 nodeId: widget.postId,
                                 username: username,
                               ),
                             ));
 
-                        final PostState state = await postBloc;
+                        final RootNodeState state = await postBloc;
 
                         if (state is PostRefreshErrorState) {
                           if (!mounted) return;

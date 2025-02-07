@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
@@ -8,13 +9,14 @@ import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
 import 'package:doko_react/core/widgets/like-widget/like_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/share/share.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
-import 'package:doko_react/features/user-profile/user-features/post/presentation/bloc/post_bloc.dart';
-import 'package:doko_react/features/user-profile/user-features/post/presentation/provider/post_provider.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/bloc/root_node_bloc.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/root_node_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -207,31 +209,28 @@ class _CommentWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
 
-    if (isReply) {
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          bool shrink = constraints.maxWidth < 275;
-          double shrinkFactor = shrink ? 0.75 : 1;
-
-          return Container(
-            margin: EdgeInsets.only(
-              left: Constants.padding * shrinkFactor,
-            ),
-            padding: const EdgeInsets.only(
-              top: Constants.padding * 0.75,
-            ),
-            child: child,
-          );
-        },
-      );
-    }
+    // if (isReply) {
+    //   return LayoutBuilder(
+    //     builder: (context, constraints) {
+    //       bool shrink = constraints.maxWidth < 275;
+    //       double shrinkFactor = shrink ? 0.75 : 1;
+    //
+    //       return Container(
+    //         margin: EdgeInsets.only(
+    //           left: Constants.padding * shrinkFactor,
+    //         ),
+    //         padding: const EdgeInsets.only(
+    //           top: Constants.padding * 0.75,
+    //         ),
+    //         child: child,
+    //       );
+    //     },
+    //   );
+    // }
 
     return Container(
       margin: const EdgeInsets.symmetric(
         horizontal: Constants.padding,
-      ),
-      padding: const EdgeInsets.all(
-        Constants.padding * 0.75,
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Constants.radius),
@@ -247,7 +246,34 @@ class _CommentWrapper extends StatelessWidget {
           ),
         ],
       ),
-      child: child,
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isReply
+              ? null
+              : () {
+                  // send to comment page
+                },
+          onLongPress: () {
+            // share to chat message or report and delete options
+            final postId = context.read<RootNodeCommentProvider>().rootNodeId;
+            FocusManager.instance.primaryFocus?.unfocus();
+
+            Share.share(
+              context: context,
+              subject: MessageSubject.dokiPost,
+              nodeIdentifier: postId,
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(
+              Constants.padding * 0.75,
+            ),
+            child: child,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -422,7 +448,7 @@ class _CommentActionsState extends State<_CommentActions> {
                       ),
                     ),
                     const SizedBox(
-                      width: Constants.gap,
+                      width: Constants.gap * 0.5,
                     ),
                     TextButton(
                       onPressed: () {
@@ -432,15 +458,15 @@ class _CommentActionsState extends State<_CommentActions> {
                         String targetUsername =
                             getUsernameFromUserKey(comment.commentBy);
 
-                        if (widget.isReply) {
-                          CommentEntity entity = graph.getValueByKey(
-                                  generateCommentNodeKey(targetId))!
-                              as CommentEntity;
-                          targetUsername =
-                              getUsernameFromUserKey(entity.commentBy);
-                        }
+                        // if (widget.isReply) {
+                        //   CommentEntity entity = graph.getValueByKey(
+                        //           generateCommentNodeKey(targetId))!
+                        //       as CommentEntity;
+                        //   targetUsername =
+                        //       getUsernameFromUserKey(entity.commentBy);
+                        // }
 
-                        context.read<PostCommentProvider>()
+                        context.read<RootNodeCommentProvider>()
                           ..updateCommentTarget(
                             targetId,
                             targetUsername,
@@ -450,7 +476,7 @@ class _CommentActionsState extends State<_CommentActions> {
                       style: TextButton.styleFrom(
                         minimumSize: Size.zero,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: Constants.padding,
+                          horizontal: Constants.padding * 0.875,
                           vertical: Constants.padding * 0.5,
                         ),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -464,24 +490,59 @@ class _CommentActionsState extends State<_CommentActions> {
                         "Reply",
                       ),
                     ),
+                    const SizedBox(
+                      width: Constants.gap * 0.25,
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // for now sharing post only
+                        final rootNodeId =
+                            context.read<RootNodeCommentProvider>().rootNodeId;
+
+                        FocusManager.instance.primaryFocus?.unfocus();
+
+                        Share.share(
+                          context: context,
+                          subject: MessageSubject.dokiPost,
+                          nodeIdentifier: rootNodeId,
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: Constants.padding * 0.875,
+                          vertical: Constants.padding * 0.5,
+                        ),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        textStyle: TextStyle(
+                          color: currTheme.secondary,
+                          fontWeight: FontWeight.w500,
+                          fontSize: Constants.smallFontSize,
+                        ),
+                      ),
+                      child: const Text(
+                        "Share",
+                      ),
+                    ),
                   ],
                 ),
-                // todo: for hierarchy show this
                 if (!widget.isReply)
-                  LayoutBuilder(builder: (context, constraints) {
-                    final width = MediaQuery.sizeOf(context).width;
-                    bool shrink = width < 250;
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final width = MediaQuery.sizeOf(context).width;
+                      bool shrink = width < 300;
 
-                    if (shrink) return const SizedBox.shrink();
+                      if (shrink) return const SizedBox.shrink();
 
-                    return Text(
-                      "${displayNumberFormat(comment.commentsCount)} Repl${comment.commentsCount > 1 ? "ies" : "y"}",
-                      style: TextStyle(
-                        color: currTheme.onSurfaceVariant,
-                        fontSize: Constants.smallFontSize * 0.9,
-                      ),
-                    );
-                  }),
+                      return Text(
+                        "${displayNumberFormat(comment.commentsCount)} Repl${comment.commentsCount > 1 ? "ies" : "y"}",
+                        style: TextStyle(
+                          color: currTheme.onSurfaceVariant,
+                          fontSize: Constants.smallFontSize * 0.9,
+                        ),
+                      );
+                    },
+                  ),
               ],
             );
           },
@@ -489,11 +550,10 @@ class _CommentActionsState extends State<_CommentActions> {
         const Divider(
           height: Constants.gap * 0.5,
         ),
-        // todo: for hierarchy show this
-        if (!widget.isReply)
-          _CommentReplies(
-            commentId: comment.id,
-          ),
+        // if (!widget.isReply)
+        //   _CommentReplies(
+        //     commentId: comment.id,
+        //   ),
       ],
     );
   }
@@ -529,7 +589,7 @@ class _CommentRepliesState extends State<_CommentReplies> {
         return state is UserActionNewCommentState && state.nodeId == commentId;
       },
       builder: (context, state) {
-        return BlocBuilder<PostBloc, PostState>(
+        return BlocBuilder<RootNodeBloc, RootNodeState>(
           buildWhen: (previousState, state) {
             return (state is CommentReplyState &&
                     state.commentId == commentId) ||
@@ -585,7 +645,7 @@ class _CommentRepliesState extends State<_CommentReplies> {
                                         comment.comments.pageInfo.hasNextPage;
                                     if (nextPage || comment.comments.isEmpty) {
                                       context
-                                          .read<PostBloc>()
+                                          .read<RootNodeBloc>()
                                           .add(LoadCommentReplyEvent(
                                             details: GetCommentsInput(
                                               nodeId: commentId,

@@ -1,39 +1,39 @@
-part of 'post_bloc.dart';
+part of 'root_node_bloc.dart';
 
 @immutable
-sealed class PostState extends Equatable {}
+sealed class RootNodeState extends Equatable {}
 
-final class PostInitial extends PostState {
+final class RootNodeInitial extends RootNodeState {
   @override
   List<Object?> get props => [];
 }
 
 // when post is not present
-final class PostLoadingState extends PostInitial {
+final class RootNodeLoading extends RootNodeInitial {
   @override
   List<Object?> get props => [];
 }
 
 // when post is present
-final class CommentLoadingState extends PostInitial {
+final class CommentLoadingState extends RootNodeInitial {
   @override
   List<Object?> get props => [];
 }
 
 // when either initial comments or post is loaded
-final class PostAndCommentSuccessState extends PostInitial {
+final class PostAndCommentSuccessState extends RootNodeInitial {
   @override
   List<Object?> get props => [];
 }
 
 /// used when post is already present but
 /// we don't need to fire it
-final class PostSuccessState extends PostInitial {
+final class PostSuccessState extends RootNodeInitial {
   @override
   List<Object?> get props => [];
 }
 
-final class CommentLoadSuccess extends PostState {
+final class CommentLoadSuccess extends RootNodeState {
   CommentLoadSuccess({
     required this.loadedCommentCount,
   });
@@ -45,7 +45,7 @@ final class CommentLoadSuccess extends PostState {
 }
 
 // base class for comment replies loading
-final class CommentReplyState extends PostState {
+final class CommentReplyState extends RootNodeState {
   CommentReplyState({
     required this.commentId,
   });
@@ -77,7 +77,7 @@ final class CommentReplyLoadSuccess extends CommentReplyState {
   List<Object?> get props => [loadedReplyCount];
 }
 
-final class PostErrorState extends PostState {
+final class PostErrorState extends RootNodeState {
   PostErrorState({
     required this.message,
   });
@@ -88,7 +88,7 @@ final class PostErrorState extends PostState {
   List<Object?> get props => [message];
 }
 
-final class CommentErrorState extends PostState {
+final class CommentErrorState extends RootNodeState {
   CommentErrorState({
     required this.message,
   });
@@ -100,7 +100,7 @@ final class CommentErrorState extends PostState {
 }
 
 // used with load more comments and comment replies
-final class LoadErrorState extends PostState {
+final class LoadErrorState extends RootNodeState {
   LoadErrorState({
     required this.message,
     required this.nodeId,
@@ -114,12 +114,12 @@ final class LoadErrorState extends PostState {
 }
 
 // post refresh
-final class PostRefreshState extends PostState {
+final class PostRefreshState extends RootNodeState {
   @override
   List<Object?> get props => [];
 }
 
-final class PostRefreshSuccessState extends PostInitial {
+final class PostRefreshSuccessState extends RootNodeInitial {
   PostRefreshSuccessState() : now = DateTime.now();
 
   final DateTime now;
@@ -128,7 +128,7 @@ final class PostRefreshSuccessState extends PostInitial {
   List<Object?> get props => [now];
 }
 
-final class PostRefreshErrorState extends PostInitial {
+final class PostRefreshErrorState extends RootNodeInitial {
   PostRefreshErrorState({
     required this.message,
   }) : now = DateTime.now();

@@ -1,9 +1,9 @@
-part of 'post_bloc.dart';
+part of 'root_node_bloc.dart';
 
 @immutable
-sealed class PostEvent {}
+sealed class RootNodeEvent {}
 
-class PostLoadEvent extends PostEvent {
+class PostLoadEvent extends RootNodeEvent {
   PostLoadEvent({
     required this.details,
   });
@@ -11,7 +11,7 @@ class PostLoadEvent extends PostEvent {
   final GetNodeInput details;
 }
 
-class CommentLoadEvent extends PostEvent {
+class CommentLoadEvent extends RootNodeEvent {
   CommentLoadEvent({
     required this.details,
   });
@@ -19,7 +19,7 @@ class CommentLoadEvent extends PostEvent {
   final GetCommentsInput details;
 }
 
-class LoadMoreCommentEvent extends PostEvent {
+class LoadMoreCommentEvent extends RootNodeEvent {
   LoadMoreCommentEvent({
     required this.details,
   });
@@ -27,7 +27,7 @@ class LoadMoreCommentEvent extends PostEvent {
   final GetCommentsInput details;
 }
 
-class LoadCommentReplyEvent extends PostEvent {
+class LoadCommentReplyEvent extends RootNodeEvent {
   LoadCommentReplyEvent({
     required this.details,
   });
@@ -35,7 +35,7 @@ class LoadCommentReplyEvent extends PostEvent {
   final GetCommentsInput details;
 }
 
-class PostRefreshEvent extends PostEvent {
+class PostRefreshEvent extends RootNodeEvent {
   PostRefreshEvent({required this.details});
 
   final GetNodeInput details;

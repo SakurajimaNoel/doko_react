@@ -43,13 +43,6 @@ import "package:doko_react/features/user-profile/user-features/node-create/domai
 import "package:doko_react/features/user-profile/user-features/node-create/domain/use-case/comment-use-case/create_comment_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/domain/use-case/post-create-use-case/post_create_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/presentation/bloc/node_create_bloc.dart";
-import "package:doko_react/features/user-profile/user-features/post/data/data-source/post_remote_data_source.dart";
-import "package:doko_react/features/user-profile/user-features/post/data/repository/post_repository_impl.dart";
-import "package:doko_react/features/user-profile/user-features/post/domain/repository/post_repository.dart";
-import "package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/comments_use_case.dart";
-import "package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/replies_use_case.dart";
-import "package:doko_react/features/user-profile/user-features/post/domain/use-case/post-use-case/post_use_case.dart";
-import "package:doko_react/features/user-profile/user-features/post/presentation/bloc/post_bloc.dart";
 import "package:doko_react/features/user-profile/user-features/profile/data/data-sources/profile_remote_data_source.dart";
 import "package:doko_react/features/user-profile/user-features/profile/data/repository/profile_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/repository/profile_repository.dart";
@@ -63,6 +56,13 @@ import "package:doko_react/features/user-profile/user-features/profile/domain/us
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/user_friend_search_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/user_search_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart";
+import "package:doko_react/features/user-profile/user-features/root-node/data/data-source/post_remote_data_source.dart";
+import "package:doko_react/features/user-profile/user-features/root-node/data/repository/root_node_repository_impl.dart";
+import "package:doko_react/features/user-profile/user-features/root-node/domain/repository/root_node_repository.dart";
+import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/comments-use-case/comments_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/comments-use-case/replies_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/post-use-case/post_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/root-node/presentation/bloc/root_node_bloc.dart";
 import "package:flutter/foundation.dart";
 import "package:get_it/get_it.dart";
 import "package:graphql/client.dart";
@@ -108,32 +108,32 @@ void _initPost() {
     ),
   );
 
-  serviceLocator.registerFactory<PostRepository>(
-    () => PostRepositoryImpl(
+  serviceLocator.registerFactory<RootNodeRepository>(
+    () => RootNodeRepositoryImpl(
       remoteDataSource: serviceLocator<PostRemoteDataSource>(),
     ),
   );
 
   serviceLocator.registerFactory<PostUseCase>(
     () => PostUseCase(
-      postRepository: serviceLocator(),
+      rootNodeRepository: serviceLocator(),
     ),
   );
 
   serviceLocator.registerFactory<CommentsUseCase>(
     () => CommentsUseCase(
-      postRepository: serviceLocator(),
+      rootNodeRepository: serviceLocator(),
     ),
   );
 
   serviceLocator.registerFactory<RepliesUseCase>(
     () => RepliesUseCase(
-      postRepository: serviceLocator(),
+      rootNodeRepository: serviceLocator(),
     ),
   );
 
-  serviceLocator.registerFactory<PostBloc>(
-    () => PostBloc(
+  serviceLocator.registerFactory<RootNodeBloc>(
+    () => RootNodeBloc(
       postUseCase: serviceLocator(),
       commentsUseCase: serviceLocator(),
       repliesUseCase: serviceLocator(),

@@ -5,9 +5,9 @@ import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
-import 'package:doko_react/features/user-profile/user-features/post/presentation/bloc/post_bloc.dart';
-import 'package:doko_react/features/user-profile/user-features/post/presentation/widgets/comment/comment_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/bloc/root_node_bloc.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/widgets/comment/comment_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -56,7 +56,7 @@ class _CommentListState extends State<CommentList> {
 
       if (!loading) {
         loading = true;
-        context.read<PostBloc>().add(LoadMoreCommentEvent(
+        context.read<RootNodeBloc>().add(LoadMoreCommentEvent(
               details: GetCommentsInput(
                 nodeId: postId,
                 username: username,
@@ -97,7 +97,7 @@ class _CommentListState extends State<CommentList> {
           );
         }
 
-        return BlocConsumer<PostBloc, PostState>(
+        return BlocConsumer<RootNodeBloc, RootNodeState>(
           listenWhen: (previousState, state) {
             return state is CommentLoadSuccess ||
                 (state is LoadErrorState && state.nodeId == postId);

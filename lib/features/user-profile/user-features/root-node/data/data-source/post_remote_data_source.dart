@@ -5,7 +5,7 @@ import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
 import 'package:graphql/client.dart';
 
 class PostRemoteDataSource {

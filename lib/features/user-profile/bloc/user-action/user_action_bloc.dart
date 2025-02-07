@@ -13,7 +13,7 @@ import 'package:doko_react/features/user-profile/domain/use-case/posts/post_get.
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_remove_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
-import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';

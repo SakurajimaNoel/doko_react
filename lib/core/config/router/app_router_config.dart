@@ -1,5 +1,6 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/page/token_page.dart';
 import 'package:doko_react/core/widgets/error/error_unknown_route.dart';
 import 'package:doko_react/features/authentication/presentation/pages/login/confirm_login_page.dart';
@@ -23,13 +24,14 @@ import 'package:doko_react/features/user-profile/user-features/nearby/nearby_pag
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/create_post_page.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/post_publish_page.dart';
-import 'package:doko_react/features/user-profile/user-features/post/presentation/pages/post/post_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/edit-profile/edit_profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-friends/pending_request_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-friends/user_friends_list_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile/profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile/user_profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/search/search_page.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/pages/comment/comment_page.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/pages/post/post_page.dart';
 import 'package:doko_react/features/user-profile/user-features/user-feed/user_feed_page.dart';
 import 'package:doko_react/features/user-profile/user_layout.dart';
 import 'package:flutter/material.dart';
@@ -352,6 +354,23 @@ class AppRouterConfig {
 
                       return PostPage(
                         postId: postId,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: RouterConstants.comment,
+                    path: "comment/:rootNodeType/:rootNodeId/:commentId",
+                    builder: (context, state) {
+                      String rootNodeName =
+                          state.pathParameters["rootNodeType"]!;
+                      String rootNodeId = state.pathParameters["rootNodeId"]!;
+                      String commentId = state.pathParameters["commentId"]!;
+
+                      return CommentPage(
+                        commentId: commentId,
+                        rootNodeId: rootNodeId,
+                        rootNodeType: DokiNodeType.fromName(rootNodeName),
                       );
                     },
                   ),

@@ -18,9 +18,9 @@ import 'package:doko_react/features/user-profile/user-features/node-create/domai
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/bloc/node_create_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/provider/comment_input_provider.dart';
-import 'package:doko_react/features/user-profile/user-features/post/presentation/provider/post_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/root_node_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +79,7 @@ class CommentInput extends StatelessWidget {
 
             // handle success
             final UserGraph graph = UserGraph();
-            final commentProvider = context.read<PostCommentProvider>();
+            final commentProvider = context.read<RootNodeCommentProvider>();
 
             String commentId = state.nodeId;
             bool userLike;
@@ -125,7 +125,8 @@ class CommentInput extends StatelessWidget {
             children: [
               Builder(
                 builder: (context) {
-                  final commentProvider = context.watch<PostCommentProvider>();
+                  final commentProvider =
+                      context.watch<RootNodeCommentProvider>();
 
                   if (!commentProvider.isReply) {
                     return const SizedBox.shrink();
@@ -231,7 +232,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
 
   late final commentController =
       context.read<CommentInputProvider>().commentController;
-  late final focusNode = context.read<PostCommentProvider>().focusNode;
+  late final focusNode = context.read<RootNodeCommentProvider>().focusNode;
 
   List<String> userSearchResults = [];
 
@@ -516,7 +517,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
             if (adding) return;
 
             if (focusNode.hasFocus) {
-              context.read<PostCommentProvider>().resetCommentTarget();
+              context.read<RootNodeCommentProvider>().resetCommentTarget();
               FocusScope.of(context).unfocus();
               return;
             }
@@ -652,7 +653,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
 
   void handleAddComment() {
     final commentInputProvider = context.read<CommentInputProvider>();
-    final commentProvider = context.read<PostCommentProvider>();
+    final commentProvider = context.read<RootNodeCommentProvider>();
 
     CommentContentInput content =
         commentInputProvider.commentController.getCommentInput();
@@ -664,10 +665,10 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
       if (media.extension != "uri") {
         // generate bucket path
         UserGraph graph = UserGraph();
-        String key = generateUserNodeKey(commentProvider.postCreatedBy);
+        String key = generateUserNodeKey(commentProvider.rootNodeCreatedBy);
         final postCreatedBy = graph.getValueByKey(key)! as UserEntity;
         bucketPath =
-            "${postCreatedBy.userId}/posts/${commentProvider.postId}/comment/${generateUniqueString()}${media.extension}";
+            "${postCreatedBy.userId}/posts/${commentProvider.rootNodeId}/comment/${generateUniqueString()}${media.extension}";
       } else {
         bucketPath = media.uri;
       }
@@ -792,7 +793,8 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
               ),
               const Spacer(),
               Builder(builder: (context) {
-                final commentProvider = context.watch<PostCommentProvider>();
+                final commentProvider =
+                    context.watch<RootNodeCommentProvider>();
 
                 return FilledButton.icon(
                   onPressed: adding

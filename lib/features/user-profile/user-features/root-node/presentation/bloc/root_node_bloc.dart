@@ -5,32 +5,32 @@ import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/comments_use_case.dart';
-import 'package:doko_react/features/user-profile/user-features/post/domain/use-case/comments-use-case/replies_use_case.dart';
-import 'package:doko_react/features/user-profile/user-features/post/domain/use-case/post-use-case/post_use_case.dart';
-import 'package:doko_react/features/user-profile/user-features/post/input/post_input.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/domain/use-case/comments-use-case/comments_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/domain/use-case/comments-use-case/replies_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/domain/use-case/post-use-case/post_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
-part 'post_event.dart';
-part 'post_state.dart';
+part 'root_node_event.dart';
+part 'root_node_state.dart';
 
-class PostBloc extends Bloc<PostEvent, PostState> {
+class RootNodeBloc extends Bloc<RootNodeEvent, RootNodeState> {
   final UserGraph graph = UserGraph();
 
   final PostUseCase _postUseCase;
   final CommentsUseCase _commentsUseCase;
   final RepliesUseCase _repliesUseCase;
 
-  PostBloc({
+  RootNodeBloc({
     required PostUseCase postUseCase,
     required CommentsUseCase commentsUseCase,
     required RepliesUseCase repliesUseCase,
   })  : _postUseCase = postUseCase,
         _commentsUseCase = commentsUseCase,
         _repliesUseCase = repliesUseCase,
-        super(PostLoadingState()) {
+        super(RootNodeLoading()) {
     on<PostLoadEvent>(_handlePostLoadEvent);
     on<CommentLoadEvent>(_handleCommentLoadEvent);
     on<LoadMoreCommentEvent>(_handleLoadMoreCommentEvent);
@@ -39,7 +39,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   }
 
   FutureOr<void> _handlePostLoadEvent(
-      PostLoadEvent event, Emitter<PostState> emit) async {
+      PostLoadEvent event, Emitter<RootNodeState> emit) async {
     try {
       String postId = event.details.nodeId;
       String postKey = generatePostNodeKey(postId);
@@ -79,7 +79,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   }
 
   FutureOr<void> _handleCommentLoadEvent(
-      CommentLoadEvent event, Emitter<PostState> emit) async {
+      CommentLoadEvent event, Emitter<RootNodeState> emit) async {
     try {
       emit(CommentLoadingState());
 
@@ -97,7 +97,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   }
 
   FutureOr<void> _handleLoadMoreCommentEvent(
-      LoadMoreCommentEvent event, Emitter<PostState> emit) async {
+      LoadMoreCommentEvent event, Emitter<RootNodeState> emit) async {
     try {
       String postKey = generatePostNodeKey(event.details.nodeId);
       final PostEntity entity = graph.getValueByKey(postKey)! as PostEntity;
@@ -128,7 +128,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   }
 
   FutureOr<void> _handleCommentReplyEvent(
-      LoadCommentReplyEvent event, Emitter<PostState> emit) async {
+      LoadCommentReplyEvent event, Emitter<RootNodeState> emit) async {
     try {
       emit(CommentReplyLoadingState(
         commentId: event.details.nodeId,
@@ -166,7 +166,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   }
 
   FutureOr<void> _handlePostRefreshEvent(
-      PostRefreshEvent event, Emitter<PostState> emit) async {
+      PostRefreshEvent event, Emitter<RootNodeState> emit) async {
     try {
       await _postUseCase(event.details);
       emit(PostRefreshSuccessState());
