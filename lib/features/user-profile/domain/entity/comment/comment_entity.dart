@@ -33,9 +33,18 @@ class CommentEntity extends GraphEntity {
 
   bool showReplies;
 
+  @Deprecated("use individual methods")
   void updateUserLikes(bool userLike, int likesCount) {
     this.likesCount = likesCount;
     this.userLike = userLike;
+  }
+
+  void updateUserLikeStatus(bool userLike) {
+    this.userLike = userLike;
+  }
+
+  void updateLikeCount(int likesCount) {
+    this.likesCount = likesCount;
   }
 
   void updateCommentsCount(int newCommentsCount) {

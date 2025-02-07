@@ -363,11 +363,14 @@ class UserProfileRemoteDataSource {
       UserGraph graph = UserGraph();
       PostEntity post = await PostEntity.createEntity(map: res[0]);
       String postKey = generatePostNodeKey(post.id);
+
+      // this condition shouldn't exist
       if (graph.containsKey(postKey)) {
         final existsPost = graph.getValueByKey(postKey)! as PostEntity;
 
         existsPost.updateCommentsCount(post.commentsCount);
-        existsPost.updateUserLikes(post.userLike, post.likesCount);
+        existsPost.updateLikeCount(post.likesCount);
+        existsPost.updateUserLikeStatus(post.userLike);
 
         graph.addEntity(postKey, existsPost);
       } else {

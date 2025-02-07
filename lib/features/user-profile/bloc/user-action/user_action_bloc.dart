@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -87,6 +88,62 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
 
     on<UserActionGetPostByIdEvent>(_handleUserActionGetPostByIdEvent);
     on<UserActionGetCommentByIdEvent>(_handleUserActionGetCommentByIdEvent);
+    on<UserActionNodeLikeRemoteEvent>(_handleUserActionNodeLikeRemoteEvent);
+  }
+
+  FutureOr<void> _handleUserActionNodeLikeRemoteEvent(
+      UserActionNodeLikeRemoteEvent event,
+      Emitter<UserActionState> emit) async {
+    final UserNodeLikeAction payload = event.payload;
+    final bool self = event.username == payload.from;
+
+    // node type will always be post, comment or discussion
+    if (payload.nodeType == NodeType.post) {
+      graph.handleUserLikeActionForPostEntity(
+        payload.nodeId,
+        userLike: self ? payload.isLike : null,
+        likesCount: payload.likeCount,
+        commentsCount: payload.commentCount,
+      );
+    }
+
+    if (payload.nodeType == NodeType.comment) {
+      graph.handleUserLikeActionForCommentEntity(
+        payload.nodeId,
+        likesCount: payload.likeCount,
+        commentsCount: payload.commentCount,
+        userLike: self ? payload.isLike : null,
+      );
+    }
+
+    String nodeId = payload.nodeId;
+    NodeType nodeType = payload.nodeType;
+
+    /// handle parents
+    /// for comment parents will either be comment, post or discussion
+    /// there will always be only on root node like post or discussion
+    if (!self) {
+      for (var parentNode in payload.parents) {
+        if (parentNode.nodeType == NodeType.user) continue;
+
+        String nodeKey = generateGraphKey(nodeType, nodeId);
+        if (parentNode.nodeType == NodeType.post) {
+          // add comment to post
+        }
+
+        if (parentNode.nodeType == NodeType.comment) {}
+
+        // update nodeId for next iteration
+        nodeId = parentNode.nodeId;
+      }
+    }
+
+    emit(UserActionNodeActionState(
+      nodeId: payload.nodeId,
+      userLike: payload.isLike,
+      likesCount: payload.likeCount,
+      commentsCount: payload.commentCount,
+    ));
   }
 
   FutureOr<void> _handleUserActionNewPostRemoteEvent(

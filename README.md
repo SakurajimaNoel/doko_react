@@ -1,2 +1,2 @@
-# Dokii in flutter
-reimplementation of dokii in flutter
+# Doki
+A social media platform.

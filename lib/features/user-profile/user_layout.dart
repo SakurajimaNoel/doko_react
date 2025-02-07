@@ -215,7 +215,8 @@ class _UserLayoutState extends State<UserLayout> {
                   username: username,
                 ));
           }
-        }
+        },
+        PayloadType.userNodeLikeAction: (UserNodeLikeAction payload) {}
       },
     );
 

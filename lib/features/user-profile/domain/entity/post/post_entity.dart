@@ -36,9 +36,18 @@ class PostEntity extends GraphEntity {
     currDisplay = item;
   }
 
+  @Deprecated("user individual method")
   void updateUserLikes(bool userLike, int likesCount) {
     this.likesCount = likesCount;
     this.userLike = userLike;
+  }
+
+  void updateUserLikeStatus(bool userLike) {
+    this.userLike = userLike;
+  }
+
+  void updateLikeCount(int likesCount) {
+    this.likesCount = likesCount;
   }
 
   void updateCommentsCount(int newCommentsCount) {

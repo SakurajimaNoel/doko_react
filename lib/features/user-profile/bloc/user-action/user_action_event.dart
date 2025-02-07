@@ -108,3 +108,14 @@ final class UserActionGetCommentByIdEvent extends UserActionEvent {
   final String username;
   final String commentId;
 }
+
+// remote like action
+final class UserActionNodeLikeRemoteEvent extends UserActionEvent {
+  UserActionNodeLikeRemoteEvent({
+    required this.payload,
+    required this.username,
+  });
+
+  final UserNodeLikeAction payload;
+  final String username;
+}

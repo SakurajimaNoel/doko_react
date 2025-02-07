@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:doki_websocket_client/doki_websocket_client.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
@@ -86,7 +87,8 @@ class UserGraph {
         final existsPost = getValueByKey(postKey)! as PostEntity;
 
         existsPost.updateCommentsCount(postItem.commentsCount);
-        existsPost.updateUserLikes(postItem.userLike, postItem.likesCount);
+        existsPost.updateLikeCount(postItem.likesCount);
+        existsPost.updateUserLikeStatus(postItem.userLike);
 
         postToAdd = existsPost;
       } else {
@@ -462,7 +464,7 @@ class UserGraph {
 
   void handleUserLikeActionForPostEntity(
     String postId, {
-    required bool userLike,
+    bool? userLike,
     required int likesCount,
     required int commentsCount,
   }) {
@@ -471,13 +473,16 @@ class UserGraph {
     if (!containsKey(key)) return;
 
     final post = getValueByKey(key) as PostEntity;
-    post.updateUserLikes(userLike, likesCount);
+    post.updateLikeCount(likesCount);
+    if (userLike != null) {
+      post.updateUserLikeStatus(userLike);
+    }
     post.updateCommentsCount(commentsCount);
   }
 
   void handleUserLikeActionForCommentEntity(
     String commentId, {
-    required bool userLike,
+    bool? userLike,
     required int likesCount,
     required int commentsCount,
   }) {
@@ -486,7 +491,8 @@ class UserGraph {
     if (!containsKey(key)) return;
 
     final comment = getValueByKey(key) as CommentEntity;
-    comment.updateUserLikes(userLike, likesCount);
+    if (userLike != null) comment.updateUserLikeStatus(userLike);
+    comment.updateLikeCount(likesCount);
     comment.updateCommentsCount(commentsCount);
   }
 
