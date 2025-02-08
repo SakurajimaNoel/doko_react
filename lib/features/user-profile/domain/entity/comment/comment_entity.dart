@@ -18,6 +18,7 @@ class CommentEntity extends GraphEntity {
     required this.commentsCount,
     required this.userLike,
     required this.showReplies,
+    required this.replyOn,
   });
 
   final String id;
@@ -26,18 +27,13 @@ class CommentEntity extends GraphEntity {
   final StorageResource media; // also handle giphy url
   final List<String> content;
   final List<String> mentions;
+  final String? replyOn;
   int likesCount;
   int commentsCount;
   bool userLike;
   Nodes comments;
 
   bool showReplies;
-
-  @Deprecated("use individual methods")
-  void updateUserLikes(bool userLike, int likesCount) {
-    this.likesCount = likesCount;
-    this.userLike = userLike;
-  }
 
   void updateUserLikeStatus(bool userLike) {
     this.userLike = userLike;
@@ -91,6 +87,12 @@ class CommentEntity extends GraphEntity {
     List<String> content =
         mapContent.map((element) => element.toString()).toList();
 
+    Map? replyMap = map["replyOn"];
+    String? replyOn;
+    if (replyMap != null) {
+      replyOn = replyMap["id"];
+    }
+
     return CommentEntity(
       id: map["id"],
       createdOn: DateTime.parse(map["createdOn"]),
@@ -103,6 +105,7 @@ class CommentEntity extends GraphEntity {
       commentsCount: map["commentsConnection"]["totalCount"],
       comments: Nodes.empty(),
       showReplies: false,
+      replyOn: replyOn,
     );
   }
 }
