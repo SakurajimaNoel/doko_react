@@ -7,7 +7,8 @@ class NodeCommentProvider extends ChangeNotifier {
     required this.rootNodeId,
     required this.rootNodeCreatedBy,
     required this.targetByUser,
-    // required this.commentTargetId,
+    required this.commentTargetId,
+    required this.commentTargetNodeType,
     required this.rootNodeType,
     this.replyOn,
   });
@@ -16,17 +17,21 @@ class NodeCommentProvider extends ChangeNotifier {
 
   String? replyOn;
 
-  // new node will have commentOn relationship with this node
-  // String commentTargetId;
+  /// new node will have commentOn relationship with this node
+  /// in post page this will be post, in comment page it will be comment id of that page
+  final String commentTargetId;
+  final DokiNodeType commentTargetNodeType;
 
-  // username of user whose comment reply is clicked
+  /// username of user whose comment reply is clicked
+  /// used for display purposes
   String targetByUser;
 
-  // root node details like post, comment,
+  /// root node details like post, or discussion but not comment
+  /// will be used with comment media bucket storage path
   final String rootNodeId;
   final String rootNodeCreatedBy;
 
-  // when navigating to comment page
+  /// used when navigating to comment page and when creating new comment node
   final DokiNodeType rootNodeType;
 
   // new comment or reply will be added to commentTargetId

@@ -108,5 +108,5 @@ class Constants {
   static final Duration typingStatusEventDuration = const Duration(
     seconds: 3,
   ); // used for both firing end events and sending typing events
-  static final int maxScrollDuration = 3000; // in milliseconds
+  static const int maxScrollDuration = 500; // in milliseconds
 }

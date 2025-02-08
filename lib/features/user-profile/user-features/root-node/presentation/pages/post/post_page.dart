@@ -6,6 +6,7 @@ import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/widgets/comment/comment_input.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
@@ -35,6 +36,8 @@ class _PostPageState extends State<PostPage> {
   late final postKey = generatePostNodeKey(widget.postId);
   late final username =
       (context.read<UserBloc>().state as UserCompleteState).username;
+
+  final ScrollController controller = ScrollController();
 
   Future<void> handlePostRefreshEvent() async {
     context.read<UserActionBloc>().add(UserActionPrimaryNodeRefreshEvent(
@@ -92,16 +95,19 @@ class _PostPageState extends State<PostPage> {
             }
 
             final PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
+            final UserEntity user =
+                graph.getValueByKey(post.createdBy)! as UserEntity;
 
             return ChangeNotifierProvider(
               create: (BuildContext context) {
                 return NodeCommentProvider(
                   focusNode: FocusNode(),
                   rootNodeId: post.id,
-                  rootNodeCreatedBy: getUsernameFromUserKey(post.createdBy),
+                  rootNodeCreatedBy: user.userId,
                   targetByUser: getUsernameFromUserKey(post.createdBy),
-                  // commentTargetId: post.id,
+                  commentTargetId: post.id,
                   rootNodeType: DokiNodeType.post,
+                  commentTargetNodeType: DokiNodeType.post,
                 );
               },
               child: Column(
@@ -132,68 +138,88 @@ class _PostPageState extends State<PostPage> {
 
                         handlePostRefreshEvent();
                       },
-                      child: CustomScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        cacheExtent: scrollCacheHeight,
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: PostWidget(
-                              postKey: postKey,
+                      child: BlocListener<UserActionBloc, UserActionState>(
+                        listenWhen: (previousState, state) {
+                          return state is UserActionNewCommentState &&
+                              state.nodeId == post.id;
+                        },
+                        listener: (context, state) {
+                          final double offset =
+                              post.content.isNotEmpty ? 150 : 0;
+
+                          controller.animateTo(
+                            offset,
+                            duration: const Duration(
+                              milliseconds: Constants.maxScrollDuration,
                             ),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: SizedBox(
-                              height: Constants.gap * 2,
-                            ),
-                          ),
-                          if (commentError) ...[
+                            curve: Curves.fastOutSlowIn,
+                          );
+                        },
+                        child: CustomScrollView(
+                          controller: controller,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          cacheExtent: scrollCacheHeight,
+                          slivers: [
                             SliverToBoxAdapter(
-                              child: SizedBox(
-                                height: Constants.height * 5,
-                                child: StyledText.error(state.message),
+                              child: PostWidget(
+                                postKey: postKey,
                               ),
                             ),
-                          ] else
-                            commentsLoading
-                                ? const SliverToBoxAdapter(
-                                    child: SizedBox(
-                                      height: Constants.height * 5,
-                                      child: Center(
-                                        child: SmallLoadingIndicator(),
-                                      ),
-                                    ),
-                                  )
-                                : BlocBuilder<UserActionBloc, UserActionState>(
-                                    buildWhen: (previousState, state) {
-                                      return state
-                                              is UserActionPrimaryNodeRefreshState &&
-                                          state.nodeId == post.id;
-                                    },
-                                    builder: (context, state) {
-                                      DateTime now;
-                                      if (state
-                                          is UserActionPrimaryNodeRefreshState) {
-                                        now = state.now;
-                                      } else {
-                                        now = DateTime.now();
-                                      }
-
-                                      return CommentList(
-                                        parentNodeId: widget.postId,
-                                        parentNodeType: DokiNodeType.post,
-                                        key: ObjectKey({
-                                          "postId": post.id,
-                                          "lastFetch": now,
-                                        }),
-                                      );
-                                    },
-                                  ),
-                          const SliverToBoxAdapter(
-                            child: SizedBox(
-                              height: Constants.gap * 2,
+                            const SliverToBoxAdapter(
+                              child: SizedBox(
+                                height: Constants.gap * 2,
+                              ),
                             ),
-                          ),
-                        ],
+                            if (commentError) ...[
+                              SliverToBoxAdapter(
+                                child: SizedBox(
+                                  height: Constants.height * 5,
+                                  child: StyledText.error(state.message),
+                                ),
+                              ),
+                            ] else
+                              commentsLoading
+                                  ? const SliverToBoxAdapter(
+                                      child: SizedBox(
+                                        height: Constants.height * 5,
+                                        child: Center(
+                                          child: SmallLoadingIndicator(),
+                                        ),
+                                      ),
+                                    )
+                                  : BlocBuilder<UserActionBloc,
+                                      UserActionState>(
+                                      buildWhen: (previousState, state) {
+                                        return state
+                                                is UserActionPrimaryNodeRefreshState &&
+                                            state.nodeId == post.id;
+                                      },
+                                      builder: (context, state) {
+                                        DateTime now;
+                                        if (state
+                                            is UserActionPrimaryNodeRefreshState) {
+                                          now = state.now;
+                                        } else {
+                                          now = DateTime.now();
+                                        }
+
+                                        return CommentList(
+                                          parentNodeId: widget.postId,
+                                          parentNodeType: DokiNodeType.post,
+                                          key: ObjectKey({
+                                            "postId": post.id,
+                                            "lastFetch": now,
+                                          }),
+                                        );
+                                      },
+                                    ),
+                            const SliverToBoxAdapter(
+                              child: SizedBox(
+                                height: Constants.gap * 2,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

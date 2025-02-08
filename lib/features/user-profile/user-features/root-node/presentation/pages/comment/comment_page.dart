@@ -26,6 +26,7 @@ class CommentPage extends StatefulWidget {
     required this.commentId,
     required this.rootNodeId,
     required this.rootNodeType,
+    required this.rootNodeBy,
   });
 
   final String commentId;
@@ -34,6 +35,7 @@ class CommentPage extends StatefulWidget {
   /// discussion or post
   final String rootNodeId;
   final DokiNodeType rootNodeType;
+  final String rootNodeBy;
 
   @override
   State<CommentPage> createState() => _CommentPageState();
@@ -45,8 +47,11 @@ class _CommentPageState extends State<CommentPage> {
 
   late final DokiNodeType rootNodeType = widget.rootNodeType;
   late final String rootNodeId = widget.rootNodeId;
+  late final String rootNodeBy = widget.rootNodeBy;
   late final username =
       (context.read<UserBloc>().state as UserCompleteState).username;
+
+  final ScrollController controller = ScrollController();
 
   Future<void> handleCommentRefreshEvent() async {
     // todo: handle this
@@ -143,10 +148,12 @@ class _CommentPageState extends State<CommentPage> {
               create: (BuildContext context) {
                 return NodeCommentProvider(
                   focusNode: FocusNode(),
-                  rootNodeId: comment.id,
-                  rootNodeCreatedBy: getUsernameFromUserKey(comment.commentBy),
+                  rootNodeId: rootNodeId,
+                  rootNodeCreatedBy: rootNodeBy,
                   targetByUser: getUsernameFromUserKey(comment.commentBy),
-                  rootNodeType: DokiNodeType.post,
+                  rootNodeType: rootNodeType,
+                  commentTargetId: comment.id,
+                  commentTargetNodeType: DokiNodeType.comment,
                 );
               },
               child: Column(
@@ -177,69 +184,86 @@ class _CommentPageState extends State<CommentPage> {
 
                         handleCommentRefreshEvent();
                       },
-                      child: CustomScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        cacheExtent: scrollCacheHeight,
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: CommentWidget(
-                              commentKey: commentKey,
-                              parentNodeId: comment.id,
+                      child: BlocListener<UserActionBloc, UserActionState>(
+                        listenWhen: (previousState, state) {
+                          return state is UserActionNewCommentState &&
+                              state.nodeId == comment.id;
+                        },
+                        listener: (context, state) {
+                          controller.animateTo(
+                            controller.position.maxScrollExtent,
+                            duration: const Duration(
+                              milliseconds: Constants.maxScrollDuration,
                             ),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: SizedBox(
-                              height: Constants.gap * 2,
-                            ),
-                          ),
-                          if (repliesError) ...[
+                            curve: Curves.fastOutSlowIn,
+                          );
+                        },
+                        child: CustomScrollView(
+                          controller: controller,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          cacheExtent: scrollCacheHeight,
+                          slivers: [
                             SliverToBoxAdapter(
-                              child: SizedBox(
-                                height: Constants.height * 5,
-                                child: StyledText.error(state.message),
+                              child: CommentWidget(
+                                commentKey: commentKey,
+                                parentNodeId: comment.id,
                               ),
                             ),
-                          ] else
-                            repliesLoading
-                                ? const SliverToBoxAdapter(
-                                    child: SizedBox(
-                                      height: Constants.height * 5,
-                                      child: Center(
-                                        child: SmallLoadingIndicator(),
-                                      ),
-                                    ),
-                                  )
-                                : BlocBuilder<UserActionBloc, UserActionState>(
-                                    buildWhen: (previousState, state) {
-                                      return state
-                                              is UserActionPrimaryNodeRefreshState &&
-                                          state.nodeId == comment.id;
-                                    },
-                                    builder: (context, state) {
-                                      DateTime now;
-                                      if (state
-                                          is UserActionPrimaryNodeRefreshState) {
-                                        now = state.now;
-                                      } else {
-                                        now = DateTime.now();
-                                      }
-
-                                      return CommentList(
-                                        parentNodeId: widget.commentId,
-                                        parentNodeType: DokiNodeType.comment,
-                                        key: ObjectKey({
-                                          "postId": comment.id,
-                                          "lastFetch": now,
-                                        }),
-                                      );
-                                    },
-                                  ),
-                          const SliverToBoxAdapter(
-                            child: SizedBox(
-                              height: Constants.gap * 2,
+                            const SliverToBoxAdapter(
+                              child: SizedBox(
+                                height: Constants.gap * 2,
+                              ),
                             ),
-                          ),
-                        ],
+                            if (repliesError) ...[
+                              SliverToBoxAdapter(
+                                child: SizedBox(
+                                  height: Constants.height * 5,
+                                  child: StyledText.error(state.message),
+                                ),
+                              ),
+                            ] else
+                              repliesLoading
+                                  ? const SliverToBoxAdapter(
+                                      child: SizedBox(
+                                        height: Constants.height * 5,
+                                        child: Center(
+                                          child: SmallLoadingIndicator(),
+                                        ),
+                                      ),
+                                    )
+                                  : BlocBuilder<UserActionBloc,
+                                      UserActionState>(
+                                      buildWhen: (previousState, state) {
+                                        return state
+                                                is UserActionPrimaryNodeRefreshState &&
+                                            state.nodeId == comment.id;
+                                      },
+                                      builder: (context, state) {
+                                        DateTime now;
+                                        if (state
+                                            is UserActionPrimaryNodeRefreshState) {
+                                          now = state.now;
+                                        } else {
+                                          now = DateTime.now();
+                                        }
+
+                                        return CommentList(
+                                          parentNodeId: widget.commentId,
+                                          parentNodeType: DokiNodeType.comment,
+                                          key: ObjectKey({
+                                            "postId": comment.id,
+                                            "lastFetch": now,
+                                          }),
+                                        );
+                                      },
+                                    ),
+                            const SliverToBoxAdapter(
+                              child: SizedBox(
+                                height: Constants.gap * 2,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

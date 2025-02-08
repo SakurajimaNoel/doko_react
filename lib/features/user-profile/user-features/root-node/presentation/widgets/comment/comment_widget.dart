@@ -259,6 +259,7 @@ class _CommentWrapper extends StatelessWidget {
 
                   final rootNodeId = nodeProvider.rootNodeId;
                   final rootNodeType = nodeProvider.rootNodeType;
+                  final rootNodeBy = nodeProvider.rootNodeCreatedBy;
 
                   context.pushNamed(
                     RouterConstants.comment,
@@ -266,6 +267,7 @@ class _CommentWrapper extends StatelessWidget {
                       "rootNodeType": rootNodeType.name,
                       "rootNodeId": rootNodeId,
                       "commentId": commentId,
+                      "userId": rootNodeBy,
                     },
                   );
                 },
@@ -493,6 +495,7 @@ class _CommentActionsState extends State<_CommentActions> {
 
                         final rootNodeId = nodeProvider.rootNodeId;
                         final rootNodeType = nodeProvider.rootNodeType;
+                        final rootNodeBy = nodeProvider.rootNodeCreatedBy;
 
                         context.pushNamed(
                           RouterConstants.comment,
@@ -500,6 +503,7 @@ class _CommentActionsState extends State<_CommentActions> {
                             "rootNodeType": rootNodeType.name,
                             "rootNodeId": rootNodeId,
                             "commentId": commentId,
+                            "userId": rootNodeBy,
                           },
                         );
                       },

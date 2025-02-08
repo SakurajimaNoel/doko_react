@@ -13,7 +13,6 @@ import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
-import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/domain/entity/comment/comment_media.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
@@ -87,16 +86,16 @@ class CommentInput extends StatelessWidget {
             int likesCount = 0;
             int commentsCount = 0;
 
-            String targetId = commentProvider.rootNodeId;
+            String targetId = commentProvider.commentTargetId;
 
-            if (commentProvider.rootNodeType == DokiNodeType.post) {
+            if (commentProvider.commentTargetNodeType == DokiNodeType.post) {
               final PostEntity post = graph
                   .getValueByKey(generatePostNodeKey(targetId))! as PostEntity;
               userLike = post.userLike;
               likesCount = post.likesCount;
               commentsCount = post.commentsCount;
             }
-            if (commentProvider.rootNodeType == DokiNodeType.comment) {
+            if (commentProvider.commentTargetNodeType == DokiNodeType.comment) {
               final CommentEntity comment =
                   graph.getValueByKey(generateCommentNodeKey(targetId))!
                       as CommentEntity;
@@ -664,11 +663,8 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
     if (media != null) {
       if (media.extension != "uri") {
         // generate bucket path
-        UserGraph graph = UserGraph();
-        String key = generateUserNodeKey(commentProvider.rootNodeCreatedBy);
-        final postCreatedBy = graph.getValueByKey(key)! as UserEntity;
         bucketPath =
-            "${postCreatedBy.userId}/posts/${commentProvider.rootNodeId}/comment/${generateUniqueString()}${media.extension}";
+            "${commentProvider.rootNodeCreatedBy}/${commentProvider.rootNodeType.nodeName.toLowerCase()}/${commentProvider.rootNodeId}/comment/${generateUniqueString()}${media.extension}";
       } else {
         bucketPath = media.uri;
       }
@@ -678,8 +674,8 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
       content: content,
       media: media,
       bucketPath: bucketPath,
-      targetNodeId: commentProvider.rootNodeId,
-      targetNode: commentProvider.rootNodeType,
+      targetNodeId: commentProvider.commentTargetId,
+      targetNode: commentProvider.commentTargetNodeType,
       username: (context.read<UserBloc>().state as UserCompleteState).username,
       replyOn: commentProvider.replyOn,
     );
