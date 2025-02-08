@@ -12,7 +12,7 @@ import 'package:doko_react/features/user-profile/domain/entity/profile_entity.da
 /// full profile is requested CompleteUserEntity
 /// instance will be used
 /// all mutable fields are non final
-class UserEntity extends GraphEntity {
+class UserEntity implements GraphEntity {
   UserEntity({
     required this.userId,
     required this.username,

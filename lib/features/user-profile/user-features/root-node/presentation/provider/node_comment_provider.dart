@@ -7,33 +7,43 @@ class NodeCommentProvider extends ChangeNotifier {
     required this.rootNodeId,
     required this.rootNodeCreatedBy,
     required this.targetByUser,
-    required this.commentTargetId,
+    // required this.commentTargetId,
     required this.rootNodeType,
+    this.replyOn,
   });
 
   final FocusNode focusNode;
-  String commentTargetId;
+
+  String? replyOn;
+
+  // new node will have commentOn relationship with this node
+  // String commentTargetId;
+
+  // username of user whose comment reply is clicked
   String targetByUser;
+
+  // root node details like post, comment,
   final String rootNodeId;
   final String rootNodeCreatedBy;
+
   // when navigating to comment page
   final DokiNodeType rootNodeType;
 
   // new comment or reply will be added to commentTargetId
-  void updateCommentTarget(String targetId, String targetUser) {
-    commentTargetId = targetId;
+  void updateCommentTarget(String targetUser, String targetId) {
     targetByUser = targetUser;
+    replyOn = targetId;
 
     notifyListeners();
   }
 
   void resetCommentTarget() {
-    commentTargetId = rootNodeId;
+    replyOn = null;
     targetByUser = rootNodeCreatedBy;
 
     notifyListeners();
   }
 
   // to render info box above input
-  bool get isReply => commentTargetId != rootNodeId;
+  bool get isReply => replyOn != null && replyOn!.isNotEmpty;
 }

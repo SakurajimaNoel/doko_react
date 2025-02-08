@@ -61,7 +61,7 @@ class LatestActivity {
   }
 }
 
-class InboxItemEntity extends GraphEntity {
+class InboxItemEntity implements GraphEntity {
   InboxItemEntity({
     required this.messages,
     required LatestActivity activity,

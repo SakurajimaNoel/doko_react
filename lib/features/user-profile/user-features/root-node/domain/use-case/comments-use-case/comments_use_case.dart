@@ -13,6 +13,6 @@ class CommentsUseCase implements UseCases<bool, GetCommentsInput> {
 
   @override
   FutureOr<bool> call(GetCommentsInput params) {
-    return rootNodeRepository.getPostComments(params);
+    return rootNodeRepository.getPrimaryNodeComments(params);
   }
 }

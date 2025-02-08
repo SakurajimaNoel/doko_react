@@ -8,7 +8,7 @@ import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.da
 
 part 'post_content_entity.dart';
 
-class PostEntity extends GraphEntity {
+class PostEntity implements NodeWithCommentEntity {
   PostEntity({
     required this.id,
     required this.caption,
@@ -36,11 +36,8 @@ class PostEntity extends GraphEntity {
     currDisplay = item;
   }
 
-  @Deprecated("user individual method")
-  void updateUserLikes(bool userLike, int likesCount) {
-    this.likesCount = likesCount;
-    this.userLike = userLike;
-  }
+  @override
+  Nodes get nodeComments => comments;
 
   void updateUserLikeStatus(bool userLike) {
     this.userLike = userLike;

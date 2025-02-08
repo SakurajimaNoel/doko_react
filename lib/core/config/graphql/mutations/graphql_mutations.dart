@@ -425,8 +425,7 @@ class GraphqlMutations {
 
   static Map<String, dynamic> addCommentVariables(
       CommentCreateInput commentInput) {
-    String commentOnNode =
-        commentInput.targetNode == CommentTarget.comment ? "Comment" : "Post";
+    String commentOnNode = commentInput.targetNode.nodeName;
 
     if (commentInput.content.mentions.isEmpty) {
       return {

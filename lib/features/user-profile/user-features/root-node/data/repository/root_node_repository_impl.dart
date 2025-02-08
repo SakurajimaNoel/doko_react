@@ -8,17 +8,17 @@ class RootNodeRepositoryImpl implements RootNodeRepository {
   final PostRemoteDataSource remoteDataSource;
 
   @override
-  Future<bool> getCommentReplies(GetCommentsInput details) {
-    return remoteDataSource.getCommentReplies(details);
-  }
-
-  @override
-  Future<bool> getPostComments(GetCommentsInput details) {
-    return remoteDataSource.getPostComments(details);
+  Future<bool> getPrimaryNodeComments(GetCommentsInput details) {
+    return remoteDataSource.getPrimaryNodeComments(details);
   }
 
   @override
   Future<bool> getPostWithComment(GetNodeInput details) {
     return remoteDataSource.getPostWithComments(details);
+  }
+
+  @override
+  Future<bool> getCommentWithReplies(GetNodeInput details) {
+    return remoteDataSource.getCommentWithReplies(details);
   }
 }

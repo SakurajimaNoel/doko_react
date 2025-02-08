@@ -1,7 +1,7 @@
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 
-class InboxEntity extends GraphEntity {
+class InboxEntity implements GraphEntity {
   InboxEntity({
     required PageInfo pageInfo,
     required List<String> inboxItems,

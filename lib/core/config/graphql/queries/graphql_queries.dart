@@ -1,4 +1,5 @@
 import 'package:doko_react/core/config/graphql/graphql_constants.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/query/query_helper.dart';
 
 class GraphqlQueries {
@@ -861,8 +862,7 @@ class GraphqlQueries {
   }
 
   // get comments
-  static String getComments(
-    bool post, {
+  static String getComments({
     String? cursor,
   }) {
     if (cursor == null || cursor.isEmpty) {
@@ -969,11 +969,12 @@ class GraphqlQueries {
   static Map<String, dynamic> getCommentsVariable(
     String nodeId, {
     String? cursor,
-    required bool post,
+    required DokiNodeType nodeType,
     required String username,
+    bool latestFirst = true,
   }) {
-    String connectionNode = post ? "Post" : "Comment";
-    String sort = post ? "DESC" : "ASC";
+    String connectionNode = nodeType.nodeName;
+    String sort = latestFirst ? "DESC" : "ASC";
 
     if (cursor == null || cursor.isEmpty) {
       return {
@@ -1200,6 +1201,24 @@ class GraphqlQueries {
               }
               replyOn {
                 id
+              }
+              commentsConnection {
+                totalCount
+              }
+              commentBy {
+                id
+                username
+                name
+                profilePicture
+                friendsConnection(where: \$friendsConnectionWhere2) {
+                  edges {
+                    properties {
+                      addedOn
+                      requestedBy
+                      status
+                    }
+                  }
+                }
               }
             }
           }

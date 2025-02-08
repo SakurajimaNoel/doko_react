@@ -3,6 +3,7 @@ part of 'root_node_bloc.dart';
 @immutable
 sealed class RootNodeEvent {}
 
+/// load event used in individual pages
 class PostLoadEvent extends RootNodeEvent {
   PostLoadEvent({
     required this.details,
@@ -16,19 +17,28 @@ class CommentLoadEvent extends RootNodeEvent {
     required this.details,
   });
 
-  final GetCommentsInput details;
+  final GetNodeInput details;
 }
 
-class LoadMoreCommentEvent extends RootNodeEvent {
-  LoadMoreCommentEvent({
+class DiscussionLoadEvent extends RootNodeEvent {
+  DiscussionLoadEvent({
+    required this.details,
+  });
+
+  final GetNodeInput details;
+}
+
+/// secondary nodes load event used when initially fetching the nodes
+class SecondaryNodeLoadEvent extends RootNodeEvent {
+  SecondaryNodeLoadEvent({
     required this.details,
   });
 
   final GetCommentsInput details;
 }
 
-class LoadCommentReplyEvent extends RootNodeEvent {
-  LoadCommentReplyEvent({
+class LoadMoreSecondaryNodesEvent extends RootNodeEvent {
+  LoadMoreSecondaryNodesEvent({
     required this.details,
   });
 
@@ -37,6 +47,18 @@ class LoadCommentReplyEvent extends RootNodeEvent {
 
 class PostRefreshEvent extends RootNodeEvent {
   PostRefreshEvent({required this.details});
+
+  final GetNodeInput details;
+}
+
+class CommentRefreshEvent extends RootNodeEvent {
+  CommentRefreshEvent({required this.details});
+
+  final GetNodeInput details;
+}
+
+class DiscussionRefreshEvent extends RootNodeEvent {
+  DiscussionRefreshEvent({required this.details});
 
   final GetNodeInput details;
 }

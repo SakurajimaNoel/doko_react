@@ -1,2 +1,8 @@
+import 'package:doko_react/core/global/entity/page-info/nodes.dart';
+
 /// base class to use with user graph
-class GraphEntity {}
+abstract class GraphEntity {}
+
+abstract class NodeWithCommentEntity implements GraphEntity {
+  Nodes get nodeComments;
+}

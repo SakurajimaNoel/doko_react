@@ -5,7 +5,7 @@ import 'package:doko_react/features/user-profile/domain/entity/profile_entity.da
 
 /// items are keys for userGraph that is stored in memory
 /// keys are like user:username, post:post_id or comment:comment_id
-class Nodes extends GraphEntity {
+class Nodes implements GraphEntity {
   Nodes({
     required PageInfo pageInfo,
     required this.items,

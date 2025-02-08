@@ -1,7 +1,7 @@
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 
-class MessageEntity extends GraphEntity {
+class MessageEntity implements GraphEntity {
   MessageEntity({
     required ChatMessage message,
   }) : _message = message;

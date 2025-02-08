@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
@@ -82,20 +83,20 @@ class CommentInput extends StatelessWidget {
             final commentProvider = context.read<NodeCommentProvider>();
 
             String commentId = state.nodeId;
-            bool userLike;
-            int likesCount;
-            int commentsCount;
+            bool userLike = false;
+            int likesCount = 0;
+            int commentsCount = 0;
 
-            String targetId = commentProvider.commentTargetId;
-            bool isPost = !commentProvider.isReply;
+            String targetId = commentProvider.rootNodeId;
 
-            if (isPost) {
+            if (commentProvider.rootNodeType == DokiNodeType.post) {
               final PostEntity post = graph
                   .getValueByKey(generatePostNodeKey(targetId))! as PostEntity;
               userLike = post.userLike;
               likesCount = post.likesCount;
               commentsCount = post.commentsCount;
-            } else {
+            }
+            if (commentProvider.rootNodeType == DokiNodeType.comment) {
               final CommentEntity comment =
                   graph.getValueByKey(generateCommentNodeKey(targetId))!
                       as CommentEntity;
@@ -677,10 +678,10 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
       content: content,
       media: media,
       bucketPath: bucketPath,
-      targetNodeId: commentProvider.commentTargetId,
-      targetNode:
-          commentProvider.isReply ? CommentTarget.comment : CommentTarget.post,
+      targetNodeId: commentProvider.rootNodeId,
+      targetNode: commentProvider.rootNodeType,
       username: (context.read<UserBloc>().state as UserCompleteState).username,
+      replyOn: commentProvider.replyOn,
     );
 
     context.read<NodeCreateBloc>().add(CreateCommentEvent(

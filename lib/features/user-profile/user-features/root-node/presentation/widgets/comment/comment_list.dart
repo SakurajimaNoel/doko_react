@@ -1,9 +1,10 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
-import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/bloc/root_node_bloc.dart';
@@ -14,10 +15,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class CommentList extends StatefulWidget {
   const CommentList({
     super.key,
-    required this.postId,
+    required this.parentNodeId,
+    required this.parentNodeType,
   });
 
-  final String postId;
+  final String parentNodeId;
+  final DokiNodeType parentNodeType;
 
   @override
   State<CommentList> createState() => _CommentListState();
@@ -26,24 +29,26 @@ class CommentList extends StatefulWidget {
 class _CommentListState extends State<CommentList> {
   final UserGraph graph = UserGraph();
 
-  late final postId = widget.postId;
-  late final postKey = generatePostNodeKey(widget.postId);
+  late final parentNodeId = widget.parentNodeId;
+  late final parentNodeType = widget.parentNodeType;
+  late final String parentGraphKey;
   late final username =
       (context.read<UserBloc>().state as UserCompleteState).username;
 
-  late final PostEntity post;
-
   bool loading = false;
+
+  late final NodeWithCommentEntity parentNode;
 
   @override
   void initState() {
     super.initState();
 
-    post = graph.getValueByKey(postKey)! as PostEntity;
+    parentGraphKey = parentNodeType.keyGenerator(parentNodeId);
+    parentNode = graph.getValueByKey(parentGraphKey)! as NodeWithCommentEntity;
   }
 
   Widget buildCommentItems(BuildContext context, int index) {
-    final Nodes comments = post.comments;
+    final Nodes comments = parentNode.nodeComments;
 
     if (index >= comments.items.length) {
       if (!comments.pageInfo.hasNextPage) {
@@ -56,11 +61,11 @@ class _CommentListState extends State<CommentList> {
 
       if (!loading) {
         loading = true;
-        context.read<RootNodeBloc>().add(LoadMoreCommentEvent(
+        context.read<RootNodeBloc>().add(LoadMoreSecondaryNodesEvent(
               details: GetCommentsInput(
-                nodeId: postId,
+                nodeId: parentNodeId,
                 username: username,
-                isPost: true,
+                nodeType: parentNodeType,
                 cursor: comments.pageInfo.endCursor!,
               ),
             ));
@@ -70,9 +75,17 @@ class _CommentListState extends State<CommentList> {
       );
     }
 
+    if (parentNodeType == DokiNodeType.comment) {
+      return CommentWidget.reply(
+        commentKey: comments.items[index],
+        parentNodeId: parentNodeId,
+        key: ValueKey(comments.items[index]),
+      );
+    }
+
     return CommentWidget(
       commentKey: comments.items[index],
-      parentNodeId: postId,
+      parentNodeId: parentNodeId,
       key: ValueKey(comments.items[index]),
     );
   }
@@ -81,10 +94,11 @@ class _CommentListState extends State<CommentList> {
   Widget build(BuildContext context) {
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
-        return state is UserActionNewCommentState && state.nodeId == postId;
+        return state is UserActionNewCommentState &&
+            state.nodeId == parentNodeId;
       },
       builder: (context, state) {
-        bool isEmpty = post.comments.items.isEmpty;
+        bool isEmpty = parentNode.nodeComments.items.isEmpty;
 
         if (isEmpty) {
           return const SliverToBoxAdapter(
@@ -99,18 +113,18 @@ class _CommentListState extends State<CommentList> {
 
         return BlocConsumer<RootNodeBloc, RootNodeState>(
           listenWhen: (previousState, state) {
-            return state is CommentLoadSuccess ||
-                (state is LoadErrorState && state.nodeId == postId);
+            return state is SecondaryLoadSuccess ||
+                (state is LoadErrorState && state.nodeId == parentNodeId);
           },
           listener: (context, state) {
             if (loading) loading = false;
           },
           buildWhen: (previousState, state) {
-            return state is CommentLoadSuccess;
+            return state is SecondaryLoadSuccess;
           },
           builder: (context, state) {
             return SliverList.separated(
-              itemCount: post.comments.items.length + 1,
+              itemCount: parentNode.nodeComments.items.length + 1,
               itemBuilder: buildCommentItems,
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(

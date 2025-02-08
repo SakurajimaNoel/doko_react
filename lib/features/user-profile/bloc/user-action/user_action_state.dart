@@ -69,8 +69,8 @@ class UserActionNewCommentState extends UserActionState {
   List<Object?> get props => [nodeId, now];
 }
 
-class UserActionPostRefreshState extends UserActionState {
-  UserActionPostRefreshState({
+class UserActionPrimaryNodeRefreshState extends UserActionState {
+  UserActionPrimaryNodeRefreshState({
     required this.nodeId,
   }) : now = DateTime.now();
 

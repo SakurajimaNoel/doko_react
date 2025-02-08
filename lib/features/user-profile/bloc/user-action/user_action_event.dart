@@ -79,12 +79,12 @@ final class UserActionNewCommentEvent extends UserActionEvent {
 }
 
 // user to post action
-final class UserActionPostRefreshEvent extends UserActionEvent {
-  UserActionPostRefreshEvent({
-    required this.postId,
+final class UserActionPrimaryNodeRefreshEvent extends UserActionEvent {
+  UserActionPrimaryNodeRefreshEvent({
+    required this.nodeId,
   });
 
-  final String postId;
+  final String nodeId;
 }
 
 // fetch post by postId for new messages

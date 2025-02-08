@@ -1,3 +1,4 @@
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/utils/text-controller/mention_text_controller.dart';
 import 'package:doko_react/core/validation/input.dart';
@@ -48,11 +49,6 @@ class PostCreateInput {
   final List<PostContent> content;
 }
 
-enum CommentTarget {
-  post,
-  comment,
-}
-
 class CommentCreateInput extends Input {
   CommentCreateInput({
     required this.content,
@@ -61,6 +57,7 @@ class CommentCreateInput extends Input {
     required this.targetNodeId,
     required this.targetNode,
     required this.username,
+    this.replyOn,
   });
 
   final CommentContentInput content;
@@ -69,8 +66,11 @@ class CommentCreateInput extends Input {
   // when uri bucket path = uri
   final String? bucketPath;
 
+  // reply on comment id
+  final String? replyOn;
+
   final String targetNodeId;
-  final CommentTarget targetNode;
+  final DokiNodeType targetNode;
   final String username;
 
   @override

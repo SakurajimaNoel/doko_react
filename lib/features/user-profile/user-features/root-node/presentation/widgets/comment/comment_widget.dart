@@ -13,8 +13,6 @@ import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
-import 'package:doko_react/features/user-profile/user-features/root-node/presentation/bloc/root_node_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/node_comment_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/gestures.dart';
@@ -54,6 +52,9 @@ class _CommentWidgetState extends State<CommentWidget> {
 
     final width = MediaQuery.sizeOf(context).width - Constants.padding * 3;
     final height = width / Constants.commentContainer;
+
+    String currentRoute = GoRouter.of(context).currentRouteName ?? "";
+    bool isCommentPage = currentRoute == RouterConstants.comment;
 
     if (!graph.containsKey(widget.commentKey)) {
       // send a req to fetch the post
@@ -137,15 +138,21 @@ class _CommentWidgetState extends State<CommentWidget> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    UserWidget.small(
-                      userKey: comment.commentBy,
-                      key: ValueKey(comment.id),
-                      trim: 16,
-                      baseFontSize: baseFontSize,
-                    ),
-                    if (superShrink)
-                      const SizedBox.shrink()
+                    if (!shrink && isCommentPage && !widget.isReply)
+                      UserWidget(
+                        userKey: comment.commentBy,
+                        key: ValueKey(comment.id),
+                        trim: 20,
+                        baseFontSize: baseFontSize,
+                      )
                     else
+                      UserWidget.small(
+                        userKey: comment.commentBy,
+                        key: ValueKey("${comment.id}-shrink"),
+                        trim: 16,
+                        baseFontSize: baseFontSize,
+                      ),
+                    if (!superShrink)
                       Text(
                         displayDateDifference(
                           comment.createdOn,
@@ -212,24 +219,15 @@ class _CommentWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
 
-    // if (isReply) {
-    //   return LayoutBuilder(
-    //     builder: (context, constraints) {
-    //       bool shrink = constraints.maxWidth < 275;
-    //       double shrinkFactor = shrink ? 0.75 : 1;
-    //
-    //       return Container(
-    //         margin: EdgeInsets.only(
-    //           left: Constants.padding * shrinkFactor,
-    //         ),
-    //         padding: const EdgeInsets.only(
-    //           top: Constants.padding * 0.75,
-    //         ),
-    //         child: child,
-    //       );
-    //     },
-    //   );
-    // }
+    String currentRoute = GoRouter.of(context).currentRouteName ?? "";
+    bool isCommentPage = currentRoute == RouterConstants.comment;
+
+    if (isCommentPage && !isReply) {
+      return Padding(
+        padding: const EdgeInsets.all(Constants.padding),
+        child: child,
+      );
+    }
 
     return Container(
       margin: const EdgeInsets.symmetric(
@@ -462,16 +460,20 @@ class _CommentActionsState extends State<_CommentActions> {
 
                         // replies are only shown on comment page
                         if (widget.isReply) {
-                          String targetId =
-                              widget.isReply ? widget.parentNodeId : commentId;
+                          // new node will have commentOn relationship with this node
+                          // String targetId =
+                          //     widget.isReply ? widget.parentNodeId : commentId;
+
+                          // new node will have replyOn relationship with this node
+                          String replyOn = commentId;
 
                           String targetUsername =
                               getUsernameFromUserKey(comment.commentBy);
 
                           nodeProvider
                             ..updateCommentTarget(
-                              targetId,
                               targetUsername,
+                              replyOn,
                             )
                             ..focusNode.requestFocus();
                           return;
@@ -544,164 +546,7 @@ class _CommentActionsState extends State<_CommentActions> {
         const Divider(
           height: Constants.gap * 0.5,
         ),
-        // if (!widget.isReply)
-        //   _CommentReplies(
-        //     commentId: comment.id,
-        //   ),
-        // if (comment.commentsCount > 0) ...[
-        //   const SizedBox(
-        //     height: Constants.gap * 0.5,
-        //   ),
-        //   TextButton(
-        //     onPressed: () {
-        //       // go to comment page
-        //     },
-        //     style: TextButton.styleFrom(
-        //       minimumSize: Size.zero,
-        //       padding: const EdgeInsets.symmetric(
-        //         horizontal: Constants.padding,
-        //         vertical: Constants.padding * 0.5,
-        //       ),
-        //       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        //       textStyle: TextStyle(
-        //         color: currTheme.tertiary,
-        //         fontWeight: FontWeight.w500,
-        //         fontSize: Constants.smallFontSize,
-        //       ),
-        //     ),
-        //     child: const Text("View replies"),
-        //   )
-        // ],
       ],
-    );
-  }
-}
-
-class _CommentReplies extends StatefulWidget {
-  const _CommentReplies({
-    required this.commentId,
-  });
-
-  final String commentId;
-
-  @override
-  State<_CommentReplies> createState() => _CommentRepliesState();
-}
-
-class _CommentRepliesState extends State<_CommentReplies> {
-  final UserGraph graph = UserGraph();
-
-  late final String commentId = widget.commentId;
-  late final String commentKey = generateCommentNodeKey(commentId);
-  late final String username =
-      (context.read<UserBloc>().state as UserCompleteState).username;
-
-  @override
-  Widget build(BuildContext context) {
-    final currTheme = Theme.of(context).colorScheme;
-    final CommentEntity comment =
-        graph.getValueByKey(commentKey)! as CommentEntity;
-
-    return BlocBuilder<UserActionBloc, UserActionState>(
-      buildWhen: (previousState, state) {
-        return state is UserActionNewCommentState && state.nodeId == commentId;
-      },
-      builder: (context, state) {
-        return BlocBuilder<RootNodeBloc, RootNodeState>(
-          buildWhen: (previousState, state) {
-            return (state is CommentReplyState &&
-                    state.commentId == commentId) ||
-                (state is LoadErrorState && state.nodeId == commentId);
-          },
-          builder: (context, state) {
-            bool loading = state is CommentReplyLoadingState;
-            bool loadError = state is LoadErrorState;
-
-            return Column(
-              children: [
-                const SizedBox(
-                  height: Constants.gap * 0.5,
-                ),
-                if (comment.showReplies &&
-                    comment.comments.items.isNotEmpty) ...[
-                  ...[
-                    ...List.generate((comment.comments.items.length) * 2 - 1,
-                        (index) {
-                      if (index.isEven) {
-                        int itemIndex = index ~/ 2;
-                        return CommentWidget.reply(
-                          commentKey: comment.comments.items[itemIndex],
-                          parentNodeId: commentId,
-                          key: ValueKey(comment.comments.items[itemIndex]),
-                        );
-                      } else {
-                        return const SizedBox(
-                          height: Constants.gap * 0.5,
-                        );
-                      }
-                    })
-                  ],
-                ],
-                if (comment.commentsCount > comment.comments.items.length)
-                  Center(
-                    child: loadError
-                        ? StyledText.error(state.message)
-                        : TextButton(
-                            onPressed: loading
-                                ? null
-                                : () {
-                                    if (comment.commentsCount < 1) return;
-
-                                    if (!comment.showReplies) {
-                                      setState(() {
-                                        comment.showReplies = true;
-                                      });
-                                    }
-
-                                    // fetch comment replies
-                                    bool nextPage =
-                                        comment.comments.pageInfo.hasNextPage;
-                                    if (nextPage || comment.comments.isEmpty) {
-                                      context
-                                          .read<RootNodeBloc>()
-                                          .add(LoadCommentReplyEvent(
-                                            details: GetCommentsInput(
-                                              nodeId: commentId,
-                                              username: username,
-                                              isPost: false,
-                                              cursor: nextPage
-                                                  ? comment.comments.pageInfo
-                                                      .endCursor!
-                                                  : "",
-                                            ),
-                                          ));
-                                    }
-                                  },
-                            style: TextButton.styleFrom(
-                              minimumSize: Size.zero,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: Constants.padding,
-                                vertical: Constants.padding * 0.5,
-                              ),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              textStyle: TextStyle(
-                                color: currTheme.tertiary,
-                                fontWeight: FontWeight.w500,
-                                fontSize: Constants.smallFontSize,
-                              ),
-                            ),
-                            child: loading
-                                ? const SmallLoadingIndicator.small()
-                                : comment.showReplies
-                                    ? const Text("View more replies")
-                                    : const Text("View replies"),
-                          ),
-                  )
-              ],
-            );
-          },
-        );
-      },
     );
   }
 }

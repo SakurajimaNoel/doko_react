@@ -3,7 +3,7 @@ import 'package:doko_react/features/user-profile/user-features/root-node/input/p
 abstract class RootNodeRepository {
   Future<bool> getPostWithComment(GetNodeInput details);
 
-  Future<bool> getPostComments(GetCommentsInput details);
+  Future<bool> getPrimaryNodeComments(GetCommentsInput details);
 
-  Future<bool> getCommentReplies(GetCommentsInput details);
+  Future<bool> getCommentWithReplies(GetNodeInput details);
 }

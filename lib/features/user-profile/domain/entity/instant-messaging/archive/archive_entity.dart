@@ -1,7 +1,7 @@
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 
-class ArchiveEntity extends GraphEntity {
+class ArchiveEntity implements GraphEntity {
   ArchiveEntity({
     required this.archiveMessages,
     required this.currentSessionMessages,

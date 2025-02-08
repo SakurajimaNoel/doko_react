@@ -1,6 +1,7 @@
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
@@ -72,20 +73,20 @@ class PostRemoteDataSource {
     }
   }
 
-  Future<bool> getPostComments(GetCommentsInput details) async {
+  Future<bool> getPrimaryNodeComments(GetCommentsInput details) async {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
           document: gql(GraphqlQueries.getComments(
-            true,
             cursor: details.cursor,
           )),
           variables: GraphqlQueries.getCommentsVariable(
             details.nodeId,
-            post: true,
+            nodeType: details.nodeType,
             username: details.username,
             cursor: details.cursor,
+            latestFirst: details.nodeType != DokiNodeType.comment,
           ),
         ),
       );
@@ -93,7 +94,7 @@ class PostRemoteDataSource {
       if (result.hasException) {
         throw ApplicationException(
             reason: result.exception?.graphqlErrors.toString() ??
-                "Problem loading post comments.");
+                "Problem loading comments.");
       }
 
       Map? commentData = result.data?["commentsConnection"];
@@ -116,11 +117,21 @@ class PostRemoteDataSource {
           .toList();
 
       List<CommentEntity> comments = await Future.wait(commentFutures);
-      graph.addCommentListToPostEntity(
-        details.nodeId,
-        comments: comments,
-        pageInfo: info,
-      );
+      if (details.nodeType == DokiNodeType.post) {
+        graph.addCommentListToPostEntity(
+          details.nodeId,
+          comments: comments,
+          pageInfo: info,
+        );
+      }
+
+      if (details.nodeType == DokiNodeType.comment) {
+        graph.addCommentListToReply(
+          details.nodeId,
+          comments: comments,
+          pageInfo: info,
+        );
+      }
 
       return true;
     } catch (e) {
@@ -177,63 +188,6 @@ class PostRemoteDataSource {
       graph.addCommentListToReply(
         details.nodeId,
         comments: replies,
-        pageInfo: info,
-      );
-
-      return true;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<bool> getCommentReplies(GetCommentsInput details) async {
-    try {
-      QueryResult result = await _client.query(
-        QueryOptions(
-          fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(GraphqlQueries.getComments(
-            false,
-            cursor: details.cursor,
-          )),
-          variables: GraphqlQueries.getCommentsVariable(
-            details.nodeId,
-            post: false,
-            username: details.username,
-            cursor: details.cursor,
-          ),
-        ),
-      );
-
-      if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Problem loading post comments.");
-      }
-
-      Map? commentData = result.data?["commentsConnection"];
-
-      if (commentData == null || commentData.isEmpty) {
-        throw const ApplicationException(
-          reason: Constants.errorMessage,
-        );
-      }
-
-      PageInfo info = PageInfo.createEntity(map: commentData["pageInfo"]);
-      List commentList = commentData["edges"];
-
-      var commentFutures = (commentList)
-          .map(
-            (comment) => CommentEntity.createEntity(
-              map: comment["node"],
-            ),
-          )
-          .toList();
-
-      List<CommentEntity> comments = await Future.wait(commentFutures);
-
-      graph.addCommentListToReply(
-        details.nodeId,
-        comments: comments,
         pageInfo: info,
       );
 

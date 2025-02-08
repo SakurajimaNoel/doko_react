@@ -60,7 +60,7 @@ import "package:doko_react/features/user-profile/user-features/root-node/data/da
 import "package:doko_react/features/user-profile/user-features/root-node/data/repository/root_node_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/root-node/domain/repository/root_node_repository.dart";
 import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/comments-use-case/comments_use_case.dart";
-import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/comments-use-case/replies_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/comments-use-case/comments_with_replies_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/post-use-case/post_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/root-node/presentation/bloc/root_node_bloc.dart";
 import "package:flutter/foundation.dart";
@@ -126,8 +126,8 @@ void _initPost() {
     ),
   );
 
-  serviceLocator.registerFactory<RepliesUseCase>(
-    () => RepliesUseCase(
+  serviceLocator.registerFactory<CommentsWithRepliesUseCase>(
+    () => CommentsWithRepliesUseCase(
       rootNodeRepository: serviceLocator(),
     ),
   );
@@ -136,7 +136,7 @@ void _initPost() {
     () => RootNodeBloc(
       postUseCase: serviceLocator(),
       commentsUseCase: serviceLocator(),
-      repliesUseCase: serviceLocator(),
+      commentsWithRepliesUseCase: serviceLocator(),
     ),
   );
 }

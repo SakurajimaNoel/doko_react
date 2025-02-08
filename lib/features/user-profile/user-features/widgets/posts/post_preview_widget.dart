@@ -118,7 +118,7 @@ class PostPreviewWidget extends StatelessWidget {
                         buildWhen: (previousState, state) {
                           return (state is UserActionNodeActionState &&
                                   state.nodeId == post.id) ||
-                              (state is UserActionPostRefreshState &&
+                              (state is UserActionPrimaryNodeRefreshState &&
                                   state.nodeId == post.id);
                         },
                         builder: (context, state) {

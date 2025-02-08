@@ -37,8 +37,8 @@ class _PostPageState extends State<PostPage> {
       (context.read<UserBloc>().state as UserCompleteState).username;
 
   Future<void> handlePostRefreshEvent() async {
-    context.read<UserActionBloc>().add(UserActionPostRefreshEvent(
-          postId: widget.postId,
+    context.read<UserActionBloc>().add(UserActionPrimaryNodeRefreshEvent(
+          nodeId: widget.postId,
         ));
   }
 
@@ -74,10 +74,10 @@ class _PostPageState extends State<PostPage> {
           },
           builder: (context, state) {
             bool loading = state is RootNodeLoading;
-            bool commentsLoading = state is CommentLoadingState;
+            bool commentsLoading = state is SecondaryLoadingState;
 
             bool postError = state is RootNodeErrorState;
-            bool commentError = state is CommentErrorState;
+            bool commentError = state is SecondaryNodeErrorState;
 
             if (loading) {
               return const Center(
@@ -100,7 +100,7 @@ class _PostPageState extends State<PostPage> {
                   rootNodeId: post.id,
                   rootNodeCreatedBy: getUsernameFromUserKey(post.createdBy),
                   targetByUser: getUsernameFromUserKey(post.createdBy),
-                  commentTargetId: post.id,
+                  // commentTargetId: post.id,
                   rootNodeType: DokiNodeType.post,
                 );
               },
@@ -122,7 +122,7 @@ class _PostPageState extends State<PostPage> {
 
                         final RootNodeState state = await postBloc;
 
-                        if (state is PostRefreshErrorState) {
+                        if (state is PrimaryNodeRefreshErrorState) {
                           if (!mounted) return;
                           showToastError(state.message);
                           return;
@@ -166,19 +166,21 @@ class _PostPageState extends State<PostPage> {
                                 : BlocBuilder<UserActionBloc, UserActionState>(
                                     buildWhen: (previousState, state) {
                                       return state
-                                              is UserActionPostRefreshState &&
+                                              is UserActionPrimaryNodeRefreshState &&
                                           state.nodeId == post.id;
                                     },
                                     builder: (context, state) {
                                       DateTime now;
-                                      if (state is UserActionPostRefreshState) {
+                                      if (state
+                                          is UserActionPrimaryNodeRefreshState) {
                                         now = state.now;
                                       } else {
                                         now = DateTime.now();
                                       }
 
                                       return CommentList(
-                                        postId: widget.postId,
+                                        parentNodeId: widget.postId,
+                                        parentNodeType: DokiNodeType.post,
                                         key: ObjectKey({
                                           "postId": post.id,
                                           "lastFetch": now,

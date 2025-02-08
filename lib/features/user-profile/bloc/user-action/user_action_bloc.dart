@@ -77,10 +77,10 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         nodeId: event.targetId,
       ));
     });
-    on<UserActionPostRefreshEvent>(
+    on<UserActionPrimaryNodeRefreshEvent>(
       (event, emit) => emit(
-        UserActionPostRefreshState(
-          nodeId: event.postId,
+        UserActionPrimaryNodeRefreshState(
+          nodeId: event.nodeId,
         ),
       ),
     );

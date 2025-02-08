@@ -458,7 +458,7 @@ class _PostActionState extends State<_PostAction> {
       buildWhen: (previousState, state) {
         return (state is UserActionNodeActionState &&
                 state.nodeId == widget.postId) ||
-            (state is UserActionPostRefreshState &&
+            (state is UserActionPrimaryNodeRefreshState &&
                 state.nodeId == widget.postId);
       },
       builder: (context, state) {
