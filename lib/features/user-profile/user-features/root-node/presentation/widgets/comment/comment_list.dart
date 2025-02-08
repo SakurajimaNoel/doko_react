@@ -4,6 +4,7 @@ import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
+import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
@@ -76,6 +77,11 @@ class _CommentListState extends State<CommentList> {
     }
 
     if (parentNodeType == DokiNodeType.comment) {
+      final comment = graph.getValueByKey(comments.items[index]);
+      if (comment is CommentEntity) {
+        comment.index = index;
+      }
+
       return CommentWidget.reply(
         commentKey: comments.items[index],
         parentNodeId: parentNodeId,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
@@ -34,6 +36,9 @@ class CommentEntity implements NodeWithCommentEntity {
   Nodes comments;
 
   bool showReplies;
+
+  /// used in comment page to move to particular reply
+  int? index;
 
   @override
   Nodes get nodeComments => comments;

@@ -1106,6 +1106,9 @@ class GraphqlQueries {
         likedBy(where: \$likedByWhere2) {
           username
         }
+        replyOn {
+          id
+        }
         commentBy {
           id
           name

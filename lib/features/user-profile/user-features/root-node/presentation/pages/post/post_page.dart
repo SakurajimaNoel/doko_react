@@ -51,7 +51,7 @@ class _PostPageState extends State<PostPage> {
 
   @override
   Widget build(BuildContext context) {
-    final scrollCacheHeight = MediaQuery.sizeOf(context).height;
+    final scrollCacheHeight = MediaQuery.sizeOf(context).height * 2;
 
     return Scaffold(
       appBar: AppBar(

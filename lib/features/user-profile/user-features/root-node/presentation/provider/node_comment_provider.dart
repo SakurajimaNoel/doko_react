@@ -1,5 +1,6 @@
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollview_observer/scrollview_observer.dart';
 
 class NodeCommentProvider extends ChangeNotifier {
   NodeCommentProvider({
@@ -11,9 +12,12 @@ class NodeCommentProvider extends ChangeNotifier {
     required this.commentTargetNodeType,
     required this.rootNodeType,
     this.replyOn,
+    this.controller,
   });
 
   final FocusNode focusNode;
+
+  final SliverObserverController? controller;
 
   String? replyOn;
 

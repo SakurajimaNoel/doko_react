@@ -124,7 +124,14 @@ class _CommentWidgetState extends State<CommentWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: Constants.gap * 0.5,
             children: [
-              if (comment.replyOn != null) StyledText(comment.replyOn!),
+              if (comment.replyOn != null) ...[
+                _CommentReplyPreview(
+                  commentId: comment.replyOn!,
+                ),
+                const SizedBox(
+                  height: Constants.gap * 0.125,
+                ),
+              ],
               LayoutBuilder(builder: (context, constraints) {
                 final width = MediaQuery.sizeOf(context).width;
                 bool shrink = min(constraints.maxWidth, width) < 275;
@@ -198,6 +205,116 @@ class _CommentWidgetState extends State<CommentWidget> {
                 parentNodeId: widget.parentNodeId,
               ),
             ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CommentReplyPreview extends StatelessWidget {
+  const _CommentReplyPreview({
+    required this.commentId,
+  });
+
+  final String commentId;
+
+  @override
+  Widget build(BuildContext context) {
+    final currTheme = Theme.of(context).colorScheme;
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
+    final UserGraph graph = UserGraph();
+    final commentKey = generateCommentNodeKey(commentId);
+
+    if (!graph.containsKey(commentKey)) {
+      // send a req to fetch the post
+      context.read<UserActionBloc>().add(UserActionGetCommentByIdEvent(
+            username: username,
+            commentId: commentId,
+          ));
+    }
+
+    return BlocBuilder<UserActionBloc, UserActionState>(
+      buildWhen: (previousState, state) {
+        return state is UserActionCommentDataFetchedState &&
+            state.commentId == commentId;
+      },
+      builder: (context, state) {
+        // bool isError =
+        //     state is UserActionCommentDataFetchedState && !state.success;
+
+        final comment = graph.getValueByKey(commentKey);
+
+        String displayText = "";
+        if (comment is CommentEntity) {
+          if (comment.content.isEmpty) {
+            displayText = "🖼️ Media";
+          } else {
+            displayText = trimText(
+              comment.content.join(),
+              len: 32,
+            );
+          }
+        } else {
+          displayText = "Comment loading...";
+        }
+
+        return Material(
+          color: currTheme.surfaceContainerHighest,
+          child: InkWell(
+            onTap: () {
+              if (comment is CommentEntity && comment.index != null) {
+                int commentIndex = comment.index!;
+                final observerController =
+                    context.read<NodeCommentProvider>().controller;
+
+                if (observerController != null) {
+                  observerController.animateTo(
+                    index: commentIndex,
+                    duration: const Duration(
+                      milliseconds: Constants.maxScrollDuration,
+                    ),
+                    curve: Curves.fastOutSlowIn,
+                  );
+                }
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(
+                right: Constants.padding * 0.5,
+              ),
+              child: IntrinsicHeight(
+                child: Row(
+                  spacing: Constants.gap * 0.625,
+                  children: [
+                    VerticalDivider(
+                      thickness: Constants.width * 0.375,
+                      width: Constants.width * 0.375,
+                      color: currTheme.inversePrimary,
+                    ),
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: Constants.padding * 0.5,
+                        ),
+                        child: Text(
+                          displayText,
+                          style: TextStyle(
+                            fontSize: Constants.smallFontSize,
+                            color: currTheme.onSurface.withValues(
+                              alpha: 0.75,
+                            ),
+                          ),
+                          softWrap: true,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
       },
