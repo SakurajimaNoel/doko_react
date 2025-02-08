@@ -129,7 +129,61 @@ class PostRemoteDataSource {
   }
 
   Future<bool> getCommentWithReplies(GetNodeInput details) async {
-    return false;
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.getCompleteCommentById()),
+          variables: GraphqlQueries.getCompleteCommentByIdVariables(
+            details.nodeId,
+            username: details.username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+            reason: result.exception?.graphqlErrors.toString() ??
+                "Problem loading comment.");
+      }
+
+      List? res = result.data?["comments"];
+
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: "Comment doesn't exist.",
+        );
+      }
+
+      CommentEntity comment = await CommentEntity.createEntity(map: res[0]);
+      String commentKey = generateCommentNodeKey(comment.id);
+      graph.addEntity(commentKey, comment);
+
+      Map repliesData = res[0]["commentsConnection"];
+
+      PageInfo info = PageInfo.createEntity(map: repliesData["pageInfo"]);
+      List repliesList = repliesData["edges"];
+
+      var repliesFuture = (repliesList)
+          .map(
+            (comment) => CommentEntity.createEntity(
+              map: comment["node"],
+            ),
+          )
+          .toList();
+
+      List<CommentEntity> replies = await Future.wait(repliesFuture);
+
+      graph.addCommentListToReply(
+        details.nodeId,
+        comments: replies,
+        pageInfo: info,
+      );
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<bool> getCommentReplies(GetCommentsInput details) async {
