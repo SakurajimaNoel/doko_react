@@ -1147,7 +1147,7 @@ class GraphqlQueries {
   // complete comment with replies
   static String getCompleteCommentById() {
     return """
-    query Comments(\$where: CommentWhere, \$likedByWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int) {
+    query Comments(\$where: CommentWhere, \$likedByWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [CommentCommentsConnectionSort!]) {
       comments(where: \$where) {
         id
         createdOn
@@ -1177,7 +1177,7 @@ class GraphqlQueries {
             }
           }
         }
-        commentsConnection(first: \$first) {
+        commentsConnection(first: \$first, sort: \$sort) {
           totalCount
           pageInfo {
             endCursor
@@ -1226,6 +1226,13 @@ class GraphqlQueries {
         }
       },
       "first": GraphqlConstants.commentLimit,
+      "sort": [
+        {
+          "node": {
+            "createdOn": "ASC",
+          }
+        }
+      ],
     };
   }
 }
