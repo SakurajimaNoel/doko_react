@@ -124,6 +124,7 @@ class _CommentWidgetState extends State<CommentWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: Constants.gap * 0.5,
             children: [
+              if (comment.replyOn != null) StyledText(comment.replyOn!),
               LayoutBuilder(builder: (context, constraints) {
                 final width = MediaQuery.sizeOf(context).width;
                 bool shrink = min(constraints.maxWidth, width) < 275;

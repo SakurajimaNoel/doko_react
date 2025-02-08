@@ -417,6 +417,9 @@ class GraphqlMutations {
           likedBy(where: \$where) {
             username
           }
+          replyOn {
+            id
+          }
         }
       }
     }
@@ -447,6 +450,15 @@ class GraphqlMutations {
                     "node": {
                       "id_EQ": commentInput.targetNodeId,
                     }
+                  }
+                }
+              }
+            },
+            "replyOn": {
+              "connect": {
+                "where": {
+                  "node": {
+                    "id_EQ": commentInput.replyOn,
                   }
                 }
               }
@@ -496,8 +508,17 @@ class GraphqlMutations {
                 }
               }
             ]
-          }
-        }
+          },
+          "replyOn": {
+            "connect": {
+              "where": {
+                "node": {
+                  "id_EQ": commentInput.replyOn,
+                }
+              }
+            }
+          },
+        },
       ],
       "where": {
         "username_EQ": commentInput.username,

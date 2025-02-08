@@ -79,14 +79,14 @@ class _CommentListState extends State<CommentList> {
       return CommentWidget.reply(
         commentKey: comments.items[index],
         parentNodeId: parentNodeId,
-        key: ValueKey(comments.items[index]),
+        key: ValueKey(getCommentIdFromCommentKey(comments.items[index])),
       );
     }
 
     return CommentWidget(
       commentKey: comments.items[index],
       parentNodeId: parentNodeId,
-      key: ValueKey(comments.items[index]),
+      key: ValueKey(getCommentIdFromCommentKey(comments.items[index])),
     );
   }
 
