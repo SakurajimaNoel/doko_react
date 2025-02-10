@@ -214,76 +214,84 @@ class _CommentPageState extends State<CommentPage> {
                             curve: Curves.fastOutSlowIn,
                           );
                         },
-                        child: SliverViewObserver(
-                          controller: observerController,
-                          child: CustomScrollView(
-                            controller: controller,
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            cacheExtent: scrollCacheHeight,
-                            slivers: [
-                              SliverToBoxAdapter(
-                                child: CommentWidget(
-                                  commentKey: commentKey,
-                                  parentNodeId: comment.id,
-                                ),
-                              ),
-                              const SliverToBoxAdapter(
-                                child: SizedBox(
-                                  height: Constants.gap * 2,
-                                ),
-                              ),
-                              if (repliesError) ...[
-                                SliverToBoxAdapter(
-                                  child: SizedBox(
-                                    height: Constants.height * 5,
-                                    child: StyledText.error(state.message),
-                                  ),
-                                ),
-                              ] else
-                                repliesLoading
-                                    ? const SliverToBoxAdapter(
-                                        child: SizedBox(
-                                          height: Constants.height * 5,
-                                          child: Center(
-                                            child: SmallLoadingIndicator(),
+                        child: repliesLoading || repliesError
+                            ? SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                child: Column(
+                                  spacing: Constants.gap * 2,
+                                  children: [
+                                    CommentWidget(
+                                      commentKey: commentKey,
+                                      parentNodeId: comment.id,
+                                    ),
+                                    repliesError
+                                        ? SizedBox(
+                                            height: Constants.height * 5,
+                                            child:
+                                                StyledText.error(state.message),
+                                          )
+                                        : const SizedBox(
+                                            height: Constants.height * 5,
+                                            child: Center(
+                                              child: SmallLoadingIndicator(),
+                                            ),
                                           ),
-                                        ),
-                                      )
-                                    : BlocBuilder<UserActionBloc,
-                                        UserActionState>(
-                                        buildWhen: (previousState, state) {
-                                          return state
-                                                  is UserActionPrimaryNodeRefreshState &&
-                                              state.nodeId == comment.id;
-                                        },
-                                        builder: (context, state) {
-                                          DateTime now;
-                                          if (state
-                                              is UserActionPrimaryNodeRefreshState) {
-                                            now = state.now;
-                                          } else {
-                                            now = DateTime.now();
-                                          }
-
-                                          return CommentList(
-                                            parentNodeId: widget.commentId,
-                                            parentNodeType:
-                                                DokiNodeType.comment,
-                                            key: ObjectKey({
-                                              "postId": comment.id,
-                                              "lastFetch": now,
-                                            }),
-                                          );
-                                        },
+                                  ],
+                                ),
+                              )
+                            : SliverViewObserver(
+                                controller: observerController,
+                                child: CustomScrollView(
+                                  controller: controller,
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  cacheExtent: scrollCacheHeight,
+                                  slivers: [
+                                    SliverToBoxAdapter(
+                                      child: CommentWidget(
+                                        commentKey: commentKey,
+                                        parentNodeId: comment.id,
                                       ),
-                              const SliverToBoxAdapter(
-                                child: SizedBox(
-                                  height: Constants.gap * 2,
+                                    ),
+                                    const SliverToBoxAdapter(
+                                      child: SizedBox(
+                                        height: Constants.gap * 2,
+                                      ),
+                                    ),
+                                    BlocBuilder<UserActionBloc,
+                                        UserActionState>(
+                                      buildWhen: (previousState, state) {
+                                        return state
+                                                is UserActionPrimaryNodeRefreshState &&
+                                            state.nodeId == comment.id;
+                                      },
+                                      builder: (context, state) {
+                                        DateTime now;
+                                        if (state
+                                            is UserActionPrimaryNodeRefreshState) {
+                                          now = state.now;
+                                        } else {
+                                          now = DateTime.now();
+                                        }
+
+                                        return CommentList(
+                                          parentNodeId: widget.commentId,
+                                          parentNodeType: DokiNodeType.comment,
+                                          key: ObjectKey({
+                                            "postId": comment.id,
+                                            "lastFetch": now,
+                                          }),
+                                        );
+                                      },
+                                    ),
+                                    const SliverToBoxAdapter(
+                                      child: SizedBox(
+                                        height: Constants.gap * 2,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
                       ),
                     ),
                   ),
