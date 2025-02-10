@@ -110,3 +110,16 @@ class UserActionCommentDataFetchedState extends UserActionState {
   @override
   List<Object?> get props => [commentId, now, success];
 }
+
+/// comment highlight state
+class UserActionCommentHighlightState extends UserActionState {
+  UserActionCommentHighlightState({
+    required this.commentId,
+  }) : now = DateTime.now();
+
+  final String commentId;
+  final DateTime now;
+
+  @override
+  List<Object?> get props => [commentId, now];
+}

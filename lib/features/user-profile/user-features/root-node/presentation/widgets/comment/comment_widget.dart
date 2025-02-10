@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/utils/debounce/debounce.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
@@ -269,8 +271,19 @@ class _CommentReplyPreview extends StatelessWidget {
                 int commentIndex = comment.index!;
                 final observerController =
                     context.read<NodeCommentProvider>().controller;
+                final userActionBloc = context.read<UserActionBloc>();
 
                 if (observerController != null) {
+                  Timer(
+                      const Duration(
+                        milliseconds: Constants.maxScrollDuration,
+                      ), () {
+                    // fire highlight event
+                    userActionBloc.add(UserActionCommentHighlightEvent(
+                      commentId: comment.id,
+                    ));
+                  });
+
                   observerController.animateTo(
                     index: commentIndex,
                     duration: const Duration(
@@ -322,7 +335,7 @@ class _CommentReplyPreview extends StatelessWidget {
   }
 }
 
-class _CommentWrapper extends StatelessWidget {
+class _CommentWrapper extends StatefulWidget {
   const _CommentWrapper({
     required this.child,
     required this.isReply,
@@ -334,66 +347,100 @@ class _CommentWrapper extends StatelessWidget {
   final String commentId;
 
   @override
+  State<_CommentWrapper> createState() => _CommentWrapperState();
+}
+
+class _CommentWrapperState extends State<_CommentWrapper> {
+  bool highlight = false;
+  final highlightDebounce = Debounce(
+    const Duration(
+      milliseconds: 1500,
+    ),
+  );
+
+  @override
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
 
     String currentRoute = GoRouter.of(context).currentRouteName ?? "";
     bool isCommentPage = currentRoute == RouterConstants.comment;
 
-    if (isCommentPage && !isReply) {
+    if (isCommentPage && !widget.isReply) {
       return Padding(
         padding: const EdgeInsets.all(Constants.padding),
-        child: child,
+        child: widget.child,
       );
     }
 
-    return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: Constants.padding,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(Constants.radius),
-        color: currTheme.surfaceContainer,
-        boxShadow: [
-          BoxShadow(
-            color: currTheme.shadow.withValues(
-              alpha: 0.25,
+    return BlocListener<UserActionBloc, UserActionState>(
+      listenWhen: (previousState, state) {
+        return state is UserActionCommentHighlightState &&
+            state.commentId == widget.commentId;
+      },
+      listener: (context, state) {
+        if (!highlight) {
+          setState(() {
+            highlight = true;
+          });
+        }
+        highlightDebounce(() {
+          if (highlight) {
+            setState(() {
+              highlight = false;
+            });
+          }
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(
+          horizontal: Constants.padding,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(Constants.radius),
+          color: highlight
+              ? currTheme.primaryContainer
+              : currTheme.surfaceContainer,
+          boxShadow: [
+            BoxShadow(
+              color: currTheme.shadow.withValues(
+                alpha: 0.25,
+              ),
+              spreadRadius: 0,
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
-            spreadRadius: 0,
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isReply
-              ? null
-              : () {
-                  // send to comment page
-                  final nodeProvider = context.read<NodeCommentProvider>();
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.isReply
+                ? null
+                : () {
+                    // send to comment page
+                    final nodeProvider = context.read<NodeCommentProvider>();
 
-                  final rootNodeId = nodeProvider.rootNodeId;
-                  final rootNodeType = nodeProvider.rootNodeType;
-                  final rootNodeBy = nodeProvider.rootNodeCreatedBy;
+                    final rootNodeId = nodeProvider.rootNodeId;
+                    final rootNodeType = nodeProvider.rootNodeType;
+                    final rootNodeBy = nodeProvider.rootNodeCreatedBy;
 
-                  context.pushNamed(
-                    RouterConstants.comment,
-                    pathParameters: {
-                      "rootNodeType": rootNodeType.name,
-                      "rootNodeId": rootNodeId,
-                      "commentId": commentId,
-                      "userId": rootNodeBy,
-                    },
-                  );
-                },
-          child: Padding(
-            padding: const EdgeInsets.all(
-              Constants.padding * 0.75,
+                    context.pushNamed(
+                      RouterConstants.comment,
+                      pathParameters: {
+                        "rootNodeType": rootNodeType.name,
+                        "rootNodeId": rootNodeId,
+                        "commentId": widget.commentId,
+                        "userId": rootNodeBy,
+                      },
+                    );
+                  },
+            child: Padding(
+              padding: const EdgeInsets.all(
+                Constants.padding * 0.75,
+              ),
+              child: widget.child,
             ),
-            child: child,
           ),
         ),
       ),

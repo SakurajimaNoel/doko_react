@@ -60,7 +60,7 @@ class _CommentPageState extends State<CommentPage> {
     super.initState();
     observerController = SliverObserverController(
       controller: controller,
-    )..cacheJumpIndexOffset = false;
+    )..cacheJumpIndexOffset = true;
   }
 
   @override

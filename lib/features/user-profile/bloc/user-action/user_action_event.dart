@@ -119,3 +119,12 @@ final class UserActionNodeLikeRemoteEvent extends UserActionEvent {
   final UserNodeLikeAction payload;
   final String username;
 }
+
+/// comment reply highlight event
+final class UserActionCommentHighlightEvent extends UserActionEvent {
+  UserActionCommentHighlightEvent({
+    required this.commentId,
+  });
+
+  final String commentId;
+}
