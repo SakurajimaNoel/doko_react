@@ -47,13 +47,13 @@ class _LoginPageState extends State<LoginPage> {
         case LoginStatus.confirmSingUp:
           String message =
               "A verification email has been sent to your inbox.\nPlease click the link to confirm your email address and log in.";
-          showInfo(context, message);
+          showInfo(message);
           return;
       }
     }
 
     String errorMessage = (state as AuthenticationError).message;
-    showError(context, errorMessage);
+    showError(errorMessage);
   }
 
   void handleLogin(BuildContext context) {

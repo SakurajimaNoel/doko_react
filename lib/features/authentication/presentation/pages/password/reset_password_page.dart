@@ -41,7 +41,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     }
 
     String errorMessage = (state as AuthenticationError).message;
-    showError(context, errorMessage);
+    showError(errorMessage);
   }
 
   void handleResetPassword(BuildContext context) {

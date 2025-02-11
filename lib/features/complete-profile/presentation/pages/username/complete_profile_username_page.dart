@@ -41,7 +41,7 @@ class _CompleteProfileUsernamePageState
 
   void stateActions(BuildContext context, CompleteProfileState state) {
     String errorMessage = (state as CompleteProfileErrorState).message;
-    showError(context, errorMessage);
+    showError(errorMessage);
   }
 
   @override

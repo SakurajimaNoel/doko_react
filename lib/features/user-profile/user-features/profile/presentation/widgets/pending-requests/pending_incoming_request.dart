@@ -84,7 +84,7 @@ class _PendingIncomingRequestState extends State<PendingIncomingRequest>
             loading = false;
 
             if (state is PendingRequestLoadError) {
-              showError(context, state.message);
+              showError(state.message);
             }
           },
           builder: (context, state) {

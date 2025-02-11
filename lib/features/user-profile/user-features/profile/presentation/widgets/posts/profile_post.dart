@@ -93,7 +93,7 @@ class _ProfilePostState extends State<ProfilePost> {
         loading = false;
 
         if (state is ProfilePostLoadError) {
-          showError(context, state.message);
+          showError(state.message);
           return;
         }
 

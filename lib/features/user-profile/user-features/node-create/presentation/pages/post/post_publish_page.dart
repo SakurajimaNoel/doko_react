@@ -52,7 +52,7 @@ class _PostPublishPageState extends State<PostPublishPage> {
           listener: (context, state) {
             if (state is NodeCreateSuccess) {
               String message = "Successfully created new post.";
-              showSuccess(context, message);
+              showSuccess(message);
 
               context.read<UserActionBloc>().add(
                     UserActionNewPostEvent(
@@ -77,7 +77,7 @@ class _PostPublishPageState extends State<PostPublishPage> {
               return;
             }
 
-            showError(context, (state as NodeCreateError).message);
+            showError((state as NodeCreateError).message);
           },
           builder: (context, state) {
             bool uploading = state is NodeCreateLoading;
@@ -90,7 +90,7 @@ class _PostPublishPageState extends State<PostPublishPage> {
                 if (uploading) {
                   String message =
                       "Your post is almost there! Please let it finish uploading before navigating away.";
-                  showInfo(context, message);
+                  showInfo(message);
                   return;
                 }
 
@@ -142,7 +142,7 @@ class _PostPublishPageState extends State<PostPublishPage> {
                                   widget.postDetails.content.isEmpty) {
                                 String message =
                                     "Your post needs either content or a caption.\nPlease add at least one to proceed.";
-                                showError(context, message);
+                                showError(message);
                                 return;
                               }
 

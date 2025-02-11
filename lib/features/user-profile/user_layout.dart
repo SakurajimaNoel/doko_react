@@ -91,13 +91,14 @@ class _UserLayoutState extends State<UserLayout> {
     // create websocket client
     client = Client(
       url: Uri.parse(dotenv.env["WEBSOCKET_ENDPOINT"]!),
+      pingInterval: Constants.pingInterval,
       getToken: () async {
         final token = await getUserToken();
         return token.idToken;
       },
       onReconnectSuccess: () {
         /// find latest message from inbox and fetch based on that
-        showSuccess(context, "Reconnected to websocket server.");
+        showSuccess("Reconnected to websocket server.");
       },
       onConnectionClosure: (retry) async {
         StreamSubscription<InternetConnectionStatus>? internetSubscription;
@@ -112,8 +113,7 @@ class _UserLayoutState extends State<UserLayout> {
             retry();
             cancelSubscriptions();
           } else {
-            if (!mounted) return;
-            showError(context, "No internet connection.");
+            showError("No internet connection.");
 
             // Listen for internet connection changes
             internetSubscription = connectionChecker.onStatusChange.listen(
@@ -228,11 +228,11 @@ class _UserLayoutState extends State<UserLayout> {
   }
 
   Future<void> connectWS() async {
+    final websocketClientProvider = context.read<WebsocketClientProvider>();
     await client.connect();
-    if (!mounted) return;
 
-    showSuccess(context, "Connected to websocket server.");
-    context.read<WebsocketClientProvider>().addClient(client);
+    showSuccess("Connected to websocket server.");
+    websocketClientProvider.addClient(client);
   }
 
   void showNewFriendRequestNotification(UserSendFriendRequest request) {

@@ -69,16 +69,6 @@ class _CommentPageState extends State<CommentPage> {
     super.dispose();
   }
 
-  Future<void> handleCommentRefreshEvent() async {
-    context.read<UserActionBloc>().add(UserActionPrimaryNodeRefreshEvent(
-          nodeId: widget.commentId,
-        ));
-  }
-
-  void showToastError(String message) {
-    showError(context, message);
-  }
-
   @override
   Widget build(BuildContext context) {
     bool invalidNode = rootNodeType == DokiNodeType.user;
@@ -133,7 +123,7 @@ class _CommentPageState extends State<CommentPage> {
             return state is LoadErrorState;
           },
           listener: (context, state) {
-            if (state is LoadErrorState) showError(context, state.message);
+            if (state is LoadErrorState) showError(state.message);
           },
           buildWhen: (previousState, state) {
             return state is RootNodeInitial;
@@ -178,6 +168,7 @@ class _CommentPageState extends State<CommentPage> {
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: () async {
+                        final userActionBloc = context.read<UserActionBloc>();
                         Future postBloc =
                             context.read<RootNodeBloc>().stream.first;
 
@@ -191,14 +182,13 @@ class _CommentPageState extends State<CommentPage> {
                         final RootNodeState state = await postBloc;
 
                         if (state is PrimaryNodeRefreshErrorState) {
-                          if (!mounted) return;
-                          showToastError(state.message);
+                          showError(state.message);
                           return;
                         }
 
-                        if (!mounted) return;
-
-                        handleCommentRefreshEvent();
+                        userActionBloc.add(UserActionPrimaryNodeRefreshEvent(
+                          nodeId: widget.commentId,
+                        ));
                       },
                       child: BlocListener<UserActionBloc, UserActionState>(
                         listenWhen: (previousState, state) {

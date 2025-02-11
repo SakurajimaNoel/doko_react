@@ -27,7 +27,7 @@ class _ConfirmLoginPageState extends State<ConfirmLoginPage> {
 
   void stateActions(BuildContext context, AuthenticationState state) {
     String errorMessage = (state as AuthenticationError).message;
-    showError(context, errorMessage);
+    showError(errorMessage);
   }
 
   void handleConfirmLogin(BuildContext context) {

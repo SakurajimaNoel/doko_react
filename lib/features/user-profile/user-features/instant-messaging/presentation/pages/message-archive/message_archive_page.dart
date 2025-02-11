@@ -205,13 +205,13 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                       }
 
                       return IconButton(
-                        onPressed: () {
+                        onPressed: () async {
                           final client =
                               context.read<WebsocketClientProvider>().client;
                           if (client == null) {
-                            showError(context, "You are not connected.");
+                            showError("You are not connected.");
                           }
-
+                          final realTimeBloc = context.read<RealTimeBloc>();
                           final username = (context.read<UserBloc>().state
                                   as UserCompleteState)
                               .username;
@@ -227,17 +227,16 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                             everyone: false,
                           );
 
-                          bool result = client!.sendPayload(deleteMessage);
+                          bool result =
+                              await client!.sendPayload(deleteMessage);
                           if (result) {
-                            context
-                                .read<RealTimeBloc>()
-                                .add(RealTimeDeleteMessageEvent(
-                                  message: deleteMessage,
-                                  username: username,
-                                ));
+                            realTimeBloc.add(RealTimeDeleteMessageEvent(
+                              message: deleteMessage,
+                              username: username,
+                            ));
                             archiveMessageProvider.clearSelect();
                           } else {
-                            showError(context,
+                            showError(
                                 "Failed to delete ${archiveMessageProvider.selectedMessages.length} messages.");
                           }
                         },

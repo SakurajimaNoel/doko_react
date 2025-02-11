@@ -89,10 +89,6 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
     super.dispose();
   }
 
-  void showToastError(String message) {
-    showError(context, message);
-  }
-
   @override
   Widget build(BuildContext context) {
     final GetProfileInput details = GetProfileInput(
@@ -133,7 +129,7 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
               }
 
               if (errorMessage.isNotEmpty) {
-                showError(context, errorMessage);
+                showError(errorMessage);
                 return;
               }
 
@@ -197,8 +193,7 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
 
                   final ProfileState state = await profileBloc;
                   if (state is ProfileRefreshError) {
-                    if (!mounted) return;
-                    showToastError(state.message);
+                    showError(state.message);
                   }
                 },
                 child: BlocBuilder<UserToUserActionBloc, UserToUserActionState>(

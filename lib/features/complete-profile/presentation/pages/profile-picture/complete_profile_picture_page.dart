@@ -59,7 +59,7 @@ class _CompleteProfilePicturePageState
     }
 
     String errorMessage = (state as CompleteProfileErrorState).message;
-    showError(context, errorMessage);
+    showError(errorMessage);
   }
 
   void handleCompleteProfile(BuildContext context) {

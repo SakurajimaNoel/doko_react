@@ -15,7 +15,7 @@ class SignOutButton extends StatefulWidget {
 class _SignOutButtonState extends State<SignOutButton> {
   void stateActions(BuildContext context, AuthenticationState state) {
     String errorMessage = (state as AuthenticationError).message;
-    showError(context, errorMessage);
+    showError(errorMessage);
   }
 
   @override

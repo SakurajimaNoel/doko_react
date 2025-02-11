@@ -22,7 +22,7 @@ class _RemoveMfaButtonState extends State<RemoveMfaButton> {
       return;
     }
     String errorMessage = (state as AuthenticationError).message;
-    showError(context, errorMessage);
+    showError(errorMessage);
   }
 
   @override

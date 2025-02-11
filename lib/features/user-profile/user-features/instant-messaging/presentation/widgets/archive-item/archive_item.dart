@@ -53,14 +53,15 @@ class ArchiveItem extends StatelessWidget {
         graph.getValueByKey(messageKey)! as MessageEntity;
     final message = messageEntity.message;
 
-    void deleteMessage({
+    Future<void> deleteMessage({
       required bool everyone,
-    }) {
+    }) async {
       final client = context.read<WebsocketClientProvider>().client;
       if (client == null || client.isNotActive) {
-        showError(context, "You are not connected.");
+        showError("You are not connected.");
       }
 
+      final realTimeBloc = context.read<RealTimeBloc>();
       final username =
           (context.read<UserBloc>().state as UserCompleteState).username;
       final archiveMessageProvider = context.read<ArchiveMessageProvider>();
@@ -72,15 +73,15 @@ class ArchiveItem extends StatelessWidget {
         everyone: everyone,
       );
 
-      bool result = client!.sendPayload(deleteMessage);
+      bool result = await client!.sendPayload(deleteMessage);
       if (result) {
-        context.read<RealTimeBloc>().add(RealTimeDeleteMessageEvent(
-              message: deleteMessage,
-              username: username,
-            ));
+        realTimeBloc.add(RealTimeDeleteMessageEvent(
+          message: deleteMessage,
+          username: username,
+        ));
         archiveMessageProvider.clearSelect();
       } else {
-        showError(context, "Failed to delete message.");
+        showError("Failed to delete message.");
       }
     }
 
@@ -473,19 +474,20 @@ class _EditMessageState extends State<_EditMessage> {
           child: const Text("Cancel"),
         ),
         TextButton(
-          onPressed: () {
+          onPressed: () async {
             String newBody = controller.text.trim();
 
             if (newBody.isEmpty) {
-              showError(context, "Message can't be empty.");
+              showError("Message can't be empty.");
               return;
             }
 
             final client = context.read<WebsocketClientProvider>().client;
             if (client == null || client.isNotActive) {
-              showError(context, "You are not connected.");
+              showError("You are not connected.");
             }
 
+            final realTimeBloc = context.read<RealTimeBloc>();
             final archiveMessageProvider =
                 context.read<ArchiveMessageProvider>();
             final username =
@@ -497,23 +499,30 @@ class _EditMessageState extends State<_EditMessage> {
               body: newBody,
             );
 
-            if (client!.sendPayload(editedMessage)) {
+            if (await client!.sendPayload(editedMessage)) {
               // success
-              showSuccess(context, "Message edited.");
-              context.read<RealTimeBloc>().add(RealTimeEditMessageEvent(
-                    message: editedMessage,
-                    username: username,
-                  ));
+              realTimeBloc.add(RealTimeEditMessageEvent(
+                message: editedMessage,
+                username: username,
+              ));
+
+              showSuccess("Message edited.");
             } else {
-              showError(context, "Failed to edit message.");
+              showError("Failed to edit message.");
               return;
             }
 
-            context.pop();
+            if (mounted) {
+              contextPop();
+            }
           },
           child: const Text("Edit"),
         ),
       ],
     );
+  }
+
+  void contextPop() {
+    context.pop();
   }
 }

@@ -33,13 +33,13 @@ class _VerifyMfaPageState extends State<VerifyMfaPage> {
       context.read<UserBloc>().add(UserUpdateMFAEvent(
             mfaStatus: true,
           ));
-      showSuccess(context, 'Successfully added MFA to this account!');
+      showSuccess('Successfully added MFA to this account!');
       context.goNamed(RouterConstants.settings);
       return;
     }
 
     String errorMessage = (state as AuthenticationError).message;
-    showError(context, errorMessage);
+    showError(errorMessage);
   }
 
   void handleVerifyMFA(BuildContext context) {

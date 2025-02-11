@@ -69,7 +69,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   void stateActions(BuildContext context, ProfileState state) {
     if (state is ProfileEditSuccess) {
-      showSuccess(context, 'Successfully updated user profile');
+      showSuccess('Successfully updated user profile');
 
       UserGraph graph = UserGraph();
       String key = generateUserNodeKey(user.username);
@@ -100,7 +100,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
 
     String errorMessage = (state as ProfileError).message;
-    showError(context, errorMessage);
+    showError(errorMessage);
   }
 
   bool needsUpdate() {

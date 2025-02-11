@@ -39,16 +39,6 @@ class _PostPageState extends State<PostPage> {
 
   final ScrollController controller = ScrollController();
 
-  Future<void> handlePostRefreshEvent() async {
-    context.read<UserActionBloc>().add(UserActionPrimaryNodeRefreshEvent(
-          nodeId: widget.postId,
-        ));
-  }
-
-  void showToastError(String message) {
-    showError(context, message);
-  }
-
   @override
   Widget build(BuildContext context) {
     final scrollCacheHeight = MediaQuery.sizeOf(context).height * 2;
@@ -70,7 +60,7 @@ class _PostPageState extends State<PostPage> {
             return state is LoadErrorState;
           },
           listener: (context, state) {
-            if (state is LoadErrorState) showError(context, state.message);
+            if (state is LoadErrorState) showError(state.message);
           },
           buildWhen: (previousState, state) {
             return state is RootNodeInitial;
@@ -116,6 +106,7 @@ class _PostPageState extends State<PostPage> {
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: () async {
+                        final userActionBloc = context.read<UserActionBloc>();
                         Future postBloc =
                             context.read<RootNodeBloc>().stream.first;
 
@@ -129,14 +120,13 @@ class _PostPageState extends State<PostPage> {
                         final RootNodeState state = await postBloc;
 
                         if (state is PrimaryNodeRefreshErrorState) {
-                          if (!mounted) return;
-                          showToastError(state.message);
+                          showError(state.message);
                           return;
                         }
 
-                        if (!mounted) return;
-
-                        handlePostRefreshEvent();
+                        userActionBloc.add(UserActionPrimaryNodeRefreshEvent(
+                          nodeId: widget.postId,
+                        ));
                       },
                       child: BlocListener<UserActionBloc, UserActionState>(
                         listenWhen: (previousState, state) {

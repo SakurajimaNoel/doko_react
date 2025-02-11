@@ -35,13 +35,13 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
     if (state is AuthenticationUpdatePasswordSuccess) {
       formKey.currentState?.reset();
       String message = "Your password has been successfully updated.";
-      showSuccess(context, message);
+      showSuccess(message);
       context.goNamed(RouterConstants.settings);
       return;
     }
 
     String errorMessage = (state as AuthenticationError).message;
-    showError(context, errorMessage);
+    showError(errorMessage);
   }
 
   void handleUpdatePassword(BuildContext context) {

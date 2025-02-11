@@ -115,7 +115,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
       }),
       onVisibilityChanged: (VisibilityInfo visibilityInfo) {
         var visiblePercentage = visibilityInfo.visibleFraction * 100;
-        if (!mounted) return;
+        if (!mounted) {
+          player.pause();
+          return;
+        }
 
         try {
           if (preferences.state.audio) {

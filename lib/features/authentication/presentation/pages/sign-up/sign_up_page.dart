@@ -36,13 +36,13 @@ class _SignUpPageState extends State<SignUpPage> {
       formKey.currentState?.reset();
       String message =
           "Almost there! Just one more step: verify your email address to activate your account.\nLook for the verification email in your inbox.";
-      showInfo(context, message);
+      showInfo(message);
       context.goNamed(RouterConstants.login);
       return;
     }
 
     String errorMessage = (state as AuthenticationError).message;
-    showError(context, errorMessage);
+    showError(errorMessage);
   }
 
   void handleSignUp(BuildContext context) {

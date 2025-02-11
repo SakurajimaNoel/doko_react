@@ -4,6 +4,8 @@ import 'package:nice_overlay/nice_overlay.dart';
 
 part "notification_helper_lib.dart";
 
+const _shadow = Color(0xff000000);
+
 /// [createNewNotification] is used to create [NiceInAppNotification]
 NiceInAppNotification createNewNotification({
   required BuildContext context,
@@ -54,22 +56,18 @@ NiceInAppNotification createNewNotification({
   );
 }
 
-NiceToast createNewToast(
-  BuildContext context, {
+NiceToast createNewToast({
   required String message,
   required ToastType type,
 }) {
-  final currTheme = Theme.of(context).colorScheme;
   final backgroundColor = type == ToastType.error
-      ? currTheme.errorContainer
+      ? Colors.redAccent
       : type == ToastType.success
           ? Colors.green
-          : currTheme.inverseSurface;
-  final textColor = type == ToastType.error
-      ? currTheme.onErrorContainer
-      : type == ToastType.success
-          ? Colors.white
-          : currTheme.onInverseSurface;
+          : Colors.white;
+  final textColor = type == ToastType.error || type == ToastType.success
+      ? Colors.white
+      : Colors.black;
 
   return NiceToast(
     backgroundColor: backgroundColor,
@@ -94,7 +92,7 @@ NiceToast createNewToast(
     ),
     boxShadows: [
       BoxShadow(
-        color: currTheme.shadow.withValues(
+        color: _shadow.withValues(
           alpha: 0.5,
         ),
         spreadRadius: 0,

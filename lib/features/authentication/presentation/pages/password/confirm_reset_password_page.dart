@@ -46,7 +46,7 @@ class _ConfirmResetPasswordPageState extends State<ConfirmResetPasswordPage> {
     }
 
     String errorMessage = (state as AuthenticationError).message;
-    showError(context, errorMessage);
+    showError(errorMessage);
   }
 
   void handleConfirmResetPassword(BuildContext context) {

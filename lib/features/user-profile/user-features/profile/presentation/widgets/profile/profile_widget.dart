@@ -261,16 +261,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     );
   }
 
-  Future<void> handleUserRefreshEvent() async {
-    context.read<UserToUserActionBloc>().add(UserToUserActionUserRefreshEvent(
-          username: username,
-        ));
-  }
-
-  void showToastError(String message) {
-    showError(context, message);
-  }
-
   @override
   Widget build(BuildContext context) {
     GetProfileInput details = GetProfileInput(
@@ -468,6 +458,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
                 return RefreshIndicator(
                   onRefresh: () async {
+                    final userToUserActionBloc =
+                        context.read<UserToUserActionBloc>();
                     Future profileBloc =
                         context.read<ProfileBloc>().stream.first;
 
@@ -478,13 +470,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     final ProfileState state = await profileBloc;
 
                     if (state is ProfileRefreshError) {
-                      if (!mounted) return;
-                      showToastError(state.message);
+                      showError(state.message);
                     } else {
                       // trigger ui rebuilds
-                      if (mounted) {
-                        handleUserRefreshEvent();
-                      }
+                      userToUserActionBloc.add(UserToUserActionUserRefreshEvent(
+                        username: username,
+                      ));
                     }
                   },
                   child: CustomScrollView(

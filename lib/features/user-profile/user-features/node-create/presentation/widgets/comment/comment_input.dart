@@ -72,7 +72,7 @@ class CommentInput extends StatelessWidget {
           listener: (context, state) {
             if (state is! NodeCreateSuccess) {
               if (state is NodeCreateError) {
-                showError(context, state.message);
+                showError(state.message);
               }
               return;
             }
@@ -104,7 +104,7 @@ class CommentInput extends StatelessWidget {
               commentsCount = comment.commentsCount;
             }
 
-            showSuccess(context, "Comment added successfully");
+            showSuccess("Comment added successfully");
 
             // clean up
             context.read<CommentInputProvider>().reset();
@@ -546,7 +546,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                           getFileExtensionFromMimeType(data.mimeType);
 
                       if (extension == null) {
-                        showError(context, Constants.errorMessage);
+                        showError(Constants.errorMessage);
                         return;
                       }
 
@@ -642,10 +642,6 @@ class _CommentInputActions extends StatefulWidget {
 }
 
 class _CommentInputActionsState extends State<_CommentInputActions> {
-  void showToastMediaError() {
-    showError(context, "Invalid media file selected.");
-  }
-
   void addMedia(CommentMedia selectedMedia) {
     context.read<CommentInputProvider>().addMedia(selectedMedia);
   }
@@ -737,8 +733,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                             getFileExtensionFromFileName(selectedMedia.path);
 
                         if (extension == null) {
-                          if (!mounted) return;
-                          showToastMediaError();
+                          showError("Invalid media file selected.");
                           return;
                         }
 

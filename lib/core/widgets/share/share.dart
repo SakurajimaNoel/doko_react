@@ -120,8 +120,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
       if (selectedLength < Constants.shareLimit) {
         selectedUsers.add(username);
       } else {
-        showInfo(context,
-            "You can send up to ${Constants.shareLimit} users at a time.");
+        showInfo("You can send up to ${Constants.shareLimit} users at a time.");
       }
     }
 
@@ -212,7 +211,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
           }
 
           if (errorMessage.isNotEmpty) {
-            showError(context, errorMessage);
+            showError(errorMessage);
             return;
           }
 
@@ -480,7 +479,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                     .client;
 
                                 if (client == null || client.isNotActive) {
-                                  showError(context, "You are offline.");
+                                  showError("You are offline.");
                                   return;
                                 }
 
@@ -524,7 +523,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                 }
 
                                 if (successMessage.isNotEmpty) {
-                                  showSuccess(context, successMessage);
+                                  showSuccess(successMessage);
                                 }
                                 context.pop();
                               },

@@ -89,12 +89,13 @@ class CreatePostPageState extends State<CreatePostPage> {
       // handle failed case
       String message =
           "Uh-oh, looks like we couldn't add that video.\nPlease try selecting it again.";
-      if (!mounted) return;
 
-      showError(context, message);
-      setState(() {
-        content.removeLast();
-      });
+      showError(message);
+      if (mounted) {
+        setState(() {
+          content.removeLast();
+        });
+      }
       return;
     }
 
@@ -130,7 +131,7 @@ class CreatePostPageState extends State<CreatePostPage> {
 
     String message =
         "It seems like we don't support that file type.\nPlease try uploading an image or video instead.";
-    showError(context, message);
+    showError(message);
   }
 
   void onSelection(List<XFile> selectedFiles) {
