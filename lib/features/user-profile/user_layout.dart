@@ -18,6 +18,7 @@ import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_t
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,6 +47,7 @@ class _UserLayoutState extends State<UserLayout> {
   DateTime? backgroundWhen;
 
   late StreamSubscription<FGBGType> appState;
+  AsyncCallback? retryOnForeground;
 
   @override
   void initState() {
@@ -61,17 +63,23 @@ class _UserLayoutState extends State<UserLayout> {
       isForeground = event == FGBGType.foreground;
 
       if (!isForeground) {
-        /// refresh whole app if user comes back after 30minutes
+        /// refresh whole app if user comes back after [Constants.backgroundDurationLimit]
         backgroundWhen = DateTime.now();
       } else {
+        /// process event if on foreground
+        if (retryOnForeground != null) {
+          retryOnForeground!();
+          retryOnForeground = null;
+        }
+
         DateTime now = DateTime.now();
         if (backgroundWhen == null) return;
 
         Duration diff = now.difference(backgroundWhen!);
         backgroundWhen = null;
 
-        // refresh the whole app after 1 hour
-        if (diff.inMinutes > 60) {
+        /// refresh the whole app after [Constants.backgroundDurationLimit]
+        if (diff.inMinutes > Constants.backgroundDurationLimit) {
           refreshApp();
         }
       }
@@ -92,12 +100,10 @@ class _UserLayoutState extends State<UserLayout> {
         showSuccess(context, "Reconnected to websocket server.");
       },
       onConnectionClosure: (retry) async {
-        StreamSubscription<FGBGType>? fgBgSubscription;
         StreamSubscription<InternetConnectionStatus>? internetSubscription;
 
         void cancelSubscriptions() {
           internetSubscription?.cancel();
-          fgBgSubscription?.cancel();
         }
 
         Future<void> handleReconnection() async {
@@ -124,13 +130,7 @@ class _UserLayoutState extends State<UserLayout> {
         if (isForeground) {
           await handleReconnection();
         } else {
-          fgBgSubscription = FGBGEvents.instance.stream.listen(
-            (event) async {
-              if (event == FGBGType.foreground) {
-                await handleReconnection();
-              }
-            },
-          );
+          retryOnForeground = handleReconnection;
         }
       },
       payloadHandler: {

@@ -16,6 +16,7 @@ class Constants {
   static const Duration notificationDuration = Duration(
     seconds: 3,
   );
+  static const int backgroundDurationLimit = 60;
 
   static const double padding = _root;
   static const double gap = _root;
