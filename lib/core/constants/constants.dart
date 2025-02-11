@@ -103,9 +103,9 @@ class Constants {
   static final RegExp emailRegexMessage =
       RegExp(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
   static final RegExp urlRegexMessage = RegExp(
-      r"(?!@)(https?:\/\/)?([a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}([\/\w\-\.~]*)?(\?[^\s#@]*)?(\#[^\s@]*)?");
+      r"(?!@)(https?://)?([a-zA-Z0-9-]+\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}([/\w\-.~]*)?(\?[^\s#@]*)?(#[^\s@]*)?");
   static final RegExp phoneRegexMessage =
-      RegExp(r"(\+?[0-9]{1,3})?[ ]?[0-9]{3}[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}");
+      RegExp(r"(\+?[0-9]{1,3})? ?[0-9]{3}[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}");
   static final Duration typingStatusEventDuration = const Duration(
     seconds: 3,
   ); // used for both firing end events and sending typing events
