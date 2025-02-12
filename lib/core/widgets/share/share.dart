@@ -473,15 +473,10 @@ class _ShareDetailsState extends State<_ShareDetails> {
                     : FilledButton(
                         onPressed: selectedUsers.isEmpty
                             ? null
-                            : () {
+                            : () async {
                                 final client = context
                                     .read<WebsocketClientProvider>()
                                     .client;
-
-                                if (client == null || client.isNotActive) {
-                                  showError("You are offline.");
-                                  return;
-                                }
 
                                 final realTimeBloc =
                                     context.read<RealTimeBloc>();
@@ -495,12 +490,21 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                     sendAt: DateTime.now(),
                                   );
 
-                                  client.sendPayload(message);
-                                  // fire bloc event
-                                  realTimeBloc.add(RealTimeNewMessageEvent(
-                                    message: message,
-                                    username: username,
-                                  ));
+                                  bool result =
+                                      await client?.sendPayload(message) ??
+                                          false;
+
+                                  if (result) {
+                                    // fire bloc event
+                                    realTimeBloc.add(RealTimeNewMessageEvent(
+                                      message: message,
+                                      username: username,
+                                    ));
+                                  } else {
+                                    showError(
+                                        Constants.websocketNotConnectedError);
+                                    return;
+                                  }
                                 }
 
                                 String successMessage;
@@ -526,7 +530,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                 if (successMessage.isNotEmpty) {
                                   showSuccess(successMessage);
                                 }
-                                context.pop();
+                                if (mounted) contextPop();
                               },
                         style: FilledButton.styleFrom(
                           minimumSize: const Size(
@@ -542,6 +546,10 @@ class _ShareDetailsState extends State<_ShareDetails> {
         },
       ),
     );
+  }
+
+  void contextPop() {
+    context.pop();
   }
 }
 

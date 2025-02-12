@@ -57,9 +57,6 @@ class ArchiveItem extends StatelessWidget {
       required bool everyone,
     }) async {
       final client = context.read<WebsocketClientProvider>().client;
-      if (client == null || client.isNotActive) {
-        showError("You are not connected.");
-      }
 
       final realTimeBloc = context.read<RealTimeBloc>();
       final username =
@@ -73,7 +70,7 @@ class ArchiveItem extends StatelessWidget {
         everyone: everyone,
       );
 
-      bool result = await client!.sendPayload(deleteMessage);
+      bool result = await client?.sendPayload(deleteMessage) ?? false;
       if (result) {
         realTimeBloc.add(RealTimeDeleteMessageEvent(
           message: deleteMessage,
@@ -81,7 +78,7 @@ class ArchiveItem extends StatelessWidget {
         ));
         archiveMessageProvider.clearSelect();
       } else {
-        showError("Failed to delete message.");
+        showError(Constants.websocketNotConnectedError);
       }
     }
 
@@ -483,9 +480,6 @@ class _EditMessageState extends State<_EditMessage> {
             }
 
             final client = context.read<WebsocketClientProvider>().client;
-            if (client == null || client.isNotActive) {
-              showError("You are not connected.");
-            }
 
             final realTimeBloc = context.read<RealTimeBloc>();
             final archiveMessageProvider =
@@ -500,7 +494,7 @@ class _EditMessageState extends State<_EditMessage> {
               editedOn: DateTime.now(),
             );
 
-            if (await client!.sendPayload(editedMessage)) {
+            if (await client?.sendPayload(editedMessage) ?? false) {
               // success
               realTimeBloc.add(RealTimeEditMessageEvent(
                 message: editedMessage,
@@ -509,7 +503,7 @@ class _EditMessageState extends State<_EditMessage> {
 
               showSuccess("Message edited.");
             } else {
-              showError("Failed to edit message.");
+              showError(Constants.websocketNotConnectedError);
               return;
             }
 

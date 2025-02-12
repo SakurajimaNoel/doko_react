@@ -138,7 +138,6 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
         if (!updating) return;
 
         final client = context.read<WebsocketClientProvider>().client;
-        if (client == null || client.isNotActive) return;
 
         final user = graph.getValueByKey(graphKey);
         DateTime addedOn = DateTime.now();
@@ -155,7 +154,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
             to: username,
             addedOn: addedOn,
           );
-          client.sendPayload(req);
+          client?.sendPayload(req);
         }
 
         if (relation == UserToUserRelation.outgoingReq) {
@@ -164,7 +163,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
             to: username,
             addedOn: addedOn,
           );
-          client.sendPayload(req);
+          client?.sendPayload(req);
         }
 
         if (relation == UserToUserRelation.unrelated) {
@@ -172,7 +171,7 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
             from: currentUsername,
             to: username,
           );
-          client.sendPayload(relation);
+          client?.sendPayload(relation);
         }
 
         updating = false;

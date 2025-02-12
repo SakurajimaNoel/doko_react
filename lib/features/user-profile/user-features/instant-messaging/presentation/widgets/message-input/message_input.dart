@@ -93,12 +93,7 @@ class _MessageInputState extends State<MessageInput> {
     final client = context.read<WebsocketClientProvider>().client;
 
     Widget gifPicker = GifPicker(
-      handleSelection: (String gifURL) {
-        if (client == null || client.isNotActive) {
-          showError("You are not connected.");
-          return;
-        }
-
+      handleSelection: (String gifURL) async {
         ChatMessage message = ChatMessage(
           from: username,
           to: widget.archiveUser,
@@ -107,13 +102,17 @@ class _MessageInputState extends State<MessageInput> {
           body: gifURL,
           sendAt: DateTime.now(),
         );
-        client.sendPayload(message);
+        bool result = await client?.sendPayload(message) ?? false;
 
-        // fire bloc event
-        realTimeBloc.add(RealTimeNewMessageEvent(
-          message: message,
-          username: username,
-        ));
+        if (result) {
+          // fire bloc event
+          realTimeBloc.add(RealTimeNewMessageEvent(
+            message: message,
+            username: username,
+          ));
+        } else {
+          showError(Constants.websocketNotConnectedError);
+        }
       },
       disabled: false,
     );
@@ -180,14 +179,9 @@ class _MessageInputState extends State<MessageInput> {
                     gifPicker,
                     const Spacer(),
                     FilledButton(
-                      onPressed: () {
+                      onPressed: () async {
                         final messageBody = controller.text.trim();
                         if (messageBody.isEmpty) return;
-
-                        if (client == null || client.isNotActive) {
-                          showError("You are offline.");
-                          return;
-                        }
 
                         ChatMessage message = ChatMessage(
                           from: username,
@@ -197,17 +191,23 @@ class _MessageInputState extends State<MessageInput> {
                           body: messageBody,
                           sendAt: DateTime.now(),
                         );
-                        client.sendPayload(message);
+                        bool result =
+                            await client?.sendPayload(message) ?? false;
 
                         HapticFeedback.vibrate();
-                        // fire bloc event
-                        realTimeBloc.add(RealTimeNewMessageEvent(
-                          message: message,
-                          username: username,
-                        ));
 
-                        controller.clear();
-                        setState(() {});
+                        if (result) {
+                          // fire bloc event
+                          realTimeBloc.add(RealTimeNewMessageEvent(
+                            message: message,
+                            username: username,
+                          ));
+
+                          controller.clear();
+                          setState(() {});
+                        } else {
+                          showError(Constants.websocketNotConnectedError);
+                        }
                       },
                       child: const Text("Send"),
                     ),
