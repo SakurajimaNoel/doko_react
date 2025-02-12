@@ -226,6 +226,29 @@ class _UserLayoutState extends State<UserLayout> {
                 payload: payload,
                 username: username,
               ));
+        },
+        PayloadType.userCreateSecondaryNode: (UserCreateSecondaryNode payload) {
+          // send created secondary on my node
+          if (payload.from != username && payload.to == username) {
+            showUserCreateSecondaryNodeNotification(payload);
+          }
+
+          // send notifications to mentioned users
+          if (payload.mentions?.contains(username) ?? false) {
+            userMentionedOnCommentNotification(payload);
+          }
+
+          // send notification on reply to my comment
+          if (payload.replyOnNodeCreatedBy == username &&
+              payload.to != username) {
+            userRepliedToYourCommentNode(payload);
+          }
+
+          context
+              .read<UserActionBloc>()
+              .add(UserActionNewSecondaryNodeRemoteEvent(
+                payload: payload,
+              ));
         }
       },
     );
@@ -245,47 +268,116 @@ class _UserLayoutState extends State<UserLayout> {
     websocketClientProvider.addClient(client);
   }
 
+  void handleRedirectToNodePage({
+    required NodeType nodeType,
+    required String nodeId,
+    required List<UserNodeType> parents,
+  }) {
+    if (nodeType == NodeType.post) {
+      // go to post page
+      context.pushNamed(
+        RouterConstants.userPost,
+        pathParameters: {
+          "postId": nodeId,
+        },
+      );
+    }
+
+    if (nodeType == NodeType.comment) {
+      bool commentReply = parents.length == 3;
+      String parentNodeType =
+          DokiNodeType.fromNodeType(parents.first.nodeType).name;
+      String parentNodeId = parents.first.nodeId;
+
+      String rootNodeType = parentNodeType;
+      String rootNodeId = parentNodeId;
+      if (commentReply) {
+        rootNodeType = DokiNodeType.fromNodeType(parents[1].nodeType).name;
+        rootNodeId = parents[1].nodeId;
+      }
+
+      context.pushNamed(
+        RouterConstants.comment,
+        pathParameters: {
+          "userId": parents.last.nodeId,
+          "parentNodeType": parentNodeType,
+          "parentNodeId": parentNodeId,
+          "commentId": nodeId,
+          "rootNodeType": rootNodeType,
+          "rootNodeId": rootNodeId,
+        },
+      );
+    }
+  }
+
+  void userRepliedToYourCommentNode(UserCreateSecondaryNode payload) {
+    final userKey = generateUserNodeKey(payload.from);
+    final notification = createNewNotification(
+      context: context,
+      userKey: userKey,
+      body: Text("@${payload.from} replied to your comment."),
+      onTap: () => handleRedirectToNodePage(
+        nodeType: payload.nodeType,
+        nodeId: payload.nodeId,
+        parents: payload.parents,
+      ),
+    );
+
+    showNotification(notification);
+  }
+
+  void userMentionedOnCommentNotification(UserCreateSecondaryNode payload) {
+    final userKey = generateUserNodeKey(payload.from);
+    final notification = createNewNotification(
+      context: context,
+      userKey: userKey,
+      body:
+          Text("@${payload.from} mentioned you on a ${payload.nodeType.name}."),
+      onTap: () => handleRedirectToNodePage(
+        nodeType: payload.nodeType,
+        nodeId: payload.nodeId,
+        parents: payload.parents,
+      ),
+    );
+
+    showNotification(notification);
+  }
+
+  void showUserCreateSecondaryNodeNotification(
+      UserCreateSecondaryNode payload) {
+    final userKey = generateUserNodeKey(payload.from);
+    String nodeDisplayText = "comment";
+    if (payload.parents.first.nodeType == NodeType.comment) {
+      nodeDisplayText = "reply";
+    }
+
+    final notification = createNewNotification(
+      context: context,
+      userKey: userKey,
+      body: Text(
+          "@${payload.from} added a $nodeDisplayText to your ${payload.parents.first.nodeType.name}."),
+      onTap: () => handleRedirectToNodePage(
+        nodeType: payload.nodeType,
+        nodeId: payload.nodeId,
+        parents: payload.parents,
+      ),
+    );
+
+    showNotification(notification);
+  }
+
   void showUserLikeMyNodeNotification(UserNodeLikeAction payload) {
     final userKey = generateUserNodeKey(payload.from);
     final notification = createNewNotification(
-        context: context,
-        userKey: userKey,
-        body: Text("@${payload.from} liked your ${payload.nodeType.name}."),
-        onTap: () {
-          if (payload.nodeType == NodeType.post) {
-            // go to post page
-            context.pushNamed(RouterConstants.userPost, pathParameters: {
-              "postId": payload.nodeId,
-            });
-          }
-
-          if (payload.nodeType == NodeType.comment) {
-            bool commentReply = payload.parents.length == 3;
-            String parentNodeType =
-                DokiNodeType.fromNodeType(payload.parents.first.nodeType).name;
-            String parentNodeId = payload.parents.first.nodeId;
-
-            String rootNodeType = parentNodeType;
-            String rootNodeId = parentNodeId;
-            if (commentReply) {
-              rootNodeType =
-                  DokiNodeType.fromNodeType(payload.parents[1].nodeType).name;
-              rootNodeId = payload.parents[1].nodeId;
-            }
-
-            context.pushNamed(
-              RouterConstants.comment,
-              pathParameters: {
-                "userId": payload.parents.last.nodeId,
-                "parentNodeType": parentNodeType,
-                "parentNodeId": parentNodeId,
-                "commentId": payload.nodeId,
-                "rootNodeType": rootNodeType,
-                "rootNodeId": rootNodeId,
-              },
-            );
-          }
-        });
+      context: context,
+      userKey: userKey,
+      body: Text("@${payload.from} liked your ${payload.nodeType.name}."),
+      onTap: () => handleRedirectToNodePage(
+        nodeType: payload.nodeType,
+        nodeId: payload.nodeId,
+        parents: payload.parents,
+      ),
+    );
 
     showNotification(notification);
   }

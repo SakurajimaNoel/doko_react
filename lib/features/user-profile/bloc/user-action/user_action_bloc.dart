@@ -76,6 +76,8 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       emit(UserActionNewCommentState(
         nodeId: event.targetId,
       ));
+
+      // send to websocket server
     });
     on<UserActionPrimaryNodeRefreshEvent>(
       (event, emit) => emit(
@@ -96,6 +98,46 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         ),
       ),
     );
+
+    on<UserActionNewSecondaryNodeRemoteEvent>(
+        _handleUserActionNewSecondaryNodeRemoteEvent);
+  }
+
+  FutureOr<void> _handleUserActionNewSecondaryNodeRemoteEvent(
+      UserActionNewSecondaryNodeRemoteEvent event,
+      Emitter<UserActionState> emit) async {
+    /// update graph
+    /// need to update post and comment based on parent
+    /// if parents.first is post update post if comment update comment
+    final parentNodeType = event.payload.parents.first.nodeType;
+    final parentNodeId = event.payload.parents.first.nodeId;
+
+    final nodeId = event.payload.nodeId;
+
+    if (parentNodeType == NodeType.post) {
+      graph.addCommentIdToPostEntity(
+        parentNodeId,
+        commentId: nodeId,
+      );
+    }
+
+    if (parentNodeType == NodeType.comment) {
+      graph.addReplyIdToCommentEntity(
+        parentNodeId,
+        replyId: nodeId,
+      );
+    }
+
+    emit(UserActionNodeActionState(
+      nodeId: event.payload.parents.first.nodeId,
+      userLike: false,
+      likesCount: 0,
+      commentsCount: 0,
+    ));
+
+    emit(UserActionNewCommentState(
+      nodeId: event.payload.parents.first.nodeId,
+    ));
   }
 
   FutureOr<void> _handleUserActionNodeLikeRemoteEvent(

@@ -138,3 +138,12 @@ final class UserActionCommentHighlightEvent extends UserActionEvent {
 
   final String commentId;
 }
+
+// new comment on user related nodes
+final class UserActionNewSecondaryNodeRemoteEvent extends UserActionEvent {
+  UserActionNewSecondaryNodeRemoteEvent({
+    required this.payload,
+  });
+
+  final UserCreateSecondaryNode payload;
+}
