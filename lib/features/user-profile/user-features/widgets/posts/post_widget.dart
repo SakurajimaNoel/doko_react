@@ -3,6 +3,7 @@ import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
@@ -515,12 +516,28 @@ class _PostActionState extends State<_PostAction> {
                           LikeWidget(
                             shrinkFactor: shrinkFactor,
                             onPress: () {
+                              UserNodeLikeAction payload = UserNodeLikeAction(
+                                from: (context.read<UserBloc>().state
+                                        as UserCompleteState)
+                                    .username,
+                                to: getUsernameFromUserKey(post.createdBy),
+                                isLike: post.userLike,
+                                likeCount: post.likesCount,
+                                commentCount: post.commentsCount,
+                                nodeId: post.id,
+                                nodeType: NodeType.post,
+                                parents: [], // for root node no requirement to get parents
+                              );
                               context
                                   .read<UserActionBloc>()
                                   .add(UserActionPostLikeActionEvent(
                                     postId: post.id,
                                     userLike: !post.userLike,
                                     username: username,
+                                    client: context
+                                        .read<WebsocketClientProvider>()
+                                        .client,
+                                    remotePayload: payload,
                                   ));
                             },
                             userLike: post.userLike,

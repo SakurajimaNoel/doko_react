@@ -9,11 +9,17 @@ final class UserActionPostLikeActionEvent extends UserActionEvent {
     required this.postId,
     required this.userLike,
     required this.username,
+    required this.client,
+    required this.remotePayload,
   });
 
   final String postId;
   final bool userLike;
   final String username;
+
+  // used to send to remote users
+  final Client? client;
+  final UserNodeLikeAction remotePayload;
 }
 
 // user to post action
@@ -54,11 +60,15 @@ final class UserActionCommentLikeActionEvent extends UserActionEvent {
     required this.commentId,
     required this.userLike,
     required this.username,
+    required this.client,
+    required this.remotePayload,
   });
 
   final String commentId;
   final bool userLike;
   final String username;
+  final Client? client;
+  final UserNodeLikeAction remotePayload;
 }
 
 // user to comment action

@@ -221,6 +221,13 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         likesCount: post.likesCount,
         commentsCount: post.commentsCount,
       ));
+
+      UserNodeLikeAction payload = event.remotePayload.copyWith(
+        likeCount: post.likesCount,
+        commentCount: post.commentsCount,
+        isLike: post.userLike,
+      );
+      event.client?.sendPayload(payload);
     } catch (_) {
       // optimistic failure revert
       graph.handleUserLikeActionForPostEntity(
@@ -289,6 +296,13 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         likesCount: comment.likesCount,
         commentsCount: comment.commentsCount,
       ));
+
+      UserNodeLikeAction payload = event.remotePayload.copyWith(
+        isLike: comment.userLike,
+        likeCount: comment.likesCount,
+        commentCount: comment.commentsCount,
+      );
+      event.client?.sendPayload(payload);
     } catch (_) {
       // optimistic failure revert
       graph.handleUserLikeActionForCommentEntity(

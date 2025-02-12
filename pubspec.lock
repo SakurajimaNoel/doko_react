@@ -310,7 +310,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "6acc1e45b65f3ccc28e58fb4cfac721f855a3e30"
+      resolved-ref: "75cddb4404461c30eac2b56f78cd70df7421e526"
       url: "https://github.com/rohan031/doki_websocket_client.git"
     source: git
     version: "2.0.1"
@@ -510,6 +510,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  freezed_annotation:
+    dependency: transitive
+    description:
+      name: freezed_annotation
+      sha256: c2e2d632dd9b8a2b7751117abcfc2b4888ecfe181bd9fca7170d9ef02e595fe2
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.4"
   get_it:
     dependency: "direct main"
     description:

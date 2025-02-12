@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/debounce/debounce.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
@@ -611,12 +613,54 @@ class _CommentActionsState extends State<_CommentActions> {
                   children: [
                     LikeWidget(
                       onPress: () {
+                        final nodeCommentProvider =
+                            context.read<NodeCommentProvider>();
+
+                        List<UserNodeType> parents = [];
+                        if (widget.isReplyPage || widget.isReply) {
+                          /// if reply add comment as parent
+                          parents.add(UserNodeType(
+                            nodeId: nodeCommentProvider.commentTargetId,
+                            nodeType: nodeCommentProvider
+                                .commentTargetNodeType.nodeType,
+                          ));
+                        }
+
+                        // add root node
+                        parents.add(UserNodeType(
+                          nodeId: nodeCommentProvider.rootNodeId,
+                          nodeType: nodeCommentProvider.rootNodeType.nodeType,
+                        ));
+
+                        // add user
+                        parents.add(UserNodeType(
+                          nodeId: nodeCommentProvider.rootNodeCreatedBy,
+                          nodeType: NodeType.user,
+                        ));
+
+                        UserNodeLikeAction payload = UserNodeLikeAction(
+                          from: (context.read<UserBloc>().state
+                                  as UserCompleteState)
+                              .username,
+                          to: getUsernameFromUserKey(comment.commentBy),
+                          isLike: comment.userLike,
+                          likeCount: comment.likesCount,
+                          commentCount: comment.commentsCount,
+                          nodeId: comment.id,
+                          nodeType: NodeType.comment,
+                          parents: parents,
+                        );
+
                         context
                             .read<UserActionBloc>()
                             .add(UserActionCommentLikeActionEvent(
                               commentId: comment.id,
                               userLike: !comment.userLike,
                               username: username,
+                              client: context
+                                  .read<WebsocketClientProvider>()
+                                  .client,
+                              remotePayload: payload,
                             ));
                       },
                       userLike: comment.userLike,

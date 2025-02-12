@@ -218,8 +218,9 @@ class _UserLayoutState extends State<UserLayout> {
         },
         PayloadType.userNodeLikeAction: (UserNodeLikeAction payload) {
           // handle notification
-          if (payload.from != username) {
+          if (payload.from != username && payload.isLike) {
             // show notification
+            showUserLikeMyNodeNotification(payload);
           }
           context.read<UserActionBloc>().add(UserActionNodeLikeRemoteEvent(
                 payload: payload,
