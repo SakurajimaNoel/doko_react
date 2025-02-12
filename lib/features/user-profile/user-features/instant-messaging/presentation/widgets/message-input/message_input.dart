@@ -105,6 +105,7 @@ class _MessageInputState extends State<MessageInput> {
           id: generateUniqueString(),
           subject: MessageSubject.mediaExternal,
           body: gifURL,
+          sendAt: DateTime.now(),
         );
         client.sendPayload(message);
 
@@ -194,6 +195,7 @@ class _MessageInputState extends State<MessageInput> {
                           id: generateUniqueString(),
                           subject: MessageSubject.text,
                           body: messageBody,
+                          sendAt: DateTime.now(),
                         );
                         client.sendPayload(message);
 

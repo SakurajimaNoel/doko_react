@@ -17,7 +17,7 @@ class MessageEntity implements GraphEntity {
   bool get deleted => _deleted;
 
   void editMessage(EditMessage message) {
-    _message = _message.updateMessage(
+    _message = _message.copyWith(
       body: message.body,
     );
 

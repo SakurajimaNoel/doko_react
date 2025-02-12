@@ -492,6 +492,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                     id: generateUniqueString(),
                                     subject: widget.subject,
                                     body: widget.nodeIdentifier,
+                                    sendAt: DateTime.now(),
                                   );
 
                                   client.sendPayload(message);

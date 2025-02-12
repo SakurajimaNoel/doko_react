@@ -497,6 +497,7 @@ class _EditMessageState extends State<_EditMessage> {
               to: archiveMessageProvider.archiveUser,
               id: widget.messageId,
               body: newBody,
+              editedOn: DateTime.now(),
             );
 
             if (await client!.sendPayload(editedMessage)) {
