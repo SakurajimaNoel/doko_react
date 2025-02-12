@@ -14,7 +14,11 @@ class PostCreateEvent extends NodeCreateEvent {
 class CreateCommentEvent extends NodeCreateEvent {
   CreateCommentEvent({
     required this.commentDetails,
+    required this.client,
+    required this.remotePayload,
   });
 
   final CommentCreateInput commentDetails;
+  final Client? client;
+  final UserCreateSecondaryNode remotePayload;
 }

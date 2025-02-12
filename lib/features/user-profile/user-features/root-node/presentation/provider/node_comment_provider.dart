@@ -10,6 +10,7 @@ class NodeCommentProvider extends ChangeNotifier {
     required this.targetByUser,
     required this.commentTargetId,
     required this.commentTargetNodeType,
+    required this.commentTargetNodeBy,
     required this.rootNodeType,
     this.replyOn,
     this.controller,
@@ -19,12 +20,17 @@ class NodeCommentProvider extends ChangeNotifier {
 
   final SliverObserverController? controller;
 
+  /// node id of comment whose reply it will be
+  /// this can be null
   String? replyOn;
 
   /// new node will have commentOn relationship with this node
   /// in post page this will be post, in comment page it will be comment id of that page
   final String commentTargetId;
   final DokiNodeType commentTargetNodeType;
+
+  /// used to send remote events
+  final String commentTargetNodeBy;
 
   /// username of user whose comment reply is clicked
   /// used for display purposes

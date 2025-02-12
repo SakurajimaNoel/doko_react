@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
+import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
@@ -666,18 +668,68 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
       }
     }
 
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
     CommentCreateInput commentDetails = CommentCreateInput(
       content: content,
       media: media,
       bucketPath: bucketPath,
       targetNodeId: commentProvider.commentTargetId,
       targetNode: commentProvider.commentTargetNodeType,
-      username: (context.read<UserBloc>().state as UserCompleteState).username,
+      username: username,
       replyOn: commentProvider.replyOn,
+    );
+
+    String? replyOnNodeCreatedBy;
+    if (commentProvider.replyOn != null) {
+      UserGraph graph = UserGraph();
+
+      final commentKey = generateCommentNodeKey(commentProvider.replyOn!);
+      final comment = graph.getValueByKey(commentKey);
+
+      if (comment is CommentEntity) {
+        replyOnNodeCreatedBy = getUsernameFromUserKey(comment.commentBy);
+      }
+    }
+
+    List<UserNodeType> parents = [];
+    // if is reply
+    if (commentProvider.commentTargetNodeType == DokiNodeType.comment) {
+      parents.add(UserNodeType(
+        nodeId: commentProvider.commentTargetId,
+        nodeType: commentProvider.commentTargetNodeType.nodeType,
+      ));
+    }
+
+    // add root node
+    parents.add(UserNodeType(
+      nodeId: commentProvider.rootNodeId,
+      nodeType: commentProvider.rootNodeType.nodeType,
+    ));
+
+    // add user
+    parents.add(UserNodeType(
+      nodeId: commentProvider.rootNodeCreatedBy,
+      nodeType: NodeType.user,
+    ));
+
+    final payload = UserCreateSecondaryNode(
+      from: username,
+      to: commentProvider.commentTargetNodeBy,
+      nodeId: "will-be-updated-on-bloc-success",
+      nodeType: NodeType.comment,
+      parents: parents,
+      mentions: content.mentions.toList(
+        growable: false,
+      ),
+      replyOnNodeCreatedBy: replyOnNodeCreatedBy,
     );
 
     context.read<NodeCreateBloc>().add(CreateCommentEvent(
           commentDetails: commentDetails,
+          client: context.read<WebsocketClientProvider>().client,
+          remotePayload: payload,
         ));
   }
 

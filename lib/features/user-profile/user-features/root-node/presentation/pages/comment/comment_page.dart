@@ -101,7 +101,9 @@ class _CommentPageState extends State<CommentPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Comment"),
+        title: isCommentReply
+            ? const Text("Comment reply")
+            : const Text("Comment"),
         actions: [
           TextButton(
             onPressed: () {
@@ -190,6 +192,8 @@ class _CommentPageState extends State<CommentPage> {
                   commentTargetId: isCommentReply ? parentNodeId : comment.id,
                   commentTargetNodeType:
                       isCommentReply ? parentNodeType : DokiNodeType.comment,
+                  commentTargetNodeBy:
+                      getUsernameFromUserKey(comment.commentBy),
                   controller: observerController,
                 );
               },

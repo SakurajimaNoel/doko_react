@@ -413,7 +413,7 @@ class UserProfileRemoteDataSource {
       );
 
       UserGraph graph = UserGraph();
-      graph.addEntity(comment.id, comment);
+      graph.addEntity(generateCommentNodeKey(comment.id), comment);
 
       return true;
     } catch (e) {

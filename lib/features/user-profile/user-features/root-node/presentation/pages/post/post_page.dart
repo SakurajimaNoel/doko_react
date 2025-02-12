@@ -98,6 +98,7 @@ class _PostPageState extends State<PostPage> {
                   commentTargetId: post.id,
                   rootNodeType: DokiNodeType.post,
                   commentTargetNodeType: DokiNodeType.post,
+                  commentTargetNodeBy: getUsernameFromUserKey(post.createdBy),
                 );
               },
               child: Column(
