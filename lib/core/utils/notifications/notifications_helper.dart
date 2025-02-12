@@ -1,4 +1,6 @@
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/utils/display/display_helper.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:nice_overlay/nice_overlay.dart';
 
@@ -9,26 +11,39 @@ const _shadow = Color(0xff000000);
 /// [createNewNotification] is used to create [NiceInAppNotification]
 NiceInAppNotification createNewNotification({
   required BuildContext context,
-  Widget? leading,
-  Widget? title,
   Widget? body,
-  Widget? trailing,
   VoidCallback? onTap,
+  String? userKey,
+  DateTime? notificationTime,
 }) {
   final currTheme = Theme.of(context).colorScheme;
 
   return NiceInAppNotification(
-    leading: leading == null
+    leading: userKey == null
         ? null
         : Container(
             margin: const EdgeInsets.only(
               right: Constants.gap * 0.5,
             ),
-            child: leading,
+            child: UserWidget.avtar(
+              userKey: userKey,
+            ),
           ),
-    title: title,
+    title: userKey == null
+        ? null
+        : UserWidget.name(
+            userKey: userKey,
+            baseFontSize: Constants.smallFontSize * 1.125,
+            trim: 20,
+            bold: true,
+          ),
     body: body,
-    trailing: trailing,
+    trailing: Text(
+      formatDateTimeToTimeString(notificationTime ?? DateTime.now()),
+      style: const TextStyle(
+        fontSize: Constants.smallFontSize,
+      ),
+    ),
     backgroundColor: currTheme.surfaceContainer,
     displayDuration: Constants.notificationDuration,
     showingAnimationDuration: const Duration(

@@ -15,9 +15,11 @@ class PostLoadEvent extends RootNodeEvent {
 class CommentLoadEvent extends RootNodeEvent {
   CommentLoadEvent({
     required this.details,
+    required this.fetchReply,
   });
 
   final GetNodeInput details;
+  final bool fetchReply;
 }
 
 class DiscussionLoadEvent extends RootNodeEvent {

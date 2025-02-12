@@ -123,27 +123,27 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       );
     }
 
-    String nodeId = payload.nodeId;
-    NodeType nodeType = payload.nodeType;
-
-    /// handle parents
-    /// for comment parents will either be comment, post or discussion
-    /// there will always be only on root node like post or discussion
-    if (!self) {
-      for (var parentNode in payload.parents) {
-        if (parentNode.nodeType == NodeType.user) continue;
-
-        String nodeKey = generateGraphKey(nodeType, nodeId);
-        if (parentNode.nodeType == NodeType.post) {
-          // add comment to post
-        }
-
-        if (parentNode.nodeType == NodeType.comment) {}
-
-        // update nodeId for next iteration
-        nodeId = parentNode.nodeId;
-      }
-    }
+    // String nodeId = payload.nodeId;
+    // NodeType nodeType = payload.nodeType;
+    //
+    // /// handle parents
+    // /// for comment parents will either be comment, post or discussion
+    // /// there will always be only on root node like post or discussion
+    // if (!self) {
+    //   for (var parentNode in payload.parents) {
+    //     if (parentNode.nodeType == NodeType.user) continue;
+    //
+    //     String nodeKey = generateGraphKey(nodeType, nodeId);
+    //     if (parentNode.nodeType == NodeType.post) {
+    //       // add comment to post
+    //     }
+    //
+    //     if (parentNode.nodeType == NodeType.comment) {}
+    //
+    //     // update nodeId for next iteration
+    //     nodeId = parentNode.nodeId;
+    //   }
+    // }
 
     emit(UserActionNodeActionState(
       nodeId: payload.nodeId,

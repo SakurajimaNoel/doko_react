@@ -27,17 +27,22 @@ class CommentWidget extends StatefulWidget {
     super.key,
     required this.commentKey,
     required this.parentNodeId,
+    this.isReplyPage = false,
   }) : isReply = false;
 
   const CommentWidget.reply({
     super.key,
     required this.commentKey,
     required this.parentNodeId,
-  }) : isReply = true;
+  })  : isReply = true,
+        isReplyPage = false;
 
   final String commentKey;
   final bool isReply;
   final String parentNodeId;
+
+  /// used with comment reply page from notifications
+  final bool isReplyPage;
 
   @override
   State<CommentWidget> createState() => _CommentWidgetState();
@@ -126,7 +131,7 @@ class _CommentWidgetState extends State<CommentWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: Constants.gap * 0.5,
             children: [
-              if (comment.replyOn != null) ...[
+              if (comment.replyOn != null && !widget.isReplyPage) ...[
                 _CommentReplyPreview(
                   commentId: comment.replyOn!,
                 ),
@@ -205,6 +210,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                 commentId: commentId,
                 isReply: widget.isReply,
                 parentNodeId: widget.parentNodeId,
+                isReplyPage: widget.isReplyPage,
               ),
             ],
           ),
@@ -436,6 +442,8 @@ class _CommentWrapperState extends State<_CommentWrapper> {
                         "rootNodeId": rootNodeId,
                         "commentId": widget.commentId,
                         "userId": rootNodeBy,
+                        "parentNodeType": rootNodeType.name,
+                        "parentNodeId": rootNodeId,
                       },
                     );
                   },
@@ -558,11 +566,14 @@ class _CommentActions extends StatefulWidget {
     required this.commentId,
     required this.isReply,
     required this.parentNodeId,
+    required this.isReplyPage,
   });
 
   final String commentId;
   final bool isReply;
   final String parentNodeId;
+
+  final bool isReplyPage;
 
   @override
   State<_CommentActions> createState() => _CommentActionsState();
@@ -624,58 +635,63 @@ class _CommentActionsState extends State<_CommentActions> {
                     const SizedBox(
                       width: Constants.gap,
                     ),
+                    // if (!widget.isReplyPage)
                     TextButton(
-                      onPressed: () {
-                        final nodeProvider =
-                            context.read<NodeCommentProvider>();
+                      onPressed: widget.isReplyPage
+                          ? null
+                          : () {
+                              final nodeProvider =
+                                  context.read<NodeCommentProvider>();
 
-                        // replies are only shown on comment page
-                        if (widget.isReply) {
-                          // new node will have commentOn relationship with this node
-                          // String targetId =
-                          //     widget.isReply ? widget.parentNodeId : commentId;
+                              // replies are only shown on comment page
+                              if (widget.isReply) {
+                                // new node will have commentOn relationship with this node
+                                // String targetId =
+                                //     widget.isReply ? widget.parentNodeId : commentId;
 
-                          // new node will have replyOn relationship with this node
-                          String replyOn = commentId;
+                                // new node will have replyOn relationship with this node
+                                String replyOn = commentId;
 
-                          String targetUsername =
-                              getUsernameFromUserKey(comment.commentBy);
+                                String targetUsername =
+                                    getUsernameFromUserKey(comment.commentBy);
 
-                          nodeProvider
-                            ..updateCommentTarget(
-                              targetUsername,
-                              replyOn,
-                            )
-                            ..focusNode.requestFocus();
-                          return;
-                        }
+                                nodeProvider
+                                  ..updateCommentTarget(
+                                    targetUsername,
+                                    replyOn,
+                                  )
+                                  ..focusNode.requestFocus();
+                                return;
+                              }
 
-                        String currentRoute =
-                            GoRouter.of(context).currentRouteName ?? "";
-                        bool isCommentPage =
-                            currentRoute == RouterConstants.comment;
+                              String currentRoute =
+                                  GoRouter.of(context).currentRouteName ?? "";
+                              bool isCommentPage =
+                                  currentRoute == RouterConstants.comment;
 
-                        if (isCommentPage) {
-                          nodeProvider
-                            ..focusNode.requestFocus()
-                            ..resetCommentTarget();
-                          return;
-                        }
+                              if (isCommentPage) {
+                                nodeProvider
+                                  ..focusNode.requestFocus()
+                                  ..resetCommentTarget();
+                                return;
+                              }
 
-                        final rootNodeId = nodeProvider.rootNodeId;
-                        final rootNodeType = nodeProvider.rootNodeType;
-                        final rootNodeBy = nodeProvider.rootNodeCreatedBy;
+                              final rootNodeId = nodeProvider.rootNodeId;
+                              final rootNodeType = nodeProvider.rootNodeType;
+                              final rootNodeBy = nodeProvider.rootNodeCreatedBy;
 
-                        context.pushNamed(
-                          RouterConstants.comment,
-                          pathParameters: {
-                            "rootNodeType": rootNodeType.name,
-                            "rootNodeId": rootNodeId,
-                            "commentId": commentId,
-                            "userId": rootNodeBy,
-                          },
-                        );
-                      },
+                              context.pushNamed(
+                                RouterConstants.comment,
+                                pathParameters: {
+                                  "rootNodeType": rootNodeType.name,
+                                  "rootNodeId": rootNodeId,
+                                  "commentId": commentId,
+                                  "userId": rootNodeBy,
+                                  "parentNodeType": rootNodeType.name,
+                                  "parentNodeId": rootNodeId,
+                                },
+                              );
+                            },
                       style: TextButton.styleFrom(
                         minimumSize: Size.zero,
                         padding: const EdgeInsets.symmetric(
@@ -695,7 +711,7 @@ class _CommentActionsState extends State<_CommentActions> {
                     ),
                   ],
                 ),
-                if (!widget.isReply)
+                if (!widget.isReply && !widget.isReplyPage)
                   LayoutBuilder(
                     builder: (context, constraints) {
                       final width = MediaQuery.sizeOf(context).width;

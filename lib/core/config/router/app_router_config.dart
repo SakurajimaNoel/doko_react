@@ -360,13 +360,16 @@ class AppRouterConfig {
                   GoRoute(
                     parentNavigatorKey: rootNavigatorKey,
                     name: RouterConstants.comment,
-                    // path: "comment/:rootNodeType/:rootNodeId/:commentId",
                     path:
-                        "user/:userId/:rootNodeType/:rootNodeId/comment/:commentId",
+                        "user/:userId/:rootNodeType/:rootNodeId/:parentNodeType/:parentNodeId/comment/:commentId",
                     builder: (context, state) {
                       String rootNodeName =
                           state.pathParameters["rootNodeType"]!;
                       String rootNodeId = state.pathParameters["rootNodeId"]!;
+                      String parentNodeName =
+                          state.pathParameters["parentNodeType"]!;
+                      String parentNodeId =
+                          state.pathParameters["parentNodeId"]!;
                       String commentId = state.pathParameters["commentId"]!;
                       String userId = state.pathParameters["userId"]!;
 
@@ -375,6 +378,8 @@ class AppRouterConfig {
                         rootNodeId: rootNodeId,
                         rootNodeType: DokiNodeType.fromName(rootNodeName),
                         rootNodeBy: userId,
+                        parentNodeId: parentNodeId,
+                        parentNodeType: DokiNodeType.fromName(parentNodeName),
                       );
                     },
                   ),

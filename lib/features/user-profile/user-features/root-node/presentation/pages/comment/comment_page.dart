@@ -28,6 +28,8 @@ class CommentPage extends StatefulWidget {
     required this.rootNodeId,
     required this.rootNodeType,
     required this.rootNodeBy,
+    required this.parentNodeType,
+    required this.parentNodeId,
   });
 
   final String commentId;
@@ -36,7 +38,14 @@ class CommentPage extends StatefulWidget {
   /// discussion or post
   final String rootNodeId;
   final DokiNodeType rootNodeType;
+
+  /// cognito user id for storing media items
   final String rootNodeBy;
+
+  /// parents details can be same as root node details
+  /// only required with comment replies for notifications
+  final String parentNodeId;
+  final DokiNodeType parentNodeType;
 
   @override
   State<CommentPage> createState() => _CommentPageState();
@@ -51,6 +60,9 @@ class _CommentPageState extends State<CommentPage> {
   late final String rootNodeBy = widget.rootNodeBy;
   late final username =
       (context.read<UserBloc>().state as UserCompleteState).username;
+
+  late final DokiNodeType parentNodeType = widget.parentNodeType;
+  late final String parentNodeId = widget.parentNodeId;
 
   final ScrollController controller = ScrollController();
   late SliverObserverController observerController;
@@ -72,6 +84,7 @@ class _CommentPageState extends State<CommentPage> {
   @override
   Widget build(BuildContext context) {
     bool invalidNode = rootNodeType == DokiNodeType.user;
+    bool isCommentReply = parentNodeType == DokiNodeType.comment;
 
     if (invalidNode) {
       return Scaffold(
@@ -93,17 +106,32 @@ class _CommentPageState extends State<CommentPage> {
           TextButton(
             onPressed: () {
               // redirect to correct page
-              if (rootNodeType == DokiNodeType.post) {
+              if (parentNodeType == DokiNodeType.post) {
                 // go to post page
                 context.pushReplacementNamed(
                   RouterConstants.userPost,
                   pathParameters: {
-                    "postId": rootNodeId,
+                    "postId": parentNodeId,
+                  },
+                );
+              }
+
+              if (parentNodeType == DokiNodeType.comment) {
+                // go to comment page
+                context.pushReplacementNamed(
+                  RouterConstants.comment,
+                  pathParameters: {
+                    "userId": rootNodeBy,
+                    "parentNodeType": rootNodeType.name,
+                    "parentNodeId": rootNodeId,
+                    "commentId": parentNodeId,
+                    "rootNodeType": rootNodeType.name,
+                    "rootNodeId": rootNodeId,
                   },
                 );
               }
             },
-            child: Text("Go to ${widget.rootNodeType.name} "),
+            child: Text("Go to ${widget.parentNodeType.name} "),
           ),
           const SizedBox(
             width: Constants.gap,
@@ -117,6 +145,7 @@ class _CommentPageState extends State<CommentPage> {
               nodeId: widget.commentId,
               username: username,
             ),
+            fetchReply: !isCommentReply,
           )),
         child: BlocConsumer<RootNodeBloc, RootNodeState>(
           listenWhen: (previousState, state) {
@@ -146,6 +175,7 @@ class _CommentPageState extends State<CommentPage> {
                 child: StyledText.error(state.message),
               );
             }
+
             final CommentEntity comment =
                 graph.getValueByKey(commentKey)! as CommentEntity;
 
@@ -157,8 +187,9 @@ class _CommentPageState extends State<CommentPage> {
                   rootNodeCreatedBy: rootNodeBy,
                   targetByUser: getUsernameFromUserKey(comment.commentBy),
                   rootNodeType: rootNodeType,
-                  commentTargetId: comment.id,
-                  commentTargetNodeType: DokiNodeType.comment,
+                  commentTargetId: isCommentReply ? parentNodeId : comment.id,
+                  commentTargetNodeType:
+                      isCommentReply ? parentNodeType : DokiNodeType.comment,
                   controller: observerController,
                 );
               },
@@ -204,7 +235,7 @@ class _CommentPageState extends State<CommentPage> {
                             curve: Curves.fastOutSlowIn,
                           );
                         },
-                        child: repliesLoading || repliesError
+                        child: repliesLoading || repliesError || isCommentReply
                             ? SingleChildScrollView(
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 child: Column(
@@ -213,19 +244,21 @@ class _CommentPageState extends State<CommentPage> {
                                     CommentWidget(
                                       commentKey: commentKey,
                                       parentNodeId: comment.id,
+                                      isReplyPage: isCommentReply,
                                     ),
-                                    repliesError
-                                        ? SizedBox(
-                                            height: Constants.height * 5,
-                                            child:
-                                                StyledText.error(state.message),
-                                          )
-                                        : const SizedBox(
-                                            height: Constants.height * 5,
-                                            child: Center(
-                                              child: SmallLoadingIndicator(),
+                                    if (!isCommentReply)
+                                      repliesError
+                                          ? SizedBox(
+                                              height: Constants.height * 5,
+                                              child: StyledText.error(
+                                                  state.message),
+                                            )
+                                          : const SizedBox(
+                                              height: Constants.height * 5,
+                                              child: Center(
+                                                child: SmallLoadingIndicator(),
+                                              ),
                                             ),
-                                          ),
                                   ],
                                 ),
                               )
@@ -285,7 +318,7 @@ class _CommentPageState extends State<CommentPage> {
                       ),
                     ),
                   ),
-                  const CommentInput(),
+                  if (!isCommentReply) const CommentInput(),
                 ],
               ),
             );

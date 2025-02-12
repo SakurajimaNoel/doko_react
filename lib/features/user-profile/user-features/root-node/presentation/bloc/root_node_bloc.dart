@@ -54,7 +54,7 @@ class RootNodeBloc extends Bloc<RootNodeEvent, RootNodeState> {
         final CommentEntity comment =
             graph.getValueByKey(commentKey)! as CommentEntity;
 
-        if (comment.comments.isEmpty) {
+        if (event.fetchReply && comment.comments.isEmpty) {
           add(SecondaryNodeLoadEvent(
             details: GetCommentsInput(
               nodeId: commentId,

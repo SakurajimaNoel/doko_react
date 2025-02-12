@@ -6,6 +6,7 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/auth/auth.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
@@ -17,7 +18,6 @@ import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -216,7 +216,16 @@ class _UserLayoutState extends State<UserLayout> {
                 ));
           }
         },
-        PayloadType.userNodeLikeAction: (UserNodeLikeAction payload) {}
+        PayloadType.userNodeLikeAction: (UserNodeLikeAction payload) {
+          // handle notification
+          if (payload.from != username) {
+            // show notification
+          }
+          context.read<UserActionBloc>().add(UserActionNodeLikeRemoteEvent(
+                payload: payload,
+                username: username,
+              ));
+        }
       },
     );
 
@@ -235,26 +244,58 @@ class _UserLayoutState extends State<UserLayout> {
     websocketClientProvider.addClient(client);
   }
 
+  void showUserLikeMyNodeNotification(UserNodeLikeAction payload) {
+    final userKey = generateUserNodeKey(payload.from);
+    final notification = createNewNotification(
+        context: context,
+        userKey: userKey,
+        body: Text("@${payload.from} liked your ${payload.nodeType.name}."),
+        onTap: () {
+          if (payload.nodeType == NodeType.post) {
+            // go to post page
+            context.pushNamed(RouterConstants.userPost, pathParameters: {
+              "postId": payload.nodeId,
+            });
+          }
+
+          if (payload.nodeType == NodeType.comment) {
+            bool commentReply = payload.parents.length == 3;
+            String parentNodeType =
+                DokiNodeType.fromNodeType(payload.parents.first.nodeType).name;
+            String parentNodeId = payload.parents.first.nodeId;
+
+            String rootNodeType = parentNodeType;
+            String rootNodeId = parentNodeId;
+            if (commentReply) {
+              rootNodeType =
+                  DokiNodeType.fromNodeType(payload.parents[1].nodeType).name;
+              rootNodeId = payload.parents[1].nodeId;
+            }
+
+            context.pushNamed(
+              RouterConstants.comment,
+              pathParameters: {
+                "userId": payload.parents.last.nodeId,
+                "parentNodeType": parentNodeType,
+                "parentNodeId": parentNodeId,
+                "commentId": payload.nodeId,
+                "rootNodeType": rootNodeType,
+                "rootNodeId": rootNodeId,
+              },
+            );
+          }
+        });
+
+    showNotification(notification);
+  }
+
   void showNewFriendRequestNotification(UserSendFriendRequest request) {
     final userKey = generateUserNodeKey(request.from);
     final notification = createNewNotification(
       context: context,
-      leading: UserWidget.avtar(
-        userKey: userKey,
-      ),
-      title: UserWidget.name(
-        userKey: userKey,
-        baseFontSize: Constants.smallFontSize * 1.125,
-        trim: 20,
-        bold: true,
-      ),
+      userKey: userKey,
+      notificationTime: request.addedOn,
       body: Text("@${request.from} has send you a friend request."),
-      trailing: Text(
-        formatDateTimeToTimeString(request.addedOn),
-        style: const TextStyle(
-          fontSize: Constants.smallFontSize,
-        ),
-      ),
       onTap: () {
         context.pushNamed(
           RouterConstants.userProfile,
@@ -272,22 +313,8 @@ class _UserLayoutState extends State<UserLayout> {
     final userKey = generateUserNodeKey(request.from);
     final notification = createNewNotification(
       context: context,
-      leading: UserWidget.avtar(
-        userKey: userKey,
-      ),
-      title: UserWidget.name(
-        userKey: userKey,
-        baseFontSize: Constants.smallFontSize * 1.125,
-        trim: 20,
-        bold: true,
-      ),
+      userKey: userKey,
       body: Text("@${request.from} has accepted your friend request."),
-      trailing: Text(
-        formatDateTimeToTimeString(DateTime.now()),
-        style: const TextStyle(
-          fontSize: Constants.smallFontSize,
-        ),
-      ),
       onTap: () {
         context.pushNamed(
           RouterConstants.userProfile,
@@ -316,22 +343,9 @@ class _UserLayoutState extends State<UserLayout> {
         (context.read<UserBloc>().state as UserCompleteState).username;
 
     final inAppNotification = createNewNotification(
-      leading: UserWidget.avtar(
-        userKey: userKey,
-      ),
-      title: UserWidget.name(
-        userKey: userKey,
-        baseFontSize: Constants.smallFontSize * 1.125,
-        trim: 20,
-        bold: true,
-      ),
+      userKey: userKey,
+      notificationTime: message.sendAt,
       body: Text(messagePreview(message, username)),
-      trailing: Text(
-        formatDateTimeToTimeString(message.sendAt),
-        style: const TextStyle(
-          fontSize: Constants.smallFontSize,
-        ),
-      ),
       onTap: () {
         context.pushNamed(
           RouterConstants.messageArchive,
