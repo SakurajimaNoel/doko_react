@@ -274,6 +274,10 @@ class _CommentReplyPreview extends StatelessWidget {
                 final userActionBloc = context.read<UserActionBloc>();
 
                 if (observerController != null) {
+                  // immediately send the event in case widget is already in view
+                  userActionBloc.add(UserActionCommentHighlightEvent(
+                    commentId: comment.id,
+                  ));
                   Timer(
                       const Duration(
                         milliseconds: Constants.maxScrollDuration,
