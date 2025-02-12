@@ -389,9 +389,22 @@ class UserGraph {
     Map<String, GraphEntity> tempMap = HashMap();
     List<String> commentKeys = comments.map((commentItem) {
       String commentKey = generateCommentNodeKey(commentItem.id);
-      // adding comment entity
-      tempMap[commentKey] = commentItem;
+      CommentEntity commentToAdd;
 
+      if (containsKey(commentKey)) {
+        final existsComment = getValueByKey(commentKey)! as CommentEntity;
+
+        existsComment.updateCommentsCount(commentItem.commentsCount);
+        existsComment.updateLikeCount(commentItem.likesCount);
+        existsComment.updateUserLikeStatus(commentItem.userLike);
+
+        commentToAdd = existsComment;
+      } else {
+        commentToAdd = commentItem;
+      }
+
+      // adding comment entity
+      tempMap[commentKey] = commentToAdd;
       return commentKey;
     }).toList();
 
@@ -429,6 +442,7 @@ class UserGraph {
     Map<String, GraphEntity> tempMap = HashMap();
     List<String> commentKeys = comments.map((commentItem) {
       String commentKey = generateCommentNodeKey(commentItem.id);
+
       // adding comment entity
       tempMap[commentKey] = commentItem;
 
