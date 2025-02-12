@@ -25,15 +25,18 @@ class UserGraph {
 
   static UserGraph? _instance;
 
+  /// returns a singleton instance during lifecycle of application
   factory UserGraph() {
     _instance ??= UserGraph._internal();
     return _instance!;
   }
 
+  /// used to check if the given entity exists or not
   bool containsKey(String key) {
     return _graph.containsKey(key);
   }
 
+  /// reset graph during exist and sign out
   void reset() {
     _graph.clear();
   }
@@ -45,10 +48,14 @@ class UserGraph {
     return _graph[key];
   }
 
+  /// basic function to add any entity by key
   void addEntity(String key, GraphEntity entity) {
     _graph[key] = entity;
   }
 
+  /// basic function to add map to userGraph
+  /// this is used where list of items are added to the graph
+  /// like user root nodes list, root nodes comments and comments replies
   void _addEntityMap(Map<String, GraphEntity> map) {
     _graph.addAll(map);
   }
@@ -180,6 +187,7 @@ class UserGraph {
     }
   }
 
+  /// used when sending request
   void sendRequest(
     String username, {
     required String friendUsername,
@@ -193,6 +201,7 @@ class UserGraph {
     _removeFromFriendList(username, friendUsername);
   }
 
+  /// used with remote friend request received
   void receiveRequest(
     String username, {
     required String friendUsername,
@@ -246,6 +255,7 @@ class UserGraph {
     _updateFriendRelation(friendUsername, null);
   }
 
+  /// add user to outgoing friend request list
   void _addOutgoingRequest(String friendUsername) {
     String key = generateUserNodeKey(friendUsername);
 
@@ -260,6 +270,7 @@ class UserGraph {
     }
   }
 
+  /// add user to incoming friend request list
   void _addIncomingRequest(String friendUsername) {
     String key = generateUserNodeKey(friendUsername);
 
@@ -274,6 +285,7 @@ class UserGraph {
     }
   }
 
+  /// remove friend from users friend list and friends friend list
   void _removeFromFriendList(String username, String friendUsername) {
     String userKey = generateUserNodeKey(username);
     String friendKey = generateUserNodeKey(friendUsername);
@@ -296,6 +308,7 @@ class UserGraph {
     }
   }
 
+  /// remove outgoing friend request from outgoing friend list
   void _removeOutgoingRequest(String friendUsername) {
     String friendKey = generateUserNodeKey(friendUsername);
     String outgoingReqKey = generatePendingOutgoingReqKey();
@@ -306,6 +319,7 @@ class UserGraph {
     }
   }
 
+  /// remove incoming friend request from incoming friend list
   void _removeIncomingRequest(String friendUsername) {
     String friendKey = generateUserNodeKey(friendUsername);
     String incomingReqKey = generatePendingIncomingReqKey();
@@ -316,6 +330,8 @@ class UserGraph {
     }
   }
 
+  /// used when fetching user incoming request
+  /// in pending requests page
   void addPendingIncomingRequests(
       List<UserEntity> pendingIncomingRequest, PageInfo info) {
     String key = generatePendingIncomingReqKey();
@@ -347,6 +363,8 @@ class UserGraph {
     items.updatePageInfo(info);
   }
 
+  /// used to fetch users outgoing requests
+  /// used in pending requests page
   void addPendingOutgoingRequests(
       List<UserEntity> pendingOutgoingRequest, PageInfo info) {
     String key = generatePendingOutgoingReqKey();
@@ -378,7 +396,8 @@ class UserGraph {
     items.updatePageInfo(info);
   }
 
-  // adding comment to post
+  /// adding comment list to post
+  /// used when fetching post comments
   void addCommentListToPostEntity(
     String postId, {
     required List<CommentEntity> comments,
@@ -416,6 +435,8 @@ class UserGraph {
     post.comments.addEntityItems(commentKeys);
   }
 
+  /// used to add single comment to post entity
+  /// used when creating new comment
   void addCommentToPostEntity(
     String postId, {
     required CommentEntity comment,
@@ -425,13 +446,35 @@ class UserGraph {
 
     addEntity(commentKey, comment);
 
-    if (!containsKey(key)) return;
+    final post = getValueByKey(key);
 
-    final PostEntity post = getValueByKey(key) as PostEntity;
+    if (post is! PostEntity) return;
+
     post.comments.addItem(commentKey);
     post.updateCommentsCount(post.commentsCount + 1);
   }
 
+  /// this is used by remote secondary node create payload
+  void addCommentIdToPostEntity(
+    String postId, {
+    required String commentId,
+  }) {
+    String key = generatePostNodeKey(postId);
+    String commentKey = generateCommentNodeKey(commentId);
+
+    final post = getValueByKey(key);
+
+    if (post is! PostEntity) return;
+
+    post.updateCommentsCount(post.commentsCount + 1);
+
+    /// no need to add comment if not fetched
+    if (post.comments.isEmpty) return;
+
+    post.comments.addItem(commentKey);
+  }
+
+  /// used to add comments replies when fetching it in comment's page
   void addCommentListToReply(
     String commentId, {
     required List<CommentEntity> comments,
@@ -457,6 +500,7 @@ class UserGraph {
     comment.comments.addEntityItems(commentKeys);
   }
 
+  /// used to add new reply to the comment
   void addReplyToCommentEntity(
     String commentId, {
     required CommentEntity comment,
@@ -476,6 +520,30 @@ class UserGraph {
     existingComment.updateCommentsCount(existingComment.commentsCount + 1);
   }
 
+  /// used by remote create secondary node
+  void addReplyIdToCommentEntity(
+    String commentId, {
+    required String replyId,
+  }) {
+    String key = generateCommentNodeKey(commentId);
+    String replyKey = generateCommentNodeKey(replyId);
+
+    final comment = getValueByKey(key);
+
+    if (comment is! CommentEntity) return;
+
+    comment.updateCommentsCount(comment.commentsCount + 1);
+
+    /// no need to add it if no replies are fetched
+    /// or not reached end of page
+    if (comment.comments.isEmpty || comment.comments.pageInfo.hasNextPage) {
+      return;
+    }
+
+    comment.comments.addItemAtLast(replyKey);
+  }
+
+  /// used update post like status and post stats
   void handleUserLikeActionForPostEntity(
     String postId, {
     bool? userLike,
@@ -494,6 +562,7 @@ class UserGraph {
     post.updateCommentsCount(commentsCount);
   }
 
+  /// used to update comment like status and comment stats
   void handleUserLikeActionForCommentEntity(
     String commentId, {
     bool? userLike,
@@ -515,6 +584,7 @@ class UserGraph {
     return _graph.toString();
   }
 
+  /// add fetched users to graph based on search query
   List<String> addUserSearchEntry(List<UserEntity> searchResults) {
     Map<String, GraphEntity> tempMap = HashMap();
 
