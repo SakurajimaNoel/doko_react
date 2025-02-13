@@ -231,6 +231,9 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                     },
                   ),
                 ),
+                actionsPadding: const EdgeInsets.symmetric(
+                  horizontal: Constants.gap,
+                ),
                 actions: [
                   Builder(
                     builder: (context) {

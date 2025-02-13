@@ -491,15 +491,13 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           color: currTheme.onSurface,
                           size: Constants.heading4,
                         ),
+                        actionsPadding: const EdgeInsets.symmetric(
+                          horizontal: Constants.gap,
+                        ),
                         actions: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              right: Constants.padding,
-                            ),
-                            child: Row(
-                              spacing: Constants.gap,
-                              children: appBarActions(),
-                            ),
+                          Row(
+                            spacing: Constants.gap,
+                            children: appBarActions(),
                           ),
                         ],
                         flexibleSpace: FlexibleSpaceBar(

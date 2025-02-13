@@ -102,6 +102,9 @@ class MessageInboxPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Message Inbox"),
+        actionsPadding: const EdgeInsets.symmetric(
+          horizontal: Constants.gap,
+        ),
         actions: [
           IconButton(
             onPressed: () {

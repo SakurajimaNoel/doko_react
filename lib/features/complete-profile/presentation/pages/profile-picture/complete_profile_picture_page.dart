@@ -99,6 +99,9 @@ class _CompleteProfilePicturePageState
           return Scaffold(
             appBar: AppBar(
               title: const Text("Profile Photo"),
+              actionsPadding: const EdgeInsets.symmetric(
+                horizontal: Constants.gap,
+              ),
               actions: [
                 if (!loading) const SignOutButton(),
               ],

@@ -24,6 +24,9 @@ class _UserFeedPageState extends State<UserFeedPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Doki"),
+        actionsPadding: const EdgeInsets.symmetric(
+          horizontal: Constants.gap,
+        ),
         actions: [
           TextButton(
             onPressed: () {
@@ -55,9 +58,6 @@ class _UserFeedPageState extends State<UserFeedPage> {
               ),
             ),
           ),
-          const SizedBox(
-            width: Constants.gap,
-          )
         ],
       ),
       body: Padding(

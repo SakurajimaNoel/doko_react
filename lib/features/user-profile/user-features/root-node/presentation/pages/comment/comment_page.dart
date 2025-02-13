@@ -104,6 +104,9 @@ class _CommentPageState extends State<CommentPage> {
         title: isCommentReply
             ? const Text("Comment reply")
             : const Text("Comment"),
+        actionsPadding: const EdgeInsets.symmetric(
+          horizontal: Constants.gap,
+        ),
         actions: [
           TextButton(
             onPressed: () {

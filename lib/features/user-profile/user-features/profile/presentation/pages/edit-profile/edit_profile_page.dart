@@ -163,6 +163,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           return Scaffold(
             appBar: AppBar(
               title: const Text("Edit profile"),
+              actionsPadding: const EdgeInsets.symmetric(
+                horizontal: Constants.gap,
+              ),
               actions: [
                 TextButton(
                   onPressed: updating ? null : () => handleEditProfile(context),
