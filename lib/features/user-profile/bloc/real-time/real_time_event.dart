@@ -49,3 +49,11 @@ final class RealTimeDeleteMessageEvent extends RealTimeEvent {
   final DeleteMessage message;
   final String username;
 }
+
+final class RealTimeUserPresenceEvent extends RealTimeEvent {
+  RealTimeUserPresenceEvent({
+    required this.payload,
+  });
+
+  final UserPresenceInfo payload;
+}

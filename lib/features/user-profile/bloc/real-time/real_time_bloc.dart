@@ -17,6 +17,12 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
     on<RealTimeTypingStatusEndEvent>(_handleRealTimeTypingStatusEndEvent);
     on<RealTimeEditMessageEvent>(_handleRealTimeEditMessageEvent);
     on<RealTimeDeleteMessageEvent>(_handleRealTimeDeleteMessageEvent);
+    on<RealTimeUserPresenceEvent>((event, emit) {
+      emit(RealTimeUserPresenceState(
+        online: event.payload.online,
+        username: event.payload.user,
+      ));
+    });
   }
 
   FutureOr<void> _handleRealTimeNewMessageEvent(

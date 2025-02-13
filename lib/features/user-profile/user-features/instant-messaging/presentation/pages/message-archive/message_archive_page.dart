@@ -43,6 +43,8 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
   late ListObserverController observerController;
 
   final UserGraph graph = UserGraph();
+  late final currentUser =
+      (context.read<UserBloc>().state as UserCompleteState).username;
 
   @override
   void initState() {
@@ -54,6 +56,14 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
     controller.addListener(handleScroll);
 
     // subscribe to user presence
+    final client = websocketClientProvider.client;
+    final UserPresenceSubscription subscription = UserPresenceSubscription(
+      from: currentUser,
+      subscribe: true,
+      user: widget.username,
+    );
+
+    client?.sendPayload(subscription);
   }
 
   void handleScroll() {
@@ -79,8 +89,6 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
     focusNode.dispose();
     controller.removeListener(handleScroll);
     controller.dispose();
-
-    // unsubscribe to user presence
 
     super.dispose();
   }
@@ -175,21 +183,6 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                   : null,
               appBar: AppBar(
                 backgroundColor: currTheme.surfaceContainer,
-                bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(Constants.height),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        bottom: Constants.padding * 0.25,
-                        left: Constants.padding,
-                      ),
-                      child: Text(
-                        "Online",
-                      ),
-                    ),
-                  ),
-                ),
                 title: InkWell(
                   onTap: () {
                     context.pushNamed(
@@ -219,12 +212,44 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                             UserWidget.avtar(
                               userKey: generateUserNodeKey(widget.username),
                             ),
-                          SizedBox(
-                            width: constraints.maxWidth * infoFactor,
-                            child: UserWidget.info(
-                              userKey: generateUserNodeKey(widget.username),
-                              baseFontSize: Constants.smallFontSize * 1.125,
-                            ),
+                          BlocBuilder<RealTimeBloc, RealTimeState>(
+                            buildWhen: (previousState, state) {
+                              return state is RealTimeUserPresenceState &&
+                                  state.username == widget.username;
+                            },
+                            builder: (context, state) {
+                              bool? online;
+                              if (state is RealTimeUserPresenceState &&
+                                  state.username == widget.username) {
+                                online = state.online;
+                              }
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                spacing: Constants.gap * 0.125,
+                                children: [
+                                  SizedBox(
+                                    width: constraints.maxWidth * infoFactor,
+                                    child: UserWidget.name(
+                                      userKey:
+                                          generateUserNodeKey(widget.username),
+                                      baseFontSize: Constants.fontSize * 1.125,
+                                    ),
+                                  ),
+                                  if (online != null)
+                                    Text(
+                                      online ? "Online" : "Offline",
+                                      style: TextStyle(
+                                        fontSize: Constants.smallFontSize,
+                                        fontWeight: FontWeight.w600,
+                                        color: online
+                                            ? Colors.green
+                                            : Colors.redAccent,
+                                      ),
+                                    ),
+                                ],
+                              );
+                            },
                           ),
                         ],
                       );

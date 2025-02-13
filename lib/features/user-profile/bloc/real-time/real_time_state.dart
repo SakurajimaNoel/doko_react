@@ -63,3 +63,16 @@ final class RealTimeDeleteMessageState extends RealTimeState {
   @override
   List<Object?> get props => [id.toString(), editedAt, archiveUser];
 }
+
+final class RealTimeUserPresenceState extends RealTimeState {
+  const RealTimeUserPresenceState({
+    required this.online,
+    required this.username,
+  });
+
+  final bool online;
+  final String username;
+
+  @override
+  List<Object?> get props => [online, username];
+}

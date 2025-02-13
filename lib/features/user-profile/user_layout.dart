@@ -250,6 +250,11 @@ class _UserLayoutState extends State<UserLayout> {
                 payload: payload,
               ));
         },
+        PayloadType.userPresenceInfo: (UserPresenceInfo payload) {
+          realTimeBloc.add(RealTimeUserPresenceEvent(
+            payload: payload,
+          ));
+        }
       },
     );
 
