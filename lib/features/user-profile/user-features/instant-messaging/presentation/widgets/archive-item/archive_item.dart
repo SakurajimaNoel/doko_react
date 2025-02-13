@@ -396,7 +396,7 @@ class _ArchiveItemState extends State<ArchiveItem> {
                         child: Column(
                           crossAxisAlignment: self
                               ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.end,
+                              : CrossAxisAlignment.start,
                           children: [
                             if (message.replyOn != null)
                               Builder(
