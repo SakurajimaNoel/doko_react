@@ -1,7 +1,6 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
-import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
@@ -69,24 +68,6 @@ class _UserFeedPageState extends State<UserFeedPage> {
             children: [
               UserWidget.preview(
                 userKey: generateUserNodeKey(username),
-              ),
-              TextButton(
-                onPressed: () {
-                  showInfo("basic info");
-                },
-                child: Text("show info"),
-              ),
-              TextButton(
-                onPressed: () {
-                  showSuccess("basic success");
-                },
-                child: Text("show success"),
-              ),
-              TextButton(
-                onPressed: () {
-                  showError("basic error");
-                },
-                child: Text("show error"),
               ),
             ],
           ),

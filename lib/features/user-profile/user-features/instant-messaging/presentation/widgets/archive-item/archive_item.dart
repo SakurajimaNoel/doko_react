@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,11 +7,14 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
+import 'package:doko_react/core/utils/debounce/debounce.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
+import 'package:doko_react/core/utils/instant-messaging/message_preview.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
+import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/message-body-type/message_body_type.dart';
@@ -30,7 +34,7 @@ part "archive_post.dart";
 part "archive_text.dart";
 part "archive_user_profile.dart";
 
-class ArchiveItem extends StatelessWidget {
+class ArchiveItem extends StatefulWidget {
   ArchiveItem({
     super.key,
     required this.messageKey,
@@ -41,21 +45,37 @@ class ArchiveItem extends StatelessWidget {
   final bool showDate;
   final String messageId;
 
+  @override
+  State<ArchiveItem> createState() => _ArchiveItemState();
+}
+
+class _ArchiveItemState extends State<ArchiveItem> {
+  bool highlight = false;
+  final highlightDebounce = Debounce(
+    const Duration(
+      milliseconds: 1500,
+    ),
+  );
+
   void showMoreOptions(BuildContext context, bool self) {
     final width = MediaQuery.sizeOf(context).width;
     final currTheme = Theme.of(context).colorScheme;
     final height = MediaQuery.sizeOf(context).height / 2;
 
     final archiveMessageProvider = context.read<ArchiveMessageProvider>();
+    bool deleting = false;
 
     final UserGraph graph = UserGraph();
     MessageEntity messageEntity =
-        graph.getValueByKey(messageKey)! as MessageEntity;
+        graph.getValueByKey(widget.messageKey)! as MessageEntity;
     final message = messageEntity.message;
 
     Future<void> deleteMessage({
       required bool everyone,
     }) async {
+      if (deleting) return;
+      deleting = true;
+
       final client = context.read<WebsocketClientProvider>().client;
 
       final realTimeBloc = context.read<RealTimeBloc>();
@@ -66,11 +86,12 @@ class ArchiveItem extends StatelessWidget {
       DeleteMessage deleteMessage = DeleteMessage(
         from: username,
         to: archiveMessageProvider.archiveUser,
-        id: [messageId],
+        id: [widget.messageId],
         everyone: everyone,
       );
 
       bool result = await client?.sendPayload(deleteMessage) ?? false;
+      deleting = false;
       if (result) {
         realTimeBloc.add(RealTimeDeleteMessageEvent(
           message: deleteMessage,
@@ -116,12 +137,23 @@ class ArchiveItem extends StatelessWidget {
                   children: [
                     InkWell(
                       onTap: () {
-                        archiveMessageProvider.selectMessage(messageId);
+                        archiveMessageProvider.selectMessage(widget.messageId);
                         context.pop();
                       },
                       child: _ArchiveItemOptions(
                         icon: Icons.check,
                         label: "Select",
+                        color: currTheme.secondary,
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        archiveMessageProvider.addReply(widget.messageId);
+                        context.pop();
+                      },
+                      child: _ArchiveItemOptions(
+                        icon: Icons.reply,
+                        label: "Reply",
                         color: currTheme.secondary,
                       ),
                     ),
@@ -135,7 +167,7 @@ class ArchiveItem extends StatelessWidget {
                               return ChangeNotifierProvider.value(
                                 value: archiveMessageProvider,
                                 child: _EditMessage(
-                                  messageId: messageId,
+                                  messageId: widget.messageId,
                                   body: message.body,
                                 ),
                               );
@@ -199,19 +231,7 @@ class ArchiveItem extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final currTheme = Theme.of(context).colorScheme;
-    final username =
-        (context.read<UserBloc>().state as UserCompleteState).username;
-
-    final UserGraph graph = UserGraph();
-    MessageEntity messageEntity =
-        graph.getValueByKey(messageKey)! as MessageEntity;
-    final message = messageEntity.message;
-    bool self = message.from == username;
-
-    final alignment = self ? Alignment.topRight : Alignment.topLeft;
+  Widget getMessageItem(MessageSubject subject, bool self) {
     final archiveProvider = context.read<ArchiveMessageProvider>();
 
     TextStyle metaDataStyle = TextStyle(
@@ -233,24 +253,24 @@ class ArchiveItem extends StatelessWidget {
         self ? archiveProvider.selfTextColor : archiveProvider.textColor;
 
     Widget body;
-    switch (message.subject) {
+    switch (subject) {
       case MessageSubject.text:
         body = _ArchiveText(
           bubbleColor: bubbleColor,
           textColor: textColor,
           metaDataStyle: metaDataStyle,
-          messageKey: messageKey,
+          messageKey: widget.messageKey,
         );
       case MessageSubject.mediaBucketResource:
         body = _ArchiveText(
           bubbleColor: bubbleColor,
           textColor: textColor,
           metaDataStyle: metaDataStyle,
-          messageKey: messageKey,
+          messageKey: widget.messageKey,
         );
       case MessageSubject.mediaExternal:
         body = _ArchiveExternalResource(
-          messageKey: messageKey,
+          messageKey: widget.messageKey,
           metaDataStyle: metaDataStyle,
         );
       case MessageSubject.userLocation:
@@ -258,17 +278,17 @@ class ArchiveItem extends StatelessWidget {
           bubbleColor: bubbleColor,
           textColor: textColor,
           metaDataStyle: metaDataStyle,
-          messageKey: messageKey,
+          messageKey: widget.messageKey,
         );
       case MessageSubject.dokiUser:
         body = _ArchiveUserProfile(
           metaDataStyle: metaDataStyle,
-          messageKey: messageKey,
+          messageKey: widget.messageKey,
         );
       case MessageSubject.dokiPost:
         body = _ArchivePost(
           metaDataStyle: metaDataStyle,
-          messageKey: messageKey,
+          messageKey: widget.messageKey,
           bubbleColor: bubbleColor,
           textColor: textColor,
         );
@@ -277,59 +297,240 @@ class ArchiveItem extends StatelessWidget {
           bubbleColor: bubbleColor,
           textColor: textColor,
           metaDataStyle: metaDataStyle,
-          messageKey: messageKey,
+          messageKey: widget.messageKey,
         );
       case MessageSubject.dokiDiscussion:
         body = _ArchiveText(
           bubbleColor: bubbleColor,
           textColor: textColor,
           metaDataStyle: metaDataStyle,
-          messageKey: messageKey,
+          messageKey: widget.messageKey,
         );
       case MessageSubject.dokiPolls:
         body = _ArchiveText(
           bubbleColor: bubbleColor,
           textColor: textColor,
           metaDataStyle: metaDataStyle,
-          messageKey: messageKey,
+          messageKey: widget.messageKey,
         );
     }
 
+    return body;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currTheme = Theme.of(context).colorScheme;
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
+    final UserGraph graph = UserGraph();
+    MessageEntity messageEntity =
+        graph.getValueByKey(widget.messageKey)! as MessageEntity;
+    final message = messageEntity.message;
+    bool self = message.from == username;
+
+    final alignment = self ? Alignment.topRight : Alignment.topLeft;
+    final archiveProvider = context.read<ArchiveMessageProvider>();
+
     return _AddDayToast(
       date: message.sendAt,
-      showDate: showDate,
-      child: Builder(builder: (context) {
-        final _ = context.watch<ArchiveMessageProvider>();
+      showDate: widget.showDate,
+      child: Dismissible(
+        key: ValueKey("${message.id}-archive-item-widget"),
+        direction: DismissDirection.startToEnd,
+        confirmDismiss: (_) async {
+          archiveProvider.addReply(widget.messageId);
+          return false;
+        },
+        child: BlocListener<UserActionBloc, UserActionState>(
+          listenWhen: (previousState, state) {
+            return state is UserActionNodeHighlightState &&
+                state.nodeId == message.id;
+          },
+          listener: (context, state) {
+            if (!highlight) {
+              setState(() {
+                highlight = true;
+              });
+            }
+            highlightDebounce(() {
+              if (highlight) {
+                setState(() {
+                  highlight = false;
+                });
+              }
+            });
+          },
+          child: Builder(
+            builder: (context) {
+              final _ = context.watch<ArchiveMessageProvider>();
 
-        return Container(
-          width: double.infinity,
-          color: archiveProvider.isSelected(messageId)
-              ? currTheme.secondaryContainer
-              : Colors.transparent,
-          child: InkWell(
-            onLongPress: archiveProvider.canShowMoreOptions()
-                ? () => showMoreOptions(context, self)
-                : null,
-            onTap: archiveProvider.canShowMoreOptions()
-                ? null
-                : () => archiveProvider.selectMessage(messageId),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: Constants.padding,
-                vertical: Constants.padding * 0.5,
-              ),
-              child: FractionallySizedBox(
-                alignment: alignment,
-                widthFactor: 0.8,
-                child: Align(
-                  alignment: alignment,
-                  child: body,
+              return Container(
+                width: double.infinity,
+                color: highlight
+                    ? currTheme.primaryContainer.withValues(
+                        alpha: 0.75,
+                      )
+                    : archiveProvider.isSelected(widget.messageId)
+                        ? currTheme.secondaryContainer
+                        : Colors.transparent,
+                child: InkWell(
+                  onLongPress: archiveProvider.canShowMoreOptions()
+                      ? () => showMoreOptions(context, self)
+                      : null,
+                  onTap: archiveProvider.canShowMoreOptions()
+                      ? null
+                      : () => archiveProvider.selectMessage(widget.messageId),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: Constants.padding,
+                      vertical: Constants.padding * 0.5,
+                    ),
+                    child: FractionallySizedBox(
+                      alignment: alignment,
+                      widthFactor: 0.8,
+                      child: Align(
+                        alignment: alignment,
+                        child: Column(
+                          crossAxisAlignment: self
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.end,
+                          children: [
+                            if (message.replyOn != null)
+                              Builder(
+                                builder: (context) {
+                                  String messageKey =
+                                      generateMessageKey(message.replyOn!);
+                                  final messageEntity =
+                                      graph.getValueByKey(messageKey);
+                                  String displayMessageReply = "";
+                                  bool deleted = false;
+
+                                  if (messageEntity is MessageEntity) {
+                                    displayMessageReply = messageReplyPreview(
+                                        messageEntity.message.subject,
+                                        messageEntity.message.body);
+
+                                    if (messageEntity.deleted) {
+                                      deleted = true;
+                                      displayMessageReply =
+                                          "This message is deleted";
+                                    }
+                                  } else {
+                                    /// todo: based on message presence display message
+                                    /// if deleted show message is deleted or loading when loading
+                                    displayMessageReply =
+                                        "Message doesn't exist any more";
+                                  }
+
+                                  return Material(
+                                    color: currTheme.surfaceContainer,
+                                    borderRadius: BorderRadius.circular(
+                                        Constants.radius * 0.5),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (deleted) {
+                                          showInfo("This message is deleted");
+                                          return;
+                                        }
+
+                                        final userActionBloc =
+                                            context.read<UserActionBloc>();
+
+                                        if (messageEntity is MessageEntity &&
+                                            messageEntity.listIndex != null) {
+                                          int messageIndex =
+                                              messageEntity.listIndex!;
+                                          final observerController = context
+                                              .read<ArchiveMessageProvider>()
+                                              .controller;
+
+                                          if (observerController != null) {
+                                            // immediately send the event in case widget is already in view
+                                            userActionBloc.add(
+                                                UserActionNodeHighlightEvent(
+                                              nodeId: messageEntity.message.id,
+                                            ));
+                                            Timer(
+                                                const Duration(
+                                                  milliseconds: Constants
+                                                      .maxScrollDuration,
+                                                ), () {
+                                              // fire highlight event
+                                              userActionBloc.add(
+                                                  UserActionNodeHighlightEvent(
+                                                nodeId:
+                                                    messageEntity.message.id,
+                                              ));
+                                            });
+
+                                            observerController.animateTo(
+                                              index: messageIndex,
+                                              duration: const Duration(
+                                                milliseconds:
+                                                    Constants.maxScrollDuration,
+                                              ),
+                                              curve: Curves.fastOutSlowIn,
+                                            );
+                                          }
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(
+                                            Constants.padding * 0.375),
+                                        child: Column(
+                                          children: [
+                                            IntrinsicHeight(
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                spacing: Constants.gap * 0.625,
+                                                children: [
+                                                  VerticalDivider(
+                                                    thickness:
+                                                        Constants.width * 0.375,
+                                                    width:
+                                                        Constants.width * 0.375,
+                                                    color: currTheme
+                                                        .inversePrimary,
+                                                  ),
+                                                  Text(
+                                                    displayMessageReply,
+                                                    style: TextStyle(
+                                                      fontSize: Constants
+                                                          .smallFontSize,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: currTheme.onSurface
+                                                          .withValues(
+                                                        alpha: 0.75,
+                                                      ),
+                                                    ),
+                                                    softWrap: true,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            getMessageItem(message.subject, self),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
-        );
-      }),
+        ),
+      ),
     );
   }
 }
@@ -432,6 +633,9 @@ class _EditMessageState extends State<_EditMessage> {
   late final TextEditingController controller =
       TextEditingController(text: widget.body);
 
+  /// handle duplicates during reconnect attempt
+  bool updating = false;
+
   @override
   void dispose() {
     controller.dispose();
@@ -478,6 +682,8 @@ class _EditMessageState extends State<_EditMessage> {
               showError("Message can't be empty.");
               return;
             }
+            if (updating) return;
+            updating = true;
 
             final client = context.read<WebsocketClientProvider>().client;
 
@@ -494,7 +700,10 @@ class _EditMessageState extends State<_EditMessage> {
               editedOn: DateTime.now(),
             );
 
-            if (await client?.sendPayload(editedMessage) ?? false) {
+            bool result = await client?.sendPayload(editedMessage) ?? false;
+            updating = false;
+
+            if (result) {
               // success
               realTimeBloc.add(RealTimeEditMessageEvent(
                 message: editedMessage,

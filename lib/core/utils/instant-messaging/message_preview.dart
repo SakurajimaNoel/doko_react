@@ -51,3 +51,33 @@ String messagePreview(ChatMessage message, String username) {
       return self ? selfResponse : remoteResponse;
   }
 }
+
+String messageReplyPreview(MessageSubject subject, String body) {
+  String displayMessageReply;
+
+  switch (subject) {
+    case MessageSubject.text:
+      displayMessageReply = trimText(
+        body,
+        len: 32,
+      );
+    case MessageSubject.mediaBucketResource:
+      displayMessageReply = "MEDIA";
+    case MessageSubject.mediaExternal:
+      displayMessageReply = "GIF / STICKER 🖼️";
+    case MessageSubject.userLocation:
+      displayMessageReply = "LOCATION";
+    case MessageSubject.dokiUser:
+      displayMessageReply = "USER Profile";
+    case MessageSubject.dokiPost:
+      displayMessageReply = "POST";
+    case MessageSubject.dokiPage:
+      displayMessageReply = "PAGE";
+    case MessageSubject.dokiDiscussion:
+      displayMessageReply = "DISCUSSION";
+    case MessageSubject.dokiPolls:
+      displayMessageReply = "POLLS";
+  }
+
+  return displayMessageReply;
+}

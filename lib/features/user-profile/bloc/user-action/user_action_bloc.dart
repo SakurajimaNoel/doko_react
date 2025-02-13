@@ -91,10 +91,10 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     on<UserActionGetPostByIdEvent>(_handleUserActionGetPostByIdEvent);
     on<UserActionGetCommentByIdEvent>(_handleUserActionGetCommentByIdEvent);
     on<UserActionNodeLikeRemoteEvent>(_handleUserActionNodeLikeRemoteEvent);
-    on<UserActionCommentHighlightEvent>(
+    on<UserActionNodeHighlightEvent>(
       (event, emit) => emit(
-        UserActionCommentHighlightState(
-          commentId: event.commentId,
+        UserActionNodeHighlightState(
+          nodeId: event.nodeId,
         ),
       ),
     );

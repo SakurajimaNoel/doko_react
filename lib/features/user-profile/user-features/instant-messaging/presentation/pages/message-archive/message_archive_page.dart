@@ -18,6 +18,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:scrollview_observer/scrollview_observer.dart';
 
 class MessageArchivePage extends StatefulWidget {
   const MessageArchivePage({
@@ -36,10 +37,17 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
   final ScrollController controller = ScrollController();
   bool show = false;
 
+  late ListObserverController observerController;
+
+  final UserGraph graph = UserGraph();
+
   @override
   void initState() {
     super.initState();
 
+    observerController = ListObserverController(
+      controller: controller,
+    );
     controller.addListener(handleScroll);
   }
 
@@ -88,6 +96,12 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
 
     String messageKey = messages[index];
     String messageId = getMessageIdFromMessageKey(messageKey);
+
+    final message = graph.getValueByKey(messageKey);
+    if (message is MessageEntity) {
+      message.listIndex = index;
+    }
+
     return ArchiveItem(
       key: ValueKey(messageId),
       showDate: showDate,
@@ -108,6 +122,7 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
         backgroundColor: currTheme.surfaceContainerHighest,
         textColor: currTheme.onSurface,
         archiveUser: widget.username,
+        controller: observerController,
       ),
       child: Builder(
         builder: (context) {
@@ -281,23 +296,27 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                             .toList(
                               growable: false,
                             );
-                        return ListView.separated(
-                          controller: controller,
-                          reverse: true,
-                          itemCount: messages.length,
-                          cacheExtent: height * 2,
-                          padding: const EdgeInsets.only(
-                            top: Constants.padding * 2,
-                            bottom: Constants.padding * 1,
+                        return ListViewObserver(
+                          controller: observerController,
+                          child: ListView.separated(
+                            controller: controller,
+                            reverse: true,
+                            itemCount: messages.length,
+                            cacheExtent: height * 2,
+                            padding: const EdgeInsets.only(
+                              top: Constants.padding * 2,
+                              bottom: Constants.padding * 1,
+                            ),
+                            separatorBuilder: (context, index) {
+                              return const SizedBox(
+                                height: Constants.gap * 0.5,
+                              );
+                            },
+                            itemBuilder: (BuildContext context, int index) {
+                              return buildItem(
+                                  context, index, messages.toList());
+                            },
                           ),
-                          separatorBuilder: (context, index) {
-                            return const SizedBox(
-                              height: Constants.gap * 0.5,
-                            );
-                          },
-                          itemBuilder: (BuildContext context, int index) {
-                            return buildItem(context, index, messages.toList());
-                          },
                         );
                       },
                     ),

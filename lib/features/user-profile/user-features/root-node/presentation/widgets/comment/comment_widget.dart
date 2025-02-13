@@ -283,16 +283,16 @@ class _CommentReplyPreview extends StatelessWidget {
 
                 if (observerController != null) {
                   // immediately send the event in case widget is already in view
-                  userActionBloc.add(UserActionCommentHighlightEvent(
-                    commentId: comment.id,
+                  userActionBloc.add(UserActionNodeHighlightEvent(
+                    nodeId: comment.id,
                   ));
                   Timer(
                       const Duration(
                         milliseconds: Constants.maxScrollDuration,
                       ), () {
                     // fire highlight event
-                    userActionBloc.add(UserActionCommentHighlightEvent(
-                      commentId: comment.id,
+                    userActionBloc.add(UserActionNodeHighlightEvent(
+                      nodeId: comment.id,
                     ));
                   });
 
@@ -386,8 +386,8 @@ class _CommentWrapperState extends State<_CommentWrapper> {
 
     return BlocListener<UserActionBloc, UserActionState>(
       listenWhen: (previousState, state) {
-        return state is UserActionCommentHighlightState &&
-            state.commentId == widget.commentId;
+        return state is UserActionNodeHighlightState &&
+            state.nodeId == widget.commentId;
       },
       listener: (context, state) {
         if (!highlight) {

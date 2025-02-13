@@ -130,13 +130,13 @@ final class UserActionNodeLikeRemoteEvent extends UserActionEvent {
   final String username;
 }
 
-/// comment reply highlight event
-final class UserActionCommentHighlightEvent extends UserActionEvent {
-  UserActionCommentHighlightEvent({
-    required this.commentId,
+/// node reply highlight event
+final class UserActionNodeHighlightEvent extends UserActionEvent {
+  UserActionNodeHighlightEvent({
+    required this.nodeId,
   });
 
-  final String commentId;
+  final String nodeId;
 }
 
 // new comment on user related nodes

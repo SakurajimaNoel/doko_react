@@ -96,6 +96,9 @@ class _ShareDetailsState extends State<_ShareDetails> {
 
   List<String> tempSearchResults = [];
 
+  /// used to prevent duplicate sending of same payload when attempting to reconnect
+  bool sending = false;
+
   @override
   void initState() {
     super.initState();
@@ -474,6 +477,9 @@ class _ShareDetailsState extends State<_ShareDetails> {
                         onPressed: selectedUsers.isEmpty
                             ? null
                             : () async {
+                                if (sending) return;
+                                sending = true;
+
                                 final client = context
                                     .read<WebsocketClientProvider>()
                                     .client;
@@ -493,6 +499,8 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                   bool result =
                                       await client?.sendPayload(message) ??
                                           false;
+
+                                  sending = false;
 
                                   if (result) {
                                     // fire bloc event
