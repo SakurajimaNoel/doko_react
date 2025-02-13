@@ -249,7 +249,7 @@ class _UserLayoutState extends State<UserLayout> {
               .add(UserActionNewSecondaryNodeRemoteEvent(
                 payload: payload,
               ));
-        }
+        },
       },
     );
 

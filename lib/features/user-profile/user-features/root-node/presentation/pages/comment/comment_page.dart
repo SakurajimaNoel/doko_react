@@ -135,9 +135,6 @@ class _CommentPageState extends State<CommentPage> {
             },
             child: Text("Go to ${widget.parentNodeType.name} "),
           ),
-          const SizedBox(
-            width: Constants.gap,
-          ),
         ],
       ),
       body: BlocProvider(

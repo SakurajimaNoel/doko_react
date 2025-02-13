@@ -310,7 +310,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: a4abccd89303980818216fbdcbe7dab29fa646e5
+      resolved-ref: "293494c057c9c8faec2947b3c303642569425078"
       url: "https://github.com/rohan031/doki_websocket_client.git"
     source: git
     version: "2.0.1"
@@ -459,10 +459,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_fgbg
-      sha256: "85e2c0b27627793b1918774b95f864588a643372c9e8bbe028cb9294592e61c9"
+      sha256: eb6da9b2047372566a6e17b505975fe5bace94af01f6fc825c4b6f81baa6c447
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.0"
+    version: "0.7.1"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:

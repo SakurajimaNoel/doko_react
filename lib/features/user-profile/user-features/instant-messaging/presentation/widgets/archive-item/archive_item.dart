@@ -341,6 +341,7 @@ class _ArchiveItemState extends State<ArchiveItem> {
         direction: DismissDirection.startToEnd,
         confirmDismiss: (_) async {
           archiveProvider.addReply(widget.messageId);
+          HapticFeedback.vibrate();
           return false;
         },
         child: BlocListener<UserActionBloc, UserActionState>(

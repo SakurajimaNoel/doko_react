@@ -37,6 +37,9 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
   final ScrollController controller = ScrollController();
   bool show = false;
 
+  late final WebsocketClientProvider websocketClientProvider =
+      context.read<WebsocketClientProvider>();
+
   late ListObserverController observerController;
 
   final UserGraph graph = UserGraph();
@@ -49,6 +52,8 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
       controller: controller,
     );
     controller.addListener(handleScroll);
+
+    // subscribe to user presence
   }
 
   void handleScroll() {
@@ -74,6 +79,9 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
     focusNode.dispose();
     controller.removeListener(handleScroll);
     controller.dispose();
+
+    // unsubscribe to user presence
+
     super.dispose();
   }
 
@@ -167,6 +175,21 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                   : null,
               appBar: AppBar(
                 backgroundColor: currTheme.surfaceContainer,
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(Constants.height),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        bottom: Constants.padding * 0.25,
+                        left: Constants.padding,
+                      ),
+                      child: Text(
+                        "Online",
+                      ),
+                    ),
+                  ),
+                ),
                 title: InkWell(
                   onTap: () {
                     context.pushNamed(

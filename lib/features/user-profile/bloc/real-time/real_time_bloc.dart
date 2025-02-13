@@ -10,6 +10,7 @@ part 'real_time_event.dart';
 part 'real_time_state.dart';
 
 class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
+  UserGraph graph = UserGraph();
   RealTimeBloc() : super(RealTimeInitial()) {
     on<RealTimeNewMessageEvent>(_handleRealTimeNewMessageEvent);
     on<RealTimeTypingStatusEvent>(_handleRealTimeTypingStatusEvent);
@@ -20,7 +21,6 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
 
   FutureOr<void> _handleRealTimeNewMessageEvent(
       RealTimeNewMessageEvent event, Emitter<RealTimeState> emit) {
-    UserGraph graph = UserGraph();
     ChatMessage message = event.message;
     graph.addNewMessage(message, event.username);
 

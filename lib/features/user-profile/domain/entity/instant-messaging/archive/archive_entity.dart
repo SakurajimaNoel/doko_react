@@ -7,6 +7,8 @@ class ArchiveEntity implements GraphEntity {
     required this.currentSessionMessages,
   });
 
+  bool? presenceOnline;
+
   // todo: handle messages in better way try SplayTreeSet
   Nodes archiveMessages;
 
