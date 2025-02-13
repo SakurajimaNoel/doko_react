@@ -482,9 +482,9 @@ class ProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Error getting users right now.");
+        throw const ApplicationException(
+          reason: "Error getting users right now.",
+        );
       }
 
       List? res = result.data?["users"];

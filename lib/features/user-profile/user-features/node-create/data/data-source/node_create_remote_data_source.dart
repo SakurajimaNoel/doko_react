@@ -63,9 +63,9 @@ class NodeCreateRemoteDataSource {
           deleteFileFromAWSByPath(path);
         }
 
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Problem uploading post.");
+        throw const ApplicationException(
+          reason: "Problem uploading post.",
+        );
       }
 
       List? res = result.data?["createPosts"]["posts"];
@@ -109,9 +109,9 @@ class NodeCreateRemoteDataSource {
           deleteFileFromAWSByPath(commentDetails.bucketPath!);
         }
 
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Problem adding comment.");
+        throw const ApplicationException(
+          reason: "Problem adding comment.",
+        );
       }
 
       List? comment = result.data?["createComments"]["comments"];

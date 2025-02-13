@@ -31,9 +31,9 @@ class PostRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Problem loading post.");
+        throw const ApplicationException(
+          reason: "Problem loading post.",
+        );
       }
       List? res = result.data?["posts"];
 
@@ -92,9 +92,9 @@ class PostRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Problem loading comments.");
+        throw const ApplicationException(
+          reason: "Problem loading comments.",
+        );
       }
 
       Map? commentData = result.data?["commentsConnection"];
@@ -153,9 +153,9 @@ class PostRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Problem loading comment.");
+        throw const ApplicationException(
+          reason: "Problem loading comment.",
+        );
       }
 
       List? res = result.data?["comments"];

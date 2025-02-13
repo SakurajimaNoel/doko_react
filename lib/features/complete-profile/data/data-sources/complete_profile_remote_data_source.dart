@@ -26,9 +26,9 @@ class CompleteProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Problem checking username availability.");
+        throw const ApplicationException(
+          reason: "Problem checking username availability.",
+        );
       }
 
       List? res = result.data?["users"];
@@ -60,9 +60,9 @@ class CompleteProfileRemoteDataSource {
       );
 
       if (result.hasException) {
-        throw ApplicationException(
-            reason: result.exception?.graphqlErrors.toString() ??
-                "Can't complete user profile right now.");
+        throw const ApplicationException(
+          reason: "Can't complete user profile right now.",
+        );
       }
 
       // check if user data is present
