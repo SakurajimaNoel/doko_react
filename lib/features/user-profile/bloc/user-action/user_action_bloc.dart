@@ -408,7 +408,6 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         nodeId: event.commentId,
       ));
 
-      print("emit comment state");
       emit(UserActionCommentDataFetchedState(
         commentId: event.commentId,
         success: true,

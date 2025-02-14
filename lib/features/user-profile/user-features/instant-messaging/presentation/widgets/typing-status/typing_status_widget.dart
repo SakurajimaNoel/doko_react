@@ -10,6 +10,7 @@ class TypingStatusWidget extends StatelessWidget {
     required this.username,
   }) : canHide = false;
 
+  /// this is used in inbox page
   const TypingStatusWidget.canHide({
     super.key,
     required this.username,
@@ -39,49 +40,59 @@ class TypingStatusWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: Constants.gap * 0.25,
             children: [
-              if (!shouldHide || !canHide)
-                Text(
-                  "@${trimText(
-                    username,
-                    len: shrink ? 12 : 50,
-                  )} is typing",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: Constants.smallFontSize * textFactor,
-                    color: currTheme.primary,
-                  ),
-                ),
-              if (shouldHide && canHide)
-                Text(
-                  "Typing",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: Constants.smallFontSize * textFactor,
-                    color: currTheme.primary,
-                  ),
-                ),
-              SizedBox(
-                height: Constants.height * 1 * animationBoxFactor,
-                width: Constants.height * 2 * animationBoxFactor,
-                child: OverflowBox(
-                  minHeight: Constants.iconButtonSize * animationFactor,
-                  maxHeight: Constants.iconButtonSize * animationFactor,
-                  maxWidth: Constants.iconButtonSize * animationFactor,
-                  minWidth: Constants.iconButtonSize * animationFactor,
-                  child: Lottie.asset(
-                    "assets/typing-animation.lottie",
-                    decoder: lottieDecoder,
-                    delegates: LottieDelegates(
-                      values: [
-                        ValueDelegate.color(
-                          const ["**"],
-                          value: currTheme.primary,
+              if (canHide) ...[
+                !shouldHide
+                    ? Text(
+                        "@${trimText(
+                          username,
+                          len: shrink ? 12 : 50,
+                        )} is typing",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: Constants.smallFontSize * textFactor,
+                          color: currTheme.primary,
                         ),
-                      ],
+                      )
+                    : Text(
+                        "Typing",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: Constants.smallFontSize * textFactor,
+                          color: currTheme.primary,
+                        ),
+                      ),
+                SizedBox(
+                  height: Constants.height * 1 * animationBoxFactor,
+                  width: Constants.height * 2 * animationBoxFactor,
+                  child: OverflowBox(
+                    minHeight: Constants.iconButtonSize * animationFactor,
+                    maxHeight: Constants.iconButtonSize * animationFactor,
+                    maxWidth: Constants.iconButtonSize * animationFactor,
+                    minWidth: Constants.iconButtonSize * animationFactor,
+                    child: Lottie.asset(
+                      "assets/typing-animation.lottie",
+                      decoder: lottieDecoder,
+                      delegates: LottieDelegates(
+                        values: [
+                          ValueDelegate.color(
+                            const ["**"],
+                            value: currTheme.primary,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
+              if (!canHide)
+                SizedBox(
+                  height: Constants.height * 6,
+                  width: Constants.height * 6,
+                  child: Lottie.asset(
+                    "assets/typing-animation-sticker.lottie",
+                    decoder: lottieDecoder,
+                  ),
+                )
             ],
           ),
         );
