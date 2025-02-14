@@ -63,7 +63,7 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
       user: widget.username,
     );
 
-    client?.sendPayload(subscription);
+    if (widget.username != currentUser) client?.sendPayload(subscription);
   }
 
   void handleScroll() {
