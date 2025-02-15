@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 class SmallLoadingIndicator extends StatelessWidget {
   const SmallLoadingIndicator({super.key, this.color})
-      : diameter = Constants.height * 1.5;
+      : diameter = Constants.height * 1.625;
 
   const SmallLoadingIndicator.small({super.key, this.color})
-      : diameter = Constants.height;
+      : diameter = Constants.height * 1.375;
 
   final Color? color;
   final double diameter;
@@ -20,7 +20,7 @@ class SmallLoadingIndicator extends StatelessWidget {
       width: diameter,
       child: CircularProgressIndicator(
         color: color ?? currTheme.primary,
-        strokeWidth: 3,
+        strokeWidth: 2.5,
       ),
     );
   }

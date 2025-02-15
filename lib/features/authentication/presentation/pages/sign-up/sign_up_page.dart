@@ -100,98 +100,109 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             Form(
                               key: formKey,
-                              child: Column(
-                                children: [
-                                  TextFormField(
-                                    controller: emailController,
-                                    enabled: !loading,
-                                    validator: (value) {
-                                      return validateEmail(value)
-                                          ? null
-                                          : "Invalid email address.";
-                                    },
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: "Email",
-                                      hintText: "Email...",
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: Constants.gap * 1.5,
-                                  ),
-                                  TextFormField(
-                                    controller: passwordController,
-                                    enabled: !loading,
-                                    obscureText: true,
-                                    validator: (value) {
-                                      return validatePassword(value)
-                                          ? null
-                                          : passwordInvalidateReason(value);
-                                    },
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: "Password",
-                                      hintText: "Password...",
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: Constants.gap * 1.5,
-                                  ),
-                                  TextFormField(
-                                    enabled: !loading,
-                                    obscureText: true,
-                                    validator: (value) {
-                                      if (value == null) {
-                                        return "Invalid value.";
-                                      }
-
-                                      return compareString(
-                                              passwordController.text.trim(),
-                                              value)
-                                          ? null
-                                          : "Both password should match.";
-                                    },
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: "Confirm Password",
-                                      hintText: "Confirm Password...",
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: Constants.gap * 1.5,
-                                  ),
-                                  FilledButton(
-                                    onPressed: loading
-                                        ? null
-                                        : () => handleSignUp(context),
-                                    style: FilledButton.styleFrom(
-                                      minimumSize: const Size(
-                                        Constants.buttonWidth,
-                                        Constants.buttonHeight,
+                              child: AutofillGroup(
+                                child: Column(
+                                  children: [
+                                    TextFormField(
+                                      autofillHints: [
+                                        AutofillHints.email,
+                                      ],
+                                      controller: emailController,
+                                      enabled: !loading,
+                                      validator: (value) {
+                                        return validateEmail(value)
+                                            ? null
+                                            : "Invalid email address.";
+                                      },
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: "Email",
+                                        hintText: "Email...",
                                       ),
                                     ),
-                                    child: loading
-                                        ? const SmallLoadingIndicator()
-                                        : const Text("Sign Up"),
-                                  ),
-                                  const SizedBox(
-                                    height: Constants.gap,
-                                  ),
-                                  const Text(
-                                    "Once you've created your account, please check your inbox for a verification email.",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                      fontSize: Constants.smallFontSize,
-                                      fontStyle: FontStyle.italic,
+                                    const SizedBox(
+                                      height: Constants.gap * 1.5,
                                     ),
-                                  ),
-                                ],
+                                    TextFormField(
+                                      controller: passwordController,
+                                      enabled: !loading,
+                                      obscureText: true,
+                                      autofillHints: [
+                                        AutofillHints.newPassword,
+                                      ],
+                                      validator: (value) {
+                                        return validatePassword(value)
+                                            ? null
+                                            : passwordInvalidateReason(value);
+                                      },
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: "Password",
+                                        hintText: "Password...",
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: Constants.gap * 1.5,
+                                    ),
+                                    TextFormField(
+                                      enabled: !loading,
+                                      autofillHints: [
+                                        AutofillHints.newPassword,
+                                      ],
+                                      obscureText: true,
+                                      validator: (value) {
+                                        if (value == null) {
+                                          return "Invalid value.";
+                                        }
+
+                                        return compareString(
+                                                passwordController.text.trim(),
+                                                value)
+                                            ? null
+                                            : "Both password should match.";
+                                      },
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: "Confirm Password",
+                                        hintText: "Confirm Password...",
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: Constants.gap * 1.5,
+                                    ),
+                                    FilledButton(
+                                      onPressed: loading
+                                          ? null
+                                          : () => handleSignUp(context),
+                                      style: FilledButton.styleFrom(
+                                        minimumSize: const Size(
+                                          Constants.buttonWidth,
+                                          Constants.buttonHeight,
+                                        ),
+                                      ),
+                                      child: loading
+                                          ? const SmallLoadingIndicator()
+                                          : const Text("Sign Up"),
+                                    ),
+                                    const SizedBox(
+                                      height: Constants.gap,
+                                    ),
+                                    const Text(
+                                      "Once you've created your account, please check your inbox for a verification email.",
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                        fontSize: Constants.smallFontSize,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],

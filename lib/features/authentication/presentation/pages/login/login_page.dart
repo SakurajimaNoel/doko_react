@@ -111,63 +111,72 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               Form(
                                 key: formKey,
-                                child: Column(
-                                  children: [
-                                    TextFormField(
-                                      controller: emailController,
-                                      enabled: !loading,
-                                      validator: (value) {
-                                        return validateEmail(value)
-                                            ? null
-                                            : "Invalid email address.";
-                                      },
-                                      autovalidateMode:
-                                          AutovalidateMode.onUserInteraction,
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(),
-                                        labelText: "Email",
-                                        hintText: "Email...",
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: Constants.gap * 1.5,
-                                    ),
-                                    TextFormField(
-                                      controller: passwordController,
-                                      enabled: !loading,
-                                      obscureText: true,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return "Password can't be empty";
-                                        }
-                                        return null;
-                                      },
-                                      autovalidateMode:
-                                          AutovalidateMode.onUserInteraction,
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(),
-                                        labelText: "Password",
-                                        hintText: "Password...",
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: Constants.gap * 1.5,
-                                    ),
-                                    FilledButton(
-                                      onPressed: loading
-                                          ? null
-                                          : () => handleLogin(context),
-                                      style: FilledButton.styleFrom(
-                                        minimumSize: const Size(
-                                          Constants.buttonWidth,
-                                          Constants.buttonHeight,
+                                child: AutofillGroup(
+                                  child: Column(
+                                    children: [
+                                      TextFormField(
+                                        controller: emailController,
+                                        enabled: !loading,
+                                        autofillHints: [
+                                          AutofillHints.email,
+                                          AutofillHints.username,
+                                        ],
+                                        validator: (value) {
+                                          return validateEmail(value)
+                                              ? null
+                                              : "Invalid email address.";
+                                        },
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: "Email",
+                                          hintText: "Email...",
                                         ),
                                       ),
-                                      child: loading
-                                          ? const SmallLoadingIndicator()
-                                          : const Text("Login"),
-                                    ),
-                                  ],
+                                      const SizedBox(
+                                        height: Constants.gap * 1.5,
+                                      ),
+                                      TextFormField(
+                                        autofillHints: [
+                                          AutofillHints.password,
+                                        ],
+                                        controller: passwordController,
+                                        enabled: !loading,
+                                        obscureText: true,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return "Password can't be empty";
+                                          }
+                                          return null;
+                                        },
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: "Password",
+                                          hintText: "Password...",
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: Constants.gap * 1.5,
+                                      ),
+                                      FilledButton(
+                                        onPressed: loading
+                                            ? null
+                                            : () => handleLogin(context),
+                                        style: FilledButton.styleFrom(
+                                          minimumSize: const Size(
+                                            Constants.buttonWidth,
+                                            Constants.buttonHeight,
+                                          ),
+                                        ),
+                                        child: loading
+                                            ? const SmallLoadingIndicator()
+                                            : const Text("Login"),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                               const SizedBox(
