@@ -165,6 +165,7 @@ class GraphqlMutations {
             "update": {
               "edge": {
                 "status": FriendStatus.accepted,
+                "addedOn": DateTime.now().toIso8601String(),
               }
             }
           }

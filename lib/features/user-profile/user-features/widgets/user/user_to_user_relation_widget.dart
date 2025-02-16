@@ -3,6 +3,7 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
+import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/relation/user_to_user_relation.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -238,21 +239,33 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
           }
 
           if (label) {
-            return FilledButton.tonalIcon(
-              onPressed: disabled ? null : () => removeFriendRelation(user),
-              label: Text(
-                "Cancel request",
-                style: TextStyle(
-                  color: currTheme.onError,
+            return Column(
+              spacing: Constants.gap * 0.5,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FilledButton.tonalIcon(
+                  onPressed: disabled ? null : () => removeFriendRelation(user),
+                  label: Text(
+                    "Cancel request",
+                    style: TextStyle(
+                      color: currTheme.onError,
+                    ),
+                  ),
+                  icon: Icon(
+                    Icons.close,
+                    color: currTheme.onError,
+                  ),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: currTheme.error,
+                  ),
                 ),
-              ),
-              icon: Icon(
-                Icons.close,
-                color: currTheme.onError,
-              ),
-              style: FilledButton.styleFrom(
-                backgroundColor: currTheme.error,
-              ),
+                Text(
+                  "You send a request on ${dateString(user.relationInfo!.addedOn)}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             );
           }
 
@@ -277,31 +290,45 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
           }
 
           if (label) {
-            return Row(
-              spacing: Constants.gap,
-              mainAxisSize: MainAxisSize.min,
+            return Column(
+              spacing: Constants.gap * 0.5,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FilledButton.tonalIcon(
-                  onPressed: disabled ? null : () => acceptFriendRelation(user),
-                  icon: const Icon(Icons.check),
-                  label: const Text("Accept"),
-                ),
-                FilledButton.tonalIcon(
-                  onPressed: disabled ? null : () => removeFriendRelation(user),
-                  label: Text(
-                    "Cancel request",
-                    style: TextStyle(
-                      color: currTheme.onError,
+                Row(
+                  spacing: Constants.gap,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FilledButton.tonalIcon(
+                      onPressed:
+                          disabled ? null : () => acceptFriendRelation(user),
+                      icon: const Icon(Icons.check),
+                      label: const Text("Accept"),
                     ),
+                    FilledButton.tonalIcon(
+                      onPressed:
+                          disabled ? null : () => removeFriendRelation(user),
+                      label: Text(
+                        "Cancel request",
+                        style: TextStyle(
+                          color: currTheme.onError,
+                        ),
+                      ),
+                      icon: Icon(
+                        Icons.close,
+                        color: currTheme.onError,
+                      ),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: currTheme.error,
+                      ),
+                    )
+                  ],
+                ),
+                Text(
+                  "${user.name} sent a request on ${dateString(user.relationInfo!.addedOn)}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
                   ),
-                  icon: Icon(
-                    Icons.close,
-                    color: currTheme.onError,
-                  ),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: currTheme.error,
-                  ),
-                )
+                ),
               ],
             );
           }
@@ -344,40 +371,53 @@ class _UserToUserRelationWidgetState extends State<UserToUserRelationWidget> {
         }
 
         if (label) {
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: Constants.gap,
+          return Column(
+            spacing: Constants.gap * 0.5,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              OutlinedButton.icon(
-                onPressed: disabled ? null : () => removeFriendRelation(user),
-                icon: Icon(
-                  Icons.person_remove_alt_1,
-                  color: currTheme.error,
-                ),
-                label: Text(
-                  "Unfriend",
-                  style: TextStyle(
-                    color: currTheme.error,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: Constants.gap,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed:
+                        disabled ? null : () => removeFriendRelation(user),
+                    icon: Icon(
+                      Icons.person_remove_alt_1,
+                      color: currTheme.error,
+                    ),
+                    label: Text(
+                      "Unfriend",
+                      style: TextStyle(
+                        color: currTheme.error,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: currTheme.error,
+                      ),
+                    ),
                   ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color: currTheme.error,
+                  OutlinedButton.icon(
+                    onPressed: disabled ? null : goToMessageArchive,
+                    icon: const Icon(
+                      Icons.chat_outlined,
+                    ),
+                    label: const Text(
+                      "Message",
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: currTheme.primary,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-              OutlinedButton.icon(
-                onPressed: disabled ? null : goToMessageArchive,
-                icon: const Icon(
-                  Icons.chat_outlined,
-                ),
-                label: const Text(
-                  "Message",
-                ),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color: currTheme.primary,
-                  ),
+              Text(
+                "Friends since ${dateString(user.relationInfo!.addedOn)}",
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],

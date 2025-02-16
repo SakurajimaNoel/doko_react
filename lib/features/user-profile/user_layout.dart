@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
@@ -14,6 +15,7 @@ import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/utils/instant-messaging/message_preview.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/notifications/notifications_helper.dart';
+import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -259,10 +261,83 @@ class _UserLayoutState extends State<UserLayout> {
     );
 
     connectWS();
+    // stressTest();
   }
 
   void refreshApp() {
     context.read<UserBloc>().add(UserInitEvent());
+  }
+
+  Future<void> stressTest() async {
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+    // create 100 clients and send message to each
+    for (int i = 0; i < 15000; i++) {
+      var client = Client(
+        url: Uri.parse(dotenv.env["WEBSOCKET_ENDPOINT"]!),
+        pingInterval: Constants.pingInterval,
+        getToken: () async {
+          final token = await getUserToken();
+          return token.idToken;
+        },
+        onReconnectSuccess: () {},
+        onConnectionClosure: (retry) async {
+          // retry();
+          print("connection dropped: $i");
+        },
+        payloadHandler: {
+          PayloadType.chatMessage: (ChatMessage message) {},
+        },
+      );
+
+      await client.connect();
+      sendMessages(client, username);
+      await Future.delayed(const Duration(
+        seconds: 1,
+      ));
+    }
+  }
+
+  String generateRandomString() {
+    int wordCount = 10;
+    const characters =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ';
+    final random = Random();
+
+    String generateRandomWord(int length) {
+      return String.fromCharCodes(
+        List.generate(
+          length,
+          (index) => characters.codeUnitAt(random.nextInt(characters.length)),
+        ),
+      );
+    }
+
+    List<String> generateRandomWords(int count) {
+      return List.generate(
+        count,
+        (index) => generateRandomWord(
+            random.nextInt(8) + 3), // Words between 3 and 10 characters
+      );
+    }
+
+    return generateRandomWords(wordCount).join(' ');
+  }
+
+  void sendMessages(Client client, String username) async {
+    while (true) {
+      client.sendPayload(ChatMessage(
+        from: username,
+        to: "rohan_verma__",
+        id: generateUniqueString(),
+        subject: MessageSubject.text,
+        body: generateRandomString(),
+        sendAt: DateTime.now(),
+      ));
+      await Future.delayed(const Duration(
+        seconds: 1,
+      ));
+    }
   }
 
   Future<void> connectWS() async {
