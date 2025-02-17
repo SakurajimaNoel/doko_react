@@ -149,7 +149,7 @@ class GraphqlQueries {
         "username_EQ": username,
       },
       "friendsAggregateWhere2": {
-        "friendsConnection_ALL": {
+        "friendsConnection_SOME": {
           "edge": {
             "status_EQ": FriendStatus.accepted,
           }
