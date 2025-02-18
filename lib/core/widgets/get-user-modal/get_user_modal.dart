@@ -1,13 +1,9 @@
-import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
-import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
-import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
-import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -18,17 +14,17 @@ import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:share_plus/share_plus.dart' as share_external;
 
-class Share extends StatelessWidget {
-  const Share({
+class GetUserModal extends StatelessWidget {
+  const GetUserModal({
     super.key,
   });
 
-  static void share({
+  static void getUserModal({
     required BuildContext context,
-    required MessageSubject subject,
-    required String nodeIdentifier,
+    required ValueSetter<List<String>> onDone,
+    required List<String> selected,
+    bool onlyFriends = true,
   }) {
     showModalBottomSheet(
       useRootNavigator: true,
@@ -53,10 +49,11 @@ class Share extends StatelessWidget {
                 ..add(GetUserFriendsEvent(
                   userDetails: details,
                 )),
-              child: _ShareDetails(
+              child: _GetUserDetails(
                 controller: controller,
-                subject: subject,
-                nodeIdentifier: nodeIdentifier,
+                onlyFriends: onlyFriends,
+                onDone: onDone,
+                selected: selected,
               ),
             );
           },
@@ -67,37 +64,40 @@ class Share extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text("Use static method \"share\" to allow sharing.");
+    return const Text(
+        "Use static method \"getUserModal\" to allow selection of users.");
   }
 }
 
-class _ShareDetails extends StatefulWidget {
-  const _ShareDetails({
+class _GetUserDetails extends StatefulWidget {
+  const _GetUserDetails({
     required this.controller,
-    required this.subject,
-    required this.nodeIdentifier,
+    required this.onlyFriends,
+    required this.onDone,
+    required this.selected,
   });
 
   final ScrollController controller;
-  final MessageSubject subject;
-  final String nodeIdentifier;
+  final bool onlyFriends;
+
+  final ValueSetter<List<String>> onDone;
+  final List<String> selected;
 
   @override
-  State<_ShareDetails> createState() => _ShareDetailsState();
+  State<_GetUserDetails> createState() => _GetUserDetailsState();
 }
 
-class _ShareDetailsState extends State<_ShareDetails> {
-  List<String> selectedUsers = [];
+class _GetUserDetailsState extends State<_GetUserDetails> {
+  late final List<String> selectedUsers = widget.selected;
   bool loading = false;
   final UserGraph graph = UserGraph();
   late final String username;
   late final String graphKey;
   final TextEditingController queryController = TextEditingController();
 
-  List<String> tempSearchResults = [];
+  late final bool onlyFriends = widget.onlyFriends;
 
-  /// used to prevent duplicate sending of same payload when attempting to reconnect
-  bool sending = false;
+  List<String> tempSearchResults = [];
 
   @override
   void initState() {
@@ -120,10 +120,10 @@ class _ShareDetailsState extends State<_ShareDetails> {
     if (selected) {
       selectedUsers.remove(username);
     } else {
-      if (selectedLength < Constants.shareLimit) {
+      if (selectedLength < Constants.userTagLimit) {
         selectedUsers.add(username);
       } else {
-        showInfo("You can send up to ${Constants.shareLimit} users at a time.");
+        showInfo("You can tag up to ${Constants.userTagLimit} users.");
       }
     }
 
@@ -163,7 +163,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
       getUsernameFromUserKey(userKey),
     );
 
-    return _ShareUserWidget(
+    return _GetUserWidget(
       key: ValueKey("friends-$userKey"),
       userKey: userKey,
       onUserSelect: onUserSelect,
@@ -190,11 +190,6 @@ class _ShareDetailsState extends State<_ShareDetails> {
       username: username,
       currentUsername: username,
     );
-
-    int selectedLength = selectedUsers.length;
-    String sendText = selectedUsers.isEmpty
-        ? "Send"
-        : "Send to $selectedLength user${selectedLength > 1 ? "s" : ""}";
 
     return SizedBox(
       width: width,
@@ -307,6 +302,23 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                   minLines: 1,
                                   maxLines: 2,
                                   onChanged: (String value) {
+                                    if (onlyFriends) {
+                                      UserFriendsSearchInput searchDetails =
+                                          UserFriendsSearchInput(
+                                        username: username,
+                                        query: value,
+                                        currentUsername: username,
+                                      );
+
+                                      context
+                                          .read<ProfileBloc>()
+                                          .add(UserFriendsSearchEvent(
+                                            searchDetails: searchDetails,
+                                          ));
+
+                                      return;
+                                    }
+
                                     if (value.isEmpty) {
                                       setState(() {});
                                       return;
@@ -358,7 +370,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                           itemBuilder: (BuildContext context, int index) {
                             final username = selectedUsers[index];
 
-                            return _ShareUserWidget(
+                            return _GetUserWidget(
                               key: ValueKey("selected-$username"),
                               userKey: generateUserNodeKey(username),
                               onUserSelect: onUserSelect,
@@ -389,7 +401,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                       getUsernameFromUserKey(userKey),
                                     );
 
-                                    return _ShareUserWidget(
+                                    return _GetUserWidget(
                                       key: ValueKey("search-$userKey"),
                                       userKey: userKey,
                                       onUserSelect: onUserSelect,
@@ -428,126 +440,20 @@ class _ShareDetailsState extends State<_ShareDetails> {
               ),
               Padding(
                 padding: const EdgeInsets.all(Constants.padding),
-                child: selectedUsers.isEmpty
-                    ? FilledButton.tonal(
-                        onPressed: () {
-                          final String baseUrl = "https://doki.co.in";
-                          String url;
-                          String supportingText;
-
-                          switch (widget.subject) {
-                            case MessageSubject.dokiUser:
-                              url = "$baseUrl/user/${widget.nodeIdentifier}";
-                              supportingText =
-                                  "Check @${widget.nodeIdentifier} profile on doki.";
-                            case MessageSubject.dokiPost:
-                              url = "$baseUrl/post/${widget.nodeIdentifier}";
-                              supportingText = "Check this Post on doki.";
-                            case MessageSubject.dokiPage:
-                              url = "$baseUrl/page/${widget.nodeIdentifier}";
-                              supportingText = "Check this Page on doki.";
-                            case MessageSubject.dokiDiscussion:
-                              url =
-                                  "$baseUrl/discussion/${widget.nodeIdentifier}";
-                              supportingText = "Check this Discussion on doki.";
-                            case MessageSubject.dokiPolls:
-                              url = "$baseUrl/poll/${widget.nodeIdentifier}";
-                              supportingText = "Check this Poll on doki.";
-                            default:
-                              url = "";
-                              supportingText = "";
-                          }
-
-                          if (url.isEmpty || supportingText.isEmpty) return;
-
-                          share_external.Share.share(
-                            url,
-                            subject: supportingText,
-                          );
-                        },
-                        style: FilledButton.styleFrom(
-                          minimumSize: const Size(
-                            Constants.buttonWidth,
-                            Constants.buttonHeight,
-                          ),
-                        ),
-                        child: const Text("More share options."),
-                      )
-                    : FilledButton(
-                        onPressed: selectedUsers.isEmpty
-                            ? null
-                            : () async {
-                                if (sending) return;
-                                sending = true;
-
-                                final client = context
-                                    .read<WebsocketClientProvider>()
-                                    .client;
-
-                                final realTimeBloc =
-                                    context.read<RealTimeBloc>();
-                                for (String userToSend in selectedUsers) {
-                                  ChatMessage message = ChatMessage(
-                                    from: username,
-                                    to: userToSend,
-                                    id: generateUniqueString(),
-                                    subject: widget.subject,
-                                    body: widget.nodeIdentifier,
-                                    sendAt: DateTime.now(),
-                                  );
-
-                                  bool result =
-                                      await client?.sendPayload(message) ??
-                                          false;
-
-                                  sending = false;
-
-                                  if (result) {
-                                    // fire bloc event
-                                    realTimeBloc.add(RealTimeNewMessageEvent(
-                                      message: message,
-                                      username: username,
-                                    ));
-                                  } else {
-                                    showError(
-                                        Constants.websocketNotConnectedError);
-                                    return;
-                                  }
-                                }
-
-                                String successMessage;
-                                String messageEnd =
-                                    "with $selectedLength user${selectedLength > 1 ? "s" : ""}";
-                                switch (widget.subject) {
-                                  case MessageSubject.dokiUser:
-                                    successMessage =
-                                        "Shared @${widget.nodeIdentifier} profile $messageEnd";
-                                  case MessageSubject.dokiPost:
-                                    successMessage = "Shared post $messageEnd";
-                                  case MessageSubject.dokiPage:
-                                    successMessage = "Shared page $messageEnd";
-                                  case MessageSubject.dokiDiscussion:
-                                    successMessage =
-                                        "Shared discussion $messageEnd";
-                                  case MessageSubject.dokiPolls:
-                                    successMessage = "Shared polls $messageEnd";
-                                  default:
-                                    successMessage = "";
-                                }
-
-                                if (successMessage.isNotEmpty) {
-                                  showSuccess(successMessage);
-                                }
-                                if (mounted) contextPop();
-                              },
-                        style: FilledButton.styleFrom(
-                          minimumSize: const Size(
-                            Constants.buttonWidth,
-                            Constants.buttonHeight,
-                          ),
-                        ),
-                        child: Text(sendText),
-                      ),
+                child: FilledButton(
+                  onPressed: () {
+                    // call value setter from parents
+                    widget.onDone(selectedUsers);
+                    contextPop();
+                  },
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(
+                      Constants.buttonWidth,
+                      Constants.buttonHeight,
+                    ),
+                  ),
+                  child: const Text("Done"),
+                ),
               ),
             ],
           );
@@ -561,8 +467,8 @@ class _ShareDetailsState extends State<_ShareDetails> {
   }
 }
 
-class _ShareUserWidget extends StatelessWidget {
-  const _ShareUserWidget({
+class _GetUserWidget extends StatelessWidget {
+  const _GetUserWidget({
     required super.key,
     required this.userKey,
     required this.onUserSelect,

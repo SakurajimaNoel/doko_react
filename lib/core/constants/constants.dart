@@ -59,6 +59,9 @@ class Constants {
   static const double landscape = 16 / 9;
   static const double portrait = 9 / 16;
 
+  // content
+  static const int userTagLimit = 50;
+
   // post
   static const double postWidth = 1;
   static const double postHeight = 1;

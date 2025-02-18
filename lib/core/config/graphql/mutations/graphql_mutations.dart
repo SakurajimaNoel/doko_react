@@ -261,32 +261,64 @@ class GraphqlMutations {
     """;
   }
 
-  static Map<String, dynamic> userCreatePostVariables(
-    String postId, {
-    required String username,
-    required String caption,
-    required List<String> content,
-  }) {
+  static Map<String, dynamic> userCreatePostVariables(PostCreateInput postInput,
+      {required List<String> postContent}) {
+    if (postInput.usersTagged.isEmpty) {
+      return {
+        "input": [
+          {
+            "id": postInput.postId,
+            "caption": postInput.caption,
+            "content": postContent,
+            "likes": 0,
+            "createdBy": {
+              "connect": {
+                "where": {
+                  "node": {
+                    "username_EQ": postInput.username,
+                  },
+                },
+              },
+            },
+          },
+        ],
+        "where": {
+          "username_EQ": postInput.username,
+        }
+      };
+    }
+
     return {
       "input": [
         {
-          "id": postId,
-          "caption": caption,
-          "content": content,
+          "id": postInput.postId,
+          "caption": postInput.caption,
+          "content": postContent,
           "likes": 0,
           "createdBy": {
             "connect": {
               "where": {
                 "node": {
-                  "username_EQ": username,
+                  "username_EQ": postInput.username,
                 },
               },
             },
           },
+          "usersTagged": {
+            "connect": [
+              {
+                "where": {
+                  "node": {
+                    "OR": postInput.generateUserTagged(),
+                  },
+                },
+              },
+            ],
+          },
         },
       ],
       "where": {
-        "username_EQ": username,
+        "username_EQ": postInput.username,
       }
     };
   }

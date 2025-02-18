@@ -49,10 +49,8 @@ class NodeCreateRemoteDataSource {
         MutationOptions(
           document: gql(GraphqlMutations.userCreatePost()),
           variables: GraphqlMutations.userCreatePostVariables(
-            postDetails.postId,
-            username: postDetails.username,
-            caption: postDetails.caption,
-            content: uploadedPostMediaContent,
+            postDetails,
+            postContent: uploadedPostMediaContent,
           ),
         ),
       );

@@ -41,12 +41,40 @@ class PostCreateInput {
     required this.caption,
     required this.content,
     required this.postId,
+    required this.usersTagged,
   });
 
   final String postId;
   final String username;
   final String caption;
   final List<PostContent> content;
+  final List<String> usersTagged;
+
+  List<Map<String, String>> generateUserTagged() {
+    var usersTaggedMap = usersTagged.map((String username) {
+      return {
+        "username_EQ": username,
+      };
+    }).toList();
+
+    return usersTaggedMap;
+  }
+
+  PostCreateInput copyWith({
+    String? postId,
+    String? username,
+    String? caption,
+    List<PostContent>? content,
+    List<String>? usersTagged,
+  }) {
+    return PostCreateInput(
+      username: username ?? this.username,
+      caption: caption ?? this.caption,
+      content: content ?? this.content,
+      postId: postId ?? this.postId,
+      usersTagged: usersTagged ?? this.usersTagged,
+    );
+  }
 }
 
 class CommentCreateInput extends Input {
