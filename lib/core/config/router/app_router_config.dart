@@ -21,7 +21,10 @@ import 'package:doko_react/features/user-profile/user-features/instant-messaging
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/pages/message-archive/message_archive_page.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/pages/message-inbox/message_inbox_page.dart';
 import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
-import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/discussion_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/discussion/create_discussion_page.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/discussion/discussion_publish_page.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/create_post_page.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/post_publish_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/edit-profile/edit_profile_page.dart';
@@ -332,6 +335,29 @@ class AppRouterConfig {
 
                           return PostPublishPage(
                             postDetails: postDetails,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: RouterConstants.createDiscussion,
+                    path: "/create-discussion",
+                    builder: (context, state) => const CreateDiscussionPage(),
+                    routes: [
+                      GoRoute(
+                        parentNavigatorKey: rootNavigatorKey,
+                        name: RouterConstants.discussionPublish,
+                        path: "publish",
+                        builder: (context, state) {
+                          final Map<String, dynamic> data =
+                              state.extra as Map<String, dynamic>;
+                          final DiscussionPublishPageData discussionDetails =
+                              data["discussionDetails"];
+
+                          return DiscussionPublishPage(
+                            discussionDetails: discussionDetails,
                           );
                         },
                       ),

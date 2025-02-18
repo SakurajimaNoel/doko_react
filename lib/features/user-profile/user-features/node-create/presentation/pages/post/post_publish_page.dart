@@ -10,7 +10,7 @@ import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/bloc/node_create_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:doko_react/init_dependency.dart';

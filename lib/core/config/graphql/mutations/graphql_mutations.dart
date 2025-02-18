@@ -3,7 +3,8 @@ import 'package:doko_react/core/config/graphql/graphql_constants.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
-import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/comment_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
 
 class GraphqlMutations {
   static String completeUserProfile() {

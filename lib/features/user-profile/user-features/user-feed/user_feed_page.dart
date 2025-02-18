@@ -94,17 +94,20 @@ class _UserFeedPageState extends State<UserFeedPage> {
               runSpacing: Constants.gap,
               children: [
                 FilledButton.tonalIcon(
-                  onPressed: () {},
-                  label: const Text("Story"),
-                  icon: const Icon(Icons.add_a_photo_outlined),
-                ),
-                FilledButton.tonalIcon(
                   onPressed: () {
                     context.pop();
                     context.pushNamed(RouterConstants.createPost);
                   },
                   label: const Text("Post"),
                   icon: const Icon(Icons.add_box_outlined),
+                ),
+                FilledButton.tonalIcon(
+                  onPressed: () {
+                    context.pop();
+                    context.pushNamed(RouterConstants.createDiscussion);
+                  },
+                  label: const Text("Discussion"),
+                  icon: const Icon(Icons.add),
                 ),
                 FilledButton.tonalIcon(
                   onPressed: () {},

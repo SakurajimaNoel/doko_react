@@ -7,7 +7,8 @@ import 'package:doko_react/features/user-profile/domain/entity/comment/comment_e
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/domain/use-case/comment-use-case/create_comment_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/domain/use-case/post-create-use-case/post_create_use_case.dart';
-import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/comment_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';

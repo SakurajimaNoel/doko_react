@@ -6,7 +6,7 @@ class Constants {
   static const usernameLimit = 20;
   static final String usernameRegex =
       r"[\w][\w\d_.-]{2," + (usernameLimit - 1).toString() + r"}";
-  static const bioLimit = 256;
+  static const bioLimit = 1 << 8;
   static const nameLimit = 30;
 
   static const String errorMessage = "Oops! Something went wrong.";
@@ -61,6 +61,11 @@ class Constants {
 
   // content
   static const int userTagLimit = 50;
+  static const int mediaLimit = 1 << 4;
+
+  // discussion
+  static const int discussionTitleLimit = 1 << 8;
+  static const int discussionTextLimit = 1 << 15;
 
   // post
   static const double postWidth = 1;
@@ -69,9 +74,8 @@ class Constants {
       postHeight); // for height use 1/postContainer and for width use postContainer
   static const double actionWidth = _root * 2.5;
   static const double actionEdgeGap = _root * 0.125;
-  static const int postLimit = 10;
-  static const int postCaptionLimit = 1024;
-  static const int postCaptionDisplayLimit = 128;
+  static const int postCaptionLimit = 1 << 10;
+  static const int postCaptionDisplayLimit = 1 << 7;
   static const double carouselDots = 6;
   static const double carouselActiveDotScale = 1.5;
   static const double postMetadataWidth = _root * 20;
@@ -103,9 +107,9 @@ class Constants {
 
   // instant messaging media
   static int archiveMedia = (_root * 25).round();
-  static const int shareLimit = 10;
-  static const int messageLimit = 10000;
-  static const int messageDisplayLimit = 512;
+  static const int shareLimit = 1 << 4;
+  static const int messageLimit = 1 << 14;
+  static const int messageDisplayLimit = 1 << 9;
   static final RegExp emailRegexMessage =
       RegExp(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}");
   static final RegExp urlRegexMessage = RegExp(

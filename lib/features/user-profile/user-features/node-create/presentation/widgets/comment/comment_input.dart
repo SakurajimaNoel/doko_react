@@ -17,7 +17,7 @@ import 'package:doko_react/features/user-profile/domain/entity/comment/comment_e
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/domain/entity/comment/comment_media.dart';
-import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/comment_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/bloc/node_create_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/provider/comment_input_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';

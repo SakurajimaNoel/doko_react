@@ -25,10 +25,15 @@ class RouterConstants {
 
   // post
   static const String createPost = "create-post";
-  static const String postPublish = "publish";
+  static const String postPublish = "publish-post";
   static const String userPost = "user-post";
   static const String token = "tokens";
   static const String comment = "user-comment";
+
+  // discussion
+  static const String createDiscussion = "create-discussion";
+  static const String discussionPublish = "publish-discussion";
+  static const String userDiscussion = "user-discussion";
 
   // settings
   static const String settings = "settings";
