@@ -6,6 +6,7 @@ import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/storage/storage.dart';
+import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -58,14 +59,14 @@ class ProfileRemoteDataSource {
       String key = generateUserNodeKey(user.username);
       graph.addEntity(key, user);
 
-      PageInfo info = PageInfo.createEntity(map: postRes["pageInfo"]);
-      List postList = postRes["edges"];
-
-      var postFutures = (postList)
-          .map((post) => PostEntity.createEntity(map: post["node"]))
-          .toList();
-
-      List<PostEntity> posts = await Future.wait(postFutures);
+      // PageInfo info = PageInfo.createEntity(map: postRes["pageInfo"]);
+      // List postList = postRes["edges"];
+      //
+      // var postFutures = (postList)
+      //     .map((post) => PostEntity.createEntity(map: post["node"]))
+      //     .toList();
+      //
+      // List<PostEntity> posts = await Future.wait(postFutures);
       // graph.addPostEntityListToUser(
       //   user.username,
       //   newPosts: posts,
@@ -505,6 +506,59 @@ class ProfileRemoteDataSource {
       final UserGraph graph = UserGraph();
 
       return graph.addUserSearchEntry(users);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getUserProfileDiscussions(
+      UserProfileNodesInput discussionDetails) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.getUserDiscussionsByUsername(
+              discussionDetails.cursor)),
+          variables: GraphqlQueries.getUserDiscussionsByUsernameVariables(
+            username: discussionDetails.username,
+            cursor: discussionDetails.cursor,
+            currentUsername: discussionDetails.currentUsername,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(
+          reason: "Can't fetch user discussions",
+        );
+      }
+
+      Map? res = result.data?["discussionsConnection"];
+
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
+        );
+      }
+
+      UserGraph graph = UserGraph();
+
+      PageInfo info = PageInfo.createEntity(map: res["pageInfo"]);
+      List discussionList = res["edges"];
+
+      var discussionFutures = (discussionList)
+          .map((discussion) =>
+              DiscussionEntity.createEntity(map: discussion["node"]))
+          .toList();
+
+      List<DiscussionEntity> discussions = await Future.wait(discussionFutures);
+      graph.addDiscussionEntityListToUser(
+        discussionDetails.username,
+        newDiscussions: discussions,
+        pageInfo: info,
+      );
+
+      return true;
     } catch (e) {
       rethrow;
     }

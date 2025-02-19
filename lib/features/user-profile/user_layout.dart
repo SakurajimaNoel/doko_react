@@ -217,6 +217,13 @@ class _UserLayoutState extends State<UserLayout> {
                   username: username,
                 ));
           }
+
+          if (payload.nodeType == NodeType.discussion) {
+            context.read<UserActionBloc>().add(UserActionNewPostRemoteEvent(
+                  postId: payload.id,
+                  username: username,
+                ));
+          }
         },
         PayloadType.userNodeLikeAction: (UserNodeLikeAction payload) {
           // handle notification

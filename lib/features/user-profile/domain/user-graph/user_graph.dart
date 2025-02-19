@@ -155,6 +155,47 @@ class UserGraph {
     }
   }
 
+  void addDiscussionEntityListToUser(
+    String username, {
+    required List<DiscussionEntity> newDiscussions,
+    required PageInfo pageInfo,
+  }) {
+    String key = generateUserNodeKey(username);
+
+    final CompleteUserEntity user = getValueByKey(key)! as CompleteUserEntity;
+
+    Map<String, GraphEntity> tempMap = HashMap();
+
+    List<String> discussionKeys = newDiscussions.map((discussionItem) {
+      String discussionKey = generateDiscussionNodeKey(discussionItem.id);
+      DiscussionEntity discussionToAdd;
+      if (containsKey(discussionKey)) {
+        final existsDiscussion =
+            getValueByKey(discussionKey)! as DiscussionEntity;
+
+        existsDiscussion.updateCommentsCount(discussionItem.commentsCount);
+        existsDiscussion.updateLikeCount(discussionItem.likesCount);
+        existsDiscussion.updateUserLikeStatus(discussionItem.userLike);
+
+        discussionToAdd = existsDiscussion;
+      } else {
+        discussionToAdd = discussionItem;
+      }
+
+      // adding post entity
+      tempMap[discussionKey] = discussionToAdd;
+
+      return discussionKey;
+    }).toList();
+
+    // adding all posts to map
+    _addEntityMap(tempMap);
+
+    // updating user
+    user.discussions.addEntityItems(discussionKeys);
+    user.discussions.updatePageInfo(pageInfo);
+  }
+
   // add  new discussion
   void addDiscussionEntityToUser(
       String username, DiscussionEntity newDiscussion) {

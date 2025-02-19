@@ -30,6 +30,7 @@ import "package:doko_react/features/user-profile/domain/repository/user_profile_
 import "package:doko_react/features/user-profile/domain/use-case/comments/comment_add_like_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/comments/comment_get.dart";
 import "package:doko_react/features/user-profile/domain/use-case/comments/comment_remove_like_use_case.dart";
+import "package:doko_react/features/user-profile/domain/use-case/discussion/discussion_get.dart";
 import "package:doko_react/features/user-profile/domain/use-case/posts/post_add_like_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/posts/post_get.dart";
 import "package:doko_react/features/user-profile/domain/use-case/posts/post_remove_like_use_case.dart";
@@ -51,6 +52,7 @@ import "package:doko_react/features/user-profile/user-features/profile/domain/us
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/pending-request-use-case/pending_incoming_request_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/pending-request-use-case/pending_outgoing_request_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/profile_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-discussion-use-case/user_discussion_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-friends-use-case/user_friends_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-post-use-case/user_post_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/comments_mention_search_use_case.dart";
@@ -266,6 +268,12 @@ void _initUserAction() {
     ),
   );
 
+  serviceLocator.registerFactory<DiscussionGetUseCase>(
+    () => DiscussionGetUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerFactory<UserActionBloc>(
     () => UserActionBloc(
       postAddLikeUseCase: serviceLocator(),
@@ -273,6 +281,7 @@ void _initUserAction() {
       commentAddLikeUseCase: serviceLocator(),
       commentRemoveLikeUseCase: serviceLocator(),
       postGetUseCase: serviceLocator(),
+      discussionGetUseCase: serviceLocator(),
       commentGetUseCase: serviceLocator(),
     ),
   );
@@ -345,11 +354,18 @@ void _initProfile() {
     ),
   );
 
+  serviceLocator.registerFactory<UserDiscussionUseCase>(
+    () => UserDiscussionUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
+  );
+
   serviceLocator.registerFactory<ProfileBloc>(
     () => ProfileBloc(
       profileUseCase: serviceLocator(),
       editProfileUseCase: serviceLocator(),
       userPostUseCase: serviceLocator(),
+      userDiscussionUseCase: serviceLocator(),
       userFriendsUseCase: serviceLocator(),
       userSearchUseCase: serviceLocator(),
       userFriendsSearchUseCase: serviceLocator(),

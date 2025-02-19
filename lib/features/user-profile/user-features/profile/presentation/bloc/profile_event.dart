@@ -67,6 +67,23 @@ final class GetUserPostsRefreshEvent extends ProfileEvent {
   final UserProfileNodesInput userDetails;
 }
 
+// user discussion fetching
+final class GetUserDiscussionEvent extends ProfileEvent {
+  GetUserDiscussionEvent({
+    required this.userDetails,
+  });
+
+  final UserProfileNodesInput userDetails;
+}
+
+final class GetUserDiscussionRefreshEvent extends ProfileEvent {
+  GetUserDiscussionRefreshEvent({
+    required this.userDetails,
+  });
+
+  final UserProfileNodesInput userDetails;
+}
+
 // user friends fetching
 final class GetUserFriendsEvent extends ProfileEvent {
   GetUserFriendsEvent({

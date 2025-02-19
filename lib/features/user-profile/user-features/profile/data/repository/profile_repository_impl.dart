@@ -29,6 +29,12 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
+  Future<bool> getUserDiscussions(
+      UserProfileNodesInput discussionDetails) async {
+    return _remoteDataSource.getUserProfileDiscussions(discussionDetails);
+  }
+
+  @override
   Future<bool> getUserFriends(UserProfileNodesInput friendsDetails) {
     return _remoteDataSource.getUserProfileFriends(friendsDetails);
   }

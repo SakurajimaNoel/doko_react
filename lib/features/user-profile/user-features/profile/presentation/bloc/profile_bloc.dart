@@ -10,6 +10,7 @@ import 'package:doko_react/features/user-profile/user-features/profile/domain/us
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/pending-request-use-case/pending_incoming_request_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/pending-request-use-case/pending_outgoing_request_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/profile_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-discussion-use-case/user_discussion_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-friends-use-case/user_friends_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-post-use-case/user_post_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/comments_mention_search_use_case.dart';
@@ -28,6 +29,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final ProfileUseCase _profileUseCase;
   final EditProfileUseCase _editProfileUseCase;
   final UserPostUseCase _userPostUseCase;
+  final UserDiscussionUseCase _userDiscussionUseCase;
   final UserFriendsUseCase _userFriendsUseCase;
   final UserSearchUseCase _userSearchUseCase;
   final UserFriendsSearchUseCase _userFriendsSearchUseCase;
@@ -39,6 +41,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required ProfileUseCase profileUseCase,
     required EditProfileUseCase editProfileUseCase,
     required UserPostUseCase userPostUseCase,
+    required UserDiscussionUseCase userDiscussionUseCase,
     required UserFriendsUseCase userFriendsUseCase,
     required UserSearchUseCase userSearchUseCase,
     required UserFriendsSearchUseCase userFriendsSearchUseCase,
@@ -48,6 +51,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   })  : _profileUseCase = profileUseCase,
         _editProfileUseCase = editProfileUseCase,
         _userPostUseCase = userPostUseCase,
+        _userDiscussionUseCase = userDiscussionUseCase,
         _userFriendsUseCase = userFriendsUseCase,
         _userSearchUseCase = userSearchUseCase,
         _userFriendsSearchUseCase = userFriendsSearchUseCase,
@@ -60,9 +64,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<LoadMoreProfilePostEvent>(_handleLoadMoreProfilePostEvent);
     on<GetUserFriendsEvent>(_handleGetUserFriendsEvent);
     on<GetUserPostsEvent>(_handleGetUserPostsEvent);
+    on<GetUserDiscussionEvent>(_handleGetUserDiscussionEvent);
     on<GetUserProfileRefreshEvent>(_handleGetUserProfileRefreshEvent);
     on<GetUserFriendsRefreshEvent>(_handleGetUserFriendsRefreshEvent);
     on<GetUserPostsRefreshEvent>(_handleGetUserPostsRefreshEvent);
+    on<GetUserDiscussionRefreshEvent>(_handleGetUserDiscussionRefreshEvent);
     on<UserSearchEvent>(
       _handleUserSearchEvent,
       transformer: debounce(
@@ -82,6 +88,50 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<GetUserPendingIncomingRequest>(_handleGetUserPendingIncomingRequest);
     on<GetUserPendingOutgoingRequest>(_handleGetUserPendingOutgoingRequest);
     on<CommentMentionSearchEvent>(_handleCommentMentionSearchEvent);
+  }
+
+  FutureOr<void> _handleGetUserDiscussionEvent(
+      GetUserDiscussionEvent event, Emitter<ProfileState> emit) async {
+    try {
+      final userKey = generateUserNodeKey(event.userDetails.username);
+      final user = graph.getValueByKey(userKey);
+
+      // either user is not fetched or first time fetching user friends
+      if (event.userDetails.cursor.isEmpty) {
+        if (user is CompleteUserEntity) {
+          // if user is already fetched check if friends exists or not
+          if (user.discussions.isNotEmpty) {
+            emit(ProfileSuccess());
+            return;
+          }
+        } else {
+          // fetch complete user
+          add(GetUserProfileEvent(
+            userDetails: event.userDetails,
+            indirect: IndirectProfileFetch.discussions,
+          ));
+          return;
+        }
+      }
+
+      if (event.userDetails.cursor.isEmpty) emit(ProfileLoading());
+      await _userDiscussionUseCase(event.userDetails);
+
+      // this handles initial success
+      if (event.userDetails.cursor.isEmpty) emit(ProfileSuccess());
+
+      emit(ProfileNodeLoadSuccess(
+        cursor: event.userDetails.cursor,
+      ));
+    } on ApplicationException catch (e) {
+      emit(ProfileNodeLoadError(
+        message: e.reason,
+      ));
+    } catch (_) {
+      emit(ProfileNodeLoadError(
+        message: Constants.errorMessage,
+      ));
+    }
   }
 
   FutureOr<void> _handleGetUserPostsEvent(
@@ -355,6 +405,22 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       GetUserPostsRefreshEvent event, Emitter<ProfileState> emit) async {
     try {
       await _userPostUseCase(event.userDetails);
+      emit(ProfileSuccess());
+    } on ApplicationException catch (e) {
+      emit(ProfileRefreshError(
+        message: e.reason,
+      ));
+    } catch (_) {
+      emit(ProfileRefreshError(
+        message: Constants.errorMessage,
+      ));
+    }
+  }
+
+  FutureOr<void> _handleGetUserDiscussionRefreshEvent(
+      GetUserDiscussionRefreshEvent event, Emitter<ProfileState> emit) async {
+    try {
+      await _userDiscussionUseCase(event.userDetails);
       emit(ProfileSuccess());
     } on ApplicationException catch (e) {
       emit(ProfileRefreshError(

@@ -6,6 +6,7 @@ import 'package:doko_react/core/global/entity/user-relation-info/user_relation_i
 import 'package:doko_react/features/user-profile/data/models/comments/comment_action_model.dart';
 import 'package:doko_react/features/user-profile/data/models/post/post_action_model.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -414,6 +415,57 @@ class UserProfileRemoteDataSource {
 
       UserGraph graph = UserGraph();
       graph.addEntity(generateCommentNodeKey(comment.id), comment);
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getDiscussionById(String discussionId, String username) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.getDiscussionById()),
+          variables: GraphqlQueries.getDiscussionByIdVariables(
+            discussionId: discussionId,
+            username: username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(reason: "Problem loading discussion.");
+      }
+
+      List? res = result.data?["discussions"];
+
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: "Discussion doesn't exist.",
+        );
+      }
+
+      // add in graph
+      UserGraph graph = UserGraph();
+      DiscussionEntity discussion =
+          await DiscussionEntity.createEntity(map: res[0]);
+      String discussionKey = generateDiscussionNodeKey(discussion.id);
+
+      // this condition shouldn't exist
+      if (graph.containsKey(discussionKey)) {
+        final existsDiscussion =
+            graph.getValueByKey(discussionKey)! as DiscussionEntity;
+
+        existsDiscussion.updateCommentsCount(discussion.commentsCount);
+        existsDiscussion.updateLikeCount(discussion.likesCount);
+        existsDiscussion.updateUserLikeStatus(discussion.userLike);
+
+        graph.addEntity(discussionKey, existsDiscussion);
+      } else {
+        graph.addEntity(discussionKey, discussion);
+      }
 
       return true;
     } catch (e) {

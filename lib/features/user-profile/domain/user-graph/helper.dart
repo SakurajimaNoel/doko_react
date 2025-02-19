@@ -33,7 +33,7 @@ String generateDiscussionNodeKey(String discussionId) {
   return "discussion:$discussionId";
 }
 
-String getDiscussionIdFromCommentKey(String discussionKey) {
+String getDiscussionIdFromDiscussionKey(String discussionKey) {
   return discussionKey.substring(11);
 }
 
@@ -42,7 +42,7 @@ String generatePollNodeKey(String pollId) {
   return "poll:$pollId";
 }
 
-String getPollIdFromCommentKey(String pollKey) {
+String getPollIdFromPollKey(String pollKey) {
   return pollKey.substring(5);
 }
 

@@ -8,6 +8,7 @@ import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.
 import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_add_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_get.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_remove_like_use_case.dart';
+import 'package:doko_react/features/user-profile/domain/use-case/discussion/discussion_get.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_add_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_get.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_remove_like_use_case.dart';
@@ -32,6 +33,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final CommentAddLikeUseCase _commentAddLikeUseCase;
   final CommentRemoveLikeUseCase _commentRemoveLikeUseCase;
   final PostGetUseCase _postGetUseCase;
+  final DiscussionGetUseCase _discussionGetUseCase;
   final CommentGetUseCase _commentGetUseCase;
 
   UserActionBloc({
@@ -40,12 +42,14 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     required CommentAddLikeUseCase commentAddLikeUseCase,
     required CommentRemoveLikeUseCase commentRemoveLikeUseCase,
     required PostGetUseCase postGetUseCase,
+    required DiscussionGetUseCase discussionGetUseCase,
     required CommentGetUseCase commentGetUseCase,
   })  : _postAddLikeUseCase = postAddLikeUseCase,
         _postRemoveLikeUseCase = postRemoveLikeUseCase,
         _commentAddLikeUseCase = commentAddLikeUseCase,
         _commentRemoveLikeUseCase = commentRemoveLikeUseCase,
         _postGetUseCase = postGetUseCase,
+        _discussionGetUseCase = discussionGetUseCase,
         _commentGetUseCase = commentGetUseCase,
         super(UserActionInitial()) {
     on<UserActionPostLikeActionEvent>(_handleUserActionPostLikeActionEvent);
@@ -58,7 +62,15 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     on<UserActionNewPostEvent>(
       (event, emit) => emit(
         UserActionNewPostState(
-          postId: event.postId,
+          nodeId: event.postId,
+          username: event.username,
+        ),
+      ),
+    );
+    on<UserActionNewDiscussionEvent>(
+      (event, emit) => emit(
+        UserActionNewDiscussionState(
+          nodeId: event.discussionId,
           username: event.username,
         ),
       ),
@@ -87,8 +99,12 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ),
     );
     on<UserActionNewPostRemoteEvent>(_handleUserActionNewPostRemoteEvent);
+    on<UserActionNewDiscussionRemoteEvent>(
+        _handleUserActionNewDiscussionRemoteEvent);
 
     on<UserActionGetPostByIdEvent>(_handleUserActionGetPostByIdEvent);
+    on<UserActionGetDiscussionByIdEvent>(
+        _handleUserActionGetDiscussionByIdEvent);
     on<UserActionGetCommentByIdEvent>(_handleUserActionGetCommentByIdEvent);
     on<UserActionNodeLikeRemoteEvent>(_handleUserActionNodeLikeRemoteEvent);
     on<UserActionNodeHighlightEvent>(
@@ -165,28 +181,6 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       );
     }
 
-    // String nodeId = payload.nodeId;
-    // NodeType nodeType = payload.nodeType;
-    //
-    // /// handle parents
-    // /// for comment parents will either be comment, post or discussion
-    // /// there will always be only on root node like post or discussion
-    // if (!self) {
-    //   for (var parentNode in payload.parents) {
-    //     if (parentNode.nodeType == NodeType.user) continue;
-    //
-    //     String nodeKey = generateGraphKey(nodeType, nodeId);
-    //     if (parentNode.nodeType == NodeType.post) {
-    //       // add comment to post
-    //     }
-    //
-    //     if (parentNode.nodeType == NodeType.comment) {}
-    //
-    //     // update nodeId for next iteration
-    //     nodeId = parentNode.nodeId;
-    //   }
-    // }
-
     emit(UserActionNodeActionState(
       nodeId: payload.nodeId,
       userLike: payload.isLike,
@@ -208,10 +202,34 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         user.postsCount++;
       }
       user.posts.addItem(postKey);
+      user.timeline.addItem(postKey);
     }
 
     emit(UserActionNewPostState(
-      postId: event.postId,
+      nodeId: event.postId,
+      username: event.username,
+    ));
+  }
+
+  FutureOr<void> _handleUserActionNewDiscussionRemoteEvent(
+      UserActionNewDiscussionRemoteEvent event,
+      Emitter<UserActionState> emit) async {
+    // handle user graph
+    String discussionKey = generateDiscussionNodeKey(event.discussionId);
+    String userKey = generateUserNodeKey(event.username);
+    final user = graph.getValueByKey(userKey);
+
+    if (user is CompleteUserEntity) {
+      if (!user.discussions.items.contains(discussionKey)) {
+        // add to user post
+        user.discussionCount++;
+      }
+      user.discussions.addItem(discussionKey);
+      user.timeline.addItem(discussionKey);
+    }
+
+    emit(UserActionNewDiscussionState(
+      nodeId: event.discussionId,
       username: event.username,
     ));
   }
@@ -391,6 +409,35 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
     }
     getNodeRequest.remove(event.postId);
+  }
+
+  FutureOr<void> _handleUserActionGetDiscussionByIdEvent(
+      UserActionGetDiscussionByIdEvent event,
+      Emitter<UserActionState> emit) async {
+    try {
+      if (getNodeRequest.contains(event.discussionId)) return;
+
+      String key = generateDiscussionNodeKey(event.discussionId);
+      if (graph.containsKey(key)) return;
+
+      getNodeRequest.add(event.discussionId);
+      await _discussionGetUseCase(GetNodeInput(
+        username: event.username,
+        nodeId: event.discussionId,
+      ));
+
+      getNodeRequest.remove(event.discussionId);
+      emit(UserActionDiscussionDataFetchedState(
+        discussionId: event.discussionId,
+        success: true,
+      ));
+    } catch (_) {
+      emit(UserActionDiscussionDataFetchedState(
+        discussionId: event.discussionId,
+        success: false,
+      ));
+    }
+    getNodeRequest.remove(event.discussionId);
   }
 
   FutureOr<void> _handleUserActionGetCommentByIdEvent(

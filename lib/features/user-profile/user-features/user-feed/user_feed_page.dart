@@ -2,6 +2,7 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/discussions/discussion_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -68,6 +69,10 @@ class _UserFeedPageState extends State<UserFeedPage> {
             children: [
               UserWidget.preview(
                 userKey: generateUserNodeKey(username),
+              ),
+              DiscussionWidget(
+                discussionKey: generateDiscussionNodeKey(
+                    "9c691388-f4c6-40c1-809e-34033f583796"),
               ),
             ],
           ),

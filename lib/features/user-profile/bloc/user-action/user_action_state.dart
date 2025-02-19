@@ -32,17 +32,39 @@ class UserActionLoadPosts extends UserActionState {
   List<Object?> get props => [username, loadedPostCount];
 }
 
-class UserActionNewPostState extends UserActionState {
-  UserActionNewPostState({
-    required this.postId,
+// base class for new node state
+// todo: use this when new node is created in timeline
+final class UserActionNewRootNodeState extends UserActionState {
+  UserActionNewRootNodeState({
+    required this.nodeId,
     required this.username,
   });
 
-  final String postId;
+  final String nodeId;
   final String username;
 
   @override
-  List<Object?> get props => [postId, username];
+  List<Object?> get props => [nodeId, username];
+}
+
+final class UserActionNewPostState extends UserActionNewRootNodeState {
+  UserActionNewPostState({
+    required super.nodeId,
+    required super.username,
+  });
+
+  @override
+  List<Object?> get props => [nodeId, username];
+}
+
+final class UserActionNewDiscussionState extends UserActionNewRootNodeState {
+  UserActionNewDiscussionState({
+    required super.nodeId,
+    required super.username,
+  });
+
+  @override
+  List<Object?> get props => [nodeId, username];
 }
 
 /// user post action state
@@ -104,6 +126,20 @@ class UserActionPostDataFetchedState extends UserActionState {
 
   @override
   List<Object?> get props => [postId, now, success];
+} // discussion data fetched for instant messaging
+
+class UserActionDiscussionDataFetchedState extends UserActionState {
+  UserActionDiscussionDataFetchedState({
+    required this.discussionId,
+    required this.success,
+  }) : now = DateTime.now();
+
+  final String discussionId;
+  final DateTime now;
+  final bool success;
+
+  @override
+  List<Object?> get props => [discussionId, now, success];
 }
 
 // comment data fetched for streaming

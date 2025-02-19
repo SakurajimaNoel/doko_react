@@ -44,6 +44,16 @@ final class UserActionNewPostEvent extends UserActionEvent {
   final String postId;
 }
 
+final class UserActionNewDiscussionEvent extends UserActionEvent {
+  UserActionNewDiscussionEvent({
+    required this.discussionId,
+    required this.username,
+  });
+
+  final String username;
+  final String discussionId;
+}
+
 final class UserActionNewPostRemoteEvent extends UserActionEvent {
   UserActionNewPostRemoteEvent({
     required this.postId,
@@ -52,6 +62,16 @@ final class UserActionNewPostRemoteEvent extends UserActionEvent {
 
   final String username;
   final String postId;
+}
+
+final class UserActionNewDiscussionRemoteEvent extends UserActionEvent {
+  UserActionNewDiscussionRemoteEvent({
+    required this.discussionId,
+    required this.username,
+  });
+
+  final String username;
+  final String discussionId;
 }
 
 // user to comment action
@@ -106,6 +126,17 @@ final class UserActionGetPostByIdEvent extends UserActionEvent {
 
   final String username;
   final String postId;
+}
+
+// fetch post by postId for new messages
+final class UserActionGetDiscussionByIdEvent extends UserActionEvent {
+  UserActionGetDiscussionByIdEvent({
+    required this.username,
+    required this.discussionId,
+  });
+
+  final String username;
+  final String discussionId;
 }
 
 // fetch comment by commentId for streaming
