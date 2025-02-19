@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
 class UserDiscussionListPage extends StatefulWidget {
-  const UserDiscussionListPage({super.key});
+  const UserDiscussionListPage({
+    super.key,
+    required this.username,
+  });
 
+  final String username;
   @override
   State<UserDiscussionListPage> createState() => _UserDiscussionListPageState();
 }

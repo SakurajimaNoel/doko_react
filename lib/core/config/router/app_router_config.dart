@@ -28,8 +28,12 @@ import 'package:doko_react/features/user-profile/user-features/node-create/prese
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/create_post_page.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/post_publish_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/edit-profile/edit_profile_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-discussions/user_discussion_list_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-friends/pending_request_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-friends/user_friends_list_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-pages/user_pages_list_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-polls/user_polls_list_page.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile-posts/user_posts_list_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile/profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile/user_profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/search/search_page.dart';
@@ -433,6 +437,50 @@ class AppRouterConfig {
                         builder: (context, state) {
                           String username = state.pathParameters["username"]!;
                           return UserFriendsListPage(
+                            username: username,
+                          );
+                        },
+                      ),
+                      GoRoute(
+                        parentNavigatorKey: rootNavigatorKey,
+                        name: RouterConstants.profilePages,
+                        path: "pages",
+                        builder: (context, state) {
+                          String username = state.pathParameters["username"]!;
+                          return UserPagesListPage(
+                            username: username,
+                          );
+                        },
+                      ),
+                      GoRoute(
+                        parentNavigatorKey: rootNavigatorKey,
+                        name: RouterConstants.profilePosts,
+                        path: "posts",
+                        builder: (context, state) {
+                          String username = state.pathParameters["username"]!;
+                          return UserPostsListPage(
+                            username: username,
+                          );
+                        },
+                      ),
+                      GoRoute(
+                        parentNavigatorKey: rootNavigatorKey,
+                        name: RouterConstants.profileDiscussions,
+                        path: "discussions",
+                        builder: (context, state) {
+                          String username = state.pathParameters["username"]!;
+                          return UserDiscussionListPage(
+                            username: username,
+                          );
+                        },
+                      ),
+                      GoRoute(
+                        parentNavigatorKey: rootNavigatorKey,
+                        name: RouterConstants.profilePolls,
+                        path: "polls",
+                        builder: (context, state) {
+                          String username = state.pathParameters["username"]!;
+                          return UserPollsListPage(
                             username: username,
                           );
                         },
