@@ -822,7 +822,6 @@ class GraphqlQueries {
   }
 
   // post by id
-  // todo update this
   static String getCompletePostById() {
     return """
      query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$first: Int, \$likedByWhere3: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
@@ -851,6 +850,9 @@ class GraphqlQueries {
         }   
         likedByConnection {
           totalCount
+        }
+        usersTagged {
+          username
         }
         commentsConnection(first: \$first) {
           totalCount
@@ -1095,7 +1097,6 @@ class GraphqlQueries {
   }
 
   // post for preview in chat
-  // todo update this
   static String getPostById() {
     return """
       query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
@@ -1126,6 +1127,9 @@ class GraphqlQueries {
             totalCount
           }
           likedBy(where: \$likedByWhere2) {
+            username
+          }
+          usersTagged {
             username
           }
         }

@@ -84,8 +84,6 @@ class AuthenticationRemoteDataSource {
     } else {
       // reset all the resources here
       graph.reset();
-
-      // todo: handle xmpp connection too
     }
   }
 
