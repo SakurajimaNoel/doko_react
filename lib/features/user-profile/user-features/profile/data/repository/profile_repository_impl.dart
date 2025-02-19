@@ -24,8 +24,8 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
-  Future<bool> loadMoreUserPost(UserProfileNodesInput postDetails) async {
-    return _remoteDataSource.loadUserProfilePost(postDetails);
+  Future<bool> getUserPosts(UserProfileNodesInput postDetails) async {
+    return _remoteDataSource.getUserProfilePosts(postDetails);
   }
 
   @override

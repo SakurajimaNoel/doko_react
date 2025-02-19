@@ -80,13 +80,13 @@ final class ProfilePostLoadSuccess extends ProfilePostLoadResponse {
 }
 
 // used with user profile friends page for infinite loading
-class ProfileFriendLoadResponse extends ProfileState {
+class ProfileNodeLoadResponse extends ProfileState {
   @override
   List<Object?> get props => [];
 }
 
-final class ProfileFriendLoadError extends ProfileFriendLoadResponse {
-  ProfileFriendLoadError({
+final class ProfileNodeLoadError extends ProfileNodeLoadResponse {
+  ProfileNodeLoadError({
     required this.message,
   });
 
@@ -96,8 +96,8 @@ final class ProfileFriendLoadError extends ProfileFriendLoadResponse {
   List<Object?> get props => [message];
 }
 
-final class ProfileFriendLoadSuccess extends ProfileFriendLoadResponse {
-  ProfileFriendLoadSuccess({
+final class ProfileNodeLoadSuccess extends ProfileNodeLoadResponse {
+  ProfileNodeLoadSuccess({
     required this.cursor,
   });
 

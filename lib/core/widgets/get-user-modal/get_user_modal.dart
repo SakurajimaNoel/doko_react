@@ -1,5 +1,6 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
@@ -39,7 +40,7 @@ class GetUserModal extends StatelessWidget {
           builder: (BuildContext context, ScrollController controller) {
             final username =
                 (context.read<UserBloc>().state as UserCompleteState).username;
-            final GetProfileInput details = GetProfileInput(
+            final UserProfileNodesInput details = UserProfileNodesInput(
               username: username,
               currentUsername: username,
             );
@@ -144,8 +145,8 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
       // fetch more friends
       if (!loading) {
         loading = true;
-        context.read<ProfileBloc>().add(LoadMoreProfileFriendsEvent(
-              friendDetails: UserProfileNodesInput(
+        context.read<ProfileBloc>().add(GetUserFriendsEvent(
+              userDetails: UserProfileNodesInput(
                 username: username,
                 cursor: userFriends.pageInfo.endCursor!,
                 currentUsername: username,
@@ -186,7 +187,7 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
 
     final currTheme = Theme.of(context).colorScheme;
 
-    final GetProfileInput details = GetProfileInput(
+    final UserProfileNodesInput details = UserProfileNodesInput(
       username: username,
       currentUsername: username,
     );
@@ -195,13 +196,13 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
       width: width,
       child: BlocConsumer<ProfileBloc, ProfileState>(
         listenWhen: (previousState, state) {
-          return state is ProfileFriendLoadResponse;
+          return state is ProfileNodeLoadResponse;
         },
         listener: (context, state) {
           loading = false;
           String errorMessage = "";
 
-          if (state is ProfileFriendLoadError) {
+          if (state is ProfileNodeLoadError) {
             errorMessage = state.message;
           }
           if (state is ProfileUserSearchErrorState) {
@@ -219,13 +220,14 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
 
           context
               .read<UserToUserActionBloc>()
-              .add(UserToUserActionFriendLoadEvent(
-                friendsCount: userFriends.items.length,
+              .add(UserToUserActionNodesLoadEvent(
+                itemCount: userFriends.items.length,
                 username: username,
+                nodeType: DokiNodeType.user,
               ));
         },
         buildWhen: (previousState, state) {
-          return state is! ProfileFriendLoadResponse;
+          return state is! ProfileNodeLoadResponse;
         },
         builder: (context, state) {
           bool searching = state is ProfileUserSearchLoadingState;

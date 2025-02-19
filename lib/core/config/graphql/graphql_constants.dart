@@ -1,6 +1,5 @@
 class GraphqlConstants {
-  static const int postLimit = 8;
-  static const int friendLimit = 8;
+  static const int nodeLimit = 16;
   static const int generalSearchLimit = 8;
   static const int friendSearchLimit = 8;
   static const int friendSearchCommentLimit = 8;

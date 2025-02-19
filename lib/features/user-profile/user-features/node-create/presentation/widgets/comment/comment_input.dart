@@ -59,11 +59,10 @@ class CommentInput extends StatelessWidget {
           BlocProvider(
             create: (context) => serviceLocator<ProfileBloc>()
               ..add(GetUserFriendsEvent(
-                userDetails: GetProfileInput(
+                userDetails: UserProfileNodesInput(
                   username: username,
                   currentUsername: username,
                 ),
-                isCommentSearch: true,
               )),
           ),
         ],

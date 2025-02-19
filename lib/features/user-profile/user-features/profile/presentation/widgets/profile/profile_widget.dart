@@ -263,6 +263,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
           // pages
           BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
+            // todo: handle this
             buildWhen: (previousState, state) {
               return (state
                       is UserToUserActionUpdateUserAcceptedFriendsListState &&
@@ -276,7 +277,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 ),
                 onPressed: () {
                   context.pushNamed(
-                    RouterConstants.profileFriends,
+                    RouterConstants.profilePages,
                     pathParameters: {
                       "username": username,
                     },
@@ -301,7 +302,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 ),
                 onPressed: () {
                   context.pushNamed(
-                    RouterConstants.profileFriends,
+                    RouterConstants.profilePosts,
                     pathParameters: {
                       "username": username,
                     },
@@ -329,7 +330,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 ),
                 onPressed: () {
                   context.pushNamed(
-                    RouterConstants.profileFriends,
+                    RouterConstants.profileDiscussions,
                     pathParameters: {
                       "username": username,
                     },
@@ -356,7 +357,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 ),
                 onPressed: () {
                   context.pushNamed(
-                    RouterConstants.profileFriends,
+                    RouterConstants.profilePolls,
                     pathParameters: {
                       "username": username,
                     },
@@ -374,7 +375,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
   @override
   Widget build(BuildContext context) {
-    GetProfileInput details = GetProfileInput(
+    UserProfileNodesInput details = UserProfileNodesInput(
       username: username,
       currentUsername: currentUsername,
     );

@@ -59,7 +59,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<EditUserProfileEvent>(_handleEditUserProfileEvent);
     on<LoadMoreProfilePostEvent>(_handleLoadMoreProfilePostEvent);
     on<GetUserFriendsEvent>(_handleGetUserFriendsEvent);
-    on<LoadMoreProfileFriendsEvent>(_handleMoreProfileFriendsEvent);
+    // on<LoadMoreProfileFriendsEvent>(_handleMoreProfileFriendsEvent);
     on<GetUserProfileRefreshEvent>(_handleGetUserProfileRefreshEvent);
     on<GetUserFriendsRefreshEvent>(_handleGetUserFriendsRefreshEvent);
     on<UserSearchEvent>(
@@ -110,6 +110,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           return;
         }
 
+        // emitted when user has no friends and query is empty
         emit(ProfileInitial());
         return;
       }
@@ -184,6 +185,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     }
   }
 
+  // todo change this
   FutureOr<void> _handleLoadMoreProfilePostEvent(
       LoadMoreProfilePostEvent event, Emitter<ProfileState> emit) async {
     try {
@@ -210,90 +212,57 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   FutureOr<void> _handleGetUserFriendsEvent(
       GetUserFriendsEvent event, Emitter<ProfileState> emit) async {
     try {
-      bool isCommentSearch = event.isCommentSearch;
       final userKey = generateUserNodeKey(event.userDetails.username);
-      if (graph.containsKey(userKey)) {
-        // check if user exists
-        final user = graph.getValueByKey(userKey)!;
+      final user = graph.getValueByKey(userKey);
 
-        if (user is CompleteUserEntity && user.friends.isNotEmpty) {
-          if (isCommentSearch) {
+      // either user is not fetched or first time fetching user friends
+      if (event.userDetails.cursor.isEmpty) {
+        if (user is CompleteUserEntity) {
+          // if user is already fetched check if friends exists or not
+          if (user.friends.isNotEmpty) {
             add(CommentMentionSearchEvent(
               searchDetails: UserSearchInput(
                 username: event.userDetails.currentUsername,
                 query: "",
               ),
             ));
-          } else {
             emit(ProfileSuccess());
+
+            return;
           }
-
-          return;
-        }
-
-        if (user is! CompleteUserEntity) {
-          // if user is not complete user entity
+        } else {
+          // fetch complete user
           add(GetUserProfileEvent(
             userDetails: event.userDetails,
             indirect: true,
           ));
           return;
         }
-      } else {
-        // if user doesn't exist first fetch user
-        add(GetUserProfileEvent(
-          userDetails: event.userDetails,
-          indirect: true,
-        ));
-        return;
       }
 
       emit(ProfileLoading());
       await _userFriendsUseCase(UserProfileNodesInput(
         username: event.userDetails.username,
-        cursor: "",
+        cursor: event.userDetails.cursor,
         currentUsername: event.userDetails.currentUsername,
       ));
 
-      if (isCommentSearch) {
-        add(CommentMentionSearchEvent(
-          searchDetails: UserSearchInput(
-            username: event.userDetails.currentUsername,
-            query: "",
-          ),
-        ));
-      } else {
-        emit(ProfileSuccess());
-      }
+      add(CommentMentionSearchEvent(
+        searchDetails: UserSearchInput(
+          username: event.userDetails.currentUsername,
+          query: "",
+        ),
+      ));
+
+      emit(ProfileNodeLoadSuccess(
+        cursor: event.userDetails.cursor,
+      ));
     } on ApplicationException catch (e) {
-      emit(ProfileError(
+      emit(ProfileNodeLoadError(
         message: e.reason,
       ));
     } catch (_) {
-      emit(ProfileError(
-        message: Constants.errorMessage,
-      ));
-    }
-  }
-
-  FutureOr<void> _handleMoreProfileFriendsEvent(
-      LoadMoreProfileFriendsEvent event, Emitter<ProfileState> emit) async {
-    try {
-      final userKey = generateUserNodeKey(event.friendDetails.username);
-      final CompleteUserEntity user =
-          graph.getValueByKey(userKey)! as CompleteUserEntity;
-
-      // load more post
-      await _userFriendsUseCase(event.friendDetails);
-      emit(ProfileFriendLoadSuccess(
-        cursor: user.friends.pageInfo.endCursor,
-      ));
-    } on ApplicationException catch (e) {
-      emit(ProfileFriendLoadError(
-        message: e.reason,
-      ));
-    } catch (_) {
-      emit(ProfileFriendLoadError(
+      emit(ProfileNodeLoadError(
         message: Constants.errorMessage,
       ));
     }

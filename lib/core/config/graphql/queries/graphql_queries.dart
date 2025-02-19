@@ -83,6 +83,7 @@ class GraphqlQueries {
     };
   }
 
+  /// todo update this
   static String getCompleteUser() {
     return '''
       query Users(\$where: UserWhere, \$friendsAggregateWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$limit: Int, \$first: Int, \$postsConnectionWhere2: PostWhere, \$sort: [PostSort!], \$likedByWhere2: UserWhere) {
@@ -166,7 +167,7 @@ class GraphqlQueries {
           "username_EQ": currentUsername,
         }
       },
-      "first": GraphqlConstants.postLimit,
+      "first": GraphqlConstants.nodeLimit,
       "postsConnectionWhere2": {
         "createdBy": {
           "username_EQ": username,
@@ -184,8 +185,8 @@ class GraphqlQueries {
   }
 
   // get user accepted friends by username
-  static String getFriendsByUsername(String? cursor) {
-    if (cursor == null || cursor.isEmpty) {
+  static String getFriendsByUsername(String cursor) {
+    if (cursor.isEmpty) {
       return """
        query Users(\$where: UserWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
         users(where: \$where) {
@@ -250,15 +251,15 @@ class GraphqlQueries {
 
   static Map<String, dynamic> getFriendsByUsernameVariables(
     String username, {
-    String? cursor,
+    required String cursor,
     required String currentUsername,
   }) {
-    if (cursor == null || cursor.isEmpty) {
+    if (cursor.isEmpty) {
       return {
         "where": {
           "username_EQ": username,
         },
-        "first": GraphqlConstants.friendLimit,
+        "first": GraphqlConstants.nodeLimit,
         "sort": [
           {
             "edge": {
@@ -284,7 +285,7 @@ class GraphqlQueries {
         "username_EQ": username,
       },
       "after": cursor,
-      "first": GraphqlConstants.friendLimit,
+      "first": GraphqlConstants.nodeLimit,
       "sort": [
         {
           "edge": {
@@ -306,13 +307,49 @@ class GraphqlQueries {
   }
 
   // get user posts by username
-  static String getUserPostsByUsername() {
+  static String getUserPostsByUsername(String cursor) {
+    if (cursor.isEmpty) {
+      return """
+      query Query(\$first: Int, \$sort: [PostSort!], \$where: PostWhere, \$likedByWhere2: UserWhere) {
+        postsConnection(first: \$first, sort: \$sort, where: \$where) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          edges {
+            node {
+              id
+              createdOn
+              content
+              caption
+              createdBy {
+                username
+              }
+              likedBy(where: \$likedByWhere2) {
+                username
+              }
+              likedByConnection {
+                totalCount
+              }
+              commentsConnection {
+                totalCount
+              }
+              usersTagged {
+                username
+              }
+            }
+          }
+        }
+      }
+      """;
+    }
+
     return """
-        query Posts(\$after: String, \$sort: [PostSort!], \$first: Int, \$where: PostWhere, \$likedByWhere2: UserWhere) {
-          postsConnection(after: \$after, sort: \$sort, first: \$first, where: \$where) {
+        query Query(\$first: Int, \$sort: [PostSort!], \$where: PostWhere, \$likedByWhere2: UserWhere, \$after: String) {
+          postsConnection(first: \$first, sort: \$sort, where: \$where, after: \$after) {
             pageInfo {
-              endCursor
               hasNextPage
+              endCursor
             }
             edges {
               node {
@@ -332,11 +369,14 @@ class GraphqlQueries {
                 commentsConnection {
                   totalCount
                 }
+                usersTagged {
+                  username
+                }
               }
             }
           }
         }
-        """;
+     """;
   }
 
   static Map<String, dynamic> getUserPostsByUsernameVariables(
@@ -344,13 +384,32 @@ class GraphqlQueries {
     required String cursor,
     required String currentUsername,
   }) {
+    if (cursor.isEmpty) {
+      return {
+        "where": {
+          "createdBy": {
+            "username_EQ": username,
+          }
+        },
+        "first": GraphqlConstants.nodeLimit,
+        "sort": [
+          {
+            "createdOn": "DESC",
+          }
+        ],
+        "likedByWhere2": {
+          "username_EQ": currentUsername,
+        },
+      };
+    }
+
     return {
       "where": {
         "createdBy": {
           "username_EQ": username,
         }
       },
-      "first": GraphqlConstants.postLimit,
+      "first": GraphqlConstants.nodeLimit,
       "after": cursor,
       "sort": [
         {
@@ -448,7 +507,7 @@ class GraphqlQueries {
             "username_EQ": username,
           }
         },
-        "first": GraphqlConstants.friendLimit,
+        "first": GraphqlConstants.nodeLimit,
         "sort": [
           {
             "edge": {
@@ -475,7 +534,7 @@ class GraphqlQueries {
         }
       },
       "after": cursor,
-      "first": GraphqlConstants.friendLimit,
+      "first": GraphqlConstants.nodeLimit,
       "sort": [
         {
           "edge": {
@@ -573,7 +632,7 @@ class GraphqlQueries {
             "username_EQ": username,
           }
         },
-        "first": GraphqlConstants.friendLimit,
+        "first": GraphqlConstants.nodeLimit,
         "sort": [
           {
             "edge": {
@@ -602,7 +661,7 @@ class GraphqlQueries {
         }
       },
       "after": cursor,
-      "first": GraphqlConstants.friendLimit,
+      "first": GraphqlConstants.nodeLimit,
       "sort": [
         {
           "edge": {
@@ -763,6 +822,7 @@ class GraphqlQueries {
   }
 
   // post by id
+  // todo update this
   static String getCompletePostById() {
     return """
      query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$first: Int, \$likedByWhere3: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
@@ -1035,6 +1095,7 @@ class GraphqlQueries {
   }
 
   // post for preview in chat
+  // todo update this
   static String getPostById() {
     return """
       query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {

@@ -9,7 +9,7 @@ final class GetUserProfileEvent extends ProfileEvent {
     bool? indirect,
   }) : indirect = indirect ?? false;
 
-  final GetProfileInput userDetails;
+  final UserProfileNodesInput userDetails;
 
   /// this is used when user is fetched
   /// when accessing pages that require
@@ -23,7 +23,7 @@ final class GetUserProfileRefreshEvent extends ProfileEvent {
     required this.userDetails,
   });
 
-  final GetProfileInput userDetails;
+  final UserProfileNodesInput userDetails;
 }
 
 final class EditUserProfileEvent extends ProfileEvent {
@@ -46,11 +46,9 @@ final class LoadMoreProfilePostEvent extends ProfileEvent {
 final class GetUserFriendsEvent extends ProfileEvent {
   GetUserFriendsEvent({
     required this.userDetails,
-    this.isCommentSearch = false,
   });
 
-  final GetProfileInput userDetails;
-  final bool isCommentSearch;
+  final UserProfileNodesInput userDetails;
 }
 
 final class GetUserFriendsRefreshEvent extends ProfileEvent {
@@ -58,16 +56,16 @@ final class GetUserFriendsRefreshEvent extends ProfileEvent {
     required this.userDetails,
   });
 
-  final GetProfileInput userDetails;
+  final UserProfileNodesInput userDetails;
 }
 
-final class LoadMoreProfileFriendsEvent extends ProfileEvent {
-  LoadMoreProfileFriendsEvent({
-    required this.friendDetails,
-  });
-
-  final UserProfileNodesInput friendDetails;
-}
+// final class LoadMoreProfileFriendsEvent extends ProfileEvent {
+//   LoadMoreProfileFriendsEvent({
+//     required this.friendDetails,
+//   });
+//
+//   final UserProfileNodesInput friendDetails;
+// }
 
 // user search events
 final class UserSearchEvent extends ProfileEvent {
@@ -128,10 +126,19 @@ final class PendingOutgoingRequestMore extends ProfileEvent {
 }
 
 // comment search
-class CommentMentionSearchEvent extends ProfileEvent {
+final class CommentMentionSearchEvent extends ProfileEvent {
   CommentMentionSearchEvent({
     required this.searchDetails,
   });
 
   final UserSearchInput searchDetails;
+}
+
+// fetch user created by posts
+final class GetUserPostsEvent extends ProfileEvent {
+  GetUserPostsEvent({
+    required this.userDetails,
+  });
+
+  final UserProfileNodesInput userDetails;
 }

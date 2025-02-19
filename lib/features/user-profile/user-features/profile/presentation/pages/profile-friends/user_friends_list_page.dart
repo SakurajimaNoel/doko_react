@@ -1,5 +1,6 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
@@ -62,8 +63,8 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
       // fetch more friends
       if (!loading) {
         loading = true;
-        context.read<ProfileBloc>().add(LoadMoreProfileFriendsEvent(
-              friendDetails: UserProfileNodesInput(
+        context.read<ProfileBloc>().add(GetUserFriendsEvent(
+              userDetails: UserProfileNodesInput(
                 username: username,
                 cursor: userFriends.pageInfo.endCursor!,
                 currentUsername: currentUsername,
@@ -91,7 +92,7 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final GetProfileInput details = GetProfileInput(
+    final UserProfileNodesInput details = UserProfileNodesInput(
       username: username,
       currentUsername: currentUsername,
     );
@@ -115,13 +116,13 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
           ),
           child: BlocConsumer<ProfileBloc, ProfileState>(
             listenWhen: (previousState, state) {
-              return state is ProfileFriendLoadResponse;
+              return state is ProfileNodeLoadResponse;
             },
             listener: (context, state) {
               loading = false;
               String errorMessage = "";
 
-              if (state is ProfileFriendLoadError) {
+              if (state is ProfileNodeLoadError) {
                 errorMessage = state.message;
               }
               if (state is ProfileUserSearchErrorState) {
@@ -139,13 +140,14 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
 
               context
                   .read<UserToUserActionBloc>()
-                  .add(UserToUserActionFriendLoadEvent(
-                    friendsCount: userFriends.items.length,
+                  .add(UserToUserActionNodesLoadEvent(
+                    itemCount: userFriends.items.length,
                     username: username,
+                    nodeType: DokiNodeType.user,
                   ));
             },
             buildWhen: (previousState, state) {
-              return state is! ProfileFriendLoadResponse;
+              return state is! ProfileNodeLoadResponse;
             },
             builder: (context, state) {
               bool searching = state is ProfileUserSearchLoadingState;
@@ -198,8 +200,9 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
                 },
                 child: BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
                   buildWhen: (previousState, state) {
-                    return (state is UserToUserActionLoadFriendsState &&
-                            state.username == username) ||
+                    return (state is UserToUserActionLoadNodesState &&
+                            state.username == username &&
+                            state.nodeType == DokiNodeType.user) ||
                         (state is UserToUserActionUpdateUserAcceptedFriendsListState &&
                             (self || state.username == username));
                   },

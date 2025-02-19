@@ -11,6 +11,6 @@ class UserPostUseCase extends UseCases<bool, UserProfileNodesInput> {
 
   @override
   FutureOr<bool> call(UserProfileNodesInput params) async {
-    return profileRepository.loadMoreUserPost(params);
+    return profileRepository.getUserPosts(params);
   }
 }

@@ -26,17 +26,19 @@ class UserToUserActionUpdateProfileState extends UserToUserActionState {
   List<Object?> get props => [name, bio, profilePicture, username];
 }
 
-class UserToUserActionLoadFriendsState extends UserToUserActionState {
-  const UserToUserActionLoadFriendsState({
-    required this.loadedFriendsCount,
+class UserToUserActionLoadNodesState extends UserToUserActionState {
+  const UserToUserActionLoadNodesState({
+    required this.loadedItemCount,
     required this.username,
+    required this.nodeType,
   });
 
   final String username;
-  final int loadedFriendsCount;
+  final int loadedItemCount;
+  final DokiNodeType nodeType;
 
   @override
-  List<Object?> get props => [username, loadedFriendsCount];
+  List<Object?> get props => [username, loadedItemCount, nodeType];
 }
 
 /// used in user to user relation widget

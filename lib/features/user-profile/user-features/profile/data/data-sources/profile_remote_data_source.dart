@@ -138,12 +138,13 @@ class ProfileRemoteDataSource {
     }
   }
 
-  Future<bool> loadUserProfilePost(UserProfileNodesInput postDetails) async {
+  Future<bool> getUserProfilePosts(UserProfileNodesInput postDetails) async {
     try {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(GraphqlQueries.getUserPostsByUsername()),
+          document:
+              gql(GraphqlQueries.getUserPostsByUsername(postDetails.cursor)),
           variables: GraphqlQueries.getUserPostsByUsernameVariables(
             postDetails.username,
             cursor: postDetails.cursor,
@@ -246,8 +247,6 @@ class ProfileRemoteDataSource {
 
       return true;
     } catch (e) {
-      print("error here");
-      print(e);
       rethrow;
     }
   }

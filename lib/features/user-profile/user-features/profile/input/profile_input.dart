@@ -1,24 +1,24 @@
 import 'package:doko_react/core/validation/input.dart';
 
-class GetProfileInput extends Input {
-  GetProfileInput({
-    required this.username,
-    required this.currentUsername,
-  });
-
-  final String username;
-  final String currentUsername;
-
-  @override
-  String invalidateReason() {
-    return "";
-  }
-
-  @override
-  bool validate() {
-    return true;
-  }
-}
+// class UserProfileNodesInput extends Input {
+//   UserProfileNodesInput({
+//     required this.username,
+//     required this.currentUsername,
+//   });
+//
+//   final String username;
+//   final String currentUsername;
+//
+//   @override
+//   String invalidateReason() {
+//     return "";
+//   }
+//
+//   @override
+//   bool validate() {
+//     return true;
+//   }
+// }
 
 class EditProfileInput extends Input {
   EditProfileInput({
@@ -52,7 +52,7 @@ class EditProfileInput extends Input {
 class UserProfileNodesInput {
   const UserProfileNodesInput({
     required this.username,
-    required this.cursor,
+    this.cursor = "",
     required this.currentUsername,
   });
 

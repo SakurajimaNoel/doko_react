@@ -18,14 +18,16 @@ final class UserToUserUpdateProfileEvent extends UserToUserActionEvent {
   final String username;
 }
 
-final class UserToUserActionFriendLoadEvent extends UserToUserActionEvent {
-  const UserToUserActionFriendLoadEvent({
-    required this.friendsCount,
+final class UserToUserActionNodesLoadEvent extends UserToUserActionEvent {
+  const UserToUserActionNodesLoadEvent({
+    required this.itemCount,
     required this.username,
+    required this.nodeType,
   });
 
-  final int friendsCount;
+  final int itemCount;
   final String username;
+  final DokiNodeType nodeType;
 }
 
 final class UserToUserActionCreateFriendRelationEvent

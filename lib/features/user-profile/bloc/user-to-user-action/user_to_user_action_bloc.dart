@@ -3,6 +3,7 @@ import 'dart:collection';
 
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/graphql/graphql_constants.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/core/utils/relation/user_to_user_relation.dart';
@@ -43,7 +44,7 @@ class UserToUserActionBloc
         _userGetUseCase = userGetUseCase,
         super(UserToUserActionInitial()) {
     on<UserToUserUpdateProfileEvent>(_handleUserToUserUpdateProfileEvent);
-    on<UserToUserActionFriendLoadEvent>(_handleUserToUserActionFriendLoadEvent);
+    on<UserToUserActionNodesLoadEvent>(_handleUserToUserActionNodesLoadEvent);
     on<UserToUserActionCreateFriendRelationEvent>(
         _handleUserToUserActionCreateFriendRelationEvent);
     on<UserToUserActionAcceptFriendRelationEvent>(
@@ -215,13 +216,14 @@ class UserToUserActionBloc
     );
   }
 
-  FutureOr<void> _handleUserToUserActionFriendLoadEvent(
-      UserToUserActionFriendLoadEvent event,
+  FutureOr<void> _handleUserToUserActionNodesLoadEvent(
+      UserToUserActionNodesLoadEvent event,
       Emitter<UserToUserActionState> emit) {
     emit(
-      UserToUserActionLoadFriendsState(
-        loadedFriendsCount: event.friendsCount,
+      UserToUserActionLoadNodesState(
+        loadedItemCount: event.itemCount,
         username: event.username,
+        nodeType: event.nodeType,
       ),
     );
   }
@@ -450,7 +452,7 @@ class UserToUserActionBloc
       if (graph.containsKey(key)) return;
 
       getUserRequest.add(event.username);
-      await _userGetUseCase(GetProfileInput(
+      await _userGetUseCase(UserProfileNodesInput(
         username: event.username,
         currentUsername: event.currentUser,
       ));
