@@ -59,8 +59,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<EditUserProfileEvent>(_handleEditUserProfileEvent);
     on<LoadMoreProfilePostEvent>(_handleLoadMoreProfilePostEvent);
     on<GetUserFriendsEvent>(_handleGetUserFriendsEvent);
+    on<GetUserPostsEvent>(_handleGetUserPostsEvent);
     on<GetUserProfileRefreshEvent>(_handleGetUserProfileRefreshEvent);
     on<GetUserFriendsRefreshEvent>(_handleGetUserFriendsRefreshEvent);
+    on<GetUserPostsRefreshEvent>(_handleGetUserPostsRefreshEvent);
     on<UserSearchEvent>(
       _handleUserSearchEvent,
       transformer: debounce(
@@ -80,6 +82,50 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<GetUserPendingIncomingRequest>(_handleGetUserPendingIncomingRequest);
     on<GetUserPendingOutgoingRequest>(_handleGetUserPendingOutgoingRequest);
     on<CommentMentionSearchEvent>(_handleCommentMentionSearchEvent);
+  }
+
+  FutureOr<void> _handleGetUserPostsEvent(
+      GetUserPostsEvent event, Emitter<ProfileState> emit) async {
+    try {
+      final userKey = generateUserNodeKey(event.userDetails.username);
+      final user = graph.getValueByKey(userKey);
+
+      // either user is not fetched or first time fetching user friends
+      if (event.userDetails.cursor.isEmpty) {
+        if (user is CompleteUserEntity) {
+          // if user is already fetched check if friends exists or not
+          if (user.posts.isNotEmpty) {
+            emit(ProfileSuccess());
+            return;
+          }
+        } else {
+          // fetch complete user
+          add(GetUserProfileEvent(
+            userDetails: event.userDetails,
+            indirect: IndirectProfileFetch.posts,
+          ));
+          return;
+        }
+      }
+
+      if (event.userDetails.cursor.isEmpty) emit(ProfileLoading());
+      await _userPostUseCase(event.userDetails);
+
+      // this handles initial success
+      if (event.userDetails.cursor.isEmpty) emit(ProfileSuccess());
+
+      emit(ProfileNodeLoadSuccess(
+        cursor: event.userDetails.cursor,
+      ));
+    } on ApplicationException catch (e) {
+      emit(ProfileNodeLoadError(
+        message: e.reason,
+      ));
+    } catch (_) {
+      emit(ProfileNodeLoadError(
+        message: Constants.errorMessage,
+      ));
+    }
   }
 
   FutureOr<void> _handleCommentMentionSearchEvent(
@@ -135,6 +181,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       GetUserProfileEvent event, Emitter<ProfileState> emit) async {
     try {
       final userKey = generateUserNodeKey(event.userDetails.username);
+      var indirect = event.indirect;
+
       if (graph.containsKey(userKey)) {
         // check if user exists
         final user = graph.getValueByKey(userKey)!;
@@ -147,10 +195,18 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
       emit(ProfileLoading());
       await _profileUseCase(event.userDetails);
-      if (event.indirect) {
-        add(GetUserFriendsEvent(
-          userDetails: event.userDetails,
-        ));
+      if (indirect != IndirectProfileFetch.direct) {
+        if (indirect == IndirectProfileFetch.friends) {
+          add(GetUserFriendsEvent(
+            userDetails: event.userDetails,
+          ));
+        }
+
+        if (indirect == IndirectProfileFetch.posts) {
+          add(GetUserPostsEvent(
+            userDetails: event.userDetails,
+          ));
+        }
       } else {
         emit(ProfileSuccess());
       }
@@ -231,19 +287,17 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           // fetch complete user
           add(GetUserProfileEvent(
             userDetails: event.userDetails,
-            indirect: true,
+            indirect: IndirectProfileFetch.friends,
           ));
           return;
         }
       }
 
-      emit(ProfileLoading());
-      await _userFriendsUseCase(UserProfileNodesInput(
-        username: event.userDetails.username,
-        cursor: event.userDetails.cursor,
-        currentUsername: event.userDetails.currentUsername,
-      ));
+      if (event.userDetails.cursor.isEmpty) emit(ProfileLoading());
 
+      await _userFriendsUseCase(event.userDetails);
+
+      // this updates profile state too in case of loading friends
       add(CommentMentionSearchEvent(
         searchDetails: UserSearchInput(
           username: event.userDetails.currentUsername,
@@ -284,11 +338,23 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   FutureOr<void> _handleGetUserFriendsRefreshEvent(
       GetUserFriendsRefreshEvent event, Emitter<ProfileState> emit) async {
     try {
-      await _userFriendsUseCase(UserProfileNodesInput(
-        username: event.userDetails.username,
-        cursor: "",
-        currentUsername: event.userDetails.currentUsername,
+      await _userFriendsUseCase(event.userDetails);
+      emit(ProfileSuccess());
+    } on ApplicationException catch (e) {
+      emit(ProfileRefreshError(
+        message: e.reason,
       ));
+    } catch (_) {
+      emit(ProfileRefreshError(
+        message: Constants.errorMessage,
+      ));
+    }
+  }
+
+  FutureOr<void> _handleGetUserPostsRefreshEvent(
+      GetUserPostsRefreshEvent event, Emitter<ProfileState> emit) async {
+    try {
+      await _userPostUseCase(event.userDetails);
       emit(ProfileSuccess());
     } on ApplicationException catch (e) {
       emit(ProfileRefreshError(

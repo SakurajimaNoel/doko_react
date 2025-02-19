@@ -171,7 +171,7 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
                       StyledText.error(state.message),
                       ElevatedButton(
                         onPressed: () {
-                          context.read<ProfileBloc>().add(GetUserProfileEvent(
+                          context.read<ProfileBloc>().add(GetUserFriendsEvent(
                                 userDetails: details,
                               ));
                         },

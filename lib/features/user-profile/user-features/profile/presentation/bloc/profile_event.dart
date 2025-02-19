@@ -1,13 +1,21 @@
 part of 'profile_bloc.dart';
 
+enum IndirectProfileFetch {
+  friends,
+  posts,
+  discussions,
+  polls,
+  direct,
+}
+
 @immutable
 sealed class ProfileEvent {}
 
 final class GetUserProfileEvent extends ProfileEvent {
   GetUserProfileEvent({
     required this.userDetails,
-    bool? indirect,
-  }) : indirect = indirect ?? false;
+    IndirectProfileFetch? indirect,
+  }) : indirect = indirect ?? IndirectProfileFetch.direct;
 
   final UserProfileNodesInput userDetails;
 
@@ -15,7 +23,7 @@ final class GetUserProfileEvent extends ProfileEvent {
   /// when accessing pages that require
   /// complete user entity
   /// like friends page
-  final bool indirect;
+  final IndirectProfileFetch indirect;
 }
 
 final class GetUserProfileRefreshEvent extends ProfileEvent {
@@ -42,9 +50,17 @@ final class LoadMoreProfilePostEvent extends ProfileEvent {
   final UserProfileNodesInput postDetails;
 }
 
-// user friends fetching
+// user posts fetching
 final class GetUserPostsEvent extends ProfileEvent {
   GetUserPostsEvent({
+    required this.userDetails,
+  });
+
+  final UserProfileNodesInput userDetails;
+}
+
+final class GetUserPostsRefreshEvent extends ProfileEvent {
+  GetUserPostsRefreshEvent({
     required this.userDetails,
   });
 

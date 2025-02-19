@@ -66,11 +66,11 @@ class ProfileRemoteDataSource {
           .toList();
 
       List<PostEntity> posts = await Future.wait(postFutures);
-      graph.addPostEntityListToUser(
-        user.username,
-        newPosts: posts,
-        pageInfo: info,
-      );
+      // graph.addPostEntityListToUser(
+      //   user.username,
+      //   newPosts: posts,
+      //   pageInfo: info,
+      // );
 
       return true;
     } catch (e) {
