@@ -29,11 +29,25 @@ class RouterConstants {
   static const String userPost = "user-post";
   static const String token = "tokens";
   static const String comment = "user-comment";
+  static const String profilePosts = "profile-posts";
 
   // discussion
   static const String createDiscussion = "create-discussion";
   static const String discussionPublish = "publish-discussion";
   static const String userDiscussion = "user-discussion";
+  static const String profileDiscussions = "profile-discussions";
+
+  // poll
+  static const String createPoll = "create-poll";
+  static const String pollPublish = "publish-poll";
+  static const String userPoll = "user-poll";
+  static const String profilePolls = "profile-polls";
+
+  // pages
+  static const String createPage = "create-page";
+  static const String pagePublish = "publish-page";
+  static const String userPage = "user-page";
+  static const String profilePages = "profile-pages";
 
   // settings
   static const String settings = "settings";
