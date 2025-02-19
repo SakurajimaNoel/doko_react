@@ -3,7 +3,6 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
-import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
@@ -46,7 +45,7 @@ class _PendingOutgoingRequestState extends State<PendingOutgoingRequest>
       // fetch more friends
       if (!loading) {
         loading = true;
-        context.read<ProfileBloc>().add(PendingOutgoingRequestMore(
+        context.read<ProfileBloc>().add(GetUserPendingOutgoingRequest(
               username: username,
               cursor: pendingRequest.pageInfo.endCursor!,
             ));
@@ -69,7 +68,7 @@ class _PendingOutgoingRequestState extends State<PendingOutgoingRequest>
     super.build(context);
     return BlocProvider(
       create: (context) => serviceLocator<ProfileBloc>()
-        ..add(PendingOutgoingRequestInitial(
+        ..add(GetUserPendingOutgoingRequest(
           username: username,
         )),
       child: Padding(
@@ -94,36 +93,9 @@ class _PendingOutgoingRequestState extends State<PendingOutgoingRequest>
               );
             }
 
-            if (state is ProfileError) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: Constants.padding,
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      StyledText.error(state.message),
-                      ElevatedButton(
-                        onPressed: () {
-                          context
-                              .read<ProfileBloc>()
-                              .add(PendingOutgoingRequestInitial(
-                                username: username,
-                                refresh: true,
-                              ));
-                        },
-                        child: const Text("Retry"),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }
-
             return RefreshIndicator(
               onRefresh: () async {
-                context.read<ProfileBloc>().add(PendingOutgoingRequestInitial(
+                context.read<ProfileBloc>().add(GetUserPendingOutgoingRequest(
                       username: username,
                       refresh: true,
                     ));
@@ -134,10 +106,10 @@ class _PendingOutgoingRequestState extends State<PendingOutgoingRequest>
                       is UserToUserActionUpdateUserPendingFriendsListState;
                 },
                 builder: (context, state) {
-                  final Nodes pendingRequest =
-                      graph.getValueByKey(graphKey)! as Nodes;
+                  final pendingRequest = graph.getValueByKey(graphKey);
 
-                  if (pendingRequest.items.isEmpty) {
+                  if (pendingRequest is! Nodes ||
+                      pendingRequest.items.isEmpty) {
                     return const Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: Constants.padding,

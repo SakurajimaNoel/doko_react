@@ -51,6 +51,7 @@ class UserToUserActionBloc
         _handleUserToUserActionAcceptFriendRelationEvent);
     on<UserToUserActionRemoveFriendRelationEvent>(
         _handleUserToUserActionRemoveFriendRelationEvent);
+
     on<UserToUserActionUserRefreshEvent>(
         _handleUserToUserActionUserRefreshEvent);
     on<UserToUserActionGetUserByUsernameEvent>(

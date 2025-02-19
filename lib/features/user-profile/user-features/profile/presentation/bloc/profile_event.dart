@@ -43,6 +43,15 @@ final class LoadMoreProfilePostEvent extends ProfileEvent {
 }
 
 // user friends fetching
+final class GetUserPostsEvent extends ProfileEvent {
+  GetUserPostsEvent({
+    required this.userDetails,
+  });
+
+  final UserProfileNodesInput userDetails;
+}
+
+// user friends fetching
 final class GetUserFriendsEvent extends ProfileEvent {
   GetUserFriendsEvent({
     required this.userDetails,
@@ -58,14 +67,6 @@ final class GetUserFriendsRefreshEvent extends ProfileEvent {
 
   final UserProfileNodesInput userDetails;
 }
-
-// final class LoadMoreProfileFriendsEvent extends ProfileEvent {
-//   LoadMoreProfileFriendsEvent({
-//     required this.friendDetails,
-//   });
-//
-//   final UserProfileNodesInput friendDetails;
-// }
 
 // user search events
 final class UserSearchEvent extends ProfileEvent {
@@ -85,43 +86,27 @@ final class UserFriendsSearchEvent extends ProfileEvent {
 }
 
 // user pending events
-final class PendingIncomingRequestInitial extends ProfileEvent {
-  PendingIncomingRequestInitial({
+final class GetUserPendingIncomingRequest extends ProfileEvent {
+  GetUserPendingIncomingRequest({
     required this.username,
+    this.cursor = "",
     bool? refresh,
   }) : refetch = refresh ?? false;
 
   final String username;
   final bool refetch;
-}
-
-final class PendingOutgoingRequestInitial extends ProfileEvent {
-  PendingOutgoingRequestInitial({
-    required this.username,
-    bool? refresh,
-  }) : refetch = refresh ?? false;
-
-  final String username;
-  final bool refetch;
-}
-
-final class PendingIncomingRequestMore extends ProfileEvent {
-  PendingIncomingRequestMore({
-    required this.username,
-    required this.cursor,
-  });
-
-  final String username;
   final String cursor;
 }
 
-final class PendingOutgoingRequestMore extends ProfileEvent {
-  PendingOutgoingRequestMore({
+final class GetUserPendingOutgoingRequest extends ProfileEvent {
+  GetUserPendingOutgoingRequest({
     required this.username,
-    required this.cursor,
-  });
+    this.cursor = "",
+    bool? refresh,
+  }) : refetch = refresh ?? false;
 
   final String username;
+  final bool refetch;
   final String cursor;
 }
 
@@ -132,13 +117,4 @@ final class CommentMentionSearchEvent extends ProfileEvent {
   });
 
   final UserSearchInput searchDetails;
-}
-
-// fetch user created by posts
-final class GetUserPostsEvent extends ProfileEvent {
-  GetUserPostsEvent({
-    required this.userDetails,
-  });
-
-  final UserProfileNodesInput userDetails;
 }

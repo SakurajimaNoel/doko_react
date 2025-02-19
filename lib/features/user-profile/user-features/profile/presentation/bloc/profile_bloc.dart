@@ -59,7 +59,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<EditUserProfileEvent>(_handleEditUserProfileEvent);
     on<LoadMoreProfilePostEvent>(_handleLoadMoreProfilePostEvent);
     on<GetUserFriendsEvent>(_handleGetUserFriendsEvent);
-    // on<LoadMoreProfileFriendsEvent>(_handleMoreProfileFriendsEvent);
     on<GetUserProfileRefreshEvent>(_handleGetUserProfileRefreshEvent);
     on<GetUserFriendsRefreshEvent>(_handleGetUserFriendsRefreshEvent);
     on<UserSearchEvent>(
@@ -78,10 +77,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
       ),
     );
-    on<PendingIncomingRequestInitial>(_handlePendingIncomingRequestInitial);
-    on<PendingOutgoingRequestInitial>(_handlePendingOutgoingRequestInitial);
-    on<PendingIncomingRequestMore>(_handlePendingIncomingRequestMore);
-    on<PendingOutgoingRequestMore>(_handlePendingOutgoingRequestMore);
+    on<GetUserPendingIncomingRequest>(_handleGetUserPendingIncomingRequest);
+    on<GetUserPendingOutgoingRequest>(_handleGetUserPendingOutgoingRequest);
     on<CommentMentionSearchEvent>(_handleCommentMentionSearchEvent);
   }
 
@@ -354,11 +351,16 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     }
   }
 
-  FutureOr<void> _handlePendingIncomingRequestInitial(
-      PendingIncomingRequestInitial event, Emitter<ProfileState> emit) async {
+  FutureOr<void> _handleGetUserPendingIncomingRequest(
+      GetUserPendingIncomingRequest event, Emitter<ProfileState> emit) async {
     try {
       String key = generatePendingIncomingReqKey();
-      if (!event.refetch && graph.containsKey(key)) {
+      final nodes = graph.getValueByKey(key);
+
+      if (!event.refetch &&
+          nodes is Nodes &&
+          nodes.isNotEmpty &&
+          event.cursor.isEmpty) {
         emit(ProfileSuccess());
         return;
       }
@@ -369,23 +371,30 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         cursor: "",
         currentUsername: event.username,
       ));
-      emit(ProfileSuccess());
+      emit(PendingRequestLoadSuccessState(
+        cursor: event.cursor,
+      ));
     } on ApplicationException catch (e) {
-      emit(ProfileError(
+      emit(PendingRequestLoadError(
         message: e.reason,
       ));
     } catch (_) {
-      emit(ProfileError(
+      emit(PendingRequestLoadError(
         message: Constants.errorMessage,
       ));
     }
   }
 
-  FutureOr<void> _handlePendingOutgoingRequestInitial(
-      PendingOutgoingRequestInitial event, Emitter<ProfileState> emit) async {
+  FutureOr<void> _handleGetUserPendingOutgoingRequest(
+      GetUserPendingOutgoingRequest event, Emitter<ProfileState> emit) async {
     try {
       String key = generatePendingOutgoingReqKey();
-      if (!event.refetch && graph.containsKey(key)) {
+      final nodes = graph.getValueByKey(key);
+
+      if (!event.refetch &&
+          nodes is Nodes &&
+          nodes.isNotEmpty &&
+          event.cursor.isEmpty) {
         emit(ProfileSuccess());
         return;
       }
@@ -396,56 +405,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         cursor: "",
         currentUsername: event.username,
       ));
-      emit(ProfileSuccess());
-    } on ApplicationException catch (e) {
-      emit(ProfileError(
-        message: e.reason,
-      ));
-    } catch (_) {
-      emit(ProfileError(
-        message: Constants.errorMessage,
-      ));
-    }
-  }
 
-  FutureOr<void> _handlePendingIncomingRequestMore(
-      PendingIncomingRequestMore event, Emitter<ProfileState> emit) async {
-    try {
-      await _pendingIncomingRequestUseCase(UserProfileNodesInput(
-        username: event.username,
-        cursor: event.cursor,
-        currentUsername: event.username,
-      ));
-
-      final pendingIncomingReq =
-          graph.getValueByKey(generatePendingIncomingReqKey())! as Nodes;
       emit(PendingRequestLoadSuccessState(
-        cursor: pendingIncomingReq.pageInfo.endCursor,
-      ));
-    } on ApplicationException catch (e) {
-      emit(PendingRequestLoadError(
-        message: e.reason,
-      ));
-    } catch (_) {
-      emit(PendingRequestLoadError(
-        message: Constants.errorMessage,
-      ));
-    }
-  }
-
-  FutureOr<void> _handlePendingOutgoingRequestMore(
-      PendingOutgoingRequestMore event, Emitter<ProfileState> emit) async {
-    try {
-      await _pendingOutgoingRequestUseCase(UserProfileNodesInput(
-        username: event.username,
         cursor: event.cursor,
-        currentUsername: event.username,
-      ));
-
-      final pendingOutgoingRequest =
-          graph.getValueByKey(generatePendingOutgoingReqKey())! as Nodes;
-      emit(PendingRequestLoadSuccessState(
-        cursor: pendingOutgoingRequest.pageInfo.endCursor,
       ));
     } on ApplicationException catch (e) {
       emit(PendingRequestLoadError(
