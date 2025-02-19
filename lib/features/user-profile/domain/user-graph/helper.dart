@@ -37,6 +37,15 @@ String getDiscussionIdFromCommentKey(String discussionKey) {
   return discussionKey.substring(11);
 }
 
+// polls
+String generatePollNodeKey(String pollId) {
+  return "poll:$pollId";
+}
+
+String getPollIdFromCommentKey(String pollKey) {
+  return pollKey.substring(5);
+}
+
 // inbox
 String generatePendingIncomingReqKey() {
   return "pending-incoming-request";

@@ -7,9 +7,11 @@ import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/storage/storage.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/comment_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/discussion_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
 import 'package:graphql/client.dart';
 
@@ -145,6 +147,76 @@ class NodeCreateRemoteDataSource {
     } catch (e) {
       safePrint("error message");
       safePrint(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<String> createNewDiscussion(
+      DiscussionCreateInput discussionDetails) async {
+    try {
+      // upload media items to aws
+      List<Future<String>> fileUploadFuture = [];
+      for (final item in discussionDetails.media) {
+        if (item.type == MediaTypeValue.thumbnail ||
+            item.type == MediaTypeValue.unknown) {
+          continue;
+        }
+
+        fileUploadFuture.add(uploadFileToAWSByPath(
+          item.file!,
+          item.bucketPath,
+        ));
+        addFileToCache(item.file!, item.bucketPath);
+      }
+      List<String> uploadedDiscussionMediaContent =
+          await Future.wait(fileUploadFuture);
+      if (discussionDetails.media.isNotEmpty &&
+          uploadedDiscussionMediaContent.isEmpty) {
+        throw const ApplicationException(
+          reason:
+              "Oops! Something went wrong when uploading media items. Please try again later.",
+        );
+      }
+
+      // update graph
+      QueryResult result = await _client.mutate(
+        MutationOptions(
+          document: gql(GraphqlMutations.userCreateDiscussion()),
+          variables: GraphqlMutations.userCreateDiscussionVariables(
+            discussionDetails,
+            media: uploadedDiscussionMediaContent,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        // clean up
+        for (String path in uploadedDiscussionMediaContent) {
+          deleteFileFromAWSByPath(path);
+        }
+
+        throw const ApplicationException(
+          reason: "Problem creating discussion.",
+        );
+      }
+
+      List? res = result.data?["createDiscussions"]["discussions"];
+
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
+        );
+      }
+
+      DiscussionEntity newDiscussion =
+          await DiscussionEntity.createEntity(map: res[0]);
+      final UserGraph graph = UserGraph();
+
+      graph.addDiscussionEntityToUser(
+          discussionDetails.username, newDiscussion);
+
+      return newDiscussion.id;
+    } catch (e) {
       rethrow;
     }
   }

@@ -4,6 +4,7 @@ import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/comment_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/discussion_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
 
 class GraphqlMutations {
@@ -254,6 +255,9 @@ class GraphqlMutations {
             totalCount
           }
           likedBy(where: \$where) {
+            username
+          }
+          usersTagged {
             username
           }
         }
@@ -656,6 +660,102 @@ class GraphqlMutations {
       "likedByWhere2": {
         "username_EQ": username,
       }
+    };
+  }
+
+  // discussion node
+  static String userCreateDiscussion() {
+    return """
+    mutation CreateDiscussions(\$input: [DiscussionCreateInput!]!, \$where: UserWhere) {
+      createDiscussions(input: \$input) {
+        discussions {
+          id
+          createdOn
+          title
+          text
+          media
+          createdBy {
+            username
+          }
+          likedByConnection {
+            totalCount
+          }
+          commentsConnection {
+            totalCount
+          }
+          likedBy(where: \$where) {
+            username
+          }
+          usersTagged {
+            username
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> userCreateDiscussionVariables(
+    DiscussionCreateInput discussionDetails, {
+    required List<String> media,
+  }) {
+    if (discussionDetails.usersTagged.isEmpty) {
+      return {
+        "input": [
+          {
+            "id": discussionDetails.discussionId,
+            "title": discussionDetails.title,
+            "text": discussionDetails.text,
+            "media": media,
+            "createdBy": {
+              "connect": {
+                "where": {
+                  "node": {
+                    "username_EQ": discussionDetails.username,
+                  },
+                }
+              }
+            }
+          }
+        ],
+        "where": {
+          "username_EQ": discussionDetails.username,
+        },
+      };
+    }
+
+    return {
+      "input": [
+        {
+          "id": discussionDetails.discussionId,
+          "title": discussionDetails.title,
+          "text": discussionDetails.text,
+          "media": media,
+          "createdBy": {
+            "connect": {
+              "where": {
+                "node": {
+                  "username_EQ": discussionDetails.username,
+                },
+              }
+            }
+          },
+          "usersTagged": {
+            "connect": [
+              {
+                "where": {
+                  "node": {
+                    "OR": discussionDetails.generateUserTagged(),
+                  },
+                },
+              },
+            ],
+          },
+        }
+      ],
+      "where": {
+        "username_EQ": discussionDetails.username,
+      },
     };
   }
 }

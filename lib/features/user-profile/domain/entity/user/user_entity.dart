@@ -87,6 +87,13 @@ class CompleteUserEntity extends UserEntity {
     required this.friendsCount,
     required this.friends,
     required this.posts,
+    required this.discussions,
+    required this.polls,
+    required this.timeline,
+    required this.pollCount,
+    required this.discussionCount,
+    required this.pageCount,
+    required this.pages,
   });
 
   CompleteUserEntity.fromUserEntity({
@@ -98,6 +105,13 @@ class CompleteUserEntity extends UserEntity {
     required this.friendsCount,
     required this.friends,
     required this.posts,
+    required this.discussions,
+    required this.polls,
+    required this.timeline,
+    required this.pollCount,
+    required this.discussionCount,
+    required this.pageCount,
+    required this.pages,
   }) : super(
           userId: user.userId,
           username: user.username,
@@ -111,8 +125,17 @@ class CompleteUserEntity extends UserEntity {
   final DateTime createdOn;
   int postsCount;
   int friendsCount;
+  int discussionCount;
+  int pollCount;
+  int pageCount;
+
   Nodes friends;
   Nodes posts;
+  Nodes discussions;
+  Nodes polls;
+  Nodes pages;
+
+  Nodes timeline;
 
   void updateUserDetails({
     required String bio,
@@ -128,8 +151,20 @@ class CompleteUserEntity extends UserEntity {
     postsCount = newPostCount;
   }
 
+  void updateDiscussionCount(int newDiscussionCount) {
+    discussionCount = newDiscussionCount;
+  }
+
+  void updatePollCount(int newPollCount) {
+    pollCount = newPollCount;
+  }
+
   void updateFriendsCount(int newFriendsCount) {
     friendsCount = newFriendsCount;
+  }
+
+  void updatePagesCount(int newPagesCount) {
+    pageCount = newPagesCount;
   }
 
   CompleteUserEntity updateUserEntityValues(UserEntity user) {
@@ -142,6 +177,13 @@ class CompleteUserEntity extends UserEntity {
       friendsCount: friendsCount,
       friends: friends,
       posts: posts,
+      polls: polls,
+      discussions: discussions,
+      timeline: timeline,
+      discussionCount: discussionCount,
+      pollCount: pollCount,
+      pageCount: pageCount,
+      pages: pages,
     );
   }
 
@@ -157,8 +199,15 @@ class CompleteUserEntity extends UserEntity {
       createdOn: DateTime.parse(map["createdOn"]),
       postsCount: map["postsAggregate"]["count"],
       friendsCount: map["friendsAggregate"]["count"],
+      discussionCount: map["discussionsAggregate"]["count"],
+      pollCount: map["pollsAggregate"]["count"],
       friends: Nodes.empty(),
       posts: Nodes.empty(),
+      discussions: Nodes.empty(),
+      polls: Nodes.empty(),
+      timeline: Nodes.empty(),
+      pageCount: 0,
+      pages: Nodes.empty(),
     );
   }
 }

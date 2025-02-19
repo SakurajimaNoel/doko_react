@@ -193,71 +193,182 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     var currTheme = Theme.of(context).colorScheme;
     final user = graph.getValueByKey(key)! as CompleteUserEntity;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Material(
-          shape: Border(
-            bottom: BorderSide(
-              color: currTheme.primary,
-              width: Constants.sliverBorder * 3,
-            ),
-          ),
-          child: SizedBox(
-            height: double.infinity,
-            child: Row(
-              children: [
-                Icon(
-                  Icons.calendar_view_month,
-                  color: currTheme.primary,
-                ),
-                const SizedBox(
-                  width: Constants.gap * 0.5,
-                ),
-                BlocBuilder<UserActionBloc, UserActionState>(
-                  buildWhen: (previousState, state) {
-                    return (state is UserActionNewPostState &&
-                        state.username == username);
-                  },
-                  builder: (context, state) {
-                    return Text(
-                      "Posts: ${displayNumberFormat(user.postsCount)}",
-                      style: TextStyle(
-                        color: currTheme.primary,
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-        BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
-          buildWhen: (previousState, state) {
-            return (state
-                    is UserToUserActionUpdateUserAcceptedFriendsListState &&
-                (self || state.username == username));
-          },
-          builder: (context, state) {
-            return TextButton.icon(
-              style: TextButton.styleFrom(
-                iconColor: currTheme.secondary,
-                foregroundColor: currTheme.secondary,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Constants.padding,
+      ),
+      scrollDirection: Axis.horizontal,
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Row(
+        spacing: Constants.gap * 1.5,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Material(
+            shape: Border(
+              bottom: BorderSide(
+                color: currTheme.primary,
+                width: Constants.sliverBorder * 3,
               ),
-              onPressed: () {
-                context.pushNamed(
-                  RouterConstants.profileFriends,
-                  pathParameters: {
-                    "username": username,
-                  },
-                );
-              },
-              icon: const Icon(Icons.group),
-              label: Text("Friends: ${displayNumberFormat(user.friendsCount)}"),
-            );
-          },
-        ),
-      ],
+            ),
+            child: SizedBox(
+              height: double.infinity,
+              child: Row(
+                children: [
+                  BlocBuilder<UserActionBloc, UserActionState>(
+                    buildWhen: (previousState, state) {
+                      return (state is UserActionNewPostState &&
+                          state.username == username);
+                    },
+                    builder: (context, state) {
+                      return Text(
+                        "Timeline",
+                        style: TextStyle(
+                          color: currTheme.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // friends
+          BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
+            buildWhen: (previousState, state) {
+              return (state
+                      is UserToUserActionUpdateUserAcceptedFriendsListState &&
+                  (self || state.username == username));
+            },
+            builder: (context, state) {
+              return TextButton.icon(
+                style: TextButton.styleFrom(
+                  iconColor: currTheme.secondary,
+                  foregroundColor: currTheme.secondary,
+                ),
+                onPressed: () {
+                  context.pushNamed(
+                    RouterConstants.profileFriends,
+                    pathParameters: {
+                      "username": username,
+                    },
+                  );
+                },
+                icon: const Icon(Icons.group),
+                label:
+                    Text("Friends: ${displayNumberFormat(user.friendsCount)}"),
+              );
+            },
+          ),
+
+          // pages
+          BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
+            buildWhen: (previousState, state) {
+              return (state
+                      is UserToUserActionUpdateUserAcceptedFriendsListState &&
+                  (self || state.username == username));
+            },
+            builder: (context, state) {
+              return TextButton.icon(
+                style: TextButton.styleFrom(
+                  iconColor: currTheme.secondary,
+                  foregroundColor: currTheme.secondary,
+                ),
+                onPressed: () {
+                  context.pushNamed(
+                    RouterConstants.profileFriends,
+                    pathParameters: {
+                      "username": username,
+                    },
+                  );
+                },
+                icon: const Icon(Icons.pages),
+                label: Text("Pages: ${displayNumberFormat(user.pageCount)}"),
+              );
+            },
+          ),
+          // posts
+          BlocBuilder<UserActionBloc, UserActionState>(
+            buildWhen: (previousState, state) {
+              return (state is UserActionNewPostState &&
+                  state.username == username);
+            },
+            builder: (context, state) {
+              return TextButton.icon(
+                style: TextButton.styleFrom(
+                  iconColor: currTheme.secondary,
+                  foregroundColor: currTheme.secondary,
+                ),
+                onPressed: () {
+                  context.pushNamed(
+                    RouterConstants.profileFriends,
+                    pathParameters: {
+                      "username": username,
+                    },
+                  );
+                },
+                icon: const Icon(Icons.calendar_view_month),
+                label: Text(
+                  "Posts: ${displayNumberFormat(user.postsCount)}",
+                ),
+              );
+            },
+          ),
+          // discussions
+          BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
+            buildWhen: (previousState, state) {
+              return (state
+                      is UserToUserActionUpdateUserAcceptedFriendsListState &&
+                  (self || state.username == username));
+            },
+            builder: (context, state) {
+              return TextButton.icon(
+                style: TextButton.styleFrom(
+                  iconColor: currTheme.secondary,
+                  foregroundColor: currTheme.secondary,
+                ),
+                onPressed: () {
+                  context.pushNamed(
+                    RouterConstants.profileFriends,
+                    pathParameters: {
+                      "username": username,
+                    },
+                  );
+                },
+                icon: const Icon(Icons.text_snippet),
+                label: Text(
+                    "Discussions: ${displayNumberFormat(user.discussionCount)}"),
+              );
+            },
+          ),
+          // polls
+          BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
+            buildWhen: (previousState, state) {
+              return (state
+                      is UserToUserActionUpdateUserAcceptedFriendsListState &&
+                  (self || state.username == username));
+            },
+            builder: (context, state) {
+              return TextButton.icon(
+                style: TextButton.styleFrom(
+                  iconColor: currTheme.secondary,
+                  foregroundColor: currTheme.secondary,
+                ),
+                onPressed: () {
+                  context.pushNamed(
+                    RouterConstants.profileFriends,
+                    pathParameters: {
+                      "username": username,
+                    },
+                  );
+                },
+                icon: const Icon(Icons.poll),
+                label: Text("Polls: ${displayNumberFormat(user.pollCount)}"),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 

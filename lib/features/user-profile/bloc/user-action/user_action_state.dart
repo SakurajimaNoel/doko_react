@@ -8,6 +8,16 @@ final class UserActionInitial extends UserActionState {
   List<Object?> get props => [];
 }
 
+// this is used for timeline render
+final class UserActionNewContentState extends UserActionState {
+  UserActionNewContentState({required this.nodeId});
+
+  final String nodeId;
+
+  @override
+  List<Object?> get props => [nodeId];
+}
+
 // more post action
 class UserActionLoadPosts extends UserActionState {
   UserActionLoadPosts({

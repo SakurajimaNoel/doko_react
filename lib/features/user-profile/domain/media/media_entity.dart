@@ -1,7 +1,9 @@
-part of 'post_entity.dart';
+import 'package:doko_react/core/global/cache/cache.dart';
+import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
+import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 
-class PostContentEntity {
-  const PostContentEntity({
+class MediaEntity {
+  const MediaEntity({
     required this.mediaType,
     required this.resource,
   });
@@ -9,14 +11,14 @@ class PostContentEntity {
   final MediaTypeValue mediaType;
   final StorageResource resource;
 
-  static Future<PostContentEntity> createEntity(String bucketPath) async {
+  static Future<MediaEntity> createEntity(String bucketPath) async {
     final MediaTypeValue mediaType = getMediaTypeFromPath(bucketPath);
 
     if (mediaType == MediaTypeValue.video) {
       // check cache if present and return
       String? cachedPath = await getFileFromCache(bucketPath);
       if (cachedPath != null) {
-        return PostContentEntity(
+        return MediaEntity(
           mediaType: mediaType,
           resource: StorageResource.forGeneralResource(
             bucketPath: bucketPath,
@@ -28,7 +30,7 @@ class PostContentEntity {
 
     final StorageResource resource =
         await StorageResource.createStorageResource(bucketPath);
-    return PostContentEntity(
+    return MediaEntity(
       mediaType: mediaType,
       resource: resource,
     );

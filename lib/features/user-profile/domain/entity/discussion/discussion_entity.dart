@@ -4,25 +4,27 @@ import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.
 import 'package:doko_react/features/user-profile/domain/media/media_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 
-class PostEntity implements NodeWithCommentEntity {
-  PostEntity({
+class DiscussionEntity implements NodeWithCommentEntity {
+  DiscussionEntity({
     required this.id,
-    required this.caption,
+    required this.title,
     required this.createdOn,
-    required this.content,
     required this.createdBy,
-    required this.comments,
+    required this.media,
+    required this.text,
     required this.likesCount,
     required this.commentsCount,
+    required this.comments,
     required this.userLike,
     required this.usersTagged,
   });
 
   final String id;
-  final String caption;
+  final String title;
   final DateTime createdOn;
-  final List<MediaEntity> content;
-  final String createdBy; // reference to user key user:username
+  final String createdBy;
+  final List<MediaEntity> media;
+  final String text;
   final List<String> usersTagged;
 
   int likesCount;
@@ -34,9 +36,6 @@ class PostEntity implements NodeWithCommentEntity {
   void updateDisplayItem(int item) {
     currDisplay = item;
   }
-
-  @override
-  Nodes get nodeComments => comments;
 
   void updateUserLikeStatus(bool userLike) {
     this.userLike = userLike;
@@ -50,13 +49,10 @@ class PostEntity implements NodeWithCommentEntity {
     commentsCount = newCommentsCount;
   }
 
-  /// create different methods when user is already present in user graph
-  /// and when user is not present
-  static Future<PostEntity> createEntity({required Map map}) async {
-    /// check if user:username exists in map
-    /// if not add the user to map and save reference
-    /// when fetching post for user profile user will always
-    /// be there so no need to get user info in every post item
+  @override
+  Nodes get nodeComments => comments;
+
+  static Future<DiscussionEntity> createEntity({required Map map}) async {
     final String createdByUsername = map["createdBy"]["username"];
     String key = generateUserNodeKey(createdByUsername);
 
@@ -89,17 +85,18 @@ class PostEntity implements NodeWithCommentEntity {
       }
     }
 
-    return PostEntity(
+    return DiscussionEntity(
       id: map["id"],
-      caption: map["caption"],
       createdOn: DateTime.parse(map["createdOn"]),
-      content: mediaContent,
+      media: mediaContent,
       createdBy: key,
       comments: Nodes.empty(),
       likesCount: map["likedByConnection"]["totalCount"],
       commentsCount: map["commentsConnection"]["totalCount"],
       userLike: userLike,
       usersTagged: usersTagged,
+      title: map["title"],
+      text: map["text"],
     );
   }
 }

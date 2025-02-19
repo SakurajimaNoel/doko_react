@@ -100,6 +100,12 @@ class GraphqlQueries {
           friendsAggregate(where: \$friendsAggregateWhere2) {
             count
           }
+          pollsAggregate {
+            count
+          }
+          discussionsAggregate {
+            count
+          }
           friendsConnection(where: \$friendsConnectionWhere2) {
             edges {
               properties {

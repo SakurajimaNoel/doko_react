@@ -22,3 +22,11 @@ class CreateCommentEvent extends NodeCreateEvent {
   final Client? client;
   final UserCreateSecondaryNode remotePayload;
 }
+
+class DiscussionCreateEvent extends NodeCreateEvent {
+  DiscussionCreateEvent({
+    required this.discussionDetails,
+  });
+
+  final DiscussionCreateInput discussionDetails;
+}

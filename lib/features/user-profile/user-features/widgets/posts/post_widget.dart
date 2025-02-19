@@ -14,6 +14,7 @@ import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/core/widgets/video-player/video_player.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
+import 'package:doko_react/features/user-profile/domain/media/media_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/node_comment_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/provider/post_carousel_indicator_provider.dart';
@@ -234,7 +235,7 @@ class PostContent extends StatefulWidget {
     required this.postId,
   }) : preview = true;
 
-  final List<PostContentEntity> content;
+  final List<MediaEntity> content;
   final bool preview;
   final String postId;
 
@@ -279,7 +280,7 @@ class _PostContentState extends State<PostContent> {
     super.dispose();
   }
 
-  Widget imageContent(PostContentEntity image) {
+  Widget imageContent(MediaEntity image) {
     return CachedNetworkImage(
       cacheKey: image.resource.bucketPath,
       fit: BoxFit.cover,
@@ -293,13 +294,13 @@ class _PostContentState extends State<PostContent> {
     );
   }
 
-  Widget unknownContent(PostContentEntity item) {
+  Widget unknownContent(MediaEntity item) {
     return const Center(
       child: StyledText.error(Constants.errorMessage),
     );
   }
 
-  Widget videoContent(PostContentEntity video) {
+  Widget videoContent(MediaEntity video) {
     return VideoPlayer(
       path: video.resource.accessURI,
       bucketPath: video.resource.bucketPath,

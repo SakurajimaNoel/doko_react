@@ -6,10 +6,12 @@ import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -124,11 +126,108 @@ class UserGraph {
     addEntity(postKey, newPost);
 
     final user = getValueByKey(key)!;
-    if (user is! CompleteUserEntity) return;
+    if (user is CompleteUserEntity) {
+      // update user
+      user.updatePostCount(user.postsCount + 1);
+      user.posts.addItem(postKey);
 
-    // update user
-    user.updatePostCount(user.postsCount + 1);
-    user.posts.addItem(postKey);
+      user.timeline.addItem(postKey);
+    }
+
+    addPostToTaggedUser(
+      newPost.usersTagged,
+      postKey: postKey,
+    );
+  }
+
+  void addPostToTaggedUser(
+    List<String> usersTagged, {
+    required String postKey,
+  }) {
+    // add to tagged user timeline
+    for (String username in usersTagged) {
+      String userKey = generateUserNodeKey(username);
+      final userEntity = getValueByKey(userKey);
+
+      if (userEntity is CompleteUserEntity) {
+        userEntity.timeline.addItem(postKey);
+      }
+    }
+  }
+
+  // add  new discussion
+  void addDiscussionEntityToUser(
+      String username, DiscussionEntity newDiscussion) {
+    String key = generateUserNodeKey(username);
+
+    String discussionKey = generateDiscussionNodeKey(newDiscussion.id);
+    addEntity(discussionKey, newDiscussion);
+
+    final user = getValueByKey(key)!;
+    if (user is CompleteUserEntity) {
+      // update user
+      user.updateDiscussionCount(user.discussionCount + 1);
+      user.discussions.addItem(discussionKey);
+
+      user.timeline.addItem(discussionKey);
+    }
+
+    addDiscussionToTaggedUser(
+      newDiscussion.usersTagged,
+      discussionKey: discussionKey,
+    );
+  }
+
+  void addDiscussionToTaggedUser(
+    List<String> usersTagged, {
+    required String discussionKey,
+  }) {
+    // add to tagged user timeline
+    for (String username in usersTagged) {
+      String userKey = generateUserNodeKey(username);
+      final userEntity = getValueByKey(userKey);
+
+      if (userEntity is CompleteUserEntity) {
+        userEntity.timeline.addItem(discussionKey);
+      }
+    }
+  }
+
+  // add  new poll
+  void addPollEntityToUser(String username, PollEntity newPoll) {
+    String key = generateUserNodeKey(username);
+
+    String pollKey = generatePollNodeKey(newPoll.id);
+    addEntity(pollKey, newPoll);
+
+    final user = getValueByKey(key)!;
+    if (user is CompleteUserEntity) {
+      // update user
+      user.updatePollCount(user.pollCount + 1);
+      user.polls.addItem(pollKey);
+
+      user.timeline.addItem(pollKey);
+    }
+
+    addPollToTaggedUser(
+      newPoll.usersTagged,
+      pollKey: pollKey,
+    );
+  }
+
+  void addPollToTaggedUser(
+    List<String> usersTagged, {
+    required String pollKey,
+  }) {
+    // add to tagged user timeline
+    for (String username in usersTagged) {
+      String userKey = generateUserNodeKey(username);
+      final userEntity = getValueByKey(userKey);
+
+      if (userEntity is CompleteUserEntity) {
+        userEntity.timeline.addItem(pollKey);
+      }
+    }
   }
 
   /// adding friends to user

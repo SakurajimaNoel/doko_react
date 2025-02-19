@@ -246,6 +246,8 @@ class ProfileRemoteDataSource {
 
       return true;
     } catch (e) {
+      print("error here");
+      print(e);
       rethrow;
     }
   }
