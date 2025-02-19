@@ -422,6 +422,120 @@ class GraphqlQueries {
     };
   }
 
+  // get user discussion
+  static String getUserDiscussionsByUsername(String cursor) {
+    if (cursor.isEmpty) {
+      return """
+      query DiscussionsConnection(\$sort: [DiscussionSort!], \$where: DiscussionWhere, \$likedByWhere2: UserWhere, \$first: Int) {
+        discussionsConnection(sort: \$sort, where: \$where, first: \$first) {
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
+          edges {
+            node {
+              id
+              createdOn
+              title
+              text
+              media
+              createdBy {
+                username
+              }
+              likedBy(where: \$likedByWhere2) {
+                username
+              }
+              likedByConnection {
+                totalCount
+              }
+              commentsConnection {
+                totalCount
+              }
+              usersTagged {
+                username
+              }
+            }
+          }
+        }
+      }
+      """;
+    }
+
+    return """
+    query DiscussionsConnection(\$sort: [DiscussionSort!], \$where: DiscussionWhere, \$likedByWhere2: UserWhere, \$first: Int, \$after: String) {
+      discussionsConnection(sort: \$sort, where: \$where, first: \$first, after: \$after) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        edges {
+          node {
+            id
+            createdOn
+            title
+            text
+            media
+            createdBy {
+              username
+            }
+            likedBy(where: \$likedByWhere2) {
+              username
+            }
+            likedByConnection {
+              totalCount
+            }
+            commentsConnection {
+              totalCount
+            }
+            usersTagged {
+              username
+            }
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> getUserDiscussionsByUsernameVariables({
+    required String username,
+    required String cursor,
+    required String currentUsername,
+  }) {
+    if (cursor.isEmpty) {
+      return {
+        "sort": [
+          {"createdOn": "DESC"}
+        ],
+        "where": {
+          "createdBy": {
+            "username_EQ": username,
+          }
+        },
+        "likedByWhere2": {
+          "username_EQ": currentUsername,
+        },
+        "first": GraphqlConstants.nodeLimit,
+      };
+    }
+
+    return {
+      "sort": [
+        {"createdOn": "DESC"}
+      ],
+      "where": {
+        "createdBy": {
+          "username_EQ": username,
+        }
+      },
+      "likedByWhere2": {
+        "username_EQ": currentUsername,
+      },
+      "first": GraphqlConstants.nodeLimit,
+      "after": cursor,
+    };
+  }
+
 // get user pending friends outgoing
   static String getPendingOutgoingFriendsByUsername(String? cursor) {
     if (cursor == null || cursor.isEmpty) {
@@ -824,7 +938,7 @@ class GraphqlQueries {
   // post by id
   static String getCompletePostById() {
     return """
-     query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$first: Int, \$likedByWhere3: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
+     query Posts(\$where: PostWhere, \$likedByWhere2: UserWhere, \$first: Int, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
       posts(where: \$where) {
         id
         createdOn
@@ -869,7 +983,7 @@ class GraphqlQueries {
               mentions {
                 username
               }
-              likedBy(where: \$likedByWhere3) {
+              likedBy(where: \$likedByWhere2) {
                 username
               }
               likedByConnection {
@@ -883,7 +997,7 @@ class GraphqlQueries {
                 username
                 profilePicture
                 name
-                friendsConnection(where: \$friendsConnectionWhere3) {
+                friendsConnection(where: \$friendsConnectionWhere2) {
                   edges {
                     properties {
                       addedOn
@@ -912,16 +1026,8 @@ class GraphqlQueries {
       "likedByWhere2": {
         "username_EQ": username,
       },
-      "first": GraphqlConstants.commentLimit,
-      "likedByWhere3": {
-        "username_EQ": username,
-      },
+      "first": GraphqlConstants.nodeLimit,
       "friendsConnectionWhere2": {
-        "node": {
-          "username_EQ": username,
-        }
-      },
-      "friendsConnectionWhere3": {
         "node": {
           "username_EQ": username,
         }
@@ -1046,7 +1152,7 @@ class GraphqlQueries {
 
     if (cursor == null || cursor.isEmpty) {
       return {
-        "first": GraphqlConstants.commentLimit,
+        "first": GraphqlConstants.nodeLimit,
         "where": {
           "commentOn": {
             connectionNode: {
@@ -1071,7 +1177,7 @@ class GraphqlQueries {
     }
 
     return {
-      "first": GraphqlConstants.commentLimit,
+      "first": GraphqlConstants.nodeLimit,
       "where": {
         "commentOn": {
           connectionNode: {
@@ -1321,7 +1427,7 @@ class GraphqlQueries {
           "username_EQ": username,
         }
       },
-      "first": GraphqlConstants.commentLimit,
+      "first": GraphqlConstants.nodeLimit,
       "sort": [
         {
           "node": {
@@ -1329,6 +1435,166 @@ class GraphqlQueries {
           }
         }
       ],
+    };
+  }
+
+  // get discussion by id
+  static String getCompleteDiscussionById() {
+    return """
+    query Discussions(\$where: DiscussionWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$likedByWhere2: UserWhere, \$first: Int) {
+      discussions(where: \$where) {
+        id
+        createdOn
+        title
+        text
+        createdBy {
+          id
+          username
+          name
+          profilePicture
+          friendsConnection(where: \$friendsConnectionWhere2) {
+            edges {
+              properties {
+                addedOn
+                requestedBy
+                status
+              }
+            }
+          }
+        }
+        likedByConnection {
+          totalCount
+        }
+        usersTagged {
+          username
+        }
+        commentsConnection(first: \$first) {
+          totalCount
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
+          edges {
+            node {
+              id
+              createdOn
+              media
+              content
+              mentions {
+                username
+              }
+              likedBy(where: \$likedByWhere2) {
+                username
+              }
+              likedByConnection {
+                totalCount
+              }
+              commentByConnection {
+                totalCount
+              }
+              commentBy {
+                id
+                name
+                username
+                profilePicture
+                friendsConnection(where: \$friendsConnectionWhere2) {
+                  edges {
+                    properties {
+                      addedOn
+                      requestedBy
+                      status
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        likedBy(where: \$likedByWhere2) {
+          username
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> getCompleteDiscussionByIdVariables({
+    required String discussionId,
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": discussionId,
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "first": GraphqlConstants.nodeLimit,
+    };
+  }
+
+  // discussion in user inbox
+  static String getDiscussionById() {
+    return """
+    query Discussions(\$where: DiscussionWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$likedByWhere2: UserWhere) {
+      discussions(where: \$where) {
+        id
+        createdOn
+        title
+        text
+        createdBy {
+          id
+          username
+          name
+          profilePicture
+          friendsConnection(where: \$friendsConnectionWhere2) {
+            edges {
+              properties {
+                addedOn
+                requestedBy
+                status
+              }
+            }
+          }
+        }
+        likedByConnection {
+          totalCount
+        }
+        usersTagged {
+          username
+        }
+        commentsConnection {
+          totalCount
+        }
+        likedBy(where: \$likedByWhere2) {
+          username
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> getDiscussionByIdVariables({
+    required String discussionId,
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": discussionId,
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      }
     };
   }
 }
