@@ -49,7 +49,7 @@ class _CommentListState extends State<CommentList> {
   }
 
   Widget buildCommentItems(BuildContext context, int index) {
-    final Nodes comments = parentNode.nodeComments;
+    final Nodes comments = parentNode.comments;
 
     if (index >= comments.items.length) {
       if (!comments.pageInfo.hasNextPage) {
@@ -104,7 +104,7 @@ class _CommentListState extends State<CommentList> {
             state.nodeId == parentNodeId;
       },
       builder: (context, state) {
-        bool isEmpty = parentNode.nodeComments.items.isEmpty;
+        bool isEmpty = parentNode.comments.items.isEmpty;
 
         if (isEmpty) {
           return const SliverToBoxAdapter(
@@ -130,7 +130,7 @@ class _CommentListState extends State<CommentList> {
           },
           builder: (context, state) {
             return SliverList.separated(
-              itemCount: parentNode.nodeComments.items.length + 1,
+              itemCount: parentNode.comments.items.length + 1,
               itemBuilder: buildCommentItems,
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(

@@ -1,12 +1,17 @@
+import 'package:doki_websocket_client/doki_websocket_client.dart';
+import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/share/share.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class DiscussionWidget extends StatelessWidget {
   const DiscussionWidget({
@@ -29,6 +34,9 @@ class DiscussionWidget extends StatelessWidget {
             discussionId: getDiscussionIdFromDiscussionKey(discussionKey),
           ));
     }
+
+    String currentRoute = GoRouter.of(context).currentRouteName ?? "";
+    bool isDiscussionPage = currentRoute == RouterConstants.userDiscussion;
 
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
@@ -82,11 +90,34 @@ class DiscussionWidget extends StatelessWidget {
         final DiscussionEntity discussion =
             graph.getValueByKey(discussionKey)! as DiscussionEntity;
 
-        return Container(
+        return Material(
           color: Colors.blue,
-          height: Constants.height * 15,
-          child: Center(
-            child: Text(discussion.title),
+          child: InkWell(
+            onTap: isDiscussionPage
+                ? null
+                : () {
+                    context.pushNamed(
+                      RouterConstants.userDiscussion,
+                      pathParameters: {
+                        "discussionId": discussion.id,
+                      },
+                    );
+                  },
+            onLongPress: isDiscussionPage
+                ? null
+                : () {
+                    Share.share(
+                      context: context,
+                      subject: MessageSubject.dokiDiscussion,
+                      nodeIdentifier: discussion.id,
+                    );
+                  },
+            child: SizedBox(
+              height: Constants.height * 15,
+              child: Center(
+                child: Text(discussion.title),
+              ),
+            ),
           ),
         );
       },

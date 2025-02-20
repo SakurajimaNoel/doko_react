@@ -4,6 +4,7 @@ import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
@@ -61,8 +62,8 @@ class PostRemoteDataSource {
           .toList();
 
       List<CommentEntity> comments = await Future.wait(commentFutures);
-      graph.addCommentListToPostEntity(
-        details.nodeId,
+      graph.addCommentListToPrimaryNode(
+        generatePostNodeKey(details.nodeId),
         comments: comments,
         pageInfo: info,
       );
@@ -117,21 +118,12 @@ class PostRemoteDataSource {
           .toList();
 
       List<CommentEntity> comments = await Future.wait(commentFutures);
-      if (details.nodeType == DokiNodeType.post) {
-        graph.addCommentListToPostEntity(
-          details.nodeId,
-          comments: comments,
-          pageInfo: info,
-        );
-      }
 
-      if (details.nodeType == DokiNodeType.comment) {
-        graph.addCommentListToReply(
-          details.nodeId,
-          comments: comments,
-          pageInfo: info,
-        );
-      }
+      graph.addCommentListToPrimaryNode(
+        details.nodeType.keyGenerator(details.nodeId),
+        comments: comments,
+        pageInfo: info,
+      );
 
       return true;
     } catch (e) {
@@ -184,12 +176,125 @@ class PostRemoteDataSource {
           .toList();
 
       List<CommentEntity> replies = await Future.wait(repliesFuture);
-
-      graph.addCommentListToReply(
-        details.nodeId,
+      graph.addCommentListToPrimaryNode(
+        generateCommentNodeKey(details.nodeId),
         comments: replies,
         pageInfo: info,
       );
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getDiscussionWithComments(GetNodeInput details) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.getCompleteDiscussionById()),
+          variables: GraphqlQueries.getCompleteDiscussionByIdVariables(
+            discussionId: details.nodeId,
+            username: details.username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(
+          reason: "Problem loading discussion.",
+        );
+      }
+      List? res = result.data?["posts"];
+
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: "Discussion doesn't exist.",
+        );
+      }
+
+      DiscussionEntity discussion =
+          await DiscussionEntity.createEntity(map: res[0]);
+      String discussionKey = generateDiscussionNodeKey(discussion.id);
+      graph.addEntity(discussionKey, discussion);
+
+      Map commentData = res[0]["commentsConnection"];
+
+      PageInfo info = PageInfo.createEntity(map: commentData["pageInfo"]);
+      List commentList = commentData["edges"];
+
+      var commentFutures = (commentList)
+          .map(
+            (comment) => CommentEntity.createEntity(
+              map: comment["node"],
+            ),
+          )
+          .toList();
+
+      List<CommentEntity> comments = await Future.wait(commentFutures);
+      graph.addCommentListToPrimaryNode(
+        generateDiscussionNodeKey(details.nodeId),
+        comments: comments,
+        pageInfo: info,
+      );
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getPollWithComments(GetNodeInput details) async {
+    try {
+      return true;
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.getCompletePostById()),
+          variables: GraphqlQueries.getCompletePostByIdVariables(
+            details.nodeId,
+            username: details.username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(
+          reason: "Problem loading post.",
+        );
+      }
+      List? res = result.data?["posts"];
+
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: "Post doesn't exist.",
+        );
+      }
+
+      PostEntity post = await PostEntity.createEntity(map: res[0]);
+      String postKey = generatePostNodeKey(post.id);
+      graph.addEntity(postKey, post);
+
+      Map commentData = res[0]["commentsConnection"];
+
+      PageInfo info = PageInfo.createEntity(map: commentData["pageInfo"]);
+      List commentList = commentData["edges"];
+
+      var commentFutures = (commentList)
+          .map(
+            (comment) => CommentEntity.createEntity(
+              map: comment["node"],
+            ),
+          )
+          .toList();
+
+      List<CommentEntity> comments = await Future.wait(commentFutures);
+      // graph.addCommentListToPostEntity(
+      //   details.nodeId,
+      //   comments: comments,
+      //   pageInfo: info,
+      // );
 
       return true;
     } catch (e) {

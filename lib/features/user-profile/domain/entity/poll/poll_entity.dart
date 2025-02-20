@@ -21,8 +21,10 @@ class PollEntity implements NodeWithCommentEntity {
   final List<String> usersTagged;
 
   int likesCount;
+  @override
   int commentsCount;
   bool userLike;
+  @override
   Nodes comments;
 
   void updateUserLikeStatus(bool userLike) {
@@ -33,12 +35,10 @@ class PollEntity implements NodeWithCommentEntity {
     this.likesCount = likesCount;
   }
 
+  @override
   void updateCommentsCount(int newCommentsCount) {
     commentsCount = newCommentsCount;
   }
-
-  @override
-  Nodes get nodeComments => comments;
 
   static Future<PollEntity> createEntity({required Map map}) async {
     final String createdByUsername = map["createdBy"]["username"];

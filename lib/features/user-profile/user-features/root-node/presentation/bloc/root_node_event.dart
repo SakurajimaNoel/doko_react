@@ -30,6 +30,14 @@ class DiscussionLoadEvent extends RootNodeEvent {
   final GetNodeInput details;
 }
 
+class PollLoadEvent extends RootNodeEvent {
+  PollLoadEvent({
+    required this.details,
+  });
+
+  final GetNodeInput details;
+}
+
 /// secondary nodes load event used when initially fetching the nodes
 class SecondaryNodeLoadEvent extends RootNodeEvent {
   SecondaryNodeLoadEvent({
@@ -61,6 +69,12 @@ class CommentRefreshEvent extends RootNodeEvent {
 
 class DiscussionRefreshEvent extends RootNodeEvent {
   DiscussionRefreshEvent({required this.details});
+
+  final GetNodeInput details;
+}
+
+class PollRefreshEvent extends RootNodeEvent {
+  PollRefreshEvent({required this.details});
 
   final GetNodeInput details;
 }

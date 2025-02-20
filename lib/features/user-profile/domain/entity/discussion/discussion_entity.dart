@@ -28,8 +28,11 @@ class DiscussionEntity implements NodeWithMediaItems {
   final List<String> usersTagged;
 
   int likesCount;
+  @override
   int commentsCount;
   bool userLike;
+
+  @override
   Nodes comments;
 
   @override
@@ -48,12 +51,10 @@ class DiscussionEntity implements NodeWithMediaItems {
     this.likesCount = likesCount;
   }
 
+  @override
   void updateCommentsCount(int newCommentsCount) {
     commentsCount = newCommentsCount;
   }
-
-  @override
-  Nodes get nodeComments => comments;
 
   static Future<DiscussionEntity> createEntity({required Map map}) async {
     final String createdByUsername = map["createdBy"]["username"];

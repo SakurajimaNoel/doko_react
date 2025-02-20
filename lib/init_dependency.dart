@@ -64,6 +64,8 @@ import "package:doko_react/features/user-profile/user-features/root-node/data/re
 import "package:doko_react/features/user-profile/user-features/root-node/domain/repository/root_node_repository.dart";
 import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/comments-use-case/comments_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/comments-use-case/comments_with_replies_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/discussion-use-case/discussion_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/poll-use-case/poll_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/post-use-case/post_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/root-node/presentation/bloc/root_node_bloc.dart";
 import "package:flutter/foundation.dart";
@@ -129,6 +131,18 @@ void _initPost() {
     ),
   );
 
+  serviceLocator.registerFactory<DiscussionUseCase>(
+    () => DiscussionUseCase(
+      rootNodeRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<PollUseCase>(
+    () => PollUseCase(
+      rootNodeRepository: serviceLocator(),
+    ),
+  );
+
   serviceLocator.registerFactory<CommentsWithRepliesUseCase>(
     () => CommentsWithRepliesUseCase(
       rootNodeRepository: serviceLocator(),
@@ -138,6 +152,8 @@ void _initPost() {
   serviceLocator.registerFactory<RootNodeBloc>(
     () => RootNodeBloc(
       postUseCase: serviceLocator(),
+      pollUseCase: serviceLocator(),
+      discussionUseCase: serviceLocator(),
       commentsUseCase: serviceLocator(),
       commentsWithRepliesUseCase: serviceLocator(),
     ),

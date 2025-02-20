@@ -38,6 +38,7 @@ import 'package:doko_react/features/user-profile/user-features/profile/presentat
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/profile/user_profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/search/search_page.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/pages/comment/comment_page.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/pages/discussion/discussion_page.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/pages/post/post_page.dart';
 import 'package:doko_react/features/user-profile/user-features/user-feed/user_feed_page.dart';
 import 'package:doko_react/features/user-profile/user_layout.dart';
@@ -384,6 +385,19 @@ class AppRouterConfig {
 
                       return PostPage(
                         postId: postId,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: RouterConstants.userDiscussion,
+                    path: "discussion/:discussionId",
+                    builder: (context, state) {
+                      String discussionId =
+                          state.pathParameters["discussionId"]!;
+
+                      return DiscussionPage(
+                        discussionId: discussionId,
                       );
                     },
                   ),

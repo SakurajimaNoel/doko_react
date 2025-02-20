@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:doki_websocket_client/doki_websocket_client.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -125,24 +126,16 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     /// update graph
     /// need to update post and comment based on parent
     /// if parents.first is post update post if comment update comment
-    final parentNodeType = event.payload.parents.first.nodeType;
+    final parentNodeType =
+        DokiNodeType.fromNodeType(event.payload.parents.first.nodeType);
     final parentNodeId = event.payload.parents.first.nodeId;
 
     final nodeId = event.payload.nodeId;
 
-    if (parentNodeType == NodeType.post) {
-      graph.addCommentIdToPostEntity(
-        parentNodeId,
-        commentId: nodeId,
-      );
-    }
-
-    if (parentNodeType == NodeType.comment) {
-      graph.addReplyIdToCommentEntity(
-        parentNodeId,
-        replyId: nodeId,
-      );
-    }
+    graph.addCommentIdToPrimaryNode(
+      parentNodeType.keyGenerator(parentNodeId),
+      commentId: nodeId,
+    );
 
     emit(UserActionNodeActionState(
       nodeId: event.payload.parents.first.nodeId,

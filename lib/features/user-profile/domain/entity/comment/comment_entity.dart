@@ -19,7 +19,6 @@ class CommentEntity implements NodeWithCommentEntity {
     required this.likesCount,
     required this.commentsCount,
     required this.userLike,
-    required this.showReplies,
     required this.replyOn,
   });
 
@@ -31,17 +30,14 @@ class CommentEntity implements NodeWithCommentEntity {
   final List<String> mentions;
   final String? replyOn;
   int likesCount;
+  @override
   int commentsCount;
   bool userLike;
+  @override
   Nodes comments;
-
-  bool showReplies;
 
   /// used in comment page to move to particular reply
   int? index;
-
-  @override
-  Nodes get nodeComments => comments;
 
   void updateUserLikeStatus(bool userLike) {
     this.userLike = userLike;
@@ -51,6 +47,7 @@ class CommentEntity implements NodeWithCommentEntity {
     this.likesCount = likesCount;
   }
 
+  @override
   void updateCommentsCount(int newCommentsCount) {
     commentsCount = newCommentsCount;
   }
@@ -112,7 +109,6 @@ class CommentEntity implements NodeWithCommentEntity {
       userLike: userLike,
       commentsCount: map["commentsConnection"]["totalCount"],
       comments: Nodes.empty(),
-      showReplies: false,
       replyOn: replyOn,
     );
   }

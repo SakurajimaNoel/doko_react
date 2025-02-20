@@ -26,8 +26,12 @@ class PostEntity implements NodeWithMediaItems {
   final List<String> usersTagged;
 
   int likesCount;
+
+  @override
   int commentsCount;
   bool userLike;
+
+  @override
   Nodes comments;
 
   @override
@@ -38,8 +42,8 @@ class PostEntity implements NodeWithMediaItems {
     currDisplay = item;
   }
 
-  @override
-  Nodes get nodeComments => comments;
+  // @override
+  // Nodes get nodeComments => comments;
 
   void updateUserLikeStatus(bool userLike) {
     this.userLike = userLike;
@@ -49,6 +53,7 @@ class PostEntity implements NodeWithMediaItems {
     this.likesCount = likesCount;
   }
 
+  @override
   void updateCommentsCount(int newCommentsCount) {
     commentsCount = newCommentsCount;
   }
