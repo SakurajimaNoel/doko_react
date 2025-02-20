@@ -83,11 +83,10 @@ class GraphqlQueries {
     };
   }
 
-  /// todo update this
   static String getCompleteUser() {
     return '''
-      query Users(\$where: UserWhere, \$friendsAggregateWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$limit: Int, \$first: Int, \$postsConnectionWhere2: PostWhere, \$sort: [PostSort!], \$likedByWhere2: UserWhere) {
-        users(where: \$where, limit: \$limit) {
+      query Users(\$where: UserWhere, \$friendsAggregateWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [ContentSort!], \$contentsConnectionWhere2: ContentWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$likedByWhere2: UserWhere) {
+        users(where: \$where) {
           id
           username
           name
@@ -98,13 +97,13 @@ class GraphqlQueries {
           postsAggregate {
             count
           }
-          friendsAggregate(where: \$friendsAggregateWhere2) {
+          discussionsAggregate {
             count
           }
           pollsAggregate {
             count
           }
-          discussionsAggregate {
+          friendsAggregate(where: \$friendsAggregateWhere2) {
             count
           }
           friendsConnection(where: \$friendsConnectionWhere2) {
@@ -117,28 +116,58 @@ class GraphqlQueries {
             }
           }
         }
-        postsConnection(first: \$first, where: \$postsConnectionWhere2, sort: \$sort) {
+        contentsConnection(first: \$first, sort: \$sort, where: \$contentsConnectionWhere2) {
           pageInfo {
-            endCursor
             hasNextPage
+            endCursor
           }
           edges {
             node {
+              __typename
               id
               createdOn
-              content
-              caption
               createdBy {
+                id
+                username
+                name
+                profilePicture
+                friendsConnection(where: \$friendsConnectionWhere3) {
+                  edges {
+                    properties {
+                      addedOn
+                      requestedBy
+                      status
+                    }
+                  }
+                }
+              }
+              likedBy(where: \$likedByWhere2) {
                 username
               }
-              commentsConnection {
-                totalCount
+              usersTagged {
+                username
               }
               likedByConnection {
                 totalCount
               }
-              likedBy(where: \$likedByWhere2) {
-                username
+              commentsConnection {
+                totalCount
+              }
+              ... on Post {
+                content
+                caption
+              }
+              ... on Discussion {
+                title
+                text
+                media
+              }
+              ... on Poll {
+                title
+                options
+                votesAggregate {
+                  count
+                }
               }
             }
           }
@@ -168,19 +197,133 @@ class GraphqlQueries {
         }
       },
       "first": GraphqlConstants.nodeLimit,
-      "postsConnectionWhere2": {
-        "createdBy": {
-          "username_EQ": username,
+      "sort": [
+        {"createdOn": "DESC"}
+      ],
+      "contentsConnectionWhere2": {
+        "OR": [
+          {
+            "createdBy": {
+              "username_EQ": username,
+            },
+          },
+          {
+            "usersTagged_SOME": {
+              "username_EQ": username,
+            },
+          }
+        ]
+      },
+      "friendsConnectionWhere3": {
+        "node": {
+          "username_EQ": currentUsername,
         }
       },
+      "likedByWhere2": {
+        "username_EQ": currentUsername,
+      }
+    };
+  }
+
+  // get more timeline nodes
+  static String getUserTimelineNodes() {
+    return """
+    query ContentsConnection(\$first: Int, \$after: String, \$sort: [ContentSort!], \$where: ContentWhere, \$likedByWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+      contentsConnection(first: \$first, after: \$after, sort: \$sort, where: \$where) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        edges {
+          node {
+            __typename
+            id
+            createdOn
+            commentsConnection {
+              totalCount
+            }
+            likedByConnection {
+              totalCount
+            }
+            usersTagged {
+              username
+            }
+            likedBy(where: \$likedByWhere2) {
+              username
+            }
+            createdBy {
+              id
+              username
+              name
+              profilePicture
+              friendsConnection(where: \$friendsConnectionWhere2) {
+                edges {
+                  properties {
+                    addedOn
+                    requestedBy
+                    status
+                  }
+                }
+              }
+            }
+            ... on Discussion {
+              media
+              text
+              title
+            }
+            ... on Poll {
+              title
+              options
+              votesAggregate {
+                count
+              }
+            }
+            ... on Post {
+              caption
+              content
+            }
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> getUserTimelineNodesVariables({
+    required String cursor,
+    required String username,
+    required String currentUsername,
+  }) {
+    return {
+      "first": GraphqlConstants.nodeLimit,
+      "after": cursor,
       "sort": [
         {
           "createdOn": "DESC",
         }
       ],
-      "likedByWhere2": {
-        "username_EQ": currentUsername,
+      "where": {
+        "OR": [
+          {
+            "createdBy": {
+              "username_EQ": username,
+            },
+          },
+          {
+            "usersTagged_SOME": {
+              "username_EQ": username,
+            },
+          }
+        ]
       },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      }
     };
   }
 

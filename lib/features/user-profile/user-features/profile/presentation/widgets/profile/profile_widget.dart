@@ -19,7 +19,7 @@ import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
-import 'package:doko_react/features/user-profile/user-features/profile/presentation/widgets/posts/profile_post.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/widgets/timeline/timeline.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_to_user_relation_widget.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
@@ -711,7 +711,11 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           height: Constants.gap * 2,
                         ),
                       ),
-                      ProfilePost(
+                      // ProfilePost(
+                      //   username: username,
+                      //   key: ObjectKey(latestFetch),
+                      // ),
+                      Timeline(
                         username: username,
                         key: ObjectKey(latestFetch),
                       ),

@@ -3,10 +3,12 @@ import 'package:doko_react/core/config/graphql/mutations/graphql_mutations.dart'
 import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/storage/storage.dart';
 import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -43,7 +45,7 @@ class ProfileRemoteDataSource {
       }
 
       List? res = result.data?["users"];
-      Map postRes = result.data?["postsConnection"];
+      Map contentRes = result.data?["contentsConnection"];
 
       if (res == null || res.isEmpty) {
         throw const ApplicationException(reason: "User doesn't exist.");
@@ -59,19 +61,133 @@ class ProfileRemoteDataSource {
       String key = generateUserNodeKey(user.username);
       graph.addEntity(key, user);
 
-      // PageInfo info = PageInfo.createEntity(map: postRes["pageInfo"]);
-      // List postList = postRes["edges"];
-      //
-      // var postFutures = (postList)
-      //     .map((post) => PostEntity.createEntity(map: post["node"]))
-      //     .toList();
-      //
-      // List<PostEntity> posts = await Future.wait(postFutures);
-      // graph.addPostEntityListToUser(
-      //   user.username,
-      //   newPosts: posts,
-      //   pageInfo: info,
-      // );
+      PageInfo info = PageInfo.createEntity(map: contentRes["pageInfo"]);
+      List contentList = contentRes["edges"];
+
+      List<String> items = [];
+      var contentFuture = (contentList).map((content) {
+        var contentMap = content["node"];
+        String id = contentMap["id"];
+        String key = "";
+        String typename = contentMap["__typename"];
+
+        Future<dynamic> entity;
+
+        if (typename == DokiNodeType.post.nodeName) {
+          entity = PostEntity.createEntity(map: contentMap);
+          key = DokiNodeType.post.keyGenerator(id);
+        } else if (typename == DokiNodeType.discussion.nodeName) {
+          entity = DiscussionEntity.createEntity(map: contentMap);
+          key = DokiNodeType.discussion.keyGenerator(id);
+        } else {
+          entity = PollEntity.createEntity(map: contentMap);
+          key = DokiNodeType.poll.keyGenerator(id);
+        }
+
+        items.add(key);
+
+        return entity;
+      }).toList();
+
+      List content = await Future.wait(contentFuture);
+      for (var item in content) {
+        if (item is PostEntity) {
+          graph.addEntity(DokiNodeType.post.keyGenerator(item.id), item);
+        }
+
+        if (item is DiscussionEntity) {
+          graph.addEntity(DokiNodeType.discussion.keyGenerator(item.id), item);
+        }
+
+        if (item is PollEntity) {
+          graph.addEntity(DokiNodeType.poll.keyGenerator(item.id), item);
+        }
+      }
+
+      graph.addContentEntityToUser(
+        username,
+        pageInfo: info,
+        content: items,
+      );
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getUserTimeline(UserProfileNodesInput details) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.getUserTimelineNodes()),
+          variables: GraphqlQueries.getUserTimelineNodesVariables(
+            username: details.username,
+            currentUsername: details.currentUsername,
+            cursor: details.cursor,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw ApplicationException(
+          reason: "Problem getting \"@${details.username}'s\" timeline.",
+        );
+      }
+
+      Map contentRes = result.data?["contentsConnection"];
+
+      // add in graph
+      UserGraph graph = UserGraph();
+
+      PageInfo info = PageInfo.createEntity(map: contentRes["pageInfo"]);
+      List contentList = contentRes["edges"];
+
+      List<String> items = [];
+      var contentFuture = (contentList).map((content) {
+        var contentMap = content["node"];
+        String id = contentMap["id"];
+        String key = "";
+        String typename = contentMap["__typename"];
+
+        Future<dynamic> entity;
+
+        if (typename == DokiNodeType.post.nodeName) {
+          entity = PostEntity.createEntity(map: contentMap);
+          key = DokiNodeType.post.keyGenerator(id);
+        } else if (typename == DokiNodeType.discussion.nodeName) {
+          entity = DiscussionEntity.createEntity(map: contentMap);
+          key = DokiNodeType.discussion.keyGenerator(id);
+        } else {
+          entity = PollEntity.createEntity(map: contentMap);
+          key = DokiNodeType.poll.keyGenerator(id);
+        }
+
+        items.add(key);
+
+        return entity;
+      }).toList();
+
+      List content = await Future.wait(contentFuture);
+      for (var item in content) {
+        if (item is PostEntity) {
+          graph.addEntity(DokiNodeType.post.keyGenerator(item.id), item);
+        }
+
+        if (item is DiscussionEntity) {
+          graph.addEntity(DokiNodeType.discussion.keyGenerator(item.id), item);
+        }
+
+        if (item is PollEntity) {
+          graph.addEntity(DokiNodeType.poll.keyGenerator(item.id), item);
+        }
+      }
+      graph.addContentEntityToUser(
+        details.username,
+        pageInfo: info,
+        content: items,
+      );
 
       return true;
     } catch (e) {

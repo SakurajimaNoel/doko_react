@@ -18,18 +18,17 @@ final class UserActionNewContentState extends UserActionState {
   List<Object?> get props => [nodeId];
 }
 
-// more post action
-class UserActionLoadPosts extends UserActionState {
-  UserActionLoadPosts({
-    required this.loadedPostCount,
+class UserActionLoadTimelineState extends UserActionState {
+  UserActionLoadTimelineState({
+    required this.itemCount,
     required this.username,
   });
 
   final String username;
-  final int loadedPostCount;
+  final int itemCount;
 
   @override
-  List<Object?> get props => [username, loadedPostCount];
+  List<Object?> get props => [username, itemCount];
 }
 
 // base class for new node state

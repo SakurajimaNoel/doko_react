@@ -54,9 +54,9 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         _commentGetUseCase = commentGetUseCase,
         super(UserActionInitial()) {
     on<UserActionPostLikeActionEvent>(_handleUserActionPostLikeActionEvent);
-    on<UserActionPostLoadEvent>((event, emit) {
-      emit(UserActionLoadPosts(
-        loadedPostCount: event.postCount,
+    on<UserActionTimelineLoadEvent>((event, emit) {
+      emit(UserActionLoadTimelineState(
+        itemCount: event.itemCount,
         username: event.username,
       ));
     });

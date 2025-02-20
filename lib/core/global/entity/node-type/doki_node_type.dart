@@ -26,6 +26,13 @@ enum DokiNodeType {
     nodeType: NodeType.discussion,
     keyGenerator: generateDiscussionNodeKey,
     nodeName: "Discussion",
+  ),
+
+  poll(
+    // todo: update this
+    nodeType: NodeType.post,
+    keyGenerator: generatePollNodeKey,
+    nodeName: "Poll",
   );
 
   const DokiNodeType({

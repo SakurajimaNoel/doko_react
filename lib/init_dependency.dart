@@ -76,6 +76,7 @@ import "package:hydrated_bloc/hydrated_bloc.dart";
 import "package:path_provider/path_provider.dart";
 
 import "aws/amplifyconfiguration.dart";
+import "features/user-profile/user-features/profile/domain/use-case/profile-use-case/timeline_use_case.dart";
 
 final serviceLocator = GetIt.instance;
 
@@ -370,6 +371,12 @@ void _initProfile() {
     ),
   );
 
+  serviceLocator.registerFactory<TimelineUseCase>(
+    () => TimelineUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
+  );
+
   serviceLocator.registerFactory<UserDiscussionUseCase>(
     () => UserDiscussionUseCase(
       profileRepository: serviceLocator<ProfileRepository>(),
@@ -379,6 +386,7 @@ void _initProfile() {
   serviceLocator.registerFactory<ProfileBloc>(
     () => ProfileBloc(
       profileUseCase: serviceLocator(),
+      timelineUseCase: serviceLocator(),
       editProfileUseCase: serviceLocator(),
       userPostUseCase: serviceLocator(),
       userDiscussionUseCase: serviceLocator(),

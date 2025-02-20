@@ -42,12 +42,12 @@ final class EditUserProfileEvent extends ProfileEvent {
   final EditProfileInput editDetails;
 }
 
-final class LoadMoreProfilePostEvent extends ProfileEvent {
-  LoadMoreProfilePostEvent({
-    required this.postDetails,
+final class LoadUserTimelineNodesEvent extends ProfileEvent {
+  LoadUserTimelineNodesEvent({
+    required this.timelineDetails,
   });
 
-  final UserProfileNodesInput postDetails;
+  final UserProfileNodesInput timelineDetails;
 }
 
 // user posts fetching

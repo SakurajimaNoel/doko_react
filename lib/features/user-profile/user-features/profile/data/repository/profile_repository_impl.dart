@@ -65,4 +65,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
   Future<List<String>> searchUserByUsername(UserSearchInput searchDetails) {
     return _remoteDataSource.searchUserByUsername(searchDetails);
   }
+
+  @override
+  Future<bool> getUserTimeline(UserProfileNodesInput details) {
+    return _remoteDataSource.getUserTimeline(details);
+  }
 }

@@ -23,13 +23,13 @@ final class UserActionPostLikeActionEvent extends UserActionEvent {
 }
 
 // user to post action
-final class UserActionPostLoadEvent extends UserActionEvent {
-  UserActionPostLoadEvent({
-    required this.postCount,
+final class UserActionTimelineLoadEvent extends UserActionEvent {
+  UserActionTimelineLoadEvent({
+    required this.itemCount,
     required this.username,
   });
 
-  final int postCount;
+  final int itemCount;
   final String username;
 }
 

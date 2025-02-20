@@ -10,6 +10,7 @@ import 'package:doko_react/features/user-profile/user-features/profile/domain/us
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/pending-request-use-case/pending_incoming_request_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/pending-request-use-case/pending_outgoing_request_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/profile_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/timeline_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-discussion-use-case/user_discussion_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-friends-use-case/user_friends_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-post-use-case/user_post_use_case.dart';
@@ -27,6 +28,7 @@ part 'profile_state.dart';
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final UserGraph graph = UserGraph();
   final ProfileUseCase _profileUseCase;
+  final TimelineUseCase _timelineUseCase;
   final EditProfileUseCase _editProfileUseCase;
   final UserPostUseCase _userPostUseCase;
   final UserDiscussionUseCase _userDiscussionUseCase;
@@ -39,6 +41,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
   ProfileBloc({
     required ProfileUseCase profileUseCase,
+    required TimelineUseCase timelineUseCase,
     required EditProfileUseCase editProfileUseCase,
     required UserPostUseCase userPostUseCase,
     required UserDiscussionUseCase userDiscussionUseCase,
@@ -49,6 +52,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required PendingOutgoingRequestUseCase pendingOutgoingRequestUseCase,
     required CommentsMentionSearchUseCase commentMentionSearchUseCase,
   })  : _profileUseCase = profileUseCase,
+        _timelineUseCase = timelineUseCase,
         _editProfileUseCase = editProfileUseCase,
         _userPostUseCase = userPostUseCase,
         _userDiscussionUseCase = userDiscussionUseCase,
@@ -61,7 +65,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         super(ProfileInitial()) {
     on<GetUserProfileEvent>(_handleGetUserProfileEvent);
     on<EditUserProfileEvent>(_handleEditUserProfileEvent);
-    on<LoadMoreProfilePostEvent>(_handleLoadMoreProfilePostEvent);
+    on<LoadUserTimelineNodesEvent>(_handleLoadUserTimelineNodesEvent);
     on<GetUserFriendsEvent>(_handleGetUserFriendsEvent);
     on<GetUserPostsEvent>(_handleGetUserPostsEvent);
     on<GetUserDiscussionEvent>(_handleGetUserDiscussionEvent);
@@ -288,25 +292,23 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     }
   }
 
-  // todo change this
-  FutureOr<void> _handleLoadMoreProfilePostEvent(
-      LoadMoreProfilePostEvent event, Emitter<ProfileState> emit) async {
+  FutureOr<void> _handleLoadUserTimelineNodesEvent(
+      LoadUserTimelineNodesEvent event, Emitter<ProfileState> emit) async {
     try {
-      final userKey = generateUserNodeKey(event.postDetails.username);
+      final userKey = generateUserNodeKey(event.timelineDetails.username);
       final CompleteUserEntity user =
           graph.getValueByKey(userKey)! as CompleteUserEntity;
 
-      // load more post
-      await _userPostUseCase(event.postDetails);
-      emit(ProfilePostLoadSuccess(
-        cursor: user.posts.pageInfo.endCursor,
+      await _timelineUseCase(event.timelineDetails);
+      emit(ProfileTimelineLoadSuccess(
+        cursor: user.timeline.pageInfo.endCursor,
       ));
     } on ApplicationException catch (e) {
-      emit(ProfilePostLoadError(
+      emit(ProfileTimelineLoadError(
         message: e.reason,
       ));
     } catch (_) {
-      emit(ProfilePostLoadError(
+      emit(ProfileTimelineLoadError(
         message: Constants.errorMessage,
       ));
     }

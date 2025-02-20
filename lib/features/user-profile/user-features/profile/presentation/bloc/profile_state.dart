@@ -51,14 +51,13 @@ final class ProfileEditSuccess extends ProfileState {
   List<Object?> get props => [];
 }
 
-// used with user posts in profile page for infinite loading
-class ProfilePostLoadResponse extends ProfileState {
+class ProfileTimelineLoadResponse extends ProfileState {
   @override
   List<Object?> get props => [];
 }
 
-final class ProfilePostLoadError extends ProfilePostLoadResponse {
-  ProfilePostLoadError({
+final class ProfileTimelineLoadError extends ProfileTimelineLoadResponse {
+  ProfileTimelineLoadError({
     required this.message,
   });
 
@@ -68,8 +67,8 @@ final class ProfilePostLoadError extends ProfilePostLoadResponse {
   List<Object?> get props => [message];
 }
 
-final class ProfilePostLoadSuccess extends ProfilePostLoadResponse {
-  ProfilePostLoadSuccess({
+final class ProfileTimelineLoadSuccess extends ProfileTimelineLoadResponse {
+  ProfileTimelineLoadSuccess({
     required this.cursor,
   });
 

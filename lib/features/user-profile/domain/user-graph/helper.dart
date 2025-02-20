@@ -97,3 +97,13 @@ String generateGraphKey(NodeType type, String identifier) {
   DokiNodeType dokiNodeType = DokiNodeType.fromNodeType(type);
   return dokiNodeType.keyGenerator(identifier);
 }
+
+DokiNodeType? getNodeTypeFromKey(String key) {
+  if (key.startsWith("post")) return DokiNodeType.post;
+  if (key.startsWith("poll")) return DokiNodeType.poll;
+  if (key.startsWith("comment")) return DokiNodeType.comment;
+  if (key.startsWith("discussion")) return DokiNodeType.discussion;
+  if (key.startsWith("user")) return DokiNodeType.user;
+  return null;
+  // if(key.startsWith("page")) return DokiNodeType.page;
+}

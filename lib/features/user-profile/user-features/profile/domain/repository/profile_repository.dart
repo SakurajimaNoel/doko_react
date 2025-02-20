@@ -5,6 +5,8 @@ abstract class ProfileRepository {
 
   Future<bool> editUserProfile(EditProfileInput editDetails, String bucketPath);
 
+  Future<bool> getUserTimeline(UserProfileNodesInput details);
+
   Future<bool> getUserPosts(UserProfileNodesInput postDetails);
 
   Future<bool> getUserDiscussions(UserProfileNodesInput discussionDetails);

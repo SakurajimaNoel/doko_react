@@ -68,6 +68,18 @@ class UserGraph {
   //   func(_graph);
   // }
 
+  void addContentEntityToUser(
+    String username, {
+    required PageInfo pageInfo,
+    required List<String> content,
+  }) {
+    String key = generateUserNodeKey(username);
+    final CompleteUserEntity user = getValueByKey(key)! as CompleteUserEntity;
+
+    user.timeline.updatePageInfo(pageInfo);
+    user.timeline.addEntityItems(content);
+  }
+
   /// application specific graph methods
   /// adding posts to user
   void addPostEntityListToUser(
@@ -611,74 +623,6 @@ class UserGraph {
 
     node.comments.addItem(commentKey);
   }
-
-  /// used to add comments replies when fetching it in comment's page
-  // void addCommentListToReply(
-  //   String commentId, {
-  //   required List<CommentEntity> comments,
-  //   required PageInfo pageInfo,
-  // }) {
-  //   String key = generateCommentNodeKey(commentId);
-  //
-  //   Map<String, GraphEntity> tempMap = HashMap();
-  //   List<String> commentKeys = comments.map((commentItem) {
-  //     String commentKey = generateCommentNodeKey(commentItem.id);
-  //
-  //     // adding comment entity
-  //     tempMap[commentKey] = commentItem;
-  //
-  //     return commentKey;
-  //   }).toList();
-  //
-  //   _addEntityMap(tempMap);
-  //
-  //   CommentEntity comment = getValueByKey(key)! as CommentEntity;
-  //
-  //   comment.comments.updatePageInfo(pageInfo);
-  //   comment.comments.addEntityItems(commentKeys);
-  // }
-
-  /// used to add new reply to the comment
-  // void addReplyToCommentEntity(
-  //   String commentId, {
-  //   required CommentEntity comment,
-  // }) {
-  //   String key = generateCommentNodeKey(commentId);
-  //   String commentKey = generateCommentNodeKey(comment.id);
-  //
-  //   addEntity(commentKey, comment);
-  //
-  //   if (!containsKey(key)) return;
-  //
-  //   final CommentEntity existingComment = getValueByKey(key) as CommentEntity;
-  //
-  //   // adding at the end of visible replies
-  //   existingComment.comments.addItemAtLast(commentKey);
-  //   existingComment.updateCommentsCount(existingComment.commentsCount + 1);
-  // }
-
-  /// used by remote create secondary node
-  // void addReplyIdToCommentEntity(
-  //   String commentId, {
-  //   required String replyId,
-  // }) {
-  //   String key = generateCommentNodeKey(commentId);
-  //   String replyKey = generateCommentNodeKey(replyId);
-  //
-  //   final comment = getValueByKey(key);
-  //
-  //   if (comment is! CommentEntity) return;
-  //
-  //   comment.updateCommentsCount(comment.commentsCount + 1);
-  //
-  //   /// no need to add it if no replies are fetched
-  //   /// or not reached end of page
-  //   if (comment.comments.isEmpty || comment.comments.pageInfo.hasNextPage) {
-  //     return;
-  //   }
-  //
-  //   comment.comments.addItemAtLast(replyKey);
-  // }
 
   /// used update post like status and post stats
   void handleUserLikeActionForPostEntity(
