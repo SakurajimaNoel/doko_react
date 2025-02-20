@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class PostCarouselIndicatorProvider extends ChangeNotifier {
-  PostCarouselIndicatorProvider({
+class MediaCarouselIndicatorProvider extends ChangeNotifier {
+  MediaCarouselIndicatorProvider({
     required this.currentItem,
     required this.width,
   });

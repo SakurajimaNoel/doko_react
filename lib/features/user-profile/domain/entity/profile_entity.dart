@@ -7,3 +7,9 @@ abstract class GraphEntity {}
 abstract class NodeWithCommentEntity implements GraphEntity {
   Nodes get nodeComments;
 }
+
+abstract class NodeWithMediaItems implements NodeWithCommentEntity {
+  int get currDisplay;
+
+  void updateDisplayItem(int item);
+}

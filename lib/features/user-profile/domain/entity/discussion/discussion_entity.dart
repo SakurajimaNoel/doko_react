@@ -4,7 +4,7 @@ import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.
 import 'package:doko_react/features/user-profile/domain/media/media_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 
-class DiscussionEntity implements NodeWithCommentEntity {
+class DiscussionEntity implements NodeWithMediaItems {
   DiscussionEntity({
     required this.id,
     required this.title,
@@ -31,8 +31,11 @@ class DiscussionEntity implements NodeWithCommentEntity {
   int commentsCount;
   bool userLike;
   Nodes comments;
+
+  @override
   int currDisplay = 0;
 
+  @override
   void updateDisplayItem(int item) {
     currDisplay = item;
   }

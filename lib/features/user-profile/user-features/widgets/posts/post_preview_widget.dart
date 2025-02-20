@@ -6,12 +6,10 @@ import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/widgets/posts/post_widget.dart';
-import 'package:doko_react/features/user-profile/user-features/widgets/posts/provider/post_carousel_indicator_provider.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/media-widget/media_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
 class PostPreviewWidget extends StatelessWidget {
   const PostPreviewWidget({
@@ -168,15 +166,10 @@ class PostPreviewWidget extends StatelessWidget {
                   ],
                 ),
                 if (post.content.isNotEmpty)
-                  ChangeNotifierProvider(
-                    create: (_) => PostCarouselIndicatorProvider(
-                      currentItem: post.currDisplay,
-                      width: width,
-                    ),
-                    child: PostContent.preview(
-                      content: post.content,
-                      postId: post.id,
-                    ),
+                  MediaWidget.preview(
+                    mediaItems: post.content,
+                    nodeKey: postKey,
+                    width: width,
                   ),
                 Text(trimText(post.caption)),
               ],
