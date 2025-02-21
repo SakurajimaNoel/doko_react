@@ -163,10 +163,14 @@ class GraphqlQueries {
                 media
               }
               ... on Poll {
-                title
+                question
                 options
+                activeFor
                 votesAggregate {
                   count
+                }
+                votes(where: \$likedByWhere2) {
+                  username
                 }
               }
             }
@@ -272,10 +276,14 @@ class GraphqlQueries {
               title
             }
             ... on Poll {
-              title
+              question
               options
+              activeFor
               votesAggregate {
                 count
+              }
+              votes(where: \$likedByWhere2) {
+                username
               }
             }
             ... on Post {

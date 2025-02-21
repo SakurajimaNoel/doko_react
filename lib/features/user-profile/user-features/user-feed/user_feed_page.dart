@@ -104,7 +104,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
                     context.pushNamed(RouterConstants.createPost);
                   },
                   label: const Text("Post"),
-                  icon: const Icon(Icons.add_box_outlined),
+                  icon: const Icon(Icons.calendar_view_day_rounded),
                 ),
                 FilledButton.tonalIcon(
                   onPressed: () {
@@ -112,12 +112,20 @@ class _UserFeedPageState extends State<UserFeedPage> {
                     context.pushNamed(RouterConstants.createDiscussion);
                   },
                   label: const Text("Discussion"),
-                  icon: const Icon(Icons.add),
+                  icon: const Icon(Icons.text_snippet),
+                ),
+                FilledButton.tonalIcon(
+                  onPressed: () {
+                    context.pop();
+                    context.pushNamed(RouterConstants.createPoll);
+                  },
+                  label: const Text("Poll"),
+                  icon: const Icon(Icons.poll),
                 ),
                 FilledButton.tonalIcon(
                   onPressed: () {},
                   label: const Text("Page"),
-                  icon: const Icon(Icons.post_add),
+                  icon: const Icon(Icons.pages),
                 ),
               ],
             ),

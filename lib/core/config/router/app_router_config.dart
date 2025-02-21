@@ -22,9 +22,12 @@ import 'package:doko_react/features/user-profile/user-features/instant-messaging
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/pages/message-inbox/message_inbox_page.dart';
 import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/discussion_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/poll_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/discussion/create_discussion_page.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/discussion/discussion_publish_page.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/poll/create_poll_page.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/poll/poll_publish_page.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/create_post_page.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/pages/post/post_publish_page.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/edit-profile/edit_profile_page.dart';
@@ -363,6 +366,29 @@ class AppRouterConfig {
 
                           return DiscussionPublishPage(
                             discussionDetails: discussionDetails,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: RouterConstants.createPoll,
+                    path: "/create-poll",
+                    builder: (context, state) => const CreatePollPage(),
+                    routes: [
+                      GoRoute(
+                        parentNavigatorKey: rootNavigatorKey,
+                        name: RouterConstants.pollPublish,
+                        path: "publish",
+                        builder: (context, state) {
+                          final Map<String, dynamic> data =
+                              state.extra as Map<String, dynamic>;
+                          final PollPublishPageData pollDetails =
+                              data["pollDetails"];
+
+                          return PollPublishPage(
+                            pollDetails: pollDetails,
                           );
                         },
                       ),

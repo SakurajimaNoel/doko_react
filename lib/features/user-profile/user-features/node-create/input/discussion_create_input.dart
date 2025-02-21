@@ -26,14 +26,4 @@ class DiscussionCreateInput {
   final String text;
   final List<MediaContent> media;
   final List<String> usersTagged;
-
-  List<Map<String, String>> generateUserTagged() {
-    var usersTaggedMap = usersTagged.map((String username) {
-      return {
-        "username_EQ": username,
-      };
-    }).toList();
-
-    return usersTaggedMap;
-  }
 }

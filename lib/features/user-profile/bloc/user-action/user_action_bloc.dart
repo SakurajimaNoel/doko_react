@@ -76,6 +76,14 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         ),
       ),
     );
+    on<UserActionNewPollEvent>(
+      (event, emit) => emit(
+        UserActionNewPollState(
+          nodeId: event.pollId,
+          username: event.username,
+        ),
+      ),
+    );
     on<UserActionCommentLikeActionEvent>(
         _handleUserActionCommentLikeActionEvent);
     on<UserActionNewCommentEvent>((event, emit) {
@@ -102,6 +110,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     on<UserActionNewPostRemoteEvent>(_handleUserActionNewPostRemoteEvent);
     on<UserActionNewDiscussionRemoteEvent>(
         _handleUserActionNewDiscussionRemoteEvent);
+    on<UserActionNewPollRemoteEvent>(_handleUserActionNewPollRemoteEvent);
 
     on<UserActionGetPostByIdEvent>(_handleUserActionGetPostByIdEvent);
     on<UserActionGetDiscussionByIdEvent>(
@@ -223,6 +232,28 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
 
     emit(UserActionNewDiscussionState(
       nodeId: event.discussionId,
+      username: event.username,
+    ));
+  }
+
+  FutureOr<void> _handleUserActionNewPollRemoteEvent(
+      UserActionNewPollRemoteEvent event, Emitter<UserActionState> emit) async {
+    // handle user graph
+    String pollKey = generatePollNodeKey(event.pollId);
+    String userKey = generateUserNodeKey(event.username);
+    final user = graph.getValueByKey(userKey);
+
+    if (user is CompleteUserEntity) {
+      if (!user.polls.items.contains(pollKey)) {
+        // add to user post
+        user.pollCount++;
+      }
+      user.polls.addItem(pollKey);
+      user.timeline.addItem(pollKey);
+    }
+
+    emit(UserActionNewPollState(
+      nodeId: event.pollId,
       username: event.username,
     ));
   }

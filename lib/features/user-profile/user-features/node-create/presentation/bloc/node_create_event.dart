@@ -30,3 +30,11 @@ class DiscussionCreateEvent extends NodeCreateEvent {
 
   final DiscussionCreateInput discussionDetails;
 }
+
+class PollCreateEvent extends NodeCreateEvent {
+  PollCreateEvent({
+    required this.pollDetails,
+  });
+
+  final PollCreateInput pollDetails;
+}

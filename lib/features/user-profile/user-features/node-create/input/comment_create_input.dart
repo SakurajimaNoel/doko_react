@@ -40,14 +40,4 @@ class CommentCreateInput extends Input {
 
     return content.content.isNotEmpty;
   }
-
-  List<Map<String, String>> generateMentions() {
-    var mentionMap = content.mentions.map((String username) {
-      return {
-        "username_EQ": username,
-      };
-    }).toList();
-
-    return mentionMap;
-  }
 }

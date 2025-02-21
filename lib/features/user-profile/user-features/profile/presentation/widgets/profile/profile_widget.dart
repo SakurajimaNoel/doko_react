@@ -308,7 +308,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     },
                   );
                 },
-                icon: const Icon(Icons.calendar_view_month),
+                icon: const Icon(Icons.calendar_view_day_rounded),
                 label: Text(
                   "Posts: ${displayNumberFormat(user.postsCount)}",
                 ),

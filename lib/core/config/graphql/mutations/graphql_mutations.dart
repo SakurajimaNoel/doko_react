@@ -5,6 +5,7 @@ import 'package:doko_react/features/complete-profile/input/complete_profile_inpu
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/comment_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/discussion_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/poll_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
 
 class GraphqlMutations {
@@ -268,31 +269,6 @@ class GraphqlMutations {
 
   static Map<String, dynamic> userCreatePostVariables(PostCreateInput postInput,
       {required List<String> postContent}) {
-    if (postInput.usersTagged.isEmpty) {
-      return {
-        "input": [
-          {
-            "id": postInput.postId,
-            "caption": postInput.caption,
-            "content": postContent,
-            "likes": 0,
-            "createdBy": {
-              "connect": {
-                "where": {
-                  "node": {
-                    "username_EQ": postInput.username,
-                  },
-                },
-              },
-            },
-          },
-        ],
-        "where": {
-          "username_EQ": postInput.username,
-        }
-      };
-    }
-
     return {
       "input": [
         {
@@ -314,12 +290,12 @@ class GraphqlMutations {
               {
                 "where": {
                   "node": {
-                    "OR": postInput.generateUserTagged(),
-                  },
-                },
-              },
-            ],
-          },
+                    "username_IN": postInput.usersTagged,
+                  }
+                }
+              }
+            ]
+          }
         },
       ],
       "where": {
@@ -468,49 +444,6 @@ class GraphqlMutations {
       CommentCreateInput commentInput) {
     String commentOnNode = commentInput.targetNode.nodeName;
 
-    if (commentInput.content.mentions.isEmpty) {
-      return {
-        "input": [
-          {
-            "commentBy": {
-              "connect": {
-                "where": {
-                  "node": {
-                    "username_EQ": commentInput.username,
-                  }
-                }
-              }
-            },
-            "commentOn": {
-              commentOnNode: {
-                "connect": {
-                  "where": {
-                    "node": {
-                      "id_EQ": commentInput.targetNodeId,
-                    }
-                  }
-                }
-              }
-            },
-            "replyOn": {
-              "connect": {
-                "where": {
-                  "node": {
-                    "id_EQ": commentInput.replyOn,
-                  }
-                }
-              }
-            },
-            "content": commentInput.content.content,
-            "media": commentInput.bucketPath ?? "",
-          }
-        ],
-        "where": {
-          "username_EQ": commentInput.username,
-        }
-      };
-    }
-
     return {
       "input": [
         {
@@ -541,7 +474,7 @@ class GraphqlMutations {
               {
                 "where": {
                   "node": {
-                    "OR": commentInput.generateMentions(),
+                    "username_IN": commentInput.content.mentions,
                   }
                 }
               }
@@ -699,31 +632,6 @@ class GraphqlMutations {
     DiscussionCreateInput discussionDetails, {
     required List<String> media,
   }) {
-    if (discussionDetails.usersTagged.isEmpty) {
-      return {
-        "input": [
-          {
-            "id": discussionDetails.discussionId,
-            "title": discussionDetails.title,
-            "text": discussionDetails.text,
-            "media": media,
-            "createdBy": {
-              "connect": {
-                "where": {
-                  "node": {
-                    "username_EQ": discussionDetails.username,
-                  },
-                }
-              }
-            }
-          }
-        ],
-        "where": {
-          "username_EQ": discussionDetails.username,
-        },
-      };
-    }
-
     return {
       "input": [
         {
@@ -745,16 +653,89 @@ class GraphqlMutations {
               {
                 "where": {
                   "node": {
-                    "OR": discussionDetails.generateUserTagged(),
-                  },
-                },
-              },
-            ],
-          },
+                    "username_IN": discussionDetails.usersTagged,
+                  }
+                }
+              }
+            ]
+          }
         }
       ],
       "where": {
         "username_EQ": discussionDetails.username,
+      },
+    };
+  }
+
+  // new poll
+  static String userCreatePoll() {
+    return """
+    mutation CreatePolls(\$input: [PollCreateInput!]!, \$where: UserWhere) {
+      createPolls(input: \$input) {
+        polls {
+          id
+          createdOn
+          usersTagged {
+            username
+          }
+          likedBy(where: \$where) {
+            username
+          }
+          commentsConnection {
+            totalCount
+          }
+          likedByConnection {
+            totalCount
+          }
+          question
+          options
+          activeFor
+          votesAggregate {
+            count
+          }
+          createdBy {
+            username
+          }
+          votes(where: \$where) {
+            username
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> userCreatePollVariables(PollCreateInput poll) {
+    return {
+      "input": [
+        {
+          "question": poll.question,
+          "options": poll.options,
+          "activeFor": poll.activeFor,
+          "createdBy": {
+            "connect": {
+              "where": {
+                "node": {
+                  "username_EQ": poll.username,
+                }
+              }
+            }
+          },
+          "usersTagged": {
+            "connect": [
+              {
+                "where": {
+                  "node": {
+                    "username_IN": poll.usersTagged,
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "where": {
+        "username_EQ": poll.username,
       },
     };
   }

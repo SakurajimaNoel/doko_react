@@ -63,6 +63,10 @@ class Constants {
   static const int userTagLimit = 50;
   static const int mediaLimit = 1 << 4;
 
+  // polls
+  static const int pollOptionsLimit = 5;
+  static const int pollMaxActiveDuration = 7;
+
   // discussion
   static const int discussionTitleLimit = 1 << 8;
   static const int discussionTextLimit = 1 << 15;

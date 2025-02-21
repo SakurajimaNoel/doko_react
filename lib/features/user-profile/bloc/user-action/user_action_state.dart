@@ -66,6 +66,16 @@ final class UserActionNewDiscussionState extends UserActionNewRootNodeState {
   List<Object?> get props => [nodeId, username];
 }
 
+final class UserActionNewPollState extends UserActionNewRootNodeState {
+  UserActionNewPollState({
+    required super.nodeId,
+    required super.username,
+  });
+
+  @override
+  List<Object?> get props => [nodeId, username];
+}
+
 /// user post action state
 /// used when updating ui for post action
 /// when new comment is added or like is changed

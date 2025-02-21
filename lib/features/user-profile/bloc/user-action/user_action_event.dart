@@ -54,6 +54,16 @@ final class UserActionNewDiscussionEvent extends UserActionEvent {
   final String discussionId;
 }
 
+final class UserActionNewPollEvent extends UserActionEvent {
+  UserActionNewPollEvent({
+    required this.pollId,
+    required this.username,
+  });
+
+  final String username;
+  final String pollId;
+}
+
 final class UserActionNewPostRemoteEvent extends UserActionEvent {
   UserActionNewPostRemoteEvent({
     required this.postId,
@@ -72,6 +82,16 @@ final class UserActionNewDiscussionRemoteEvent extends UserActionEvent {
 
   final String username;
   final String discussionId;
+}
+
+final class UserActionNewPollRemoteEvent extends UserActionEvent {
+  UserActionNewPollRemoteEvent({
+    required this.pollId,
+    required this.username,
+  });
+
+  final String username;
+  final String pollId;
 }
 
 // user to comment action

@@ -224,6 +224,14 @@ class _UserLayoutState extends State<UserLayout> {
                   username: username,
                 ));
           }
+
+          // todo this will be poll
+          if (payload.nodeType == NodeType.post) {
+            context.read<UserActionBloc>().add(UserActionNewPollRemoteEvent(
+                  pollId: payload.id,
+                  username: username,
+                ));
+          }
         },
         PayloadType.userNodeLikeAction: (UserNodeLikeAction payload) {
           // handle notification

@@ -25,16 +25,6 @@ class PostCreateInput {
   final List<MediaContent> content;
   final List<String> usersTagged;
 
-  List<Map<String, String>> generateUserTagged() {
-    var usersTaggedMap = usersTagged.map((String username) {
-      return {
-        "username_EQ": username,
-      };
-    }).toList();
-
-    return usersTaggedMap;
-  }
-
   PostCreateInput copyWith({
     String? postId,
     String? username,

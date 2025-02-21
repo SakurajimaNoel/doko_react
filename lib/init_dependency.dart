@@ -43,6 +43,7 @@ import "package:doko_react/features/user-profile/user-features/node-create/data/
 import "package:doko_react/features/user-profile/user-features/node-create/domain/repository/node_create_repository.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/domain/use-case/comment-use-case/create_comment_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/domain/use-case/discussion-use-case/discussion_create_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/node-create/domain/use-case/poll-use-case/poll_create_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/domain/use-case/post-create-use-case/post_create_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/presentation/bloc/node_create_bloc.dart";
 import "package:doko_react/features/user-profile/user-features/profile/data/data-sources/profile_remote_data_source.dart";
@@ -191,12 +192,18 @@ void _initNodeCreate() {
       nodeCreateRepository: serviceLocator(),
     ),
   );
+  serviceLocator.registerFactory<PollCreateUseCase>(
+    () => PollCreateUseCase(
+      nodeCreateRepository: serviceLocator(),
+    ),
+  );
 
   serviceLocator.registerFactory<NodeCreateBloc>(
     () => NodeCreateBloc(
       postCreateUseCase: serviceLocator(),
       createCommentUseCase: serviceLocator(),
       createDiscussionUseCase: serviceLocator(),
+      pollCreateUseCase: serviceLocator(),
     ),
   );
 }

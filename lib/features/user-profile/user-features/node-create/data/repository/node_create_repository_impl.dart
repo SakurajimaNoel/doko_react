@@ -2,6 +2,7 @@ import 'package:doko_react/features/user-profile/user-features/node-create/data/
 import 'package:doko_react/features/user-profile/user-features/node-create/domain/repository/node_create_repository.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/comment_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/discussion_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/poll_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
 
 class NodeCreateRepositoryImpl implements NodeCreateRepository {
@@ -24,5 +25,10 @@ class NodeCreateRepositoryImpl implements NodeCreateRepository {
   @override
   Future<String> createNewComment(CommentCreateInput commentDetails) {
     return _remoteDataSource.createComment(commentDetails);
+  }
+
+  @override
+  Future<String> createNewPoll(PollCreateInput pollDetails) {
+    return _remoteDataSource.createNewPoll(pollDetails);
   }
 }

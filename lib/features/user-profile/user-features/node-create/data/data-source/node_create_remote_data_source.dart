@@ -7,10 +7,12 @@ import 'package:doko_react/core/global/storage/storage.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/comment_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/discussion_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/poll_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
 import 'package:graphql/client.dart';
 
@@ -206,6 +208,44 @@ class NodeCreateRemoteDataSource {
 
       return newDiscussion.id;
     } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> createNewPoll(PollCreateInput pollDetails) async {
+    try {
+      // update graph
+      QueryResult result = await _client.mutate(
+        MutationOptions(
+          document: gql(GraphqlMutations.userCreatePoll()),
+          variables: GraphqlMutations.userCreatePollVariables(pollDetails),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(
+          reason: "Problem creating poll.",
+        );
+      }
+
+      List? res = result.data?["createPolls"]["polls"];
+
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
+        );
+      }
+
+      PollEntity newPoll = await PollEntity.createEntity(map: res[0]);
+
+      final UserGraph graph = UserGraph();
+
+      graph.addPollEntityToUser(pollDetails.username, newPoll);
+
+      return newPoll.id;
+    } catch (e) {
+      print(e);
+      print("error here");
       rethrow;
     }
   }
