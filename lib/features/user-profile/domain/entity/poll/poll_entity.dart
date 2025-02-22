@@ -32,10 +32,12 @@ class PollEntity implements GraphEntityWithUserAction {
   @override
   Nodes comments;
 
+  @override
   void updateUserLikeStatus(bool userLike) {
     this.userLike = userLike;
   }
 
+  @override
   void updateLikeCount(int likesCount) {
     this.likesCount = likesCount;
   }

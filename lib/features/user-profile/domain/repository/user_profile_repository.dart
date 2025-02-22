@@ -5,6 +5,14 @@ abstract class UserProfileRepository {
 
   Future<bool> userRemovePostLike(String postId, String username);
 
+  Future<bool> userAddDiscussionLike(String nodeId, String username);
+
+  Future<bool> userRemoveDiscussionLike(String nodeId, String username);
+
+  Future<bool> userAddPollLike(String nodeId, String username);
+
+  Future<bool> userRemovePollLike(String nodeId, String username);
+
   Future<bool> userCreateFriendRelation(
       UserToUserRelationDetails relationDetails);
 

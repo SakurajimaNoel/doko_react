@@ -403,6 +403,204 @@ class GraphqlMutations {
     };
   }
 
+  // poll
+  static String userAddPollLike() {
+    return """
+    mutation UpdatePolls(\$where: PollWhere, \$likedByWhere2: UserWhere, \$update: PollUpdateInput) {
+      updatePolls(where: \$where, update: \$update) {
+        polls {
+          likedByConnection {
+            totalCount
+          }
+          commentsConnection {
+            totalCount
+          }
+          likedBy(where: \$likedByWhere2) {
+            username
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> userAddPollLikeVariables({
+    required String pollId,
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": pollId,
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "update": {
+        "likedBy": [
+          {
+            "connect": [
+              {
+                "where": {
+                  "node": {
+                    "username_EQ": username,
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    };
+  }
+
+  static String userRemovePollLike() {
+    return """
+    mutation UpdatePolls(\$where: PollWhere, \$likedByWhere2: UserWhere, \$update: PollUpdateInput) {
+      updatePolls(where: \$where, update: \$update) {
+        polls {
+          likedByConnection {
+            totalCount
+          }
+          commentsConnection {
+            totalCount
+          }
+          likedBy(where: \$likedByWhere2) {
+            username
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> userRemovePollLikeVariables({
+    required String pollId,
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": pollId,
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "update": {
+        "likedBy": [
+          {
+            "disconnect": [
+              {
+                "where": {
+                  "node": {
+                    "username_EQ": username,
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    };
+  }
+
+  // discussion
+  static String userAddDiscussionLike() {
+    return """
+    mutation UpdateDiscussions(\$where: DiscussionWhere, \$likedByWhere2: UserWhere, \$update: DiscussionUpdateInput) {
+      updateDiscussions(where: \$where, update: \$update) {
+        discussions {
+          commentsConnection {
+            totalCount
+          }
+          likedByConnection {
+            totalCount
+          }
+          likedBy(where: \$likedByWhere2) {
+            username
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> userAddDiscussionLikeVariables({
+    required String discussionId,
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": discussionId,
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "update": {
+        "likedBy": [
+          {
+            "connect": [
+              {
+                "where": {
+                  "node": {
+                    "username_EQ": username,
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    };
+  }
+
+  static String userRemoveDiscussionLike() {
+    return """
+    mutation UpdateDiscussions(\$where: DiscussionWhere, \$likedByWhere2: UserWhere, \$update: DiscussionUpdateInput) {
+      updateDiscussions(where: \$where, update: \$update) {
+        discussions {
+          commentsConnection {
+            totalCount
+          }
+          likedByConnection {
+            totalCount
+          }
+          likedBy(where: \$likedByWhere2) {
+            username
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> userRemoveDiscussionLikeVariables({
+    required String discussionId,
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": discussionId,
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "update": {
+        "likedBy": [
+          {
+            "disconnect": [
+              {
+                "where": {
+                  "node": {
+                    "username_EQ": username,
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    };
+  }
+
 // add comment
   static String addComment() {
     return '''

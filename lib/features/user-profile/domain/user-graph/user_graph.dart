@@ -664,45 +664,20 @@ class UserGraph {
     node.comments.addItem(commentKey);
   }
 
-  /// used update post like status and post stats
-  void handleUserLikeActionForPostEntity(
-    String postId, {
+  /// used update node like status and node stats
+  void handleUserLikeAction({
+    required String nodeKey,
     bool? userLike,
     required int likesCount,
     required int commentsCount,
   }) {
-    String key = generatePostNodeKey(postId);
+    final node = getValueByKey(nodeKey);
 
-    if (!containsKey(key)) return;
+    if (node is! GraphEntityWithUserAction) return;
 
-    final post = getValueByKey(key) as PostEntity;
-    post.updateLikeCount(likesCount);
-    if (userLike != null) {
-      post.updateUserLikeStatus(userLike);
-    }
-    post.updateCommentsCount(commentsCount);
-  }
-
-  /// used to update comment like status and comment stats
-  void handleUserLikeActionForCommentEntity(
-    String commentId, {
-    bool? userLike,
-    required int likesCount,
-    required int commentsCount,
-  }) {
-    String key = generateCommentNodeKey(commentId);
-
-    if (!containsKey(key)) return;
-
-    final comment = getValueByKey(key) as CommentEntity;
-    if (userLike != null) comment.updateUserLikeStatus(userLike);
-    comment.updateLikeCount(likesCount);
-    comment.updateCommentsCount(commentsCount);
-  }
-
-  @override
-  String toString() {
-    return _graph.toString();
+    node.updateCommentsCount(commentsCount);
+    if (userLike != null) node.updateUserLikeStatus(userLike);
+    node.updateLikeCount(likesCount);
   }
 
   /// add fetched users to graph based on search query

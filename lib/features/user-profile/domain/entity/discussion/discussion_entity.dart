@@ -45,10 +45,12 @@ class DiscussionEntity implements UserActionEntityWithMediaItems {
     currDisplay = item;
   }
 
+  @override
   void updateUserLikeStatus(bool userLike) {
     this.userLike = userLike;
   }
 
+  @override
   void updateLikeCount(int likesCount) {
     this.likesCount = likesCount;
   }

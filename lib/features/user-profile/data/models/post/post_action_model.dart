@@ -1,5 +1,6 @@
-class PostActionModel {
-  const PostActionModel({
+/// this handles user like action on nodes
+class UserActionModel {
+  const UserActionModel({
     required this.userLike,
     required this.likesCount,
     required this.commentsCount,
@@ -7,12 +8,13 @@ class PostActionModel {
 
   final bool userLike;
   final int likesCount;
+
   final int commentsCount;
 
-  static PostActionModel createModel(Map map) {
+  static UserActionModel createModel(Map map) {
     bool userLike = (map["likedBy"] as List).length == 1;
 
-    return PostActionModel(
+    return UserActionModel(
       userLike: userLike,
       likesCount: map["likedByConnection"]["totalCount"],
       commentsCount: map["commentsConnection"]["totalCount"],

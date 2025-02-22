@@ -41,10 +41,12 @@ class CommentEntity implements GraphEntityWithUserAction {
   /// used in comment page to move to particular reply
   int? index;
 
+  @override
   void updateUserLikeStatus(bool userLike) {
     this.userLike = userLike;
   }
 
+  @override
   void updateLikeCount(int likesCount) {
     this.likesCount = likesCount;
   }

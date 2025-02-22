@@ -11,6 +11,10 @@ abstract class GraphEntityWithUserAction implements GraphEntity {
   bool get userLike;
 
   void updateCommentsCount(int count);
+
+  void updateLikeCount(int count);
+
+  void updateUserLikeStatus(bool userLike);
 }
 
 abstract class UserActionEntityWithMediaItems

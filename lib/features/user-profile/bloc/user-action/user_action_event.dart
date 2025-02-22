@@ -3,21 +3,20 @@ part of 'user_action_bloc.dart';
 @immutable
 sealed class UserActionEvent {}
 
-// user to post action
-final class UserActionPostLikeActionEvent extends UserActionEvent {
-  UserActionPostLikeActionEvent({
-    required this.postId,
-    required this.userLike,
+final class UserActionNodeLikeEvent extends UserActionEvent {
+  UserActionNodeLikeEvent({
     required this.username,
+    required this.nodeId,
+    required this.nodeType,
     required this.client,
     required this.remotePayload,
+    required this.userLike,
   });
 
-  final String postId;
-  final bool userLike;
+  final String nodeId;
+  final DokiNodeType nodeType;
   final String username;
-
-  // used to send to remote users
+  final bool userLike;
   final Client? client;
   final UserNodeLikeAction remotePayload;
 }
@@ -92,23 +91,6 @@ final class UserActionNewPollRemoteEvent extends UserActionEvent {
 
   final String username;
   final String pollId;
-}
-
-// user to comment action
-final class UserActionCommentLikeActionEvent extends UserActionEvent {
-  UserActionCommentLikeActionEvent({
-    required this.commentId,
-    required this.userLike,
-    required this.username,
-    required this.client,
-    required this.remotePayload,
-  });
-
-  final String commentId;
-  final bool userLike;
-  final String username;
-  final Client? client;
-  final UserNodeLikeAction remotePayload;
 }
 
 // user to comment action

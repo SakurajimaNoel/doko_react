@@ -2,6 +2,7 @@ import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
@@ -356,8 +357,9 @@ class _PostActionState extends State<_PostAction> {
                               );
                               context
                                   .read<UserActionBloc>()
-                                  .add(UserActionPostLikeActionEvent(
-                                    postId: post.id,
+                                  .add(UserActionNodeLikeEvent(
+                                    nodeId: post.id,
+                                    nodeType: DokiNodeType.post,
                                     userLike: !post.userLike,
                                     username: username,
                                     client: context

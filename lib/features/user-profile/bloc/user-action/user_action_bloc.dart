@@ -3,17 +3,13 @@ import 'dart:collection';
 
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
-import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
-import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
-import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_add_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_get.dart';
-import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_remove_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/discussion/discussion_get.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/poll/poll_get.dart';
-import 'package:doko_react/features/user-profile/domain/use-case/posts/post_add_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_get.dart';
-import 'package:doko_react/features/user-profile/domain/use-case/posts/post_remove_like_use_case.dart';
+import 'package:doko_react/features/user-profile/domain/use-case/user-node-action/user_node_like_action_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
@@ -30,34 +26,25 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final Set<String> nodeLikeActionRequest = HashSet();
   final Set<String> userToUserRelation = HashSet(); // currentUser@remoteUser
 
-  final PostAddLikeUseCase _postAddLikeUseCase;
-  final PostRemoveLikeUseCase _postRemoveLikeUseCase;
-  final CommentAddLikeUseCase _commentAddLikeUseCase;
-  final CommentRemoveLikeUseCase _commentRemoveLikeUseCase;
+  final UserNodeLikeActionUseCase _userNodeLikeActionUseCase;
   final PostGetUseCase _postGetUseCase;
   final DiscussionGetUseCase _discussionGetUseCase;
   final PollGetUseCase _pollGetUseCase;
   final CommentGetUseCase _commentGetUseCase;
 
   UserActionBloc({
-    required PostAddLikeUseCase postAddLikeUseCase,
-    required PostRemoveLikeUseCase postRemoveLikeUseCase,
-    required CommentAddLikeUseCase commentAddLikeUseCase,
-    required CommentRemoveLikeUseCase commentRemoveLikeUseCase,
+    required UserNodeLikeActionUseCase userNodeLikeActionUseCase,
     required PostGetUseCase postGetUseCase,
     required DiscussionGetUseCase discussionGetUseCase,
     required PollGetUseCase pollGetUseCase,
     required CommentGetUseCase commentGetUseCase,
-  })  : _postAddLikeUseCase = postAddLikeUseCase,
-        _postRemoveLikeUseCase = postRemoveLikeUseCase,
-        _commentAddLikeUseCase = commentAddLikeUseCase,
-        _commentRemoveLikeUseCase = commentRemoveLikeUseCase,
+  })  : _userNodeLikeActionUseCase = userNodeLikeActionUseCase,
         _postGetUseCase = postGetUseCase,
         _discussionGetUseCase = discussionGetUseCase,
         _pollGetUseCase = pollGetUseCase,
         _commentGetUseCase = commentGetUseCase,
         super(UserActionInitial()) {
-    on<UserActionPostLikeActionEvent>(_handleUserActionPostLikeActionEvent);
+    on<UserActionNodeLikeEvent>(_handleUserActionNodeLikeEvent);
     on<UserActionTimelineLoadEvent>((event, emit) {
       emit(UserActionLoadTimelineState(
         itemCount: event.itemCount,
@@ -88,8 +75,6 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         ),
       ),
     );
-    on<UserActionCommentLikeActionEvent>(
-        _handleUserActionCommentLikeActionEvent);
     on<UserActionNewCommentEvent>((event, emit) {
       emit(UserActionNodeActionState(
         nodeId: event.targetId,
@@ -135,6 +120,75 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         _handleUserActionNewSecondaryNodeRemoteEvent);
   }
 
+  FutureOr<void> _handleUserActionNodeLikeEvent(
+      UserActionNodeLikeEvent event, Emitter<UserActionState> emit) async {
+    String nodeId = event.nodeId;
+    DokiNodeType nodeType = event.nodeType;
+    if (nodeLikeActionRequest.contains(nodeId)) return;
+
+    nodeLikeActionRequest.add(nodeId);
+    String nodeKey = nodeType.keyGenerator(nodeId);
+    final node = graph.getValueByKey(nodeKey)! as GraphEntityWithUserAction;
+
+    int initLike = node.likesCount;
+    int newLike = event.userLike ? initLike + 1 : initLike - 1;
+
+    try {
+      // optimistic update
+      graph.handleUserLikeAction(
+        nodeKey: nodeKey,
+        userLike: event.userLike,
+        likesCount: newLike,
+        commentsCount: node.commentsCount,
+      );
+
+      emit(UserActionNodeActionState(
+        nodeId: nodeId,
+        userLike: node.userLike,
+        likesCount: node.likesCount,
+        commentsCount: node.commentsCount,
+      ));
+
+      await _userNodeLikeActionUseCase(UserNodeLikeActionInput(
+        nodeId: nodeId,
+        username: event.username,
+        userLike: event.userLike,
+        nodeType: nodeType,
+      ));
+
+      emit(UserActionNodeActionState(
+        nodeId: nodeId,
+        userLike: node.userLike,
+        likesCount: node.likesCount,
+        commentsCount: node.commentsCount,
+      ));
+
+      UserNodeLikeAction payload = event.remotePayload.copyWith(
+        likeCount: node.likesCount,
+        commentCount: node.commentsCount,
+        isLike: node.userLike,
+      );
+      event.client?.sendPayload(payload);
+    } catch (_) {
+      // optimistic failure revert
+      graph.handleUserLikeAction(
+        nodeKey: nodeKey,
+        userLike: !event.userLike,
+        likesCount: initLike,
+        commentsCount: node.commentsCount,
+      );
+
+      emit(UserActionNodeActionState(
+        nodeId: nodeId,
+        userLike: node.userLike,
+        likesCount: node.likesCount,
+        commentsCount: node.commentsCount,
+      ));
+    }
+
+    nodeLikeActionRequest.remove(nodeId);
+  }
+
   FutureOr<void> _handleUserActionNewSecondaryNodeRemoteEvent(
       UserActionNewSecondaryNodeRemoteEvent event,
       Emitter<UserActionState> emit) async {
@@ -169,25 +223,14 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       Emitter<UserActionState> emit) async {
     final UserNodeLikeAction payload = event.payload;
     final bool self = event.username == payload.from;
+    final nodeType = DokiNodeType.fromNodeType(payload.nodeType);
 
-    // node type will always be post, comment or discussion
-    if (payload.nodeType == NodeType.post) {
-      graph.handleUserLikeActionForPostEntity(
-        payload.nodeId,
-        userLike: self ? payload.isLike : null,
-        likesCount: payload.likeCount,
-        commentsCount: payload.commentCount,
-      );
-    }
-
-    if (payload.nodeType == NodeType.comment) {
-      graph.handleUserLikeActionForCommentEntity(
-        payload.nodeId,
-        likesCount: payload.likeCount,
-        commentsCount: payload.commentCount,
-        userLike: self ? payload.isLike : null,
-      );
-    }
+    graph.handleUserLikeAction(
+      nodeKey: nodeType.keyGenerator(payload.nodeId),
+      likesCount: payload.likeCount,
+      commentsCount: payload.commentCount,
+      userLike: self ? payload.isLike : null,
+    );
 
     emit(UserActionNodeActionState(
       nodeId: payload.nodeId,
@@ -262,155 +305,6 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       nodeId: event.pollId,
       username: event.username,
     ));
-  }
-
-  FutureOr<void> _handleUserActionPostLikeActionEvent(
-      UserActionPostLikeActionEvent event,
-      Emitter<UserActionState> emit) async {
-    String postId = event.postId;
-    if (nodeLikeActionRequest.contains(postId)) return;
-
-    nodeLikeActionRequest.add(postId);
-    String postKey = generatePostNodeKey(event.postId);
-    PostEntity post = graph.getValueByKey(postKey)! as PostEntity;
-
-    int initLike = post.likesCount;
-    int newLike = event.userLike ? initLike + 1 : initLike - 1;
-
-    try {
-      // optimistic update
-      graph.handleUserLikeActionForPostEntity(
-        event.postId,
-        userLike: event.userLike,
-        likesCount: newLike,
-        commentsCount: post.commentsCount,
-      );
-
-      emit(UserActionNodeActionState(
-        nodeId: post.id,
-        userLike: post.userLike,
-        likesCount: post.likesCount,
-        commentsCount: post.commentsCount,
-      ));
-
-      if (event.userLike) {
-        await _postAddLikeUseCase(UserNodeLikeActionInput(
-          nodeId: event.postId,
-          username: event.username,
-        ));
-      } else {
-        await _postRemoveLikeUseCase(UserNodeLikeActionInput(
-          nodeId: event.postId,
-          username: event.username,
-        ));
-      }
-
-      emit(UserActionNodeActionState(
-        nodeId: post.id,
-        userLike: post.userLike,
-        likesCount: post.likesCount,
-        commentsCount: post.commentsCount,
-      ));
-
-      UserNodeLikeAction payload = event.remotePayload.copyWith(
-        likeCount: post.likesCount,
-        commentCount: post.commentsCount,
-        isLike: post.userLike,
-      );
-      event.client?.sendPayload(payload);
-    } catch (_) {
-      // optimistic failure revert
-      graph.handleUserLikeActionForPostEntity(
-        event.postId,
-        userLike: !event.userLike,
-        likesCount: initLike,
-        commentsCount: post.commentsCount,
-      );
-
-      emit(UserActionNodeActionState(
-        nodeId: post.id,
-        userLike: post.userLike,
-        likesCount: post.likesCount,
-        commentsCount: post.commentsCount,
-      ));
-    }
-
-    nodeLikeActionRequest.remove(postId);
-  }
-
-  FutureOr<void> _handleUserActionCommentLikeActionEvent(
-      UserActionCommentLikeActionEvent event,
-      Emitter<UserActionState> emit) async {
-    String commentId = event.commentId;
-    if (nodeLikeActionRequest.contains(commentId)) return;
-
-    nodeLikeActionRequest.add(commentId);
-
-    String commentKey = generateCommentNodeKey(event.commentId);
-    CommentEntity comment = graph.getValueByKey(commentKey)! as CommentEntity;
-
-    int initLike = comment.likesCount;
-    int newLike = event.userLike ? initLike + 1 : initLike - 1;
-
-    try {
-      // optimistic update
-      graph.handleUserLikeActionForCommentEntity(
-        event.commentId,
-        userLike: event.userLike,
-        likesCount: newLike,
-        commentsCount: comment.commentsCount,
-      );
-
-      emit(UserActionNodeActionState(
-        nodeId: comment.id,
-        userLike: comment.userLike,
-        likesCount: comment.likesCount,
-        commentsCount: comment.commentsCount,
-      ));
-
-      if (event.userLike) {
-        await _commentAddLikeUseCase(UserNodeLikeActionInput(
-          nodeId: event.commentId,
-          username: event.username,
-        ));
-      } else {
-        await _commentRemoveLikeUseCase(UserNodeLikeActionInput(
-          nodeId: event.commentId,
-          username: event.username,
-        ));
-      }
-
-      emit(UserActionNodeActionState(
-        nodeId: comment.id,
-        userLike: comment.userLike,
-        likesCount: comment.likesCount,
-        commentsCount: comment.commentsCount,
-      ));
-
-      UserNodeLikeAction payload = event.remotePayload.copyWith(
-        isLike: comment.userLike,
-        likeCount: comment.likesCount,
-        commentCount: comment.commentsCount,
-      );
-      event.client?.sendPayload(payload);
-    } catch (_) {
-      // optimistic failure revert
-      graph.handleUserLikeActionForCommentEntity(
-        event.commentId,
-        userLike: !event.userLike,
-        likesCount: initLike,
-        commentsCount: comment.commentsCount,
-      );
-
-      emit(UserActionNodeActionState(
-        nodeId: comment.id,
-        userLike: comment.userLike,
-        likesCount: comment.likesCount,
-        commentsCount: comment.commentsCount,
-      ));
-    }
-
-    nodeLikeActionRequest.remove(commentId);
   }
 
   FutureOr<void> _handleUserActionGetPostByIdEvent(

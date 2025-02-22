@@ -6,6 +6,7 @@ import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/debounce/debounce.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
@@ -653,8 +654,9 @@ class _CommentActionsState extends State<_CommentActions> {
 
                         context
                             .read<UserActionBloc>()
-                            .add(UserActionCommentLikeActionEvent(
-                              commentId: comment.id,
+                            .add(UserActionNodeLikeEvent(
+                              nodeId: comment.id,
+                              nodeType: DokiNodeType.comment,
                               userLike: !comment.userLike,
                               username: username,
                               client: context

@@ -45,13 +45,12 @@ class PostEntity implements UserActionEntityWithMediaItems {
     currDisplay = item;
   }
 
-  // @override
-  // Nodes get nodeComments => comments;
-
+  @override
   void updateUserLikeStatus(bool userLike) {
     this.userLike = userLike;
   }
 
+  @override
   void updateLikeCount(int likesCount) {
     this.likesCount = likesCount;
   }

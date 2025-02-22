@@ -29,8 +29,7 @@ enum DokiNodeType {
   ),
 
   poll(
-    // todo: update this
-    nodeType: NodeType.post,
+    nodeType: NodeType.poll,
     keyGenerator: generatePollNodeKey,
     nodeName: "Poll",
   );

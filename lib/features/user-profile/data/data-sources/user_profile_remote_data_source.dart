@@ -3,7 +3,6 @@ import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
-import 'package:doko_react/features/user-profile/data/models/comments/comment_action_model.dart';
 import 'package:doko_react/features/user-profile/data/models/post/post_action_model.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
@@ -46,11 +45,11 @@ class UserProfileRemoteDataSource {
         );
       }
 
-      PostActionModel model = PostActionModel.createModel(res[0]);
+      UserActionModel model = UserActionModel.createModel(res[0]);
       UserGraph graph = UserGraph();
 
-      graph.handleUserLikeActionForPostEntity(
-        postId,
+      graph.handleUserLikeAction(
+        nodeKey: generatePostNodeKey(postId),
         userLike: model.userLike,
         likesCount: model.likesCount,
         commentsCount: model.commentsCount,
@@ -87,11 +86,11 @@ class UserProfileRemoteDataSource {
         );
       }
 
-      PostActionModel model = PostActionModel.createModel(res[0]);
+      UserActionModel model = UserActionModel.createModel(res[0]);
       UserGraph graph = UserGraph();
 
-      graph.handleUserLikeActionForPostEntity(
-        postId,
+      graph.handleUserLikeAction(
+        nodeKey: generatePostNodeKey(postId),
         userLike: model.userLike,
         likesCount: model.likesCount,
         commentsCount: model.commentsCount,
@@ -242,11 +241,11 @@ class UserProfileRemoteDataSource {
         );
       }
 
-      CommentActionModel model = CommentActionModel.createModel(res[0]);
+      UserActionModel model = UserActionModel.createModel(res[0]);
       UserGraph graph = UserGraph();
 
-      graph.handleUserLikeActionForCommentEntity(
-        commentId,
+      graph.handleUserLikeAction(
+        nodeKey: generateCommentNodeKey(commentId),
         userLike: model.userLike,
         likesCount: model.likesCount,
         commentsCount: model.commentsCount,
@@ -283,11 +282,11 @@ class UserProfileRemoteDataSource {
         );
       }
 
-      CommentActionModel model = CommentActionModel.createModel(res[0]);
+      UserActionModel model = UserActionModel.createModel(res[0]);
       UserGraph graph = UserGraph();
 
-      graph.handleUserLikeActionForCommentEntity(
-        commentId,
+      graph.handleUserLikeAction(
+        nodeKey: generateCommentNodeKey(commentId),
         userLike: model.userLike,
         likesCount: model.likesCount,
         commentsCount: model.commentsCount,
@@ -518,6 +517,174 @@ class UserProfileRemoteDataSource {
 
       return true;
     } catch (e) {
+      rethrow;
+    }
+  }
+
+  // discussion
+  Future<bool> userAddDiscussionLike(
+      String discussionId, String username) async {
+    try {
+      QueryResult result = await _client.mutate(
+        MutationOptions(
+          document: gql(GraphqlMutations.userAddDiscussionLike()),
+          variables: GraphqlMutations.userAddDiscussionLikeVariables(
+            discussionId: discussionId,
+            username: username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(
+          reason: "Problem adding user like",
+        );
+      }
+
+      List? res = result.data?["updateDiscussions"]["discussions"];
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
+        );
+      }
+
+      UserActionModel model = UserActionModel.createModel(res[0]);
+      UserGraph graph = UserGraph();
+
+      graph.handleUserLikeAction(
+        nodeKey: generateDiscussionNodeKey(discussionId),
+        userLike: model.userLike,
+        likesCount: model.likesCount,
+        commentsCount: model.commentsCount,
+      );
+
+      return true;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<bool> userRemoveDiscussionLike(
+      String discussionId, String username) async {
+    try {
+      QueryResult result = await _client.mutate(
+        MutationOptions(
+          document: gql(GraphqlMutations.userRemoveDiscussionLike()),
+          variables: GraphqlMutations.userRemoveDiscussionLikeVariables(
+            discussionId: discussionId,
+            username: username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(
+          reason: "Problem removing user like",
+        );
+      }
+
+      List? res = result.data?["updateDiscussions"]["discussions"];
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
+        );
+      }
+
+      UserActionModel model = UserActionModel.createModel(res[0]);
+      UserGraph graph = UserGraph();
+
+      graph.handleUserLikeAction(
+        nodeKey: generateDiscussionNodeKey(discussionId),
+        userLike: model.userLike,
+        likesCount: model.likesCount,
+        commentsCount: model.commentsCount,
+      );
+
+      return true;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  // poll
+  Future<bool> userAddPollLike(String pollId, String username) async {
+    try {
+      QueryResult result = await _client.mutate(
+        MutationOptions(
+          document: gql(GraphqlMutations.userAddPollLike()),
+          variables: GraphqlMutations.userAddPollLikeVariables(
+            pollId: pollId,
+            username: username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(
+          reason: "Problem adding user like",
+        );
+      }
+
+      List? res = result.data?["updatePolls"]["polls"];
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
+        );
+      }
+
+      UserActionModel model = UserActionModel.createModel(res[0]);
+      UserGraph graph = UserGraph();
+
+      graph.handleUserLikeAction(
+        nodeKey: generatePollNodeKey(pollId),
+        userLike: model.userLike,
+        likesCount: model.likesCount,
+        commentsCount: model.commentsCount,
+      );
+
+      return true;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<bool> userRemovePollLike(String pollId, String username) async {
+    try {
+      QueryResult result = await _client.mutate(
+        MutationOptions(
+          document: gql(GraphqlMutations.userRemovePollLike()),
+          variables: GraphqlMutations.userRemovePollLikeVariables(
+            pollId: pollId,
+            username: username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(
+          reason: "Problem removing user like",
+        );
+      }
+
+      List? res = result.data?["updatePolls"]["polls"];
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
+        );
+      }
+
+      UserActionModel model = UserActionModel.createModel(res[0]);
+      UserGraph graph = UserGraph();
+
+      graph.handleUserLikeAction(
+        nodeKey: generatePollNodeKey(pollId),
+        userLike: model.userLike,
+        likesCount: model.likesCount,
+        commentsCount: model.commentsCount,
+      );
+
+      return true;
+    } catch (_) {
       rethrow;
     }
   }

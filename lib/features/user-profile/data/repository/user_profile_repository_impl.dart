@@ -70,4 +70,24 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
   Future<bool> getPollById(String pollId, String username) {
     return _remoteDataSource.getPollById(pollId, username);
   }
+
+  @override
+  Future<bool> userAddDiscussionLike(String nodeId, String username) {
+    return _remoteDataSource.userAddDiscussionLike(nodeId, username);
+  }
+
+  @override
+  Future<bool> userAddPollLike(String nodeId, String username) {
+    return _remoteDataSource.userAddPollLike(nodeId, username);
+  }
+
+  @override
+  Future<bool> userRemoveDiscussionLike(String nodeId, String username) {
+    return _remoteDataSource.userRemoveDiscussionLike(nodeId, username);
+  }
+
+  @override
+  Future<bool> userRemovePollLike(String nodeId, String username) {
+    return _remoteDataSource.userRemovePollLike(nodeId, username);
+  }
 }
