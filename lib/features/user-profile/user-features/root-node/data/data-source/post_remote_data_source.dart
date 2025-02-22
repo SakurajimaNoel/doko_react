@@ -5,6 +5,7 @@ import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/input/post_input.dart';
@@ -206,7 +207,7 @@ class PostRemoteDataSource {
           reason: "Problem loading discussion.",
         );
       }
-      List? res = result.data?["posts"];
+      List? res = result.data?["discussions"];
 
       if (res == null || res.isEmpty) {
         throw const ApplicationException(
@@ -247,13 +248,12 @@ class PostRemoteDataSource {
 
   Future<bool> getPollWithComments(GetNodeInput details) async {
     try {
-      return true;
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(GraphqlQueries.getCompletePostById()),
-          variables: GraphqlQueries.getCompletePostByIdVariables(
-            details.nodeId,
+          document: gql(GraphqlQueries.getCompletePollById()),
+          variables: GraphqlQueries.getCompletePollByIdVariables(
+            pollId: details.nodeId,
             username: details.username,
           ),
         ),
@@ -261,20 +261,20 @@ class PostRemoteDataSource {
 
       if (result.hasException) {
         throw const ApplicationException(
-          reason: "Problem loading post.",
+          reason: "Problem loading poll.",
         );
       }
-      List? res = result.data?["posts"];
+      List? res = result.data?["polls"];
 
       if (res == null || res.isEmpty) {
         throw const ApplicationException(
-          reason: "Post doesn't exist.",
+          reason: "Poll doesn't exist.",
         );
       }
 
-      PostEntity post = await PostEntity.createEntity(map: res[0]);
-      String postKey = generatePostNodeKey(post.id);
-      graph.addEntity(postKey, post);
+      PollEntity poll = await PollEntity.createEntity(map: res[0]);
+      String pollKey = generatePollNodeKey(poll.id);
+      graph.addEntity(pollKey, poll);
 
       Map commentData = res[0]["commentsConnection"];
 
@@ -290,11 +290,11 @@ class PostRemoteDataSource {
           .toList();
 
       List<CommentEntity> comments = await Future.wait(commentFutures);
-      // graph.addCommentListToPostEntity(
-      //   details.nodeId,
-      //   comments: comments,
-      //   pageInfo: info,
-      // );
+      graph.addCommentListToPrimaryNode(
+        pollKey,
+        comments: comments,
+        pageInfo: info,
+      );
 
       return true;
     } catch (e) {

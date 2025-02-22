@@ -5,6 +5,7 @@ import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -44,13 +45,55 @@ class RootNodeBloc extends Bloc<RootNodeEvent, RootNodeState> {
         super(RootNodeLoading()) {
     on<PostLoadEvent>(_handlePostLoadEvent);
     on<DiscussionLoadEvent>(_handleDiscussionLoadEvent);
+    on<PollLoadEvent>(_handlePollLoadEvent);
     on<SecondaryNodeLoadEvent>(_handleSecondaryNodeLoadEvent);
     on<LoadMoreSecondaryNodesEvent>(_handleLoadMoreSecondaryNodesEvent);
 
     on<PostRefreshEvent>(_handlePostRefreshEvent);
     on<DiscussionRefreshEvent>(_handleDiscussionRefreshEvent);
+    on<PollRefreshEvent>(_handlePollRefreshEvent);
     on<CommentLoadEvent>(_handleCommentLoadEvent);
     on<CommentRefreshEvent>(_handleCommentRefreshEvent);
+  }
+
+  FutureOr<void> _handlePollLoadEvent(
+      PollLoadEvent event, Emitter<RootNodeState> emit) async {
+    try {
+      String pollId = event.details.nodeId;
+      String pollKey = generatePollNodeKey(pollId);
+
+      if (graph.containsKey(pollKey)) {
+        /// discussion exists no need to refetch
+        /// check if comments are present or not
+        final PollEntity poll = graph.getValueByKey(pollKey)! as PollEntity;
+
+        if (poll.comments.isEmpty) {
+          add(SecondaryNodeLoadEvent(
+            details: GetCommentsInput(
+              nodeId: pollId,
+              username: event.details.username,
+              nodeType: DokiNodeType.poll,
+              cursor: "",
+            ),
+          ));
+        } else {
+          emit(PrimaryAndSecondaryNodeSuccessState());
+        }
+
+        return;
+      }
+
+      await _pollUseCase(event.details);
+      emit(PrimaryAndSecondaryNodeSuccessState());
+    } on ApplicationException catch (e) {
+      emit(RootNodeErrorState(
+        message: e.reason,
+      ));
+    } catch (e) {
+      emit(RootNodeErrorState(
+        message: Constants.errorMessage,
+      ));
+    }
   }
 
   FutureOr<void> _handleDiscussionLoadEvent(
@@ -246,6 +289,22 @@ class RootNodeBloc extends Bloc<RootNodeEvent, RootNodeState> {
       DiscussionRefreshEvent event, Emitter<RootNodeState> emit) async {
     try {
       await _discussionUseCase(event.details);
+      emit(PrimaryNodeRefreshSuccessState());
+    } on ApplicationException catch (e) {
+      emit(PrimaryNodeRefreshErrorState(
+        message: e.reason,
+      ));
+    } catch (e) {
+      emit(PrimaryNodeRefreshErrorState(
+        message: Constants.errorMessage,
+      ));
+    }
+  }
+
+  FutureOr<void> _handlePollRefreshEvent(
+      PollRefreshEvent event, Emitter<RootNodeState> emit) async {
+    try {
+      await _pollUseCase(event.details);
       emit(PrimaryNodeRefreshSuccessState());
     } on ApplicationException catch (e) {
       emit(PrimaryNodeRefreshErrorState(

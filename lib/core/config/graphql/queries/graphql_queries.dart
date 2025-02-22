@@ -85,7 +85,7 @@ class GraphqlQueries {
 
   static String getCompleteUser() {
     return '''
-      query Users(\$where: UserWhere, \$friendsAggregateWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [ContentSort!], \$contentsConnectionWhere2: ContentWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$likedByWhere2: UserWhere) {
+      query Users(\$where: UserWhere, \$friendsAggregateWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [ContentSort!], \$contentsConnectionWhere2: ContentWhere, \$likedByWhere2: UserWhere) {
         users(where: \$where) {
           id
           username
@@ -131,7 +131,7 @@ class GraphqlQueries {
                 username
                 name
                 profilePicture
-                friendsConnection(where: \$friendsConnectionWhere3) {
+                friendsConnection(where: \$friendsConnectionWhere2) {
                   edges {
                     properties {
                       addedOn
@@ -217,11 +217,6 @@ class GraphqlQueries {
             },
           }
         ]
-      },
-      "friendsConnectionWhere3": {
-        "node": {
-          "username_EQ": currentUsername,
-        }
       },
       "likedByWhere2": {
         "username_EQ": currentUsername,
@@ -1640,7 +1635,7 @@ class GraphqlQueries {
               likedByConnection {
                 totalCount
               }
-              commentByConnection {
+              commentsConnection {
                 totalCount
               }
               commentBy {
@@ -1698,6 +1693,7 @@ class GraphqlQueries {
         createdOn
         title
         text
+        media
         createdBy {
           id
           username
@@ -1746,6 +1742,199 @@ class GraphqlQueries {
       "likedByWhere2": {
         "username_EQ": username,
       }
+    };
+  }
+
+  /// get poll by id for inbox
+  static String getPollById() {
+    return """
+    query Polls(\$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+      polls(where: \$where) {
+        id
+        createdOn
+        question
+        options
+        activeFor
+        usersTagged {
+          username
+        }
+        likedBy(where: \$likedByWhere2) {
+          username
+        }
+        commentsConnection {
+          totalCount
+        }
+        likedByConnection {
+          totalCount
+        }
+        votesAggregate {
+          count
+        }
+        votesConnection(where: \$votesConnectionWhere2) {
+          edges {
+            properties {
+              addedOn
+              option
+            }
+          }
+        }
+        createdBy {
+          id
+          username
+          name
+          profilePicture
+          friendsConnection(where: \$friendsConnectionWhere2) {
+            edges {
+              properties {
+                addedOn
+                requestedBy
+                status
+              }
+            }
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> getPollByIdVariables({
+    required String pollId,
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": pollId,
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "votesConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
+    };
+  }
+
+  static String getCompletePollById() {
+    return """
+    query Polls(\$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int) {
+      polls(where: \$where) {
+        id
+        createdOn
+        question
+        options
+        activeFor
+        usersTagged {
+          username
+        }
+        likedBy(where: \$likedByWhere2) {
+          username
+        }
+        commentsConnection(first: \$first) {
+          totalCount
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
+          edges {
+            node {
+              id
+              createdOn
+              media
+              content
+              mentions {
+                username
+              }
+              likedByConnection {
+                totalCount
+              }
+              commentsConnection {
+                totalCount
+              }
+              likedBy(where: \$likedByWhere2) {
+                username
+              }
+              commentBy {
+                id
+                username
+                name
+                profilePicture
+                friendsConnection(where: \$friendsConnectionWhere2) {
+                  edges {
+                    properties {
+                      addedOn
+                      requestedBy
+                      status
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        likedByConnection {
+          totalCount
+        }
+        votesAggregate {
+          count
+        }
+        votesConnection(where: \$votesConnectionWhere2) {
+          edges {
+            properties {
+              addedOn
+              option
+            }
+          }
+        }
+        createdBy {
+          id
+          username
+          name
+          profilePicture
+          friendsConnection(where: \$friendsConnectionWhere2) {
+            edges {
+              properties {
+                addedOn
+                requestedBy
+                status
+              }
+            }
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> getCompletePollByIdVariables({
+    required String pollId,
+    required String username,
+  }) {
+    return {
+      "where": {
+        "id_EQ": pollId,
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "votesConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
+      "first": GraphqlConstants.nodeLimit,
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
     };
   }
 }

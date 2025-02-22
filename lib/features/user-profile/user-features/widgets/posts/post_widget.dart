@@ -47,13 +47,13 @@ class PostWidget extends StatelessWidget {
 
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
-        return state is UserActionPostDataFetchedState &&
-            state.postId == getPostIdFromPostKey(postKey);
+        return state is UserActionNodeDataFetchedState &&
+            state.nodeId == getPostIdFromPostKey(postKey);
       },
       builder: (context, state) {
         bool postExists = graph.containsKey(postKey);
         bool isError =
-            state is UserActionPostDataFetchedState && !state.success;
+            state is UserActionNodeDataFetchedState && !state.success;
 
         if (!postExists) {
           return LayoutBuilder(

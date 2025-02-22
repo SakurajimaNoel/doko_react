@@ -7,6 +7,7 @@ import 'package:doko_react/features/user-profile/data/models/comments/comment_ac
 import 'package:doko_react/features/user-profile/data/models/post/post_action_model.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -465,6 +466,54 @@ class UserProfileRemoteDataSource {
         graph.addEntity(discussionKey, existsDiscussion);
       } else {
         graph.addEntity(discussionKey, discussion);
+      }
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getPollById(String pollId, String username) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(GraphqlQueries.getPollById()),
+          variables: GraphqlQueries.getPollByIdVariables(
+            pollId: pollId,
+            username: username,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(reason: "Problem loading poll.");
+      }
+
+      List? res = result.data?["polls"];
+
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: "Poll doesn't exist.",
+        );
+      }
+
+      // add in graph
+      UserGraph graph = UserGraph();
+      PollEntity poll = await PollEntity.createEntity(map: res[0]);
+      String pollKey = generatePollNodeKey(poll.id);
+
+      if (graph.containsKey(pollKey)) {
+        final existPoll = graph.getValueByKey(pollKey)! as PollEntity;
+
+        existPoll.updateCommentsCount(poll.commentsCount);
+        existPoll.updateLikeCount(poll.likesCount);
+        existPoll.updateUserLikeStatus(poll.userLike);
+
+        graph.addEntity(pollKey, existPoll);
+      } else {
+        graph.addEntity(pollKey, poll);
       }
 
       return true;

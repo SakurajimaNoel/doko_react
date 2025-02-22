@@ -474,7 +474,9 @@ class GraphqlMutations {
               {
                 "where": {
                   "node": {
-                    "username_IN": commentInput.content.mentions,
+                    "username_IN": commentInput.content.mentions.toList(
+                      growable: false,
+                    ),
                   }
                 }
               }
@@ -670,7 +672,7 @@ class GraphqlMutations {
   // new poll
   static String userCreatePoll() {
     return """
-    mutation CreatePolls(\$input: [PollCreateInput!]!, \$where: UserWhere) {
+    mutation CreatePolls(\$input: [PollCreateInput!]!, \$where: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere) {
       createPolls(input: \$input) {
         polls {
           id
@@ -696,8 +698,13 @@ class GraphqlMutations {
           createdBy {
             username
           }
-          votes(where: \$where) {
-            username
+          votesConnection(where: \$votesConnectionWhere2) {
+            edges {
+              properties {
+                addedOn
+                option
+              }
+            }
           }
         }
       }
@@ -737,6 +744,11 @@ class GraphqlMutations {
       "where": {
         "username_EQ": poll.username,
       },
+      "votesConnectionWhere2": {
+        "node": {
+          "username_EQ": poll.username,
+        }
+      }
     };
   }
 }

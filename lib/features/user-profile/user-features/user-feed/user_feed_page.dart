@@ -3,6 +3,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/discussions/discussion_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/polls/poll_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -73,6 +74,10 @@ class _UserFeedPageState extends State<UserFeedPage> {
               DiscussionWidget(
                 discussionKey: generateDiscussionNodeKey(
                     "9c691388-f4c6-40c1-809e-34033f583796"),
+              ),
+              PollWidget(
+                pollKey:
+                    generatePollNodeKey("1eeb5ae8-7b67-4eb3-a484-36f8b5ec4672"),
               ),
             ],
           ),

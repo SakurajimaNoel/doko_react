@@ -10,6 +10,7 @@ import 'package:doko_react/features/user-profile/domain/use-case/comments/commen
 import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_get.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_remove_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/discussion/discussion_get.dart';
+import 'package:doko_react/features/user-profile/domain/use-case/poll/poll_get.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_add_like_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_get.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_remove_like_use_case.dart';
@@ -35,6 +36,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final CommentRemoveLikeUseCase _commentRemoveLikeUseCase;
   final PostGetUseCase _postGetUseCase;
   final DiscussionGetUseCase _discussionGetUseCase;
+  final PollGetUseCase _pollGetUseCase;
   final CommentGetUseCase _commentGetUseCase;
 
   UserActionBloc({
@@ -44,6 +46,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     required CommentRemoveLikeUseCase commentRemoveLikeUseCase,
     required PostGetUseCase postGetUseCase,
     required DiscussionGetUseCase discussionGetUseCase,
+    required PollGetUseCase pollGetUseCase,
     required CommentGetUseCase commentGetUseCase,
   })  : _postAddLikeUseCase = postAddLikeUseCase,
         _postRemoveLikeUseCase = postRemoveLikeUseCase,
@@ -51,6 +54,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         _commentRemoveLikeUseCase = commentRemoveLikeUseCase,
         _postGetUseCase = postGetUseCase,
         _discussionGetUseCase = discussionGetUseCase,
+        _pollGetUseCase = pollGetUseCase,
         _commentGetUseCase = commentGetUseCase,
         super(UserActionInitial()) {
     on<UserActionPostLikeActionEvent>(_handleUserActionPostLikeActionEvent);
@@ -115,6 +119,8 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     on<UserActionGetPostByIdEvent>(_handleUserActionGetPostByIdEvent);
     on<UserActionGetDiscussionByIdEvent>(
         _handleUserActionGetDiscussionByIdEvent);
+    on<UserActionGetPollByIdEvent>(_handleUserActionGetPollByIdEvent);
+
     on<UserActionGetCommentByIdEvent>(_handleUserActionGetCommentByIdEvent);
     on<UserActionNodeLikeRemoteEvent>(_handleUserActionNodeLikeRemoteEvent);
     on<UserActionNodeHighlightEvent>(
@@ -422,13 +428,13 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
 
       getNodeRequest.remove(event.postId);
-      emit(UserActionPostDataFetchedState(
-        postId: event.postId,
+      emit(UserActionNodeDataFetchedState(
+        nodeId: event.postId,
         success: true,
       ));
     } catch (_) {
-      emit(UserActionPostDataFetchedState(
-        postId: event.postId,
+      emit(UserActionNodeDataFetchedState(
+        nodeId: event.postId,
         success: false,
       ));
     }
@@ -451,17 +457,45 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       ));
 
       getNodeRequest.remove(event.discussionId);
-      emit(UserActionDiscussionDataFetchedState(
-        discussionId: event.discussionId,
+      emit(UserActionNodeDataFetchedState(
+        nodeId: event.discussionId,
         success: true,
       ));
     } catch (_) {
-      emit(UserActionDiscussionDataFetchedState(
-        discussionId: event.discussionId,
+      emit(UserActionNodeDataFetchedState(
+        nodeId: event.discussionId,
         success: false,
       ));
     }
     getNodeRequest.remove(event.discussionId);
+  }
+
+  FutureOr<void> _handleUserActionGetPollByIdEvent(
+      UserActionGetPollByIdEvent event, Emitter<UserActionState> emit) async {
+    try {
+      if (getNodeRequest.contains(event.pollId)) return;
+
+      String key = generatePollNodeKey(event.pollId);
+      if (graph.containsKey(key)) return;
+
+      getNodeRequest.add(event.pollId);
+      await _pollGetUseCase(GetNodeInput(
+        username: event.username,
+        nodeId: event.pollId,
+      ));
+
+      getNodeRequest.remove(event.pollId);
+      emit(UserActionNodeDataFetchedState(
+        nodeId: event.pollId,
+        success: true,
+      ));
+    } catch (_) {
+      emit(UserActionNodeDataFetchedState(
+        nodeId: event.pollId,
+        success: false,
+      ));
+    }
+    getNodeRequest.remove(event.pollId);
   }
 
   FutureOr<void> _handleUserActionGetCommentByIdEvent(

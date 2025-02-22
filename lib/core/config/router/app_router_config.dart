@@ -42,6 +42,7 @@ import 'package:doko_react/features/user-profile/user-features/profile/presentat
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/pages/search/search_page.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/pages/comment/comment_page.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/pages/discussion/discussion_page.dart';
+import 'package:doko_react/features/user-profile/user-features/root-node/presentation/pages/poll/poll_page.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/pages/post/post_page.dart';
 import 'package:doko_react/features/user-profile/user-features/user-feed/user_feed_page.dart';
 import 'package:doko_react/features/user-profile/user_layout.dart';
@@ -424,6 +425,18 @@ class AppRouterConfig {
 
                       return DiscussionPage(
                         discussionId: discussionId,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: RouterConstants.userPoll,
+                    path: "poll/:pollId",
+                    builder: (context, state) {
+                      String pollId = state.pathParameters["pollId"]!;
+
+                      return PollPage(
+                        pollId: pollId,
                       );
                     },
                   ),

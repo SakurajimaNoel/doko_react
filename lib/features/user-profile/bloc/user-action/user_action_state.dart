@@ -123,32 +123,18 @@ class UserActionPrimaryNodeRefreshState extends UserActionState {
 }
 
 // post data fetched for instant messaging
-class UserActionPostDataFetchedState extends UserActionState {
-  UserActionPostDataFetchedState({
-    required this.postId,
+class UserActionNodeDataFetchedState extends UserActionState {
+  UserActionNodeDataFetchedState({
+    required this.nodeId,
     required this.success,
   }) : now = DateTime.now();
 
-  final String postId;
+  final String nodeId;
   final DateTime now;
   final bool success;
 
   @override
-  List<Object?> get props => [postId, now, success];
-} // discussion data fetched for instant messaging
-
-class UserActionDiscussionDataFetchedState extends UserActionState {
-  UserActionDiscussionDataFetchedState({
-    required this.discussionId,
-    required this.success,
-  }) : now = DateTime.now();
-
-  final String discussionId;
-  final DateTime now;
-  final bool success;
-
-  @override
-  List<Object?> get props => [discussionId, now, success];
+  List<Object?> get props => [nodeId, now, success];
 }
 
 // comment data fetched for streaming

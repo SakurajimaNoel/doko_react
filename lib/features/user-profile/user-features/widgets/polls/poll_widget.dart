@@ -7,19 +7,19 @@ import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/share/share.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
-import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class DiscussionWidget extends StatelessWidget {
-  const DiscussionWidget({
+class PollWidget extends StatelessWidget {
+  const PollWidget({
     super.key,
-    required this.discussionKey,
+    required this.pollKey,
   });
 
-  final String discussionKey;
+  final String pollKey;
 
   @override
   Widget build(BuildContext context) {
@@ -27,28 +27,28 @@ class DiscussionWidget extends StatelessWidget {
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
 
-    if (!graph.containsKey(discussionKey)) {
+    if (!graph.containsKey(pollKey)) {
       // send a req to fetch the discussion
-      context.read<UserActionBloc>().add(UserActionGetDiscussionByIdEvent(
+      context.read<UserActionBloc>().add(UserActionGetPollByIdEvent(
             username: username,
-            discussionId: getDiscussionIdFromDiscussionKey(discussionKey),
+            pollId: getPollIdFromPollKey(pollKey),
           ));
     }
 
     String currentRoute = GoRouter.of(context).currentRouteName ?? "";
-    bool isDiscussionPage = currentRoute == RouterConstants.userDiscussion;
+    bool isPollPage = currentRoute == RouterConstants.userPoll;
 
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
         return state is UserActionNodeDataFetchedState &&
-            state.nodeId == getDiscussionIdFromDiscussionKey(discussionKey);
+            state.nodeId == getPollIdFromPollKey(pollKey);
       },
       builder: (context, state) {
-        bool discussionExists = graph.containsKey(discussionKey);
+        bool pollExists = graph.containsKey(pollKey);
         bool isError =
             state is UserActionNodeDataFetchedState && !state.success;
 
-        if (!discussionExists) {
+        if (!pollExists) {
           return LayoutBuilder(
             builder: (context, constraints) {
               return SizedBox(
@@ -61,18 +61,16 @@ class DiscussionWidget extends StatelessWidget {
                           spacing: Constants.gap * 0.25,
                           children: [
                             const StyledText.error(
-                              "Error loading discussion.",
+                              "Error loading poll.",
                               size: Constants.smallFontSize * 1.125,
                             ),
                             TextButton.icon(
                               onPressed: () {
                                 context
                                     .read<UserActionBloc>()
-                                    .add(UserActionGetDiscussionByIdEvent(
+                                    .add(UserActionGetPollByIdEvent(
                                       username: username,
-                                      discussionId:
-                                          getDiscussionIdFromDiscussionKey(
-                                              discussionKey),
+                                      pollId: getPollIdFromPollKey(pollKey),
                                     ));
                               },
                               label: const Text("Retry"),
@@ -86,35 +84,34 @@ class DiscussionWidget extends StatelessWidget {
             },
           );
         }
-        final DiscussionEntity discussion =
-            graph.getValueByKey(discussionKey)! as DiscussionEntity;
+        final PollEntity poll = graph.getValueByKey(pollKey)! as PollEntity;
 
         return Material(
-          color: Colors.blue,
+          color: Colors.green,
           child: InkWell(
-            onTap: isDiscussionPage
+            onTap: isPollPage
                 ? null
                 : () {
                     context.pushNamed(
-                      RouterConstants.userDiscussion,
+                      RouterConstants.userPoll,
                       pathParameters: {
-                        "discussionId": discussion.id,
+                        "pollId": poll.id,
                       },
                     );
                   },
-            onLongPress: isDiscussionPage
+            onLongPress: isPollPage
                 ? null
                 : () {
                     Share.share(
                       context: context,
-                      subject: MessageSubject.dokiDiscussion,
-                      nodeIdentifier: discussion.id,
+                      subject: MessageSubject.dokiPolls,
+                      nodeIdentifier: poll.id,
                     );
                   },
             child: SizedBox(
               height: Constants.height * 15,
               child: Center(
-                child: Text(discussion.title),
+                child: Text(poll.question),
               ),
             ),
           ),

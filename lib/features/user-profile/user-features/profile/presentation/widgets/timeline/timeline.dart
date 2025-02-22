@@ -10,6 +10,7 @@ import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.da
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/discussions/discussion_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/polls/poll_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/post_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,9 +90,8 @@ class _TimelineState extends State<Timeline> {
         discussionKey: nodeKey,
       );
     }
-    return Container(
-      color: Colors.green,
-      height: Constants.height * 10,
+    return PollWidget(
+      pollKey: nodeKey,
     );
   }
 

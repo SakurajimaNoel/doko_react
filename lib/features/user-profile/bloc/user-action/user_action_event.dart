@@ -159,6 +159,16 @@ final class UserActionGetDiscussionByIdEvent extends UserActionEvent {
   final String discussionId;
 }
 
+final class UserActionGetPollByIdEvent extends UserActionEvent {
+  UserActionGetPollByIdEvent({
+    required this.username,
+    required this.pollId,
+  });
+
+  final String username;
+  final String pollId;
+}
+
 // fetch comment by commentId for streaming
 final class UserActionGetCommentByIdEvent extends UserActionEvent {
   UserActionGetCommentByIdEvent({

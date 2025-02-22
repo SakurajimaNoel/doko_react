@@ -13,12 +13,15 @@ class PollEntity implements NodeWithCommentEntity {
     required this.comments,
     required this.userLike,
     required this.usersTagged,
+    required this.question,
   });
 
   final String id;
   final DateTime createdOn;
   final String createdBy;
   final List<String> usersTagged;
+
+  final String question;
 
   int likesCount;
   @override
@@ -70,6 +73,7 @@ class PollEntity implements NodeWithCommentEntity {
       commentsCount: map["commentsConnection"]["totalCount"],
       userLike: userLike,
       usersTagged: usersTagged,
+      question: map["question"],
     );
   }
 }
