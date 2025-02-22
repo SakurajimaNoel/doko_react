@@ -143,7 +143,9 @@ class _UserDiscussionListPageState extends State<UserDiscussionListPage> {
                       StyledText.error(state.message),
                       ElevatedButton(
                         onPressed: () {
-                          context.read<ProfileBloc>().add(GetUserPostsEvent(
+                          context
+                              .read<ProfileBloc>()
+                              .add(GetUserDiscussionEvent(
                                 userDetails: details,
                               ));
                         },
@@ -158,7 +160,7 @@ class _UserDiscussionListPageState extends State<UserDiscussionListPage> {
                 onRefresh: () async {
                   Future profileBloc = context.read<ProfileBloc>().stream.first;
 
-                  context.read<ProfileBloc>().add(GetUserPostsRefreshEvent(
+                  context.read<ProfileBloc>().add(GetUserDiscussionRefreshEvent(
                         userDetails: details,
                       ));
 

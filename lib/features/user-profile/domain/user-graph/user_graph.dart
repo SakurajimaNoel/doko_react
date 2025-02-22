@@ -246,6 +246,46 @@ class UserGraph {
     }
   }
 
+  void addPollEntityListToUser(
+    String username, {
+    required List<PollEntity> newPolls,
+    required PageInfo pageInfo,
+  }) {
+    String key = generateUserNodeKey(username);
+
+    final CompleteUserEntity user = getValueByKey(key)! as CompleteUserEntity;
+
+    Map<String, GraphEntity> tempMap = HashMap();
+
+    List<String> pollKeys = newPolls.map((pollItem) {
+      String pollKey = generatePollNodeKey(pollItem.id);
+      PollEntity pollToAdd;
+      if (containsKey(pollKey)) {
+        final existsPoll = getValueByKey(pollKey)! as PollEntity;
+
+        existsPoll.updateCommentsCount(pollItem.commentsCount);
+        existsPoll.updateLikeCount(pollItem.likesCount);
+        existsPoll.updateUserLikeStatus(pollItem.userLike);
+
+        pollToAdd = existsPoll;
+      } else {
+        pollToAdd = pollItem;
+      }
+
+      // adding post entity
+      tempMap[pollKey] = pollToAdd;
+
+      return pollKey;
+    }).toList();
+
+    // adding all posts to map
+    _addEntityMap(tempMap);
+
+    // updating user
+    user.polls.addEntityItems(pollKeys);
+    user.polls.updatePageInfo(pageInfo);
+  }
+
   // add  new poll
   void addPollEntityToUser(String username, PollEntity newPoll) {
     String key = generateUserNodeKey(username);

@@ -35,6 +35,11 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
+  Future<bool> getUserPolls(UserProfileNodesInput pollDetails) async {
+    return _remoteDataSource.getUserProfilePolls(pollDetails);
+  }
+
+  @override
   Future<bool> getUserFriends(UserProfileNodesInput friendsDetails) {
     return _remoteDataSource.getUserProfileFriends(friendsDetails);
   }

@@ -56,6 +56,7 @@ import "package:doko_react/features/user-profile/user-features/profile/domain/us
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/profile-use-case/profile_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-discussion-use-case/user_discussion_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-friends-use-case/user_friends_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-poll-use-case/user_poll_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-post-use-case/user_post_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/comments_mention_search_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/profile/domain/use-case/user-search-use-case/user_friend_search_use_case.dart";
@@ -396,6 +397,11 @@ void _initProfile() {
       profileRepository: serviceLocator<ProfileRepository>(),
     ),
   );
+  serviceLocator.registerFactory<UserPollUseCase>(
+    () => UserPollUseCase(
+      profileRepository: serviceLocator<ProfileRepository>(),
+    ),
+  );
 
   serviceLocator.registerFactory<ProfileBloc>(
     () => ProfileBloc(
@@ -404,6 +410,7 @@ void _initProfile() {
       editProfileUseCase: serviceLocator(),
       userPostUseCase: serviceLocator(),
       userDiscussionUseCase: serviceLocator(),
+      userPollUseCase: serviceLocator(),
       userFriendsUseCase: serviceLocator(),
       userSearchUseCase: serviceLocator(),
       userFriendsSearchUseCase: serviceLocator(),

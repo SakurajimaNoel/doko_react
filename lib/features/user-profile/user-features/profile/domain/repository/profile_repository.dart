@@ -11,6 +11,8 @@ abstract class ProfileRepository {
 
   Future<bool> getUserDiscussions(UserProfileNodesInput discussionDetails);
 
+  Future<bool> getUserPolls(UserProfileNodesInput pollDetails);
+
   Future<bool> getUserFriends(UserProfileNodesInput friendsDetails);
 
   Future<List<String>> searchUserByUsernameOrName(

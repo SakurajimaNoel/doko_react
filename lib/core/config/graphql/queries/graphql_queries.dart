@@ -682,6 +682,152 @@ class GraphqlQueries {
     };
   }
 
+  static String getUserPollsByUsername(String cursor) {
+    if (cursor.isEmpty) {
+      return """
+      query PollsConnection(\$first: Int, \$sort: [PollSort!], \$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere) {
+        pollsConnection(first: \$first, sort: \$sort, where: \$where) {
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
+          edges {
+            node {
+              id
+              createdOn
+              question
+              options
+              activeFor
+              usersTagged {
+                username
+              }
+              likedBy(where: \$likedByWhere2) {
+                username
+              }
+              commentsConnection {
+                totalCount
+              }
+              likedByConnection {
+                totalCount
+              }
+              createdBy {
+                username
+              }
+              votesAggregate {
+                count
+              }
+              votesConnection(where: \$votesConnectionWhere2) {
+                edges {
+                  properties {
+                    addedOn
+                    option
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """;
+    }
+
+    return """
+    query PollsConnection(\$first: Int, \$sort: [PollSort!], \$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$after: String) {
+      pollsConnection(first: \$first, sort: \$sort, where: \$where, after: \$after) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        edges {
+          node {
+            id
+            createdOn
+            question
+            options
+            activeFor
+            usersTagged {
+              username
+            }
+            likedBy(where: \$likedByWhere2) {
+              username
+            }
+            commentsConnection {
+              totalCount
+            }
+            likedByConnection {
+              totalCount
+            }
+            createdBy {
+              username
+            }
+            votesAggregate {
+              count
+            }
+            votesConnection(where: \$votesConnectionWhere2) {
+              edges {
+                properties {
+                  addedOn
+                  option
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    """;
+  }
+
+  static Map<String, dynamic> getUserPollsByUsernameVariables({
+    required String username,
+    required String cursor,
+    required String currentUsername,
+  }) {
+    if (cursor.isEmpty) {
+      return {
+        "first": GraphqlConstants.nodeLimit,
+        "sort": [
+          {"createdOn": "DESC"}
+        ],
+        "where": {
+          "createdBy": {
+            "username_EQ": username,
+          }
+        },
+        "likedByWhere2": {
+          "username_EQ": currentUsername,
+        },
+        "votesConnectionWhere2": {
+          "node": {
+            "username_EQ": currentUsername,
+          }
+        }
+      };
+    }
+
+    return {
+      "first": GraphqlConstants.nodeLimit,
+      "after": cursor,
+      "sort": [
+        {"createdOn": "DESC"}
+      ],
+      "where": {
+        "createdBy": {
+          "username_EQ": username,
+        }
+      },
+      "likedByWhere2": {
+        "username_EQ": currentUsername,
+      },
+      "votesConnectionWhere2": {
+        "node": {
+          "username_EQ": currentUsername,
+        }
+      }
+    };
+  }
+
 // get user pending friends outgoing
   static String getPendingOutgoingFriendsByUsername(String? cursor) {
     if (cursor == null || cursor.isEmpty) {

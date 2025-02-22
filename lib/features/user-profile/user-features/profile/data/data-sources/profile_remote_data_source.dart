@@ -294,6 +294,16 @@ class ProfileRemoteDataSource {
           .toList();
 
       List<PostEntity> posts = await Future.wait(postFutures);
+      if (postDetails.cursor.isEmpty) {
+        /// when cursor is empty
+        /// it means first time fetching
+        /// or refresh so reset the friends of user
+        /// so reset the friends
+        String userKey = generateUserNodeKey(postDetails.username);
+        final user = graph.getValueByKey(userKey)! as CompleteUserEntity;
+
+        user.posts = Nodes.empty();
+      }
       graph.addPostEntityListToUser(
         postDetails.username,
         newPosts: posts,
@@ -668,9 +678,80 @@ class ProfileRemoteDataSource {
           .toList();
 
       List<DiscussionEntity> discussions = await Future.wait(discussionFutures);
+      if (discussionDetails.cursor.isEmpty) {
+        /// when cursor is empty
+        /// it means first time fetching
+        /// or refresh so reset the friends of user
+        /// so reset the friends
+        String userKey = generateUserNodeKey(discussionDetails.username);
+        final user = graph.getValueByKey(userKey)! as CompleteUserEntity;
+
+        user.discussions = Nodes.empty();
+      }
       graph.addDiscussionEntityListToUser(
         discussionDetails.username,
         newDiscussions: discussions,
+        pageInfo: info,
+      );
+
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getUserProfilePolls(UserProfileNodesInput pollDetails) async {
+    try {
+      QueryResult result = await _client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document:
+              gql(GraphqlQueries.getUserPollsByUsername(pollDetails.cursor)),
+          variables: GraphqlQueries.getUserPollsByUsernameVariables(
+            username: pollDetails.username,
+            cursor: pollDetails.cursor,
+            currentUsername: pollDetails.currentUsername,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(
+          reason: "Can't fetch user polls",
+        );
+      }
+
+      Map? res = result.data?["pollsConnection"];
+
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
+        );
+      }
+
+      UserGraph graph = UserGraph();
+
+      PageInfo info = PageInfo.createEntity(map: res["pageInfo"]);
+      List pollList = res["edges"];
+
+      var pollFutures = (pollList)
+          .map((poll) => PollEntity.createEntity(map: poll["node"]))
+          .toList();
+
+      List<PollEntity> polls = await Future.wait(pollFutures);
+      if (pollDetails.cursor.isEmpty) {
+        /// when cursor is empty
+        /// it means first time fetching
+        /// or refresh so reset the friends of user
+        /// so reset the friends
+        String userKey = generateUserNodeKey(pollDetails.username);
+        final user = graph.getValueByKey(userKey)! as CompleteUserEntity;
+
+        user.polls = Nodes.empty();
+      }
+      graph.addPollEntityListToUser(
+        pollDetails.username,
+        newPolls: polls,
         pageInfo: info,
       );
 
