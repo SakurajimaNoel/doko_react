@@ -621,7 +621,7 @@ class UserGraph {
 
     final node = getValueByKey(key);
 
-    if (node is! NodeWithCommentEntity) return;
+    if (node is! GraphEntityWithUserAction) return;
 
     node.comments.updatePageInfo(pageInfo);
     node.comments.addEntityItems(commentKeys);
@@ -639,7 +639,7 @@ class UserGraph {
 
     final node = getValueByKey(key);
 
-    if (node is! NodeWithCommentEntity) return;
+    if (node is! GraphEntityWithUserAction) return;
 
     node.comments.addItem(commentKey);
     node.updateCommentsCount(node.commentsCount + 1);
@@ -654,7 +654,7 @@ class UserGraph {
 
     final node = getValueByKey(key);
 
-    if (node is! NodeWithCommentEntity) return;
+    if (node is! GraphEntityWithUserAction) return;
 
     node.updateCommentsCount(node.commentsCount + 1);
 

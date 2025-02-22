@@ -38,14 +38,15 @@ class _CommentListState extends State<CommentList> {
 
   bool loading = false;
 
-  late final NodeWithCommentEntity parentNode;
+  late final GraphEntityWithUserAction parentNode;
 
   @override
   void initState() {
     super.initState();
 
     parentGraphKey = parentNodeType.keyGenerator(parentNodeId);
-    parentNode = graph.getValueByKey(parentGraphKey)! as NodeWithCommentEntity;
+    parentNode =
+        graph.getValueByKey(parentGraphKey)! as GraphEntityWithUserAction;
   }
 
   Widget buildCommentItems(BuildContext context, int index) {

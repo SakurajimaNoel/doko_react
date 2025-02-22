@@ -4,7 +4,7 @@ import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.
 import 'package:doko_react/features/user-profile/domain/media/media_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 
-class PostEntity implements NodeWithMediaItems {
+class PostEntity implements UserActionEntityWithMediaItems {
   PostEntity({
     required this.id,
     required this.caption,
@@ -25,10 +25,13 @@ class PostEntity implements NodeWithMediaItems {
   final String createdBy; // reference to user key user:username
   final List<String> usersTagged;
 
+  @override
   int likesCount;
 
   @override
   int commentsCount;
+
+  @override
   bool userLike;
 
   @override

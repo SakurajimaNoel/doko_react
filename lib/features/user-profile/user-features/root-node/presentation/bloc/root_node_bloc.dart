@@ -241,8 +241,8 @@ class RootNodeBloc extends Bloc<RootNodeEvent, RootNodeState> {
     try {
       final nodeType = event.details.nodeType;
       String graphKey = nodeType.keyGenerator(event.details.nodeId);
-      final NodeWithCommentEntity entity =
-          graph.getValueByKey(graphKey)! as NodeWithCommentEntity;
+      final GraphEntityWithUserAction entity =
+          graph.getValueByKey(graphKey)! as GraphEntityWithUserAction;
 
       if (event.details.cursor.isEmpty && entity.comments.items.isNotEmpty) {
         emit(SecondaryLoadSuccess(

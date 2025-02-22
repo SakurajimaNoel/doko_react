@@ -4,7 +4,7 @@ import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.
 import 'package:doko_react/features/user-profile/domain/media/media_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 
-class DiscussionEntity implements NodeWithMediaItems {
+class DiscussionEntity implements UserActionEntityWithMediaItems {
   DiscussionEntity({
     required this.id,
     required this.title,
@@ -27,9 +27,11 @@ class DiscussionEntity implements NodeWithMediaItems {
   final String text;
   final List<String> usersTagged;
 
+  @override
   int likesCount;
   @override
   int commentsCount;
+  @override
   bool userLike;
 
   @override

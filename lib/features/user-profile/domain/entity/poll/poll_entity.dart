@@ -3,7 +3,7 @@ import 'package:doko_react/features/user-profile/domain/entity/profile_entity.da
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 
-class PollEntity implements NodeWithCommentEntity {
+class PollEntity implements GraphEntityWithUserAction {
   PollEntity({
     required this.id,
     required this.createdOn,
@@ -23,9 +23,11 @@ class PollEntity implements NodeWithCommentEntity {
 
   final String question;
 
+  @override
   int likesCount;
   @override
   int commentsCount;
+  @override
   bool userLike;
   @override
   Nodes comments;

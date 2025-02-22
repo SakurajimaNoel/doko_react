@@ -37,7 +37,7 @@ class MediaWidget extends StatelessWidget {
     final graph = UserGraph();
     final node = graph.getValueByKey(nodeKey);
 
-    if (node is! NodeWithMediaItems) {
+    if (node is! UserActionEntityWithMediaItems) {
       return const SizedBox(
         height: Constants.height * 5,
         child: Center(
@@ -92,7 +92,8 @@ class _MediaContentState extends State<_MediaContent> {
   void initState() {
     super.initState();
 
-    final node = graph.getValueByKey(nodeKey)! as NodeWithMediaItems;
+    final node =
+        graph.getValueByKey(nodeKey)! as UserActionEntityWithMediaItems;
 
     controller = CarouselController(
       initialItem: node.currDisplay,
@@ -106,7 +107,8 @@ class _MediaContentState extends State<_MediaContent> {
 
     int item = (offset / width).round();
 
-    final node = graph.getValueByKey(nodeKey)! as NodeWithMediaItems;
+    final node =
+        graph.getValueByKey(nodeKey)! as UserActionEntityWithMediaItems;
     node.updateDisplayItem(item);
 
     context.read<MediaCarouselIndicatorProvider>().updateCurrentItem(item);
