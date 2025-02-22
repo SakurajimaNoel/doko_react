@@ -19,6 +19,8 @@ import 'package:doko_react/features/user-profile/domain/entity/instant-messaging
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/message-body-type/message_body_type.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/provider/archive_message_provider.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/discussions/discussion_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/polls/poll_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/post_preview_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/gestures.dart';
@@ -29,7 +31,9 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+part "archive_discussion.dart";
 part "archive_external_resource.dart";
+part "archive_poll.dart";
 part "archive_post.dart";
 part "archive_text.dart";
 part "archive_user_profile.dart";
@@ -300,14 +304,14 @@ class _ArchiveItemState extends State<ArchiveItem> {
           messageKey: widget.messageKey,
         );
       case MessageSubject.dokiDiscussion:
-        body = _ArchiveText(
+        body = _ArchiveDiscussion(
           bubbleColor: bubbleColor,
           textColor: textColor,
           metaDataStyle: metaDataStyle,
           messageKey: widget.messageKey,
         );
       case MessageSubject.dokiPolls:
-        body = _ArchiveText(
+        body = _ArchivePoll(
           bubbleColor: bubbleColor,
           textColor: textColor,
           metaDataStyle: metaDataStyle,
