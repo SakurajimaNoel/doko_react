@@ -4,7 +4,9 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
+import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/markdown-display-widget/markdown_display_widget.dart';
 import 'package:doko_react/core/widgets/share/share.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -12,6 +14,7 @@ import 'package:doko_react/features/user-profile/domain/entity/discussion/discus
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/content-action-widget/content_action_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/content-meta-data-widget/content_meta_data_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/media-widget/media_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -92,12 +95,72 @@ class DiscussionWidget extends StatelessWidget {
         final DiscussionEntity discussion =
             graph.getValueByKey(discussionKey)! as DiscussionEntity;
 
-        return Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: isDiscussionPage
-                ? null
-                : () {
+        return InkWell(
+          onTap: isDiscussionPage
+              ? null
+              : () {
+                  context.pushNamed(
+                    RouterConstants.userDiscussion,
+                    pathParameters: {
+                      "discussionId": discussion.id,
+                    },
+                  );
+                },
+          onLongPress: isDiscussionPage
+              ? null
+              : () {
+                  Share.share(
+                    context: context,
+                    subject: MessageSubject.dokiDiscussion,
+                    nodeIdentifier: discussion.id,
+                  );
+                },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: Constants.padding * 0.75,
+            ),
+            child: Column(
+              spacing: Constants.gap * 0.5,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ContentMetaDataWidget(
+                  nodeKey: discussionKey,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Constants.padding,
+                    vertical: Constants.padding * 0.5,
+                  ),
+                  child: Heading.left(
+                    discussion.title,
+                    size: Constants.heading4 * 1.125,
+                  ),
+                ),
+                if (discussion.media.isNotEmpty) ...[
+                  MediaWidget(
+                    mediaItems: discussion.media,
+                    nodeKey: discussionKey,
+                  ),
+                  if (!isDiscussionPage)
+                    const SizedBox(
+                      height: Constants.gap * 0.5,
+                    ),
+                ],
+                if (isDiscussionPage)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: Constants.padding,
+                      vertical: Constants.padding * 0.5,
+                    ),
+                    child: MarkdownDisplayWidget(
+                      data: discussion.text,
+                    ),
+                  ),
+                ContentActionWidget(
+                  nodeId: discussion.id,
+                  nodeType: DokiNodeType.discussion,
+                  isNodePage: isDiscussionPage,
+                  redirectToNodePage: () {
                     context.pushNamed(
                       RouterConstants.userDiscussion,
                       pathParameters: {
@@ -105,47 +168,8 @@ class DiscussionWidget extends StatelessWidget {
                       },
                     );
                   },
-            onLongPress: isDiscussionPage
-                ? null
-                : () {
-                    Share.share(
-                      context: context,
-                      subject: MessageSubject.dokiDiscussion,
-                      nodeIdentifier: discussion.id,
-                    );
-                  },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: Constants.padding * 0.75,
-              ),
-              child: Column(
-                spacing: Constants.gap,
-                children: [
-                  ContentMetaDataWidget(
-                    nodeKey: discussionKey,
-                  ),
-                  Container(
-                    color: Colors.blue,
-                    height: Constants.height * 15,
-                    child: Center(
-                      child: Text(discussion.title),
-                    ),
-                  ),
-                  ContentActionWidget(
-                    nodeId: discussion.id,
-                    nodeType: DokiNodeType.discussion,
-                    isNodePage: isDiscussionPage,
-                    redirectToNodePage: () {
-                      context.pushNamed(
-                        RouterConstants.userDiscussion,
-                        pathParameters: {
-                          "discussionId": discussion.id,
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );

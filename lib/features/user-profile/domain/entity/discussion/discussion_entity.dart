@@ -78,8 +78,8 @@ class DiscussionEntity implements UserActionEntityWithMediaItems {
     }
 
     List mapContent = [];
-    if (map["content"] != null) {
-      mapContent = map["content"] as List;
+    if (map["media"] != null) {
+      mapContent = map["media"] as List;
     }
 
     List<Future<MediaEntity>> mediaContentFuture = (mapContent)

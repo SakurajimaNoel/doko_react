@@ -118,27 +118,18 @@ class PostWidget extends StatelessWidget {
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: Constants.gap * 0.5,
               children: [
                 // post meta data
                 ContentMetaDataWidget(
                   nodeKey: postKey,
                 ),
                 // post content
-                if (post.content.isNotEmpty) ...[
-                  const SizedBox(
-                    height: Constants.gap * 0.5,
-                  ),
+                if (post.content.isNotEmpty)
                   MediaWidget(
                     mediaItems: post.content,
                     nodeKey: postKey,
                   ),
-                  const SizedBox(
-                    height: Constants.gap * 0.5,
-                  ),
-                ],
-                const SizedBox(
-                  height: Constants.gap * 0.5,
-                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: Constants.padding,
@@ -147,9 +138,6 @@ class PostWidget extends StatelessWidget {
                   child: _PostCaption(
                     caption: post.caption,
                   ),
-                ),
-                const SizedBox(
-                  height: Constants.gap * 0.5,
                 ),
                 ContentActionWidget(
                   nodeId: post.id,
