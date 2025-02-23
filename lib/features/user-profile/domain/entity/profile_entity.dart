@@ -9,6 +9,10 @@ abstract class GraphEntityWithUserAction implements GraphEntity {
   int get commentsCount;
   int get likesCount;
   bool get userLike;
+  String get id;
+  DateTime get createdOn;
+  String get createdBy;
+  List<String> get usersTagged;
 
   void updateCommentsCount(int count);
 

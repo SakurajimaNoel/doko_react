@@ -2,6 +2,7 @@ import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/share/share.dart';
@@ -9,6 +10,7 @@ import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/content-action-widget/content_action_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -87,7 +89,7 @@ class PollWidget extends StatelessWidget {
         final PollEntity poll = graph.getValueByKey(pollKey)! as PollEntity;
 
         return Material(
-          color: Colors.green,
+          color: Colors.transparent,
           child: InkWell(
             onTap: isPollPage
                 ? null
@@ -108,11 +110,30 @@ class PollWidget extends StatelessWidget {
                       nodeIdentifier: poll.id,
                     );
                   },
-            child: SizedBox(
-              height: Constants.height * 15,
-              child: Center(
-                child: Text(poll.question),
-              ),
+            child: Column(
+              spacing: Constants.gap,
+              children: [
+                Container(
+                  color: Colors.green,
+                  height: Constants.height * 15,
+                  child: Center(
+                    child: Text(poll.question),
+                  ),
+                ),
+                ContentActionWidget(
+                  nodeId: poll.id,
+                  nodeType: DokiNodeType.poll,
+                  isNodePage: isPollPage,
+                  redirectToNodePage: () {
+                    context.pushNamed(
+                      RouterConstants.userPoll,
+                      pathParameters: {
+                        "pollId": poll.id,
+                      },
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         );

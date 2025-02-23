@@ -7,7 +7,7 @@ import 'package:doko_react/core/widgets/video-player/video_player.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/media/media_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/widgets/media-widget/provider/media_carousel_indicator_provider.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/media-widget/provider/media_carousel_indicator_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';

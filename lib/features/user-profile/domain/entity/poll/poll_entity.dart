@@ -16,9 +16,13 @@ class PollEntity implements GraphEntityWithUserAction {
     required this.question,
   });
 
+  @override
   final String id;
+  @override
   final DateTime createdOn;
+  @override
   final String createdBy;
+  @override
   final List<String> usersTagged;
 
   final String question;

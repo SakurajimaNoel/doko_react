@@ -18,11 +18,15 @@ class PostEntity implements UserActionEntityWithMediaItems {
     required this.usersTagged,
   });
 
+  @override
   final String id;
   final String caption;
+  @override
   final DateTime createdOn;
   final List<MediaEntity> content;
+  @override
   final String createdBy; // reference to user key user:username
+  @override
   final List<String> usersTagged;
 
   @override

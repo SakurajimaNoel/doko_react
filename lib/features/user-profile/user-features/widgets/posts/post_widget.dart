@@ -3,18 +3,16 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
-import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
-import 'package:doko_react/core/widgets/like-widget/like_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/share/share.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
-import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/node_comment_provider.dart';
-import 'package:doko_react/features/user-profile/user-features/widgets/media-widget/media_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/content-action-widget/content_action_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/media-widget/media_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -193,8 +191,18 @@ class PostWidget extends StatelessWidget {
                 const SizedBox(
                   height: Constants.gap * 0.5,
                 ),
-                _PostAction(
-                  postId: post.id,
+                ContentActionWidget(
+                  nodeId: post.id,
+                  nodeType: DokiNodeType.post,
+                  isNodePage: isPostPage,
+                  redirectToNodePage: () {
+                    context.pushNamed(
+                      RouterConstants.userPost,
+                      pathParameters: {
+                        "postId": post.id,
+                      },
+                    );
+                  },
                 ),
               ],
             ),
@@ -257,203 +265,6 @@ class _PostCaptionState extends State<_PostCaption> {
               ]
             : [],
       ),
-    );
-  }
-}
-
-class _PostAction extends StatefulWidget {
-  _PostAction({
-    required this.postId,
-  }) : graphKey = generatePostNodeKey(postId);
-
-  final String postId;
-  final String graphKey;
-
-  @override
-  State<_PostAction> createState() => _PostActionState();
-}
-
-class _PostActionState extends State<_PostAction> {
-  final UserGraph graph = UserGraph();
-
-  @override
-  Widget build(BuildContext context) {
-    final currTheme = Theme.of(context).colorScheme;
-    final String username =
-        (context.read<UserBloc>().state as UserCompleteState).username;
-
-    return BlocBuilder<UserActionBloc, UserActionState>(
-      buildWhen: (previousState, state) {
-        return (state is UserActionNodeActionState &&
-                state.nodeId == widget.postId) ||
-            (state is UserActionPrimaryNodeRefreshState &&
-                state.nodeId == widget.postId);
-      },
-      builder: (context, state) {
-        PostEntity post = graph.getValueByKey(widget.graphKey)! as PostEntity;
-
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            bool shrink = constraints.maxWidth < 285;
-            bool superShrink = constraints.maxWidth < 235;
-
-            double shrinkFactor = shrink
-                ? 0.75
-                : superShrink
-                    ? 0.5
-                    : 1;
-
-            return Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: Constants.padding * shrinkFactor,
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "${displayNumberFormat(post.likesCount)} Like${post.likesCount > 1 ? "s" : ""}",
-                        style: TextStyle(
-                          fontSize:
-                              superShrink ? Constants.smallFontSize : null,
-                        ),
-                      ),
-                      Text(
-                        "${displayNumberFormat(post.commentsCount)} Comment${post.commentsCount > 1 ? "s" : ""}",
-                        style: TextStyle(
-                          fontSize:
-                              superShrink ? Constants.smallFontSize : null,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(
-                    thickness: Constants.dividerThickness * 0.75,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    spacing:
-                        Constants.gap * shrinkFactor - (superShrink ? 0.9 : 0),
-                    children: [
-                      Row(
-                        spacing: Constants.gap * shrinkFactor -
-                            (superShrink ? 0.9 : 0),
-                        children: [
-                          LikeWidget(
-                            shrinkFactor: shrinkFactor,
-                            onPress: () {
-                              UserNodeLikeAction payload = UserNodeLikeAction(
-                                from: (context.read<UserBloc>().state
-                                        as UserCompleteState)
-                                    .username,
-                                to: getUsernameFromUserKey(post.createdBy),
-                                isLike: post.userLike,
-                                likeCount: post.likesCount,
-                                commentCount: post.commentsCount,
-                                nodeId: post.id,
-                                nodeType: NodeType.post,
-                                parents: [], // for root node no requirement to get parents
-                              );
-                              context
-                                  .read<UserActionBloc>()
-                                  .add(UserActionNodeLikeEvent(
-                                    nodeId: post.id,
-                                    nodeType: DokiNodeType.post,
-                                    userLike: !post.userLike,
-                                    username: username,
-                                    client: context
-                                        .read<WebsocketClientProvider>()
-                                        .client,
-                                    remotePayload: payload,
-                                  ));
-                            },
-                            userLike: post.userLike,
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              String currentRoute =
-                                  GoRouter.of(context).currentRouteName ?? "";
-                              bool isPostPage =
-                                  currentRoute == RouterConstants.userPost;
-
-                              if (isPostPage) {
-                                context.read<NodeCommentProvider>()
-                                  ..focusNode.requestFocus()
-                                  ..resetCommentTarget();
-                                return;
-                              }
-
-                              context.pushNamed(
-                                RouterConstants.userPost,
-                                pathParameters: {
-                                  "postId": post.id,
-                                },
-                              );
-                            },
-                            style: TextButton.styleFrom(
-                              foregroundColor: currTheme.secondary,
-                              minimumSize: Size.zero,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: Constants.padding * shrinkFactor,
-                                vertical: Constants.padding * 0.5,
-                              ),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                            child: Text(
-                              "Comment",
-                              style: TextStyle(
-                                fontSize: superShrink
-                                    ? Constants.smallFontSize
-                                    : null,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          String currentRoute =
-                              GoRouter.of(context).currentRouteName ?? "";
-                          bool isPostPage =
-                              currentRoute == RouterConstants.userPost;
-
-                          if (isPostPage) {
-                            // remove focus
-                            FocusManager.instance.primaryFocus?.unfocus();
-                          }
-
-                          Share.share(
-                            context: context,
-                            subject: MessageSubject.dokiPost,
-                            nodeIdentifier: post.id,
-                          );
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: currTheme.secondary,
-                          minimumSize: Size.zero,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: Constants.padding * shrinkFactor,
-                            vertical: Constants.padding * 0.5,
-                          ),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        child: Text(
-                          "Share",
-                          style: TextStyle(
-                            fontSize:
-                                superShrink ? Constants.smallFontSize : null,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            );
-          },
-        );
-      },
     );
   }
 }

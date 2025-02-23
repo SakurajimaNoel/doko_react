@@ -19,12 +19,16 @@ class DiscussionEntity implements UserActionEntityWithMediaItems {
     required this.usersTagged,
   });
 
+  @override
   final String id;
   final String title;
+  @override
   final DateTime createdOn;
+  @override
   final String createdBy;
   final List<MediaEntity> media;
   final String text;
+  @override
   final List<String> usersTagged;
 
   @override

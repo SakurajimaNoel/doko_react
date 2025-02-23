@@ -22,7 +22,10 @@ class CommentEntity implements GraphEntityWithUserAction {
     required this.replyOn,
   });
 
+  @override
   final String id;
+
+  @override
   final DateTime createdOn;
   final String commentBy;
   final StorageResource media; // also handle giphy url
@@ -116,4 +119,10 @@ class CommentEntity implements GraphEntityWithUserAction {
       replyOn: replyOn,
     );
   }
+
+  @override
+  String get createdBy => commentBy;
+
+  @override
+  List<String> get usersTagged => [];
 }
