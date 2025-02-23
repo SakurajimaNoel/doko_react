@@ -120,6 +120,24 @@ class _CommentPageState extends State<CommentPage> {
                   },
                 );
               }
+              if (parentNodeType == DokiNodeType.discussion) {
+                // go to post page
+                context.pushReplacementNamed(
+                  RouterConstants.userDiscussion,
+                  pathParameters: {
+                    "discussionId": parentNodeId,
+                  },
+                );
+              }
+              if (parentNodeType == DokiNodeType.poll) {
+                // go to post page
+                context.pushReplacementNamed(
+                  RouterConstants.userPoll,
+                  pathParameters: {
+                    "pollId": parentNodeId,
+                  },
+                );
+              }
 
               if (parentNodeType == DokiNodeType.comment) {
                 // go to comment page
