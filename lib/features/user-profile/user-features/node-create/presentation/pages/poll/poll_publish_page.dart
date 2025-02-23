@@ -81,6 +81,7 @@ class _PollPublishPageState extends State<PollPublishPage> {
 
             return Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: LayoutBuilder(

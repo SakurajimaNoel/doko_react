@@ -71,21 +71,23 @@ class _UsersTaggedWidgetState extends State<UsersTaggedWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: Constants.gap * 0.5,
       children: [
-        FilledButton.tonalIcon(
-          onPressed: () {
-            GetUserModal.getUserModal(
-              context: context,
-              onDone: (selected) {
-                setState(() {
-                  usersTagged = selected;
-                });
-                widget.onSelected(selected);
-              },
-              selected: usersTagged,
-            );
-          },
-          icon: const Icon(Icons.person),
-          label: const Text("Tag friends"),
+        Center(
+          child: FilledButton.tonalIcon(
+            onPressed: () {
+              GetUserModal.getUserModal(
+                context: context,
+                onDone: (selected) {
+                  setState(() {
+                    usersTagged = selected;
+                  });
+                  widget.onSelected(selected);
+                },
+                selected: usersTagged,
+              );
+            },
+            icon: const Icon(Icons.person),
+            label: const Text("Tag friends"),
+          ),
         ),
         createSelectedUserWidget(),
       ],

@@ -103,13 +103,16 @@ class _CreatePollPageState extends State<CreatePollPage> {
                                   ),
                                 ),
                                 leading: options.length > 2
-                                    ? IconButton(
-                                        onPressed: () {
+                                    ? InkWell(
+                                        onTap: () {
                                           setState(() {
                                             options.removeAt(i);
                                           });
                                         },
-                                        icon: const Icon(Icons.delete),
+                                        child: const Icon(
+                                          Icons.delete,
+                                          color: Colors.redAccent,
+                                        ),
                                       )
                                     : null,
                                 trailing: ReorderableDragStartListener(
@@ -130,7 +133,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
                           },
                         ),
                         if (options.length < 5)
-                          ElevatedButton(
+                          TextButton(
                             onPressed: () {
                               setState(() {
                                 options.add(PollOptionInput());
@@ -151,7 +154,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
               onPressed: () {
                 final question = questionController.text.trim();
                 if (question.isEmpty) {
-                  showError("required question missing");
+                  showError("You need to add question to create a Poll.");
                   return;
                 }
 
@@ -164,7 +167,8 @@ class _CreatePollPageState extends State<CreatePollPage> {
                 }
 
                 if (optionValues.length < 2) {
-                  showError("required minimum of 2 options");
+                  showError(
+                      "You need to add minimum of 2 options to create a Poll.");
                   return;
                 }
 
