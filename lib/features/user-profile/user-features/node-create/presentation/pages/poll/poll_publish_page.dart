@@ -2,13 +2,11 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
-import 'package:doko_react/core/widgets/get-user-modal/get_user_modal.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
-import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/poll_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/bloc/node_create_bloc.dart';
-import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/presentation/widgets/users_tagged/users_tagged.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,57 +26,6 @@ class PollPublishPage extends StatefulWidget {
 
 class _PollPublishPageState extends State<PollPublishPage> {
   List<String> usersTagged = [];
-
-  List<Widget> createSelectedUserWidget() {
-    if (usersTagged.isEmpty) {
-      return [
-        const SizedBox(
-          height: Constants.height * 5,
-          child: Center(
-            child: Text(
-              "No users tagged.",
-            ),
-          ),
-        ),
-      ];
-    }
-
-    List<Widget> widgets = [];
-    for (String user in usersTagged) {
-      String userKey = generateUserNodeKey(user);
-      final widget = ListTile(
-        leading: UserWidget.avtar(
-          userKey: userKey,
-        ),
-        contentPadding: EdgeInsets.zero,
-        title: UserWidget.name(
-          userKey: userKey,
-          baseFontSize: Constants.smallFontSize * 1.25,
-          trim: 20,
-        ),
-        subtitle: UserWidget.username(
-          userKey: userKey,
-          baseFontSize: Constants.smallFontSize,
-          trim: 20,
-        ),
-        trailing: IconButton(
-          onPressed: () {
-            setState(() {
-              usersTagged.remove(user);
-            });
-          },
-          icon: const Icon(
-            Icons.close,
-            color: Colors.redAccent,
-          ),
-        ),
-      );
-
-      widgets.add(widget);
-    }
-
-    return widgets;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,26 +88,13 @@ class _PollPublishPageState extends State<PollPublishPage> {
                           constraints: BoxConstraints(
                             minHeight: constraints.maxHeight,
                           ),
-                          child: Column(
-                            spacing: Constants.gap,
-                            children: [
-                              FilledButton.tonalIcon(
-                                onPressed: () {
-                                  GetUserModal.getUserModal(
-                                    context: context,
-                                    onDone: (selected) {
-                                      setState(() {
-                                        usersTagged = selected;
-                                      });
-                                    },
-                                    selected: usersTagged,
-                                  );
-                                },
-                                icon: const Icon(Icons.person),
-                                label: const Text("Tag friends"),
-                              ),
-                              ...createSelectedUserWidget(),
-                            ],
+                          child: UsersTaggedWidget(
+                            onRemove: (String user) {
+                              usersTagged.remove(user);
+                            },
+                            onSelected: (List<String> selected) {
+                              usersTagged = selected;
+                            },
                           ),
                         ),
                       );

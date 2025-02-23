@@ -60,7 +60,7 @@ class Constants {
   static const double portrait = 9 / 16;
 
   // content
-  static const int userTagLimit = 50;
+  static const int userTagLimit = 10;
   static const int mediaLimit = 1 << 4;
 
   // polls

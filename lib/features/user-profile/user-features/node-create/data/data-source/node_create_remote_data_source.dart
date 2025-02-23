@@ -241,8 +241,6 @@ class NodeCreateRemoteDataSource {
 
       return newPoll.id;
     } catch (e) {
-      print(e);
-      print("error here");
       rethrow;
     }
   }
