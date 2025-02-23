@@ -61,6 +61,7 @@ class _PostPublishPageState extends State<PostPublishPage> {
                     UserActionNewPostEvent(
                       postId: widget.postDetails.postId,
                       username: username,
+                      usersTagged: usersTagged,
                     ),
                   );
 
@@ -73,6 +74,7 @@ class _PostPublishPageState extends State<PostPublishPage> {
                   from: username,
                   id: widget.postDetails.postId,
                   nodeType: NodeType.post,
+                  usersTagged: usersTagged,
                 );
                 client.sendPayload(payload);
               }

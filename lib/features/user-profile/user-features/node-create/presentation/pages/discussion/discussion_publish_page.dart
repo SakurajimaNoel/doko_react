@@ -1,7 +1,9 @@
+import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
+import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/content-media-selection-widget/content_media_selection_widget.dart';
@@ -72,26 +74,27 @@ class _DiscussionPublishPageState extends State<DiscussionPublishPage> {
               String message = "Successfully created new discussion.";
               showSuccess(message);
 
-              // todo: handle this
               context.read<UserActionBloc>().add(
                     UserActionNewDiscussionEvent(
                       discussionId: discussionId,
                       username: username,
+                      usersTagged: usersTagged,
                     ),
                   );
 
               // send to remote users
-              // final client = context.read<WebsocketClientProvider>().client;
-              // if (client != null && client.isActive) {
-              //   // ignore if client is null
-              //   UserCreateRootNode payload = UserCreateRootNode(
-              //     from: username,
-              //     id: widget.postDetails.postId,
-              //     nodeType: NodeType.post,
-              //   );
-              //   client.sendPayload(payload);
-              // }
-              //
+              final client = context.read<WebsocketClientProvider>().client;
+              if (client != null && client.isActive) {
+                // ignore if client is null
+                UserCreateRootNode payload = UserCreateRootNode(
+                  from: username,
+                  id: state.nodeId,
+                  nodeType: NodeType.discussion,
+                  usersTagged: usersTagged,
+                );
+                client.sendPayload(payload);
+              }
+
               context.goNamed(RouterConstants.userFeed);
               return;
             }

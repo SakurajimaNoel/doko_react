@@ -37,43 +37,48 @@ final class UserActionNewRootNodeState extends UserActionState {
   UserActionNewRootNodeState({
     required this.nodeId,
     required this.username,
+    required this.usersTagged,
   });
 
   final String nodeId;
   final String username;
+  final List<String> usersTagged;
 
   @override
-  List<Object?> get props => [nodeId, username];
+  List<Object?> get props => [nodeId, username, usersTagged];
 }
 
 final class UserActionNewPostState extends UserActionNewRootNodeState {
   UserActionNewPostState({
     required super.nodeId,
     required super.username,
+    required super.usersTagged,
   });
 
   @override
-  List<Object?> get props => [nodeId, username];
+  List<Object?> get props => [nodeId, username, usersTagged];
 }
 
 final class UserActionNewDiscussionState extends UserActionNewRootNodeState {
   UserActionNewDiscussionState({
     required super.nodeId,
     required super.username,
+    required super.usersTagged,
   });
 
   @override
-  List<Object?> get props => [nodeId, username];
+  List<Object?> get props => [nodeId, username, usersTagged];
 }
 
 final class UserActionNewPollState extends UserActionNewRootNodeState {
   UserActionNewPollState({
     required super.nodeId,
     required super.username,
+    required super.usersTagged,
   });
 
   @override
-  List<Object?> get props => [nodeId, username];
+  List<Object?> get props => [nodeId, username, usersTagged];
 }
 
 /// user post action state

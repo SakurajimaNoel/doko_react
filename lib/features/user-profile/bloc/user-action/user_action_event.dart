@@ -37,60 +37,78 @@ final class UserActionNewPostEvent extends UserActionEvent {
   UserActionNewPostEvent({
     required this.postId,
     required this.username,
+    required this.usersTagged,
   });
 
   final String username;
   final String postId;
+  final List<String> usersTagged;
 }
 
 final class UserActionNewDiscussionEvent extends UserActionEvent {
   UserActionNewDiscussionEvent({
     required this.discussionId,
     required this.username,
+    required this.usersTagged,
   });
 
   final String username;
   final String discussionId;
+  final List<String> usersTagged;
 }
 
 final class UserActionNewPollEvent extends UserActionEvent {
   UserActionNewPollEvent({
     required this.pollId,
     required this.username,
+    required this.usersTagged,
   });
 
   final String username;
   final String pollId;
+  final List<String> usersTagged;
 }
 
 final class UserActionNewPostRemoteEvent extends UserActionEvent {
   UserActionNewPostRemoteEvent({
     required this.postId,
     required this.username,
+    required this.usersTagged,
+    required this.nodeBy,
   });
 
   final String username;
+  final String nodeBy;
   final String postId;
+  final List<String> usersTagged;
 }
 
 final class UserActionNewDiscussionRemoteEvent extends UserActionEvent {
   UserActionNewDiscussionRemoteEvent({
     required this.discussionId,
     required this.username,
+    required this.usersTagged,
+    required this.nodeBy,
   });
 
   final String username;
+  final String nodeBy;
   final String discussionId;
+  final List<String> usersTagged;
 }
 
 final class UserActionNewPollRemoteEvent extends UserActionEvent {
   UserActionNewPollRemoteEvent({
     required this.pollId,
     required this.username,
+    required this.usersTagged,
+    required this.nodeBy,
   });
 
   final String username;
+  final String nodeBy;
   final String pollId;
+  final List<String> usersTagged;
 }
 
 // user to comment action

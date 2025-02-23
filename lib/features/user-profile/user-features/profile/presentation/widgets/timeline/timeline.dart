@@ -122,7 +122,8 @@ class _TimelineState extends State<Timeline> {
           return (state is UserActionLoadTimelineState &&
                   state.username == username) ||
               (state is UserActionNewRootNodeState &&
-                  state.username == username);
+                  (state.username == username ||
+                      state.usersTagged.contains(username)));
         },
         builder: (context, state) {
           final Nodes userTimeline = user.timeline;

@@ -310,7 +310,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "95651882a726e6ab59d78e18ef9aa6d2ff16ab6f"
+      resolved-ref: "2a2fb3ba9c205ea3dce8b3fd8ae19f5072e79186"
       url: "https://github.com/rohan031/doki_websocket_client.git"
     source: git
     version: "2.0.1"
@@ -1303,10 +1303,10 @@ packages:
     dependency: "direct main"
     description:
       name: smooth_page_indicator
-      sha256: "3b28b0c545fa67ed9e5997d9f9720d486f54c0c607e056a1094544e36934dff3"
+      sha256: b21ebb8bc39cf72d11c7cfd809162a48c3800668ced1c9da3aade13a32cf6c1c
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0+3"
+    version: "1.2.1"
   source_span:
     dependency: transitive
     description:

@@ -211,25 +211,37 @@ class _UserLayoutState extends State<UserLayout> {
               ));
         },
         PayloadType.userCreateRootNode: (UserCreateRootNode payload) {
+          // show notification
+          if (payload.usersTagged.contains(username)) {
+            userTaggedOnRootNode(payload);
+          }
+
           if (payload.nodeType == NodeType.post) {
             context.read<UserActionBloc>().add(UserActionNewPostRemoteEvent(
                   postId: payload.id,
+                  nodeBy: payload.from,
                   username: username,
+                  usersTagged: payload.usersTagged,
                 ));
           }
 
           if (payload.nodeType == NodeType.discussion) {
-            context.read<UserActionBloc>().add(UserActionNewPostRemoteEvent(
-                  postId: payload.id,
+            context
+                .read<UserActionBloc>()
+                .add(UserActionNewDiscussionRemoteEvent(
+                  discussionId: payload.id,
+                  nodeBy: payload.from,
                   username: username,
+                  usersTagged: payload.usersTagged,
                 ));
           }
 
-          // todo this will be poll
-          if (payload.nodeType == NodeType.post) {
+          if (payload.nodeType == NodeType.poll) {
             context.read<UserActionBloc>().add(UserActionNewPollRemoteEvent(
                   pollId: payload.id,
+                  nodeBy: payload.from,
                   username: username,
+                  usersTagged: payload.usersTagged,
                 ));
           }
         },
@@ -377,6 +389,24 @@ class _UserLayoutState extends State<UserLayout> {
         },
       );
     }
+    if (nodeType == NodeType.discussion) {
+      // go to post page
+      context.pushNamed(
+        RouterConstants.userDiscussion,
+        pathParameters: {
+          "discussionId": nodeId,
+        },
+      );
+    }
+    if (nodeType == NodeType.poll) {
+      // go to post page
+      context.pushNamed(
+        RouterConstants.userPoll,
+        pathParameters: {
+          "pollId": nodeId,
+        },
+      );
+    }
 
     if (nodeType == NodeType.comment) {
       bool commentReply = parents.length == 3;
@@ -403,6 +433,24 @@ class _UserLayoutState extends State<UserLayout> {
         },
       );
     }
+  }
+
+  void userTaggedOnRootNode(UserCreateRootNode payload) {
+    final userKey = generateUserNodeKey(payload.from);
+    final notification = createNewNotification(
+      context: context,
+      userKey: userKey,
+      body: Text("@${payload.from} tagged you on a ${payload.nodeType.name}."),
+      onTap: () {
+        handleRedirectToNodePage(
+          nodeType: payload.nodeType,
+          nodeId: payload.id,
+          parents: [],
+        );
+      },
+    );
+
+    showNotification(notification);
   }
 
   void userRepliedToYourCommentNode(UserCreateSecondaryNode payload) {

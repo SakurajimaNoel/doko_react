@@ -56,6 +56,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         UserActionNewPostState(
           nodeId: event.postId,
           username: event.username,
+          usersTagged: event.usersTagged,
         ),
       ),
     );
@@ -64,6 +65,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         UserActionNewDiscussionState(
           nodeId: event.discussionId,
           username: event.username,
+          usersTagged: event.usersTagged,
         ),
       ),
     );
@@ -72,6 +74,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         UserActionNewPollState(
           nodeId: event.pollId,
           username: event.username,
+          usersTagged: event.usersTagged,
         ),
       ),
     );
@@ -244,8 +247,9 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       UserActionNewPostRemoteEvent event, Emitter<UserActionState> emit) async {
     // handle user graph
     String postKey = generatePostNodeKey(event.postId);
-    String userKey = generateUserNodeKey(event.username);
+    String userKey = generateUserNodeKey(event.nodeBy);
     final user = graph.getValueByKey(userKey);
+    final List<String> usersTagged = event.usersTagged;
 
     if (user is CompleteUserEntity) {
       if (!user.posts.items.contains(postKey)) {
@@ -256,9 +260,19 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       user.timeline.addItem(postKey);
     }
 
+    for (String user in usersTagged) {
+      String key = generateUserNodeKey(user);
+      final node = graph.getValueByKey(key);
+
+      if (node is CompleteUserEntity) {
+        node.timeline.addItem(postKey);
+      }
+    }
+
     emit(UserActionNewPostState(
       nodeId: event.postId,
-      username: event.username,
+      username: event.nodeBy,
+      usersTagged: usersTagged,
     ));
   }
 
@@ -267,8 +281,9 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       Emitter<UserActionState> emit) async {
     // handle user graph
     String discussionKey = generateDiscussionNodeKey(event.discussionId);
-    String userKey = generateUserNodeKey(event.username);
+    String userKey = generateUserNodeKey(event.nodeBy);
     final user = graph.getValueByKey(userKey);
+    final List<String> usersTagged = event.usersTagged;
 
     if (user is CompleteUserEntity) {
       if (!user.discussions.items.contains(discussionKey)) {
@@ -279,9 +294,19 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       user.timeline.addItem(discussionKey);
     }
 
+    for (String user in usersTagged) {
+      String key = generateUserNodeKey(user);
+      final node = graph.getValueByKey(key);
+
+      if (node is CompleteUserEntity) {
+        node.timeline.addItem(discussionKey);
+      }
+    }
+
     emit(UserActionNewDiscussionState(
       nodeId: event.discussionId,
-      username: event.username,
+      username: event.nodeBy,
+      usersTagged: usersTagged,
     ));
   }
 
@@ -289,8 +314,9 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       UserActionNewPollRemoteEvent event, Emitter<UserActionState> emit) async {
     // handle user graph
     String pollKey = generatePollNodeKey(event.pollId);
-    String userKey = generateUserNodeKey(event.username);
+    String userKey = generateUserNodeKey(event.nodeBy);
     final user = graph.getValueByKey(userKey);
+    final List<String> usersTagged = event.usersTagged;
 
     if (user is CompleteUserEntity) {
       if (!user.polls.items.contains(pollKey)) {
@@ -301,9 +327,19 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
       user.timeline.addItem(pollKey);
     }
 
+    for (String user in usersTagged) {
+      String key = generateUserNodeKey(user);
+      final node = graph.getValueByKey(key);
+
+      if (node is CompleteUserEntity) {
+        node.timeline.addItem(pollKey);
+      }
+    }
+
     emit(UserActionNewPollState(
       nodeId: event.pollId,
-      username: event.username,
+      username: event.nodeBy,
+      usersTagged: usersTagged,
     ));
   }
 
