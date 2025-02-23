@@ -2,6 +2,7 @@ import 'package:doko_react/core/config/graphql/mutations/graphql_mutations.dart'
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/cache/cache.dart';
+import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/storage/storage.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
@@ -131,6 +132,7 @@ class NodeCreateRemoteDataSource {
       graph.addCommentToPrimaryNode(
         commentDetails.targetNode.keyGenerator(commentDetails.targetNodeId),
         comment: newComment,
+        isReply: commentDetails.targetNode == DokiNodeType.comment,
       );
 
       return newComment.id;

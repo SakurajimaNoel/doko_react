@@ -636,6 +636,7 @@ class UserGraph {
   void addCommentToPrimaryNode(
     String key, {
     required CommentEntity comment,
+    bool isReply = false,
   }) {
     String commentKey = generateCommentNodeKey(comment.id);
 
@@ -645,7 +646,11 @@ class UserGraph {
 
     if (node is! GraphEntityWithUserAction) return;
 
-    node.comments.addItem(commentKey);
+    if (isReply) {
+      node.comments.addItemAtLast(commentKey);
+    } else {
+      node.comments.addItem(commentKey);
+    }
     node.updateCommentsCount(node.commentsCount + 1);
   }
 
@@ -653,6 +658,7 @@ class UserGraph {
   void addCommentIdToPrimaryNode(
     String key, {
     required String commentId,
+    bool isReply = false,
   }) {
     String commentKey = generateCommentNodeKey(commentId);
 
@@ -667,7 +673,11 @@ class UserGraph {
     /// no need to add comment if not fetched
     if (node.comments.isEmpty) return;
 
-    node.comments.addItem(commentKey);
+    if (isReply) {
+      node.comments.addItemAtLast(commentKey);
+    } else {
+      node.comments.addItem(commentKey);
+    }
   }
 
   /// used update node like status and node stats

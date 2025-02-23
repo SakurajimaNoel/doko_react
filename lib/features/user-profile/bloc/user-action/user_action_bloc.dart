@@ -207,6 +207,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     graph.addCommentIdToPrimaryNode(
       parentNodeType.keyGenerator(parentNodeId),
       commentId: nodeId,
+      isReply: parentNodeType == DokiNodeType.comment,
     );
 
     emit(UserActionNodeActionState(
