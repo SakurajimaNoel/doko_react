@@ -660,7 +660,9 @@ class UserGraph {
 
     if (node is! GraphEntityWithUserAction) return;
 
-    node.updateCommentsCount(node.commentsCount + 1);
+    if (!node.comments.items.contains(commentKey)) {
+      node.updateCommentsCount(node.commentsCount + 1);
+    }
 
     /// no need to add comment if not fetched
     if (node.comments.isEmpty) return;
