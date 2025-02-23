@@ -21,56 +21,48 @@ class UsersTaggedWidget extends StatefulWidget {
 class _UsersTaggedWidgetState extends State<UsersTaggedWidget> {
   List<String> usersTagged = [];
 
-  List<Widget> createSelectedUserWidget() {
+  Widget createSelectedUserWidget() {
     if (usersTagged.isEmpty) {
-      return [
-        const SizedBox(
-          height: Constants.height * 5,
-          child: Center(
-            child: Text(
-              "No users tagged.",
-            ),
+      return const SizedBox(
+        height: Constants.height * 5,
+        child: Center(
+          child: Text(
+            "No users tagged.",
           ),
         ),
-      ];
+      );
     }
 
     List<Widget> widgets = [];
     for (String user in usersTagged) {
       String userKey = generateUserNodeKey(user);
-      final userWidget = ListTile(
-        leading: UserWidget.avtar(
+
+      final userWidget = Chip(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Constants.radius * 10),
+        ),
+        avatar: UserWidget.avtar(
           userKey: userKey,
         ),
-        contentPadding: EdgeInsets.zero,
-        title: UserWidget.name(
+        label: UserWidget.name(
           userKey: userKey,
-          baseFontSize: Constants.smallFontSize * 1.25,
-          trim: 20,
         ),
-        subtitle: UserWidget.username(
-          userKey: userKey,
-          baseFontSize: Constants.smallFontSize,
-          trim: 20,
-        ),
-        trailing: IconButton(
-          onPressed: () {
-            setState(() {
-              usersTagged.remove(user);
-            });
-            widget.onRemove(user);
-          },
-          icon: const Icon(
-            Icons.close,
-            color: Colors.redAccent,
-          ),
-        ),
+        onDeleted: () {
+          setState(() {
+            usersTagged.remove(user);
+          });
+          widget.onRemove(user);
+        },
       );
 
       widgets.add(userWidget);
     }
 
-    return widgets;
+    return Wrap(
+      spacing: Constants.gap,
+      runSpacing: Constants.gap * 0.5,
+      children: widgets,
+    );
   }
 
   @override
@@ -95,7 +87,7 @@ class _UsersTaggedWidgetState extends State<UsersTaggedWidget> {
           icon: const Icon(Icons.person),
           label: const Text("Tag friends"),
         ),
-        ...createSelectedUserWidget(),
+        createSelectedUserWidget(),
       ],
     );
   }

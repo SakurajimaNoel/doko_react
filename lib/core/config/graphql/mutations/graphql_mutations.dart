@@ -260,6 +260,7 @@ class GraphqlMutations {
           }
           usersTagged {
             username
+            profilePicture
           }
         }
       }
@@ -821,6 +822,7 @@ class GraphqlMutations {
           }
           usersTagged {
             username
+            profilePicture
           }
         }
       }
@@ -877,6 +879,7 @@ class GraphqlMutations {
           createdOn
           usersTagged {
             username
+            profilePicture
           }
           likedBy(where: \$where) {
             username

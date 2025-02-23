@@ -1,4 +1,5 @@
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
+import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/media/media_entity.dart';
@@ -27,7 +28,7 @@ class PostEntity implements UserActionEntityWithMediaItems {
   @override
   final String createdBy; // reference to user key user:username
   @override
-  final List<String> usersTagged;
+  final List<UsersTagged> usersTagged;
 
   @override
   int likesCount;
@@ -96,10 +97,16 @@ class PostEntity implements UserActionEntityWithMediaItems {
     List<MediaEntity> mediaContent = await Future.wait(mediaContentFuture);
     bool userLike = (map["likedBy"] as List).length == 1;
 
-    List<String> usersTagged = [];
+    List<UsersTagged> usersTagged = [];
     if (map["usersTagged"] != null) {
       for (var el in (map["usersTagged"] as List)) {
-        usersTagged.add(el["username"]);
+        String username = el["username"];
+        StorageResource profilePicture =
+            await StorageResource.createStorageResource(el["profilePicture"]);
+        usersTagged.add(UsersTagged(
+          username: username,
+          profilePicture: profilePicture,
+        ));
       }
     }
 

@@ -22,6 +22,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = false,
         normal = true,
         large = false,
@@ -37,6 +38,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = true,
         normal = false,
         large = false,
@@ -52,6 +54,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = false,
         normal = false,
         large = true,
@@ -68,6 +71,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = false,
         normal = true,
         large = false,
@@ -83,6 +87,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = true,
         normal = false,
         large = false,
@@ -98,6 +103,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = false,
         normal = false,
         large = true,
@@ -114,6 +120,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = false,
         normal = true,
         large = false,
@@ -129,6 +136,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = true,
         normal = false,
         large = false,
@@ -144,6 +152,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = false,
         normal = false,
         large = true,
@@ -161,6 +170,7 @@ class UserWidget extends StatelessWidget {
     this.trim = 30,
     this.bold = false,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = false,
         normal = true,
         large = false,
@@ -175,6 +185,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
     this.bold = false,
   })  : small = true,
         normal = false,
@@ -190,6 +201,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
     this.bold = false,
   })  : small = false,
         normal = false,
@@ -206,6 +218,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = false,
         normal = true,
         large = false,
@@ -221,6 +234,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = true,
         normal = false,
         large = false,
@@ -236,6 +250,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = false,
         normal = false,
         large = true,
@@ -252,6 +267,7 @@ class UserWidget extends StatelessWidget {
     required this.userKey,
     this.trim = 30,
     this.baseFontSize = Constants.fontSize,
+    this.redirect = false,
   })  : small = false,
         normal = false,
         large = false,
@@ -282,6 +298,9 @@ class UserWidget extends StatelessWidget {
   final int trim;
   final double baseFontSize;
   final bool bold; // only used with name options
+
+  // to allow redirect
+  final bool redirect;
 
   @override
   Widget build(BuildContext context) {
@@ -376,35 +395,95 @@ class UserWidget extends StatelessWidget {
 
         // if avtar
         if (avtar) {
-          return userAvtar(
-            profilePicture: user?.profilePicture,
+          return InkWell(
+            onTap: redirect
+                ? () {
+                    context.pushNamed(
+                      RouterConstants.userProfile,
+                      pathParameters: {
+                        "username": profileUsername,
+                      },
+                    );
+                  }
+                : null,
+            child: userAvtar(
+              profilePicture: user?.profilePicture,
+            ),
           );
         }
 
         if (name) {
-          return userName(
-            profileUsername: profileUsername,
-            name: user?.name,
+          return InkWell(
+            onTap: redirect
+                ? () {
+                    context.pushNamed(
+                      RouterConstants.userProfile,
+                      pathParameters: {
+                        "username": profileUsername,
+                      },
+                    );
+                  }
+                : null,
+            child: userName(
+              profileUsername: profileUsername,
+              name: user?.name,
+            ),
           );
         }
 
         if (username) {
-          return userUsername(
-            profileUsername: profileUsername,
+          return InkWell(
+            onTap: redirect
+                ? () {
+                    context.pushNamed(
+                      RouterConstants.userProfile,
+                      pathParameters: {
+                        "username": profileUsername,
+                      },
+                    );
+                  }
+                : null,
+            child: userUsername(
+              profileUsername: profileUsername,
+            ),
           );
         }
 
         if (info) {
-          return userInfo(
-            profileUsername: profileUsername,
-            user: user,
+          return InkWell(
+            onTap: redirect
+                ? () {
+                    context.pushNamed(
+                      RouterConstants.userProfile,
+                      pathParameters: {
+                        "username": profileUsername,
+                      },
+                    );
+                  }
+                : null,
+            child: userInfo(
+              profileUsername: profileUsername,
+              user: user,
+            ),
           );
         }
 
-        return userWidget(
-          profileUsername: profileUsername,
-          context: context,
-          user: user,
+        return InkWell(
+          onTap: () {
+            if (redirect) {
+              context.pushNamed(
+                RouterConstants.userProfile,
+                pathParameters: {
+                  "username": profileUsername,
+                },
+              );
+            }
+          },
+          child: userWidget(
+            profileUsername: profileUsername,
+            context: context,
+            user: user,
+          ),
         );
       },
     );
@@ -518,21 +597,15 @@ class UserWidget extends StatelessWidget {
     if (large) scaleFactor = 1.125;
     if (small) scaleFactor = 0.875;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool shrink = constraints.maxWidth < 100;
-
-        return Text(
-          trimText(
-            name ?? "@$profileUsername",
-            len: shrink ? 10 : trim,
-          ),
-          style: TextStyle(
-            fontSize: baseFontSize * scaleFactor,
-            fontWeight: name == null || bold ? FontWeight.bold : null,
-          ),
-        );
-      },
+    return Text(
+      trimText(
+        name ?? "@$profileUsername",
+        len: trim,
+      ),
+      style: TextStyle(
+        fontSize: baseFontSize * scaleFactor,
+        fontWeight: name == null || bold ? FontWeight.bold : null,
+      ),
     );
   }
 
@@ -543,21 +616,15 @@ class UserWidget extends StatelessWidget {
     if (large) scaleFactor = 1.125;
     if (small) scaleFactor = 0.875;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool shrink = constraints.maxWidth < 100;
-
-        return Text(
-          "@${trimText(
-            profileUsername,
-            len: shrink ? 10 : trim,
-          )}",
-          style: TextStyle(
-            fontSize: baseFontSize * scaleFactor,
-            fontWeight: FontWeight.bold,
-          ),
-        );
-      },
+    return Text(
+      "@${trimText(
+        profileUsername,
+        len: trim,
+      )}",
+      style: TextStyle(
+        fontSize: baseFontSize * scaleFactor,
+        fontWeight: FontWeight.bold,
+      ),
     );
   }
 
@@ -591,27 +658,17 @@ class UserWidget extends StatelessWidget {
     if (large) gapScale = 1.125;
     if (small) gapScale = 0.75;
 
-    return GestureDetector(
-      onTap: () {
-        context.pushNamed(
-          RouterConstants.userProfile,
-          pathParameters: {
-            "username": profileUsername,
-          },
-        );
-      },
-      child: Row(
-        spacing: Constants.gap * gapScale,
-        children: [
-          userAvtar(
-            profilePicture: user?.profilePicture,
-          ),
-          userInfo(
-            profileUsername: profileUsername,
-            user: user,
-          ),
-        ],
-      ),
+    return Row(
+      spacing: Constants.gap * gapScale,
+      children: [
+        userAvtar(
+          profilePicture: user?.profilePicture,
+        ),
+        userInfo(
+          profileUsername: profileUsername,
+          user: user,
+        ),
+      ],
     );
   }
 }

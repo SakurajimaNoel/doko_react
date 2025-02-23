@@ -11,6 +11,7 @@ import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bl
 import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/content-action-widget/content_action_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/content-meta-data-widget/content_meta_data_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -113,30 +114,38 @@ class DiscussionWidget extends StatelessWidget {
                       nodeIdentifier: discussion.id,
                     );
                   },
-            child: Column(
-              spacing: Constants.gap,
-              children: [
-                Container(
-                  color: Colors.blue,
-                  height: Constants.height * 15,
-                  child: Center(
-                    child: Text(discussion.title),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: Constants.padding * 0.75,
+              ),
+              child: Column(
+                spacing: Constants.gap,
+                children: [
+                  ContentMetaDataWidget(
+                    nodeKey: discussionKey,
                   ),
-                ),
-                ContentActionWidget(
-                  nodeId: discussion.id,
-                  nodeType: DokiNodeType.discussion,
-                  isNodePage: isDiscussionPage,
-                  redirectToNodePage: () {
-                    context.pushNamed(
-                      RouterConstants.userDiscussion,
-                      pathParameters: {
-                        "discussionId": discussion.id,
-                      },
-                    );
-                  },
-                ),
-              ],
+                  Container(
+                    color: Colors.blue,
+                    height: Constants.height * 15,
+                    child: Center(
+                      child: Text(discussion.title),
+                    ),
+                  ),
+                  ContentActionWidget(
+                    nodeId: discussion.id,
+                    nodeType: DokiNodeType.discussion,
+                    isNodePage: isDiscussionPage,
+                    redirectToNodePage: () {
+                      context.pushNamed(
+                        RouterConstants.userDiscussion,
+                        pathParameters: {
+                          "discussionId": discussion.id,
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         );

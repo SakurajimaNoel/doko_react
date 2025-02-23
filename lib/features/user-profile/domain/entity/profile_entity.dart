@@ -1,4 +1,5 @@
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
+import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 
 /// base class to use with user graph
 abstract class GraphEntity {}
@@ -12,7 +13,7 @@ abstract class GraphEntityWithUserAction implements GraphEntity {
   String get id;
   DateTime get createdOn;
   String get createdBy;
-  List<String> get usersTagged;
+  List<UsersTagged> get usersTagged;
 
   void updateCommentsCount(int count);
 
@@ -26,4 +27,14 @@ abstract class UserActionEntityWithMediaItems
   int get currDisplay;
 
   void updateDisplayItem(int item);
+}
+
+final class UsersTagged {
+  const UsersTagged({
+    required this.username,
+    required this.profilePicture,
+  });
+
+  final String username;
+  final StorageResource profilePicture;
 }

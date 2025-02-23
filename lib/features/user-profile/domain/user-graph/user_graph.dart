@@ -153,11 +153,13 @@ class UserGraph {
   }
 
   void addPostToTaggedUser(
-    List<String> usersTagged, {
+    List<UsersTagged> usersTagged, {
     required String postKey,
   }) {
     // add to tagged user timeline
-    for (String username in usersTagged) {
+    for (UsersTagged user in usersTagged) {
+      final username = user.username;
+
       String userKey = generateUserNodeKey(username);
       final userEntity = getValueByKey(userKey);
 
@@ -232,11 +234,12 @@ class UserGraph {
   }
 
   void addDiscussionToTaggedUser(
-    List<String> usersTagged, {
+    List<UsersTagged> usersTagged, {
     required String discussionKey,
   }) {
     // add to tagged user timeline
-    for (String username in usersTagged) {
+    for (UsersTagged user in usersTagged) {
+      final username = user.username;
       String userKey = generateUserNodeKey(username);
       final userEntity = getValueByKey(userKey);
 
@@ -309,11 +312,12 @@ class UserGraph {
   }
 
   void addPollToTaggedUser(
-    List<String> usersTagged, {
+    List<UsersTagged> usersTagged, {
     required String pollKey,
   }) {
     // add to tagged user timeline
-    for (String username in usersTagged) {
+    for (UsersTagged user in usersTagged) {
+      final username = user.username;
       String userKey = generateUserNodeKey(username);
       final userEntity = getValueByKey(userKey);
 

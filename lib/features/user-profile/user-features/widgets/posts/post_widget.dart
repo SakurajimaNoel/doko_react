@@ -12,8 +12,8 @@ import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bl
 import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/content-action-widget/content_action_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/content-meta-data-widget/content_meta_data_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/media-widget/media_widget.dart';
-import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -120,48 +120,8 @@ class PostWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // post meta data
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: Constants.padding,
-                  ),
-                  child: LayoutBuilder(builder: (context, constraints) {
-                    bool shrink =
-                        constraints.maxWidth < Constants.postMetadataWidth;
-                    double shrinkFactor = shrink ? 0.875 : 1;
-
-                    bool superShrink = constraints.maxWidth < 250;
-                    double baseFontSize = Constants.smallFontSize * 1.125;
-
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (!shrink)
-                          UserWidget(
-                            userKey: post.createdBy,
-                            baseFontSize: baseFontSize,
-                            trim: 20,
-                          )
-                        else
-                          UserWidget.small(
-                            key: ValueKey("${post.createdBy}-with-small-size"),
-                            userKey: post.createdBy,
-                            baseFontSize: baseFontSize,
-                            trim: 16,
-                          ),
-                        if (!superShrink)
-                          Text(
-                            displayDateDifference(
-                              post.createdOn,
-                              small: shrink,
-                            ),
-                            style: TextStyle(
-                              fontSize: Constants.smallFontSize * shrinkFactor,
-                            ),
-                          ),
-                      ],
-                    );
-                  }),
+                ContentMetaDataWidget(
+                  nodeKey: postKey,
                 ),
                 // post content
                 if (post.content.isNotEmpty) ...[

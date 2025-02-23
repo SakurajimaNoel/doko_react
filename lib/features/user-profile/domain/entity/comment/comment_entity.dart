@@ -124,5 +124,5 @@ class CommentEntity implements GraphEntityWithUserAction {
   String get createdBy => commentBy;
 
   @override
-  List<String> get usersTagged => [];
+  List<UsersTagged> get usersTagged => [];
 }

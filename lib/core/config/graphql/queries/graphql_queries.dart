@@ -146,6 +146,7 @@ class GraphqlQueries {
               }
               usersTagged {
                 username
+                profilePicture
               }
               likedByConnection {
                 totalCount
@@ -246,6 +247,7 @@ class GraphqlQueries {
             }
             usersTagged {
               username
+              profilePicture
             }
             likedBy(where: \$likedByWhere2) {
               username
@@ -482,6 +484,7 @@ class GraphqlQueries {
               }
               usersTagged {
                 username
+                profilePicture
               }
             }
           }
@@ -517,6 +520,7 @@ class GraphqlQueries {
                 }
                 usersTagged {
                   username
+                  profilePicture
                 }
               }
             }
@@ -599,6 +603,7 @@ class GraphqlQueries {
               }
               usersTagged {
                 username
+                profilePicture
               }
             }
           }
@@ -635,6 +640,7 @@ class GraphqlQueries {
             }
             usersTagged {
               username
+              profilePicture
             }
           }
         }
@@ -700,6 +706,7 @@ class GraphqlQueries {
               activeFor
               usersTagged {
                 username
+                profilePicture
               }
               likedBy(where: \$likedByWhere2) {
                 username
@@ -747,6 +754,7 @@ class GraphqlQueries {
             activeFor
             usersTagged {
               username
+              profilePicture
             }
             likedBy(where: \$likedByWhere2) {
               username
@@ -1259,6 +1267,7 @@ class GraphqlQueries {
         }
         usersTagged {
           username
+          profilePicture
         }
         commentsConnection(first: \$first) {
           totalCount
@@ -1529,6 +1538,7 @@ class GraphqlQueries {
           }
           usersTagged {
             username
+            profilePicture
           }
         }
       }      
@@ -1759,6 +1769,7 @@ class GraphqlQueries {
         }
         usersTagged {
           username
+          profilePicture
         }
         commentsConnection(first: \$first) {
           totalCount
@@ -1860,6 +1871,7 @@ class GraphqlQueries {
         }
         usersTagged {
           username
+          profilePicture
         }
         commentsConnection {
           totalCount
@@ -1903,6 +1915,7 @@ class GraphqlQueries {
         activeFor
         usersTagged {
           username
+          profilePicture
         }
         likedBy(where: \$likedByWhere2) {
           username
@@ -1979,6 +1992,7 @@ class GraphqlQueries {
         activeFor
         usersTagged {
           username
+          profilePicture
         }
         likedBy(where: \$likedByWhere2) {
           username
