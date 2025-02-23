@@ -67,7 +67,7 @@ class _ArchiveDiscussion extends StatelessWidget {
               },
               child: Padding(
                 padding: const EdgeInsets.all(Constants.padding * 0.5),
-                child: DiscussionWidget(
+                child: DiscussionPreviewWidget(
                   discussionKey: generateDiscussionNodeKey(message.body),
                 ),
               ),

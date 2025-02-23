@@ -19,7 +19,7 @@ import 'package:doko_react/features/user-profile/domain/entity/instant-messaging
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/message-body-type/message_body_type.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/provider/archive_message_provider.dart';
-import 'package:doko_react/features/user-profile/user-features/widgets/discussions/discussion_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/discussions/discussion_preview_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/polls/poll_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/post_preview_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
