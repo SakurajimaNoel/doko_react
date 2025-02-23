@@ -19,7 +19,6 @@ class CreatePostPage extends StatefulWidget {
 
 class CreatePostPageState extends State<CreatePostPage> {
   final List<String> postContentInfo = [
-    "You can add up to ${Constants.mediaLimit} media items per post.",
     "Keep your videos under ${Constants.videoDurationPost.inSeconds} seconds. Longer videos will be automatically trimmed.",
     "GIFs are typically designed to loop seamlessly, so cropping them might disrupt their intended animation.",
   ];

@@ -23,8 +23,9 @@ class _CreateDiscussionPageState extends State<CreateDiscussionPage> {
   final textFocusNode = FocusNode();
 
   final List<String> discussionInfo = [
-    "Discussion title is required.",
     "You can also use 'markdown' for better formatting of discussion content.",
+    "@md: See the basic [markdown syntax](https://www.markdownguide.org/basic-syntax/) and [cheat sheet.](https://www.markdownguide.org/cheat-sheet/)",
+    "You can mention user profile like: [user](doki@user:username).",
   ];
 
   @override
@@ -37,6 +38,7 @@ class _CreateDiscussionPageState extends State<CreateDiscussionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currTheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Start new discussion"),
@@ -50,6 +52,7 @@ class _CreateDiscussionPageState extends State<CreateDiscussionPage> {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
+                    backgroundColor: currTheme.surface,
                     title: const Heading(
                       "Discussion text preview",
                       size: Constants.heading3,

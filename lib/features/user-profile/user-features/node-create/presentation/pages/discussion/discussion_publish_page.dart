@@ -32,7 +32,6 @@ class DiscussionPublishPage extends StatefulWidget {
 
 class _DiscussionPublishPageState extends State<DiscussionPublishPage> {
   final List<String> mediaInfo = [
-    "You can add up to ${Constants.mediaLimit} media items per discussion.",
     "Keep your videos under ${Constants.videoDurationPost.inSeconds} seconds. Longer videos will be automatically trimmed.",
   ];
 
@@ -118,6 +117,7 @@ class _DiscussionPublishPageState extends State<DiscussionPublishPage> {
                           ),
                           child: Column(
                             spacing: Constants.gap,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ContentMediaSelectionWidget(
                                 info: mediaInfo,
