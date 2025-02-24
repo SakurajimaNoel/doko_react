@@ -59,6 +59,7 @@ class ContentMetaDataWidget extends StatelessWidget {
                       children: [
                         for (UsersTagged user in usersTagged)
                           ActionChip(
+                            clipBehavior: Clip.antiAlias,
                             shape: RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.circular(Constants.radius * 10),

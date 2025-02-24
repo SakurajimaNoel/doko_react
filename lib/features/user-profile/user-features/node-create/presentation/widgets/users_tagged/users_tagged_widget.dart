@@ -38,6 +38,7 @@ class _UsersTaggedWidgetState extends State<UsersTaggedWidget> {
       String userKey = generateUserNodeKey(user);
 
       final userWidget = Chip(
+        clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(Constants.radius * 10),
         ),
