@@ -123,6 +123,7 @@ class CommentInput extends StatelessWidget {
                 );
           },
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Builder(
                 builder: (context) {
@@ -191,9 +192,10 @@ class CommentInput extends StatelessWidget {
                   ),
                 ),
                 constraints: BoxConstraints(
-                  maxHeight: height / 3.5,
+                  maxHeight: height / 2.5,
                 ),
                 child: const SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
