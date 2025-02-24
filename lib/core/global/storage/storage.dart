@@ -15,7 +15,7 @@ Future<String> getDownloadUrlFromAWSPath(String bucketPath) async {
           options: const StorageGetUrlOptions(
             pluginOptions: S3GetUrlPluginOptions(
               expiresIn: Duration(
-                minutes: 60,
+                minutes: 120,
               ),
             ),
           ),
