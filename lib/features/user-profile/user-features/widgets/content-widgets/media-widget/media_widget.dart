@@ -88,6 +88,8 @@ class _MediaContentState extends State<_MediaContent> {
   final UserGraph graph = UserGraph();
   late final String nodeKey = widget.nodeKey;
 
+  bool boxFitContain = false;
+
   @override
   void initState() {
     super.initState();
@@ -123,16 +125,23 @@ class _MediaContentState extends State<_MediaContent> {
   }
 
   Widget imageContent(MediaEntity image) {
-    return CachedNetworkImage(
-      cacheKey: image.resource.bucketPath,
-      fit: BoxFit.cover,
-      imageUrl: image.resource.accessURI,
-      placeholder: (context, url) => const Center(
-        child: SmallLoadingIndicator.small(),
+    return InkWell(
+      onTap: () {
+        setState(() {
+          boxFitContain = !boxFitContain;
+        });
+      },
+      child: CachedNetworkImage(
+        cacheKey: image.resource.bucketPath,
+        fit: boxFitContain ? BoxFit.contain : BoxFit.cover,
+        imageUrl: image.resource.accessURI,
+        placeholder: (context, url) => const Center(
+          child: SmallLoadingIndicator.small(),
+        ),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
+        filterQuality: FilterQuality.high,
+        memCacheHeight: Constants.postCacheHeight,
       ),
-      errorWidget: (context, url, error) => const Icon(Icons.error),
-      filterQuality: FilterQuality.high,
-      memCacheHeight: Constants.postCacheHeight,
     );
   }
 
