@@ -14,13 +14,13 @@ import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
 import 'package:doko_react/core/widgets/like-widget/like_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/markdown-display-widget/markdown_display_widget.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/provider/node_comment_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -478,8 +478,85 @@ class _CommentContentState extends State<_CommentContent> {
 
   bool viewMore = false;
 
-  TextSpan buildComment() {
-    final currTheme = Theme.of(context).colorScheme;
+  // TextSpan buildComment() {
+  //   final currTheme = Theme.of(context).colorScheme;
+  //   final buttonText = viewMore ? "View less" : "View More";
+  //
+  //   bool showButton =
+  //       stringContent.length > Constants.commentContentDisplayLimit;
+  //
+  //   // for view more
+  //   int len = 0;
+  //   List<TextSpan> children = [];
+  //
+  //   for (int i = 0; i < content.length; i++) {
+  //     String item = content[i];
+  //     len += item.length;
+  //
+  //     bool usernameCandidate =
+  //         item.startsWith("@") && item.endsWith(Constants.zeroWidthSpace);
+  //     String itemAsUsername =
+  //         usernameCandidate ? getUsernameFromCommentInput(item) : item;
+  //
+  //     if (usernameCandidate && validateUsername(itemAsUsername)) {
+  //       // valid mention
+  //       children.add(
+  //         TextSpan(
+  //           text: item,
+  //           style: TextStyle(
+  //             color: currTheme.primary,
+  //             fontWeight: FontWeight.bold,
+  //           ),
+  //           recognizer: TapGestureRecognizer()
+  //             ..onTap = () {
+  //               context.pushNamed(
+  //                 RouterConstants.userProfile,
+  //                 pathParameters: {
+  //                   "username": itemAsUsername,
+  //                 },
+  //               );
+  //             },
+  //         ),
+  //       );
+  //     } else {
+  //       children.add(
+  //         TextSpan(
+  //           text: item,
+  //         ),
+  //       );
+  //     }
+  //
+  //     if (!viewMore && len >= Constants.commentContentDisplayLimit) break;
+  //   }
+  //
+  //   if (showButton) {
+  //     children.add(TextSpan(
+  //       text: " $buttonText",
+  //       style: TextStyle(
+  //         color: currTheme.outline,
+  //         fontWeight: FontWeight.bold,
+  //         fontSize: Constants.smallFontSize,
+  //       ),
+  //       recognizer: TapGestureRecognizer()
+  //         ..onTap = () {
+  //           setState(() {
+  //             viewMore = !viewMore;
+  //           });
+  //         },
+  //     ));
+  //   }
+  //
+  //   return TextSpan(
+  //     style: TextStyle(
+  //       color: currTheme.onSurface,
+  //       height: 1.5,
+  //       wordSpacing: 1.5,
+  //     ),
+  //     children: children,
+  //   );
+  // }
+
+  List<String> buildCommentContent() {
     final buttonText = viewMore ? "View less" : "View More";
 
     bool showButton =
@@ -487,7 +564,7 @@ class _CommentContentState extends State<_CommentContent> {
 
     // for view more
     int len = 0;
-    List<TextSpan> children = [];
+    List<String> children = [];
 
     for (int i = 0; i < content.length; i++) {
       String item = content[i];
@@ -500,67 +577,53 @@ class _CommentContentState extends State<_CommentContent> {
 
       if (usernameCandidate && validateUsername(itemAsUsername)) {
         // valid mention
-        children.add(
-          TextSpan(
-            text: item,
-            style: TextStyle(
-              color: currTheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                context.pushNamed(
-                  RouterConstants.userProfile,
-                  pathParameters: {
-                    "username": itemAsUsername,
-                  },
-                );
-              },
-          ),
-        );
+        String mentionLink = "[$item](doki@user:$itemAsUsername)";
+        children.add(mentionLink);
       } else {
-        children.add(
-          TextSpan(
-            text: item,
-          ),
-        );
+        children.add(item);
       }
 
       if (!viewMore && len >= Constants.commentContentDisplayLimit) break;
     }
 
-    if (showButton) {
-      children.add(TextSpan(
-        text: " $buttonText",
-        style: TextStyle(
-          color: currTheme.outline,
-          fontWeight: FontWeight.bold,
-          fontSize: Constants.smallFontSize,
-        ),
-        recognizer: TapGestureRecognizer()
-          ..onTap = () {
-            setState(() {
-              viewMore = !viewMore;
-            });
-          },
-      ));
-    }
+    String comment = children.join("");
 
-    return TextSpan(
-      style: TextStyle(
-        color: currTheme.onSurface,
-        height: 1.5,
-        wordSpacing: 1.5,
-      ),
-      children: children,
-    );
+    return [comment, showButton ? buttonText : ""];
   }
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      text: buildComment(),
+    List<String> content = buildCommentContent();
+    final currTheme = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      spacing: Constants.gap * 0.25,
+      children: [
+        MarkdownDisplayWidget(
+          data: content.first,
+        ),
+        if (content.last.isNotEmpty)
+          InkWell(
+            child: Text(content.last,
+                style: TextStyle(
+                  color: currTheme.outline,
+                  fontWeight: FontWeight.bold,
+                  fontSize: Constants.smallFontSize,
+                )),
+            onTap: () {
+              setState(() {
+                viewMore = !viewMore;
+              });
+            },
+          )
+      ],
     );
+
+    // return RichText(
+    //   text: buildComment(),
+    // );
   }
 }
 

@@ -4,7 +4,7 @@ import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class MarkdownDisplayWidget extends StatelessWidget {
   const MarkdownDisplayWidget({
@@ -79,7 +79,14 @@ class MarkdownDisplayWidget extends StatelessWidget {
             return;
           }
 
-          launchUrl(Uri.parse(url));
+          Uri? uri = Uri.tryParse(url);
+          String urlString = '';
+          if (uri != null) {
+            if (uri.scheme.isEmpty) urlString = 'https://';
+            urlString += uri.toString();
+
+            launchUrlString(urlString);
+          }
         }
       },
     );
