@@ -91,10 +91,15 @@ class _AccentWidget extends StatefulWidget {
 }
 
 class _AccentWidgetState extends State<_AccentWidget> {
+  late Color accent = context.read<ThemeBloc>().state.accent;
+
   void updateGlobalAccent(Color accent) {
     context.read<ThemeBloc>().add(ThemeChangeAccentEvent(
           selectedAccent: accent,
         ));
+    setState(() {
+      this.accent = accent;
+    });
   }
 
   @override
@@ -132,23 +137,25 @@ class _AccentWidgetState extends State<_AccentWidget> {
           title: const Text('Change Accent Color'),
           content: SizedBox(
             width: double.maxFinite,
-            height: 340,
-            child: ColorPicker(
-              color: currentAccentColor,
-              onColorChanged: (Color newColor) {
-                updateGlobalAccent(newColor);
-              },
-              borderRadius: 20,
-              spacing: 10,
-              runSpacing: 10,
-              wheelDiameter: 250,
-              wheelWidth: 25,
-              pickersEnabled: const {
-                ColorPickerType.primary: false,
-                ColorPickerType.accent: true,
-                ColorPickerType.wheel: true,
-              },
-              enableShadesSelection: false,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: ColorPicker(
+                color: accent,
+                onColorChanged: (Color newColor) {
+                  updateGlobalAccent(newColor);
+                },
+                borderRadius: 20,
+                spacing: 10,
+                runSpacing: 10,
+                wheelDiameter: 250,
+                wheelWidth: 25,
+                pickersEnabled: const {
+                  ColorPickerType.primary: false,
+                  ColorPickerType.accent: true,
+                  ColorPickerType.wheel: true,
+                },
+                enableShadesSelection: true,
+              ),
             ),
           ),
           actions: <Widget>[
