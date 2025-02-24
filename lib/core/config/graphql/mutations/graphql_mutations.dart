@@ -2,6 +2,7 @@
 import 'package:doko_react/core/config/graphql/graphql_constants.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
+import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 import 'package:doko_react/features/user-profile/input/user_profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/comment_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/discussion_create_input.dart';
@@ -872,7 +873,7 @@ class GraphqlMutations {
   // new poll
   static String userCreatePoll() {
     return """
-    mutation CreatePolls(\$input: [PollCreateInput!]!, \$where: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere) {
+    mutation CreatePolls(\$input: [PollCreateInput!]!, \$where: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere) {
       createPolls(input: \$input) {
         polls {
           id
@@ -892,20 +893,33 @@ class GraphqlMutations {
           }
           question
           options
-          activeFor
-          votesAggregate {
-            count
-          }
+          activeTill
+          
           createdBy {
             username
           }
-          votesConnection(where: \$votesConnectionWhere2) {
+          selfVote: votesConnection(where: \$votesConnectionWhere2) {
             edges {
               properties {
                 addedOn
                 option
               }
             }
+          }
+          optionA: votesConnection (where: \$votesConnectionWhere3){
+            totalCount
+          }
+          optionB: votesConnection (where: \$votesConnectionWhere4){
+            totalCount
+          }
+          optionC: votesConnection (where: \$votesConnectionWhere5){
+            totalCount
+          }
+          optionD: votesConnection (where: \$votesConnectionWhere6){
+            totalCount
+          }
+          optionE: votesConnection (where: \$votesConnectionWhere7){
+            totalCount
           }
         }
       }
@@ -919,7 +933,7 @@ class GraphqlMutations {
         {
           "question": poll.question,
           "options": poll.options,
-          "activeFor": poll.activeFor,
+          "activeTill": poll.activeTill.toIso8601String(),
           "createdBy": {
             "connect": {
               "where": {
@@ -949,7 +963,142 @@ class GraphqlMutations {
         "node": {
           "username_EQ": poll.username,
         }
+      },
+      "votesConnectionWhere3": {
+        "edge": {
+          "option_EQ": PollOption.optionA.value,
+        }
+      },
+      "votesConnectionWhere4": {
+        "edge": {
+          "option_EQ": PollOption.optionB.value,
+        }
+      },
+      "votesConnectionWhere5": {
+        "edge": {
+          "option_EQ": PollOption.optionC.value,
+        }
+      },
+      "votesConnectionWhere6": {
+        "edge": {
+          "option_EQ": PollOption.optionD.value,
+        }
+      },
+      "votesConnectionWhere7": {
+        "edge": {
+          "option_EQ": PollOption.optionE.value,
+        }
+      },
+    };
+  }
+
+  /// vote
+  static String userAddVote() {
+    return """
+      mutation UpdatePolls(\$where: PollWhere, \$likedByWhere2: UserWhere,  \$votesConnectionWhere2: PollVotesConnectionWhere, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere,\$votesConnectionWhere5: PollVotesConnectionWhere,\$votesConnectionWhere6: PollVotesConnectionWhere,\$votesConnectionWhere7: PollVotesConnectionWhere,\$update: PollUpdateInput) {
+        updatePolls(where: \$where, update: \$update) {
+          polls {
+            likedByConnection {
+              totalCount
+            }
+            commentsConnection {
+              totalCount
+            }
+            likedBy(where: \$likedByWhere2) {
+              username
+            }
+            selfVote: votesConnection(where: \$votesConnectionWhere2) {
+              edges {
+                properties {
+                  addedOn
+                  option
+                }
+              }
+            } 
+            options
+            optionA: votesConnection (where: \$votesConnectionWhere3){
+              totalCount
+            }
+            optionB: votesConnection (where: \$votesConnectionWhere4){
+              totalCount
+            }
+            optionC: votesConnection (where: \$votesConnectionWhere5){
+              totalCount
+            }
+            optionD: votesConnection (where: \$votesConnectionWhere6){
+              totalCount
+            }
+            optionE: votesConnection (where: \$votesConnectionWhere7){
+              totalCount
+            }
+          }
+        }
       }
+    """;
+  }
+
+  static Map<String, dynamic> userAddVoteVariables({
+    required String pollId,
+    required String username,
+    required PollOption option,
+  }) {
+    return {
+      "where": {
+        "id_EQ": pollId,
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "votesConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
+      "votesConnectionWhere3": {
+        "edge": {
+          "option_EQ": PollOption.optionA.value,
+        }
+      },
+      "votesConnectionWhere4": {
+        "edge": {
+          "option_EQ": PollOption.optionB.value,
+        }
+      },
+      "votesConnectionWhere5": {
+        "edge": {
+          "option_EQ": PollOption.optionC.value,
+        }
+      },
+      "votesConnectionWhere6": {
+        "edge": {
+          "option_EQ": PollOption.optionD.value,
+        }
+      },
+      "votesConnectionWhere7": {
+        "edge": {
+          "option_EQ": PollOption.optionE.value,
+        }
+      },
+      "update": {
+        "votes": [
+          {
+            "connect": [
+              {
+                "overwrite": true,
+                "edge": {
+                  "addedOn": DateTime.now().toIso8601String(),
+                  "option": option.value,
+                },
+                "where": {
+                  "node": {
+                    "username_EQ": username,
+                  }
+                }
+              },
+            ]
+          }
+        ]
+      },
     };
   }
 }

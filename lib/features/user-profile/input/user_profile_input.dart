@@ -1,4 +1,5 @@
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
+import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 
 class UserNodeLikeActionInput {
   const UserNodeLikeActionInput({
@@ -28,4 +29,16 @@ class UserToUserRelationDetails {
   // used to update local graph and getting relation info
   final String username;
   final String currentUsername;
+}
+
+class UserPollAddVoteInput {
+  UserPollAddVoteInput({
+    required this.pollId,
+    required this.username,
+    required this.option,
+  });
+
+  final String pollId;
+  final String username;
+  final PollOption option;
 }

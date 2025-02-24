@@ -3,7 +3,9 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
+import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/share/share.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
@@ -117,16 +119,25 @@ class PollWidget extends StatelessWidget {
               ),
               child: Column(
                 spacing: Constants.gap,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ContentMetaDataWidget(
                     nodeKey: pollKey,
                   ),
-                  Container(
-                    color: Colors.green,
-                    height: Constants.height * 15,
-                    child: Center(
-                      child: Text(poll.question),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: Constants.padding,
                     ),
+                    child: Text(
+                      poll.question,
+                      style: const TextStyle(
+                        fontSize: Constants.fontSize,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  _PollOptions(
+                    pollKey: pollKey,
                   ),
                   ContentActionWidget(
                     nodeId: poll.id,
@@ -144,6 +155,173 @@ class PollWidget extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _PollOptions extends StatelessWidget {
+  const _PollOptions({
+    required this.pollKey,
+  });
+
+  final String pollKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final UserGraph graph = UserGraph();
+    final poll = graph.getValueByKey(pollKey)! as PollEntity;
+
+    final currTheme = Theme.of(context).colorScheme;
+
+    return BlocConsumer<UserActionBloc, UserActionState>(
+      listenWhen: (prevState, state) {
+        return state is UserActionVoteResponse && state.pollId == poll.id;
+      },
+      listener: (context, state) {
+        if (state is UserActionVoteAddFailureState) {
+          showError(state.message);
+        }
+      },
+      buildWhen: (prevState, state) {
+        return state is UserActionVoteResponse && state.pollId == poll.id;
+      },
+      builder: (context, state) {
+        bool selected = poll.userVote != null;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Constants.padding,
+          ),
+          child: Column(
+            spacing: Constants.gap * 0.625,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var option in poll.options)
+                Builder(
+                  builder: (context) {
+                    bool displayResult = selected || !poll.isActive;
+
+                    bool myOption = poll.userVote == option.option;
+                    final color = !displayResult
+                        ? Colors.transparent
+                        : myOption
+                            ? currTheme.primaryContainer
+                            : currTheme.secondaryContainer;
+
+                    double percentage =
+                        getPercentageDouble(option.voteCount, poll.totalVotes);
+
+                    return Container(
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.circular(Constants.radius * 0.625),
+                        border: Border.all(
+                          width: 1.5,
+                          color: displayResult ? color : currTheme.outline,
+                        ),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      width: double.infinity,
+                      child: InkWell(
+                          onTap: !poll.isActive || myOption
+                              ? null
+                              : () {
+                                  context
+                                      .read<UserActionBloc>()
+                                      .add(UserActionAddVoteToPollEvent(
+                                        pollId: poll.id,
+                                        username: (context
+                                                .read<UserBloc>()
+                                                .state as UserCompleteState)
+                                            .username,
+                                        option: option.option,
+                                      ));
+                                },
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                stops: [
+                                  percentage,
+                                  1.0,
+                                ],
+                                colors: [
+                                  color,
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(
+                                  Constants.padding * 0.625),
+                              child: DefaultTextStyle.merge(
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                child: displayResult
+                                    ? Wrap(
+                                        alignment: WrapAlignment.spaceBetween,
+                                        runSpacing: Constants.gap * 0.5,
+                                        children: [
+                                          myOption
+                                              ? Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  spacing: Constants.gap * 0.5,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Icon(
+                                                      Icons.check_circle,
+                                                      size: Constants
+                                                              .iconButtonSize *
+                                                          0.5,
+                                                    ),
+                                                    Flexible(
+                                                      child: Text(
+                                                          option.optionValue),
+                                                    ),
+                                                  ],
+                                                )
+                                              : Text(option.optionValue),
+                                          Text(getPercentage(option.voteCount,
+                                              poll.totalVotes)),
+                                        ],
+                                      )
+                                    : Text(
+                                        option.optionValue,
+                                        textAlign: TextAlign.center,
+                                      ),
+                              ),
+                            ),
+                          )),
+                    );
+                  },
+                ),
+              DefaultTextStyle.merge(
+                style: const TextStyle(
+                  fontSize: Constants.smallFontSize,
+                  fontWeight: FontWeight.w500,
+                ),
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  runSpacing: Constants.gap * 0.25,
+                  children: [
+                    const SizedBox(
+                      width: double.infinity,
+                    ),
+                    Text(getPollStatusText(poll.activeTill)),
+                    Text(
+                      "${displayNumberFormat(poll.totalVotes)} Votes",
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
       },

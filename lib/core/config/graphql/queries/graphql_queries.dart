@@ -1,6 +1,7 @@
 import 'package:doko_react/core/config/graphql/graphql_constants.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/query/query_helper.dart';
+import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 
 class GraphqlQueries {
   // get user query and variables for self
@@ -85,7 +86,7 @@ class GraphqlQueries {
 
   static String getCompleteUser() {
     return '''
-      query Users(\$where: UserWhere, \$friendsAggregateWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [ContentSort!], \$contentsConnectionWhere2: ContentWhere, \$likedByWhere2: UserWhere) {
+      query Users(\$where: UserWhere, \$friendsAggregateWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [ContentSort!], \$contentsConnectionWhere2: ContentWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere) {
         users(where: \$where) {
           id
           username
@@ -166,12 +167,30 @@ class GraphqlQueries {
               ... on Poll {
                 question
                 options
-                activeFor
-                votesAggregate {
-                  count
+                activeTill
+             
+                selfVote: votesConnection(where: \$votesConnectionWhere2) {
+                  edges {
+                    properties {
+                      addedOn
+                      option
+                    }
+                  }
                 }
-                votes(where: \$likedByWhere2) {
-                  username
+                optionA: votesConnection (where: \$votesConnectionWhere3){
+                  totalCount
+                }
+                optionB: votesConnection (where: \$votesConnectionWhere4){
+                  totalCount
+                }
+                optionC: votesConnection (where: \$votesConnectionWhere5){
+                  totalCount
+                }
+                optionD: votesConnection (where: \$votesConnectionWhere6){
+                  totalCount
+                }
+                optionE: votesConnection (where: \$votesConnectionWhere7){
+                  totalCount
                 }
               }
             }
@@ -221,14 +240,42 @@ class GraphqlQueries {
       },
       "likedByWhere2": {
         "username_EQ": currentUsername,
-      }
+      },
+      "votesConnectionWhere2": {
+        "node": {"username_EQ": currentUsername}
+      },
+      "votesConnectionWhere3": {
+        "edge": {
+          "option_EQ": PollOption.optionA.value,
+        }
+      },
+      "votesConnectionWhere4": {
+        "edge": {
+          "option_EQ": PollOption.optionB.value,
+        }
+      },
+      "votesConnectionWhere5": {
+        "edge": {
+          "option_EQ": PollOption.optionC.value,
+        }
+      },
+      "votesConnectionWhere6": {
+        "edge": {
+          "option_EQ": PollOption.optionD.value,
+        }
+      },
+      "votesConnectionWhere7": {
+        "edge": {
+          "option_EQ": PollOption.optionE.value,
+        }
+      },
     };
   }
 
   // get more timeline nodes
   static String getUserTimelineNodes() {
     return """
-    query ContentsConnection(\$first: Int, \$after: String, \$sort: [ContentSort!], \$where: ContentWhere, \$likedByWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+    query ContentsConnection(\$first: Int, \$after: String, \$sort: [ContentSort!], \$where: ContentWhere, \$likedByWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere) {
       contentsConnection(first: \$first, after: \$after, sort: \$sort, where: \$where) {
         pageInfo {
           endCursor
@@ -275,12 +322,30 @@ class GraphqlQueries {
             ... on Poll {
               question
               options
-              activeFor
-              votesAggregate {
-                count
+              activeTill
+             
+              selfVote: votesConnection(where: \$votesConnectionWhere2) {
+                edges {
+                  properties {
+                    addedOn
+                    option
+                  }
+                }
               }
-              votes(where: \$likedByWhere2) {
-                username
+              optionA: votesConnection (where: \$votesConnectionWhere3){
+                totalCount
+              }
+              optionB: votesConnection (where: \$votesConnectionWhere4){
+                totalCount
+              }
+              optionC: votesConnection (where: \$votesConnectionWhere5){
+                totalCount
+              }
+              optionD: votesConnection (where: \$votesConnectionWhere6){
+                totalCount
+              }
+              optionE: votesConnection (where: \$votesConnectionWhere7){
+                totalCount
               }
             }
             ... on Post {
@@ -322,13 +387,43 @@ class GraphqlQueries {
         ]
       },
       "likedByWhere2": {
-        "username_EQ": username,
+        "username_EQ": currentUsername,
       },
       "friendsConnectionWhere2": {
         "node": {
-          "username_EQ": username,
+          "username_EQ": currentUsername,
         }
-      }
+      },
+      "votesConnectionWhere2": {
+        "node": {
+          "username_EQ": currentUsername,
+        }
+      },
+      "votesConnectionWhere3": {
+        "edge": {
+          "option_EQ": PollOption.optionA.value,
+        }
+      },
+      "votesConnectionWhere4": {
+        "edge": {
+          "option_EQ": PollOption.optionB.value,
+        }
+      },
+      "votesConnectionWhere5": {
+        "edge": {
+          "option_EQ": PollOption.optionC.value,
+        }
+      },
+      "votesConnectionWhere6": {
+        "edge": {
+          "option_EQ": PollOption.optionD.value,
+        }
+      },
+      "votesConnectionWhere7": {
+        "edge": {
+          "option_EQ": PollOption.optionE.value,
+        }
+      },
     };
   }
 
@@ -691,7 +786,7 @@ class GraphqlQueries {
   static String getUserPollsByUsername(String cursor) {
     if (cursor.isEmpty) {
       return """
-      query PollsConnection(\$first: Int, \$sort: [PollSort!], \$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere) {
+      query PollsConnection(\$first: Int, \$sort: [PollSort!], \$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere) {
         pollsConnection(first: \$first, sort: \$sort, where: \$where) {
           pageInfo {
             endCursor
@@ -703,7 +798,7 @@ class GraphqlQueries {
               createdOn
               question
               options
-              activeFor
+              activeTill
               usersTagged {
                 username
                 profilePicture
@@ -720,16 +815,29 @@ class GraphqlQueries {
               createdBy {
                 username
               }
-              votesAggregate {
-                count
-              }
-              votesConnection(where: \$votesConnectionWhere2) {
+             
+              selfVote: votesConnection(where: \$votesConnectionWhere2) {
                 edges {
                   properties {
                     addedOn
                     option
                   }
                 }
+              }
+              optionA: votesConnection (where: \$votesConnectionWhere3){
+                totalCount
+              }
+              optionB: votesConnection (where: \$votesConnectionWhere4){
+                totalCount
+              }
+              optionC: votesConnection (where: \$votesConnectionWhere5){
+                totalCount
+              }
+              optionD: votesConnection (where: \$votesConnectionWhere6){
+                totalCount
+              }
+              optionE: votesConnection (where: \$votesConnectionWhere7){
+                totalCount
               }
             }
           }
@@ -739,7 +847,7 @@ class GraphqlQueries {
     }
 
     return """
-    query PollsConnection(\$first: Int, \$sort: [PollSort!], \$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$after: String) {
+    query PollsConnection(\$first: Int, \$sort: [PollSort!], \$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$after: String, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere) {
       pollsConnection(first: \$first, sort: \$sort, where: \$where, after: \$after) {
         pageInfo {
           endCursor
@@ -751,7 +859,7 @@ class GraphqlQueries {
             createdOn
             question
             options
-            activeFor
+            activeTill
             usersTagged {
               username
               profilePicture
@@ -768,16 +876,29 @@ class GraphqlQueries {
             createdBy {
               username
             }
-            votesAggregate {
-              count
-            }
-            votesConnection(where: \$votesConnectionWhere2) {
+            
+            selfVote: votesConnection(where: \$votesConnectionWhere2) {
               edges {
                 properties {
                   addedOn
                   option
                 }
               }
+            }
+            optionA: votesConnection (where: \$votesConnectionWhere3){
+              totalCount
+            }
+            optionB: votesConnection (where: \$votesConnectionWhere4){
+              totalCount
+            }
+            optionC: votesConnection (where: \$votesConnectionWhere5){
+              totalCount
+            }
+            optionD: votesConnection (where: \$votesConnectionWhere6){
+              totalCount
+            }
+            optionE: votesConnection (where: \$votesConnectionWhere7){
+              totalCount
             }
           }
         }
@@ -810,7 +931,32 @@ class GraphqlQueries {
           "node": {
             "username_EQ": currentUsername,
           }
-        }
+        },
+        "votesConnectionWhere3": {
+          "edge": {
+            "option_EQ": PollOption.optionA.value,
+          }
+        },
+        "votesConnectionWhere4": {
+          "edge": {
+            "option_EQ": PollOption.optionB.value,
+          }
+        },
+        "votesConnectionWhere5": {
+          "edge": {
+            "option_EQ": PollOption.optionC.value,
+          }
+        },
+        "votesConnectionWhere6": {
+          "edge": {
+            "option_EQ": PollOption.optionD.value,
+          }
+        },
+        "votesConnectionWhere7": {
+          "edge": {
+            "option_EQ": PollOption.optionE.value,
+          }
+        },
       };
     }
 
@@ -832,7 +978,32 @@ class GraphqlQueries {
         "node": {
           "username_EQ": currentUsername,
         }
-      }
+      },
+      "votesConnectionWhere3": {
+        "edge": {
+          "option_EQ": PollOption.optionA.value,
+        }
+      },
+      "votesConnectionWhere4": {
+        "edge": {
+          "option_EQ": PollOption.optionB.value,
+        }
+      },
+      "votesConnectionWhere5": {
+        "edge": {
+          "option_EQ": PollOption.optionC.value,
+        }
+      },
+      "votesConnectionWhere6": {
+        "edge": {
+          "option_EQ": PollOption.optionD.value,
+        }
+      },
+      "votesConnectionWhere7": {
+        "edge": {
+          "option_EQ": PollOption.optionE.value,
+        }
+      },
     };
   }
 
@@ -1906,13 +2077,13 @@ class GraphqlQueries {
   /// get poll by id for inbox
   static String getPollById() {
     return """
-    query Polls(\$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+    query Polls(\$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere) {
       polls(where: \$where) {
         id
         createdOn
         question
         options
-        activeFor
+        activeTill
         usersTagged {
           username
           profilePicture
@@ -1926,16 +2097,29 @@ class GraphqlQueries {
         likedByConnection {
           totalCount
         }
-        votesAggregate {
-          count
-        }
-        votesConnection(where: \$votesConnectionWhere2) {
+        
+        selfVote: votesConnection(where: \$votesConnectionWhere2) {
           edges {
             properties {
               addedOn
               option
             }
           }
+        }
+        optionA: votesConnection (where: \$votesConnectionWhere3){
+          totalCount
+        }
+        optionB: votesConnection (where: \$votesConnectionWhere4){
+          totalCount
+        }
+        optionC: votesConnection (where: \$votesConnectionWhere5){
+          totalCount
+        }
+        optionD: votesConnection (where: \$votesConnectionWhere6){
+          totalCount
+        }
+        optionE: votesConnection (where: \$votesConnectionWhere7){
+          totalCount
         }
         createdBy {
           id
@@ -1978,18 +2162,43 @@ class GraphqlQueries {
           "username_EQ": username,
         }
       },
+      "votesConnectionWhere3": {
+        "edge": {
+          "option_EQ": PollOption.optionA.value,
+        }
+      },
+      "votesConnectionWhere4": {
+        "edge": {
+          "option_EQ": PollOption.optionB.value,
+        }
+      },
+      "votesConnectionWhere5": {
+        "edge": {
+          "option_EQ": PollOption.optionC.value,
+        }
+      },
+      "votesConnectionWhere6": {
+        "edge": {
+          "option_EQ": PollOption.optionD.value,
+        }
+      },
+      "votesConnectionWhere7": {
+        "edge": {
+          "option_EQ": PollOption.optionE.value,
+        }
+      },
     };
   }
 
   static String getCompletePollById() {
     return """
-    query Polls(\$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int) {
+    query Polls(\$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere) {
       polls(where: \$where) {
         id
         createdOn
         question
         options
-        activeFor
+        activeTill
         usersTagged {
           username
           profilePicture
@@ -2042,16 +2251,29 @@ class GraphqlQueries {
         likedByConnection {
           totalCount
         }
-        votesAggregate {
-          count
-        }
-        votesConnection(where: \$votesConnectionWhere2) {
+      
+        selfVote: votesConnection(where: \$votesConnectionWhere2) {
           edges {
             properties {
               addedOn
               option
             }
           }
+        }
+        optionA: votesConnection (where: \$votesConnectionWhere3){
+          totalCount
+        }
+        optionB: votesConnection (where: \$votesConnectionWhere4){
+          totalCount
+        }
+        optionC: votesConnection (where: \$votesConnectionWhere5){
+          totalCount
+        }
+        optionD: votesConnection (where: \$votesConnectionWhere6){
+          totalCount
+        }
+        optionE: votesConnection (where: \$votesConnectionWhere7){
+          totalCount
         }
         createdBy {
           id
@@ -2093,6 +2315,31 @@ class GraphqlQueries {
       "friendsConnectionWhere2": {
         "node": {
           "username_EQ": username,
+        }
+      },
+      "votesConnectionWhere3": {
+        "edge": {
+          "option_EQ": PollOption.optionA.value,
+        }
+      },
+      "votesConnectionWhere4": {
+        "edge": {
+          "option_EQ": PollOption.optionB.value,
+        }
+      },
+      "votesConnectionWhere5": {
+        "edge": {
+          "option_EQ": PollOption.optionC.value,
+        }
+      },
+      "votesConnectionWhere6": {
+        "edge": {
+          "option_EQ": PollOption.optionD.value,
+        }
+      },
+      "votesConnectionWhere7": {
+        "edge": {
+          "option_EQ": PollOption.optionE.value,
         }
       },
     };

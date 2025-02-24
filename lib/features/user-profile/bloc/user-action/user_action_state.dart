@@ -32,7 +32,6 @@ class UserActionLoadTimelineState extends UserActionState {
 }
 
 // base class for new node state
-// todo: use this when new node is created in timeline
 final class UserActionNewRootNodeState extends UserActionState {
   UserActionNewRootNodeState({
     required this.nodeId,
@@ -168,4 +167,44 @@ class UserActionNodeHighlightState extends UserActionState {
 
   @override
   List<Object?> get props => [nodeId, now];
+}
+
+class UserActionVoteResponse extends UserActionState {
+  UserActionVoteResponse({
+    required this.pollId,
+  }) : now = DateTime.now();
+
+  final String pollId;
+  final DateTime now;
+
+  @override
+  List<Object?> get props => [pollId, now];
+}
+
+class UserActionVoteAddSuccessState extends UserActionVoteResponse {
+  UserActionVoteAddSuccessState({
+    required super.pollId,
+    required this.commentCount,
+    required this.likeCount,
+    required this.options,
+  });
+
+  final int likeCount;
+  final int commentCount;
+  final List<OptionEntity> options;
+
+  @override
+  List<Object?> get props => [pollId, now, likeCount, commentCount, options];
+}
+
+class UserActionVoteAddFailureState extends UserActionVoteResponse {
+  UserActionVoteAddFailureState({
+    required super.pollId,
+    required this.message,
+  });
+
+  final String message;
+
+  @override
+  List<Object?> get props => [pollId, now, message];
 }

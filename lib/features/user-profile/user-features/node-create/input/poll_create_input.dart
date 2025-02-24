@@ -27,17 +27,19 @@ class PollOptionInput {
 }
 
 class PollCreateInput {
-  const PollCreateInput({
+  PollCreateInput({
     required this.username,
     required this.question,
-    required this.activeFor,
+    required int activeFor,
     required this.options,
     required this.usersTagged,
-  });
+  }) : activeTill = DateTime.now().add(Duration(
+          days: activeFor,
+        ));
 
   final String username;
   final String question;
-  final int activeFor;
+  final DateTime activeTill;
   final List<String> options;
   final List<String> usersTagged;
 }

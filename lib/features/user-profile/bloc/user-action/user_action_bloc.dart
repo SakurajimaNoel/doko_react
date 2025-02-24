@@ -2,12 +2,16 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:doki_websocket_client/doki_websocket_client.dart';
+import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
+import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/comments/comment_get.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/discussion/discussion_get.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/poll/poll_get.dart';
+import 'package:doko_react/features/user-profile/domain/use-case/poll/user_add_vote_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/posts/post_get.dart';
 import 'package:doko_react/features/user-profile/domain/use-case/user-node-action/user_node_like_action_use_case.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -25,12 +29,14 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   final Set<String> getNodeRequest = HashSet();
   final Set<String> nodeLikeActionRequest = HashSet();
   final Set<String> userToUserRelation = HashSet(); // currentUser@remoteUser
+  final Set<String> pollAddVote = HashSet();
 
   final UserNodeLikeActionUseCase _userNodeLikeActionUseCase;
   final PostGetUseCase _postGetUseCase;
   final DiscussionGetUseCase _discussionGetUseCase;
   final PollGetUseCase _pollGetUseCase;
   final CommentGetUseCase _commentGetUseCase;
+  final UserAddVoteUseCase _userAddVoteUseCase;
 
   UserActionBloc({
     required UserNodeLikeActionUseCase userNodeLikeActionUseCase,
@@ -38,11 +44,13 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     required DiscussionGetUseCase discussionGetUseCase,
     required PollGetUseCase pollGetUseCase,
     required CommentGetUseCase commentGetUseCase,
+    required UserAddVoteUseCase userAddVoteUseCase,
   })  : _userNodeLikeActionUseCase = userNodeLikeActionUseCase,
         _postGetUseCase = postGetUseCase,
         _discussionGetUseCase = discussionGetUseCase,
         _pollGetUseCase = pollGetUseCase,
         _commentGetUseCase = commentGetUseCase,
+        _userAddVoteUseCase = userAddVoteUseCase,
         super(UserActionInitial()) {
     on<UserActionNodeLikeEvent>(_handleUserActionNodeLikeEvent);
     on<UserActionTimelineLoadEvent>((event, emit) {
@@ -121,6 +129,63 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
 
     on<UserActionNewSecondaryNodeRemoteEvent>(
         _handleUserActionNewSecondaryNodeRemoteEvent);
+
+    on<UserActionAddVoteToPollEvent>(_handleUserActionAddVoteToPollEvent);
+  }
+
+  FutureOr<void> _handleUserActionAddVoteToPollEvent(
+      UserActionAddVoteToPollEvent event, Emitter<UserActionState> emit) async {
+    String pollId = event.pollId;
+    String username = event.username;
+    PollOption option = event.option;
+
+    if (pollAddVote.contains(pollId)) return;
+    pollAddVote.add(pollId);
+
+    final String pollKey = generatePollNodeKey(pollId);
+    final poll = graph.getValueByKey(pollKey)! as PollEntity;
+    final currVote = poll.userVote;
+
+    try {
+      // optimistic update
+      poll.addVote(option.ind);
+      emit(UserActionVoteAddSuccessState(
+        pollId: pollId,
+        commentCount: poll.commentsCount,
+        likeCount: poll.likesCount,
+        options: poll.options,
+      ));
+      await _userAddVoteUseCase(UserPollAddVoteInput(
+        pollId: pollId,
+        username: username,
+        option: option,
+      ));
+
+      emit(UserActionVoteAddSuccessState(
+        pollId: pollId,
+        commentCount: poll.commentsCount,
+        likeCount: poll.likesCount,
+        options: poll.options,
+      ));
+    } catch (e) {
+      // revert optimistic update
+      if (currVote == null) {
+        poll.removeVote();
+      } else {
+        poll.addVote(currVote.ind);
+      }
+
+      String errorMessage = Constants.errorMessage;
+      if (e is ApplicationException) {
+        errorMessage = e.reason;
+      }
+      emit(UserActionVoteAddFailureState(
+        pollId: pollId,
+        message: errorMessage,
+      ));
+    }
+
+    pollAddVote.remove(pollId);
   }
 
   FutureOr<void> _handleUserActionNodeLikeEvent(

@@ -90,4 +90,9 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
   Future<bool> userRemovePollLike(String nodeId, String username) {
     return _remoteDataSource.userRemovePollLike(nodeId, username);
   }
+
+  @override
+  Future<bool> userAddVote(UserPollAddVoteInput voteDetails) {
+    return _remoteDataSource.userAddVote(voteDetails);
+  }
 }

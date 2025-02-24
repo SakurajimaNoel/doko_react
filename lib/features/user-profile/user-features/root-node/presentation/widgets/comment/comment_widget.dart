@@ -174,7 +174,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                       Text(
                         displayDateDifference(
                           comment.createdOn,
-                          small: shrink,
+                          format: shrink ? "d MMM y" : "EEE, d MMM y",
                         ),
                         style: const TextStyle(
                           fontSize: Constants.smallFontSize * 0.875,

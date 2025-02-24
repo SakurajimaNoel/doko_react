@@ -35,4 +35,6 @@ abstract class UserProfileRepository {
   Future<bool> getPollById(String pollId, String username);
 
   Future<bool> getCommentById(String commentId, String username);
+
+  Future<bool> userAddVote(UserPollAddVoteInput voteDetails);
 }

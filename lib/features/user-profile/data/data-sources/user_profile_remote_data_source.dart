@@ -3,7 +3,7 @@ import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
-import 'package:doko_react/features/user-profile/data/models/post/post_action_model.dart';
+import 'package:doko_react/features/user-profile/data/models/user_action_model.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
@@ -681,6 +681,55 @@ class UserProfileRemoteDataSource {
         userLike: model.userLike,
         likesCount: model.likesCount,
         commentsCount: model.commentsCount,
+      );
+
+      return true;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<bool> userAddVote(UserPollAddVoteInput voteDetails) async {
+    try {
+      QueryResult result = await _client.mutate(
+        MutationOptions(
+          document: gql(GraphqlMutations.userAddVote()),
+          variables: GraphqlMutations.userAddVoteVariables(
+            pollId: voteDetails.pollId,
+            username: voteDetails.username,
+            option: voteDetails.option,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(
+          reason: "Problem adding your vote",
+        );
+      }
+
+      List? res = result.data?["updatePolls"]["polls"];
+      if (res == null || res.isEmpty) {
+        throw const ApplicationException(
+          reason: Constants.errorMessage,
+        );
+      }
+
+      UserActionModel model = UserActionModel.createModel(res[0]);
+      UserPollVoteModel voteModel = UserPollVoteModel.createModel(res[0]);
+      UserGraph graph = UserGraph();
+
+      graph.handleUserLikeAction(
+        nodeKey: generatePollNodeKey(voteDetails.pollId),
+        userLike: model.userLike,
+        likesCount: model.likesCount,
+        commentsCount: model.commentsCount,
+      );
+
+      graph.handlePollVoteDetails(
+        pollId: voteDetails.pollId,
+        options: voteModel.options,
+        userVote: voteModel.userVote,
       );
 
       return true;

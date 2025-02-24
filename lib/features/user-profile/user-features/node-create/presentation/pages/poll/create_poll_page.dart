@@ -77,6 +77,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
                             labelText: "*Question",
                             hintText: "Question...",
                           ),
+                          maxLength: Constants.pollQuestionSizeLimit,
                         ),
                         ReorderableListView(
                           shrinkWrap: true,
@@ -101,6 +102,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
                                     labelText: "Option ${i + 1}",
                                     hintText: "Option ${i + 1}...",
                                   ),
+                                  maxLength: Constants.pollOptionSizeLimit,
                                 ),
                                 leading: options.length > 2
                                     ? InkWell(

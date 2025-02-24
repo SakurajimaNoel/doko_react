@@ -248,7 +248,7 @@ class ContentMetaDataWidget extends StatelessWidget {
                   Text(
                     displayDateDifference(
                       node.createdOn,
-                      small: shrink,
+                      format: shrink ? "d MMM y" : "EEEE, d MMM y",
                     ),
                     style: TextStyle(
                       fontSize: Constants.smallFontSize * shrinkFactor,

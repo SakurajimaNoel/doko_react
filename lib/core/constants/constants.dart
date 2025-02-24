@@ -66,6 +66,8 @@ class Constants {
   // polls
   static const int pollOptionsLimit = 5;
   static const int pollMaxActiveDuration = 7;
+  static const int pollQuestionSizeLimit = 1 << 8;
+  static const int pollOptionSizeLimit = 1 << 7;
 
   // discussion
   static const int discussionTitleLimit = 1 << 8;
@@ -95,7 +97,7 @@ class Constants {
   static const double commentContainer = (commentWidth / commentHeight);
   static const String zeroWidthSpace = "\u200B";
   static const double commentOverlayHeight = _root * 5;
-  static const int commentContentDisplayLimit = 128;
+  static const int commentContentDisplayLimit = 1 << 7;
 
   // intervals
   static const Duration userProfilePollInterval = Duration(

@@ -30,6 +30,7 @@ import "package:doko_react/features/user-profile/domain/repository/user_profile_
 import "package:doko_react/features/user-profile/domain/use-case/comments/comment_get.dart";
 import "package:doko_react/features/user-profile/domain/use-case/discussion/discussion_get.dart";
 import "package:doko_react/features/user-profile/domain/use-case/poll/poll_get.dart";
+import "package:doko_react/features/user-profile/domain/use-case/poll/user_add_vote_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/posts/post_get.dart";
 import "package:doko_react/features/user-profile/domain/use-case/user-node-action/user_node_like_action_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_accepts_friend_relation_use_case.dart";
@@ -278,8 +279,15 @@ void _initUserAction() {
       profileRepository: serviceLocator(),
     ),
   );
+
   serviceLocator.registerFactory<PollGetUseCase>(
     () => PollGetUseCase(
+      profileRepository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UserAddVoteUseCase>(
+    () => UserAddVoteUseCase(
       profileRepository: serviceLocator(),
     ),
   );
@@ -291,6 +299,7 @@ void _initUserAction() {
       discussionGetUseCase: serviceLocator(),
       pollGetUseCase: serviceLocator(),
       commentGetUseCase: serviceLocator(),
+      userAddVoteUseCase: serviceLocator(),
     ),
   );
 }

@@ -208,3 +208,16 @@ final class UserActionNewSecondaryNodeRemoteEvent extends UserActionEvent {
 
   final UserCreateSecondaryNode payload;
 }
+
+/// add vote to to poll
+final class UserActionAddVoteToPollEvent extends UserActionEvent {
+  UserActionAddVoteToPollEvent({
+    required this.pollId,
+    required this.username,
+    required this.option,
+  });
+
+  final String pollId;
+  final String username;
+  final PollOption option;
+}

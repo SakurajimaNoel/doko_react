@@ -24,11 +24,9 @@ class BulletList extends StatelessWidget {
           return Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: Constants.gap * 0.25,
             children: [
               const Text("\u2022"),
-              const SizedBox(
-                width: Constants.gap * 0.25,
-              ),
               Expanded(
                 child: isMarkdown
                     ? MarkdownDisplayWidget(

@@ -696,6 +696,23 @@ class UserGraph {
     node.updateLikeCount(likesCount);
   }
 
+  /// add user vote details
+  void handlePollVoteDetails({
+    required String pollId,
+    required List<OptionEntity> options,
+    PollOption? userVote,
+  }) {
+    String pollKey = generatePollNodeKey(pollId);
+    final poll = getValueByKey(pollKey);
+
+    if (poll is! PollEntity) return;
+
+    poll.updateOptions(options);
+    if (userVote != null) {
+      poll.updateUserVote(userVote);
+    }
+  }
+
   /// add fetched users to graph based on search query
   List<String> addUserSearchEntry(List<UserEntity> searchResults) {
     Map<String, GraphEntity> tempMap = HashMap();

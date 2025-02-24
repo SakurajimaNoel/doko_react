@@ -44,6 +44,8 @@ class DiscussionWidget extends StatelessWidget {
     String currentRoute = GoRouter.of(context).currentRouteName ?? "";
     bool isDiscussionPage = currentRoute == RouterConstants.userDiscussion;
 
+    double scaleFactor = isDiscussionPage ? 1.125 : 1;
+
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
         return state is UserActionNodeDataFetchedState &&
@@ -133,7 +135,7 @@ class DiscussionWidget extends StatelessWidget {
                   ),
                   child: Heading.left(
                     discussion.title,
-                    size: Constants.heading4 * 1.125,
+                    size: Constants.heading4 * scaleFactor,
                   ),
                 ),
                 if (discussion.media.isNotEmpty) ...[
