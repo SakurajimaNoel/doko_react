@@ -13,6 +13,7 @@ import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bl
 import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/content-action-widget/content_action_widget.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/content-meta-data-widget/content_meta_data_preview_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/content-meta-data-widget/content_meta_data_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,9 +23,15 @@ class PollWidget extends StatelessWidget {
   const PollWidget({
     super.key,
     required this.pollKey,
-  });
+  }) : preview = false;
+
+  const PollWidget.preview({
+    super.key,
+    required this.pollKey,
+  }) : preview = true;
 
   final String pollKey;
+  final bool preview;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +49,10 @@ class PollWidget extends StatelessWidget {
 
     String currentRoute = GoRouter.of(context).currentRouteName ?? "";
     bool isPollPage = currentRoute == RouterConstants.userPoll;
+
+    double paddingScale = preview ? 0 : 1;
+    double gapScale = preview ? 0.5 : 1;
+    double questionScale = preview ? 0.875 : 1;
 
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (previousState, state) {
@@ -104,7 +115,7 @@ class PollWidget extends StatelessWidget {
                       },
                     );
                   },
-            onLongPress: isPollPage
+            onLongPress: isPollPage || preview
                 ? null
                 : () {
                     Share.share(
@@ -114,44 +125,56 @@ class PollWidget extends StatelessWidget {
                     );
                   },
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: Constants.padding * 0.75,
+              padding: EdgeInsets.symmetric(
+                vertical: Constants.padding * paddingScale,
               ),
               child: Column(
-                spacing: Constants.gap,
+                spacing: Constants.gap * gapScale,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ContentMetaDataWidget(
-                    nodeKey: pollKey,
-                  ),
+                  preview
+                      ? LayoutBuilder(
+                          builder: (context, constraints) {
+                            return ContentMetaDataPreviewWidget(
+                              nodeType: DokiNodeType.poll,
+                              nodeId: poll.id,
+                              width: constraints.maxWidth,
+                            );
+                          },
+                        )
+                      : ContentMetaDataWidget(
+                          nodeKey: pollKey,
+                        ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: Constants.padding,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: Constants.padding * paddingScale,
                     ),
                     child: Text(
                       poll.question,
-                      style: const TextStyle(
-                        fontSize: Constants.fontSize,
+                      style: TextStyle(
+                        fontSize: Constants.fontSize * questionScale,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                   _PollOptions(
                     pollKey: pollKey,
+                    preview: preview,
                   ),
-                  ContentActionWidget(
-                    nodeId: poll.id,
-                    nodeType: DokiNodeType.poll,
-                    isNodePage: isPollPage,
-                    redirectToNodePage: () {
-                      context.pushNamed(
-                        RouterConstants.userPoll,
-                        pathParameters: {
-                          "pollId": poll.id,
-                        },
-                      );
-                    },
-                  ),
+                  if (!preview)
+                    ContentActionWidget(
+                      nodeId: poll.id,
+                      nodeType: DokiNodeType.poll,
+                      isNodePage: isPollPage,
+                      redirectToNodePage: () {
+                        context.pushNamed(
+                          RouterConstants.userPoll,
+                          pathParameters: {
+                            "pollId": poll.id,
+                          },
+                        );
+                      },
+                    ),
                 ],
               ),
             ),
@@ -165,9 +188,11 @@ class PollWidget extends StatelessWidget {
 class _PollOptions extends StatelessWidget {
   const _PollOptions({
     required this.pollKey,
+    required this.preview,
   });
 
   final String pollKey;
+  final bool preview;
 
   @override
   Widget build(BuildContext context) {
@@ -175,6 +200,11 @@ class _PollOptions extends StatelessWidget {
     final poll = graph.getValueByKey(pollKey)! as PollEntity;
 
     final currTheme = Theme.of(context).colorScheme;
+
+    double paddingScale = preview ? 0 : 1;
+    double gapScale = preview ? 0.5 : 0.625;
+    double pollMetaScale = preview ? 0.925 : 1;
+    double iconScale = preview ? 0.375 : 0.5;
 
     return BlocConsumer<UserActionBloc, UserActionState>(
       listenWhen: (prevState, state) {
@@ -192,11 +222,11 @@ class _PollOptions extends StatelessWidget {
         bool selected = poll.userVote != null;
 
         return Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Constants.padding,
+          padding: EdgeInsets.symmetric(
+            horizontal: Constants.padding * paddingScale,
           ),
           child: Column(
-            spacing: Constants.gap * 0.625,
+            spacing: Constants.gap * gapScale,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               for (var option in poll.options)
@@ -209,7 +239,7 @@ class _PollOptions extends StatelessWidget {
                         ? Colors.transparent
                         : myOption
                             ? currTheme.primaryContainer
-                            : currTheme.secondaryContainer;
+                            : currTheme.surfaceContainerHighest;
 
                     double percentage =
                         getPercentageDouble(option.voteCount, poll.totalVotes);
@@ -218,14 +248,31 @@ class _PollOptions extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius:
                             BorderRadius.circular(Constants.radius * 0.625),
+                        color: Colors.transparent,
                         border: Border.all(
                           width: 1.5,
                           color: displayResult ? color : currTheme.outline,
+                          strokeAlign: BorderSide.strokeAlignOutside,
                         ),
                       ),
                       clipBehavior: Clip.antiAlias,
                       width: double.infinity,
-                      child: InkWell(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            stops: [
+                              percentage,
+                              1.0,
+                            ],
+                            colors: [
+                              color,
+                              currTheme.surface,
+                            ],
+                          ),
+                        ),
+                        child: InkWell(
+                          borderRadius:
+                              BorderRadius.circular(Constants.radius * 0.625),
                           onTap: !poll.isActive || myOption
                               ? null
                               : () {
@@ -240,71 +287,60 @@ class _PollOptions extends StatelessWidget {
                                         option: option.option,
                                       ));
                                 },
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                stops: [
-                                  percentage,
-                                  1.0,
-                                ],
-                                colors: [
-                                  color,
-                                  Colors.transparent,
-                                ],
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.all(Constants.padding * 0.625),
+                            child: DefaultTextStyle.merge(
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize:
+                                    preview ? Constants.smallFontSize : null,
                               ),
+                              child: displayResult
+                                  ? Wrap(
+                                      alignment: WrapAlignment.spaceBetween,
+                                      runSpacing: Constants.gap * 0.5,
+                                      children: [
+                                        myOption
+                                            ? Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                spacing: Constants.gap * 0.5,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    Icons.check_circle,
+                                                    size: Constants
+                                                            .iconButtonSize *
+                                                        iconScale,
+                                                  ),
+                                                  Flexible(
+                                                    child: Text(
+                                                        option.optionValue),
+                                                  ),
+                                                ],
+                                              )
+                                            : Text(option.optionValue),
+                                        Text(getPercentage(
+                                            option.voteCount, poll.totalVotes)),
+                                      ],
+                                    )
+                                  : Text(
+                                      option.optionValue,
+                                      textAlign: TextAlign.center,
+                                    ),
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  Constants.padding * 0.625),
-                              child: DefaultTextStyle.merge(
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                child: displayResult
-                                    ? Wrap(
-                                        alignment: WrapAlignment.spaceBetween,
-                                        runSpacing: Constants.gap * 0.5,
-                                        children: [
-                                          myOption
-                                              ? Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  spacing: Constants.gap * 0.5,
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    const Icon(
-                                                      Icons.check_circle,
-                                                      size: Constants
-                                                              .iconButtonSize *
-                                                          0.5,
-                                                    ),
-                                                    Flexible(
-                                                      child: Text(
-                                                          option.optionValue),
-                                                    ),
-                                                  ],
-                                                )
-                                              : Text(option.optionValue),
-                                          Text(getPercentage(option.voteCount,
-                                              poll.totalVotes)),
-                                        ],
-                                      )
-                                    : Text(
-                                        option.optionValue,
-                                        textAlign: TextAlign.center,
-                                      ),
-                              ),
-                            ),
-                          )),
+                          ),
+                        ),
+                      ),
                     );
                   },
                 ),
               DefaultTextStyle.merge(
-                style: const TextStyle(
-                  fontSize: Constants.smallFontSize,
+                style: TextStyle(
+                  fontSize: Constants.smallFontSize * pollMetaScale,
                   fontWeight: FontWeight.w500,
                 ),
                 child: Wrap(
@@ -314,7 +350,12 @@ class _PollOptions extends StatelessWidget {
                     const SizedBox(
                       width: double.infinity,
                     ),
-                    Text(getPollStatusText(poll.activeTill)),
+                    preview
+                        ? Text(getPollStatusText(
+                            poll.activeTill,
+                            format: "MMM d y, hh:mm a",
+                          ))
+                        : Text(getPollStatusText(poll.activeTill)),
                     Text(
                       "${displayNumberFormat(poll.totalVotes)} Votes",
                     ),

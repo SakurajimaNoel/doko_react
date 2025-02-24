@@ -133,9 +133,9 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
     return ChangeNotifierProvider(
       create: (_) => ArchiveMessageProvider(
         focusNode: focusNode,
-        selfBackgroundColor: currTheme.primaryContainer,
-        selfTextColor: currTheme.onPrimaryContainer,
-        backgroundColor: currTheme.surfaceContainerHighest,
+        selfBackgroundColor: currTheme.surfaceContainer,
+        selfTextColor: currTheme.onSurface,
+        backgroundColor: currTheme.surfaceContainerHigh,
         textColor: currTheme.onSurface,
         archiveUser: widget.username,
         controller: observerController,

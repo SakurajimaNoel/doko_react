@@ -67,7 +67,7 @@ class _ArchivePoll extends StatelessWidget {
               },
               child: Padding(
                 padding: const EdgeInsets.all(Constants.padding * 0.5),
-                child: PollWidget(
+                child: PollWidget.preview(
                   pollKey: generatePollNodeKey(message.body),
                 ),
               ),

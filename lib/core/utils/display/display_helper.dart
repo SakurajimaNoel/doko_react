@@ -69,9 +69,12 @@ String displayNumberFormat(int num) {
 }
 
 /// get poll status
-String getPollStatusText(DateTime dateTime) {
+String getPollStatusText(
+  DateTime dateTime, {
+  String format = "EEEE, MMM d y, hh:mm a",
+}) {
   DateTime now = DateTime.now();
-  String formattedDate = DateFormat('EEEE, MMM d y, hh:mm a').format(dateTime);
+  String formattedDate = DateFormat(format).format(dateTime);
 
   if (dateTime.isAfter(now)) {
     return 'Ends on $formattedDate';

@@ -371,7 +371,7 @@ class _ArchiveItemState extends State<ArchiveItem>
       showDate: widget.showDate,
       child: GestureDetector(
         onPanUpdate: (details) {
-          if (details.delta.dx > 5) {
+          if (details.delta.dx > 10) {
             controller.forward().whenComplete(() {
               archiveProvider.addReply(widget.messageId);
               HapticFeedback.vibrate();

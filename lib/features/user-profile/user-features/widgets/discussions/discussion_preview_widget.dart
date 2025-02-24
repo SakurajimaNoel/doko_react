@@ -101,7 +101,7 @@ class DiscussionPreviewWidget extends StatelessWidget {
                 ),
                 Heading.left(
                   discussion.title,
-                  size: Constants.heading4 * 0.875,
+                  size: Constants.fontSize * 1.25,
                 ),
                 if (discussion.media.isNotEmpty)
                   MediaWidget.preview(
