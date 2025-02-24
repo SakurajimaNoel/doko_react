@@ -125,7 +125,7 @@ class _MediaContentState extends State<_MediaContent> {
   }
 
   Widget imageContent(MediaEntity image) {
-    return InkWell(
+    return GestureDetector(
       onTap: () {
         setState(() {
           boxFitContain = !boxFitContain;
