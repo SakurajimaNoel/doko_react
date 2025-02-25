@@ -265,93 +265,88 @@ class _PollOptions extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius:
                             BorderRadius.circular(Constants.radius * 0.625),
-                        color: Colors.transparent,
+                        // color: Colors.transparent,
                         border: Border.all(
                           width: 1.5,
                           color: displayResult ? color : currTheme.outline,
                           strokeAlign: BorderSide.strokeAlignOutside,
                         ),
+                        gradient: LinearGradient(
+                          stops: [
+                            percentage,
+                            percentage,
+                          ],
+                          colors: [
+                            color,
+                            currTheme.surface,
+                          ],
+                        ),
                       ),
                       clipBehavior: Clip.antiAlias,
                       width: double.infinity,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            stops: [
-                              percentage,
-                              1.0,
-                            ],
-                            colors: [
-                              color,
-                              currTheme.surface,
-                            ],
-                          ),
-                        ),
-                        child: InkWell(
-                          borderRadius:
-                              BorderRadius.circular(Constants.radius * 0.625),
-                          onTap: !poll.isActive || myOption
-                              ? null
-                              : () {
-                                  context
-                                      .read<UserActionBloc>()
-                                      .add(UserActionAddVoteToPollEvent(
-                                        pollId: poll.id,
-                                        username: (context
-                                                .read<UserBloc>()
-                                                .state as UserCompleteState)
-                                            .username,
-                                        option: option.option,
-                                        client: context
-                                            .read<WebsocketClientProvider>()
-                                            .client,
-                                      ));
-                                },
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.all(Constants.padding * 0.625),
-                            child: DefaultTextStyle.merge(
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize:
-                                    preview ? Constants.smallFontSize : null,
-                              ),
-                              child: displayResult
-                                  ? Wrap(
-                                      alignment: WrapAlignment.spaceBetween,
-                                      runSpacing: Constants.gap * 0.5,
-                                      children: [
-                                        myOption
-                                            ? Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                spacing: Constants.gap * 0.5,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Icon(
-                                                    Icons.check_circle,
-                                                    size: Constants
-                                                            .iconButtonSize *
-                                                        iconScale,
-                                                  ),
-                                                  Flexible(
-                                                    child: Text(
-                                                        option.optionValue),
-                                                  ),
-                                                ],
-                                              )
-                                            : Text(option.optionValue),
-                                        Text(getPercentage(
-                                            option.voteCount, poll.totalVotes)),
-                                      ],
-                                    )
-                                  : Text(
-                                      option.optionValue,
-                                      textAlign: TextAlign.center,
-                                    ),
+                      child: InkWell(
+                        borderRadius:
+                            BorderRadius.circular(Constants.radius * 0.625),
+                        onTap: !poll.isActive || myOption
+                            ? null
+                            : () {
+                                context
+                                    .read<UserActionBloc>()
+                                    .add(UserActionAddVoteToPollEvent(
+                                      pollId: poll.id,
+                                      username: (context.read<UserBloc>().state
+                                              as UserCompleteState)
+                                          .username,
+                                      option: option.option,
+                                      client: context
+                                          .read<WebsocketClientProvider>()
+                                          .client,
+                                    ));
+                              },
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.all(Constants.padding * 0.625),
+                          child: DefaultTextStyle.merge(
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize:
+                                  preview ? Constants.smallFontSize : null,
                             ),
+                            child: displayResult
+                                ? Wrap(
+                                    alignment: WrapAlignment.spaceBetween,
+                                    runSpacing: Constants.gap * 0.5,
+                                    children: [
+                                      myOption
+                                          ? Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              spacing: Constants.gap * 0.5,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  Icons.check_circle,
+                                                  size:
+                                                      Constants.iconButtonSize *
+                                                          iconScale,
+                                                ),
+                                                Flexible(
+                                                  child:
+                                                      Text(option.optionValue),
+                                                ),
+                                              ],
+                                            )
+                                          : Text(option.optionValue),
+                                      Text(getPercentage(
+                                          option.voteCount, poll.totalVotes)),
+                                    ],
+                                  )
+                                : Text(
+                                    option.optionValue,
+                                    textAlign: TextAlign.center,
+                                  ),
                           ),
                         ),
                       ),
