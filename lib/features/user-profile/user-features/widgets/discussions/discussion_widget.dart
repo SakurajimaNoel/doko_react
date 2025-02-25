@@ -124,6 +124,7 @@ class DiscussionWidget extends StatelessWidget {
             child: Column(
               spacing: Constants.gap * 0.5,
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 ContentMetaDataWidget(
                   nodeKey: discussionKey,

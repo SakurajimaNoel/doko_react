@@ -199,7 +199,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                     ),
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.error),
-                    filterQuality: FilterQuality.high,
+
                     memCacheHeight: height.toInt(),
                     width: double.infinity,
                     // height: height,

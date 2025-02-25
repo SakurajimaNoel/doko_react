@@ -139,7 +139,6 @@ class _MediaContentState extends State<_MediaContent> {
           child: SmallLoadingIndicator.small(),
         ),
         errorWidget: (context, url, error) => const Icon(Icons.error),
-        filterQuality: FilterQuality.high,
         memCacheHeight: Constants.postCacheHeight,
       ),
     );

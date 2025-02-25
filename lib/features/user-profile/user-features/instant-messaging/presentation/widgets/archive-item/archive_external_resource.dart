@@ -50,7 +50,6 @@ class _ArchiveExternalResource extends StatelessWidget {
                   ),
                 ),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
-                filterQuality: FilterQuality.high,
                 memCacheHeight: Constants.archiveMedia,
                 width: constraints.maxWidth,
               ),

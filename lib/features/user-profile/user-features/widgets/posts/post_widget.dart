@@ -119,6 +119,7 @@ class PostWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: Constants.gap * 0.5,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 // post meta data
                 ContentMetaDataWidget(

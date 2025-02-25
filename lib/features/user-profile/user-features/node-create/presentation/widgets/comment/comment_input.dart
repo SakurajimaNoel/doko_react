@@ -606,7 +606,6 @@ class _CommentMedia extends StatelessWidget {
                     ),
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.error),
-                    filterQuality: FilterQuality.high,
                     memCacheHeight: Constants.postCacheHeight,
                   ),
             BlocBuilder<NodeCreateBloc, NodeCreateState>(
