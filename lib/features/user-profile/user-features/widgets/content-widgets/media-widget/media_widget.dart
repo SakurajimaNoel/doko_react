@@ -125,21 +125,28 @@ class _MediaContentState extends State<_MediaContent> {
   }
 
   Widget imageContent(MediaEntity image) {
-    return GestureDetector(
+    final currTheme = Theme.of(context).colorScheme;
+
+    return InkWell(
       onTap: () {
         setState(() {
           boxFitContain = !boxFitContain;
         });
       },
-      child: CachedNetworkImage(
-        cacheKey: image.resource.bucketPath,
-        fit: boxFitContain ? BoxFit.contain : BoxFit.cover,
-        imageUrl: image.resource.accessURI,
-        placeholder: (context, url) => const Center(
-          child: SmallLoadingIndicator.small(),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: currTheme.surfaceContainer,
         ),
-        errorWidget: (context, url, error) => const Icon(Icons.error),
-        memCacheHeight: Constants.postCacheHeight,
+        child: CachedNetworkImage(
+          cacheKey: image.resource.bucketPath,
+          fit: boxFitContain ? BoxFit.contain : BoxFit.cover,
+          imageUrl: image.resource.accessURI,
+          placeholder: (context, url) => const Center(
+            child: SmallLoadingIndicator.small(),
+          ),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
+          memCacheHeight: Constants.postCacheHeight,
+        ),
       ),
     );
   }
@@ -168,6 +175,7 @@ class _MediaContentState extends State<_MediaContent> {
 
         return Column(
           spacing: Constants.gap * (preview ? 0.75 : 1),
+          mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
               height: height,
