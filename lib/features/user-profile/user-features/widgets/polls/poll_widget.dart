@@ -3,6 +3,7 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
+import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
@@ -194,6 +195,20 @@ class _PollOptions extends StatelessWidget {
   final String pollKey;
   final bool preview;
 
+  void pollSubscriptionManagement(BuildContext context) {
+    final currentUser =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+
+    String pollId = getPollIdFromPollKey(pollKey);
+    PollSubscription subscription = PollSubscription(
+      from: currentUser,
+      pollId: pollId,
+    );
+
+    final client = context.read<WebsocketClientProvider>().client;
+    client?.sendPayload(subscription);
+  }
+
   @override
   Widget build(BuildContext context) {
     final UserGraph graph = UserGraph();
@@ -205,6 +220,8 @@ class _PollOptions extends StatelessWidget {
     double gapScale = preview ? 0.5 : 0.625;
     double pollMetaScale = preview ? 0.925 : 1;
     double iconScale = preview ? 0.375 : 0.5;
+
+    if (poll.isActive) pollSubscriptionManagement(context);
 
     return BlocConsumer<UserActionBloc, UserActionState>(
       listenWhen: (prevState, state) {
@@ -285,6 +302,9 @@ class _PollOptions extends StatelessWidget {
                                                 .state as UserCompleteState)
                                             .username,
                                         option: option.option,
+                                        client: context
+                                            .read<WebsocketClientProvider>()
+                                            .client,
                                       ));
                                 },
                           child: Padding(

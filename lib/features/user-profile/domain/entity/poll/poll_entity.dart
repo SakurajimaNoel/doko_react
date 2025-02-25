@@ -144,6 +144,7 @@ class PollEntity implements GraphEntityWithUserAction {
   List<OptionEntity> options;
 
   bool get isActive => activeTill.isAfter(DateTime.now());
+  bool get isEnded => !isActive;
 
   int get totalVotes {
     int count = 0;
@@ -151,6 +152,27 @@ class PollEntity implements GraphEntityWithUserAction {
       count += option.voteCount;
     }
     return count;
+  }
+
+  /// getter used to send payload to other clients
+  List<int> get getVotes {
+    List<int> votes = [];
+    for (var option in options) {
+      votes.add(option.voteCount);
+    }
+
+    return votes;
+  }
+
+  /// used when remote payload is received
+  void updateVotes(List<int> votes) {
+    for (int i = 0; i < options.length; i++) {
+      var option = options[i];
+
+      options[i] = option.copyWith(
+        voteCount: votes[i],
+      );
+    }
   }
 
   final DateTime activeTill;

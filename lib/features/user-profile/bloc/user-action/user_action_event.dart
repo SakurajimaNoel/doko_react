@@ -215,9 +215,19 @@ final class UserActionAddVoteToPollEvent extends UserActionEvent {
     required this.pollId,
     required this.username,
     required this.option,
+    required this.client,
   });
 
   final String pollId;
   final String username;
   final PollOption option;
+  final Client? client;
+}
+
+final class UserActionRemoteAddVoteToPollEvent extends UserActionEvent {
+  UserActionRemoteAddVoteToPollEvent({
+    required this.payload,
+  });
+
+  final PollVotesUpdate payload;
 }

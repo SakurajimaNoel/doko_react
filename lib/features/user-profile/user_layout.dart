@@ -89,6 +89,7 @@ class _UserLayoutState extends State<UserLayout> {
 
     final realTimeBloc = context.read<RealTimeBloc>();
     final userToUserActionBloc = context.read<UserToUserActionBloc>();
+    final userActionBloc = context.read<UserActionBloc>();
 
     // create websocket client
     client = Client(
@@ -217,12 +218,12 @@ class _UserLayoutState extends State<UserLayout> {
           }
 
           if (payload.nodeType == NodeType.post) {
-            context.read<UserActionBloc>().add(UserActionNewPostRemoteEvent(
-                  postId: payload.id,
-                  nodeBy: payload.from,
-                  username: username,
-                  usersTagged: payload.usersTagged,
-                ));
+            userActionBloc.add(UserActionNewPostRemoteEvent(
+              postId: payload.id,
+              nodeBy: payload.from,
+              username: username,
+              usersTagged: payload.usersTagged,
+            ));
           }
 
           if (payload.nodeType == NodeType.discussion) {
@@ -237,12 +238,12 @@ class _UserLayoutState extends State<UserLayout> {
           }
 
           if (payload.nodeType == NodeType.poll) {
-            context.read<UserActionBloc>().add(UserActionNewPollRemoteEvent(
-                  pollId: payload.id,
-                  nodeBy: payload.from,
-                  username: username,
-                  usersTagged: payload.usersTagged,
-                ));
+            userActionBloc.add(UserActionNewPollRemoteEvent(
+              pollId: payload.id,
+              nodeBy: payload.from,
+              username: username,
+              usersTagged: payload.usersTagged,
+            ));
           }
         },
         PayloadType.userNodeLikeAction: (UserNodeLikeAction payload) {
@@ -251,10 +252,10 @@ class _UserLayoutState extends State<UserLayout> {
             // show notification
             showUserLikeMyNodeNotification(payload);
           }
-          context.read<UserActionBloc>().add(UserActionNodeLikeRemoteEvent(
-                payload: payload,
-                username: username,
-              ));
+          userActionBloc.add(UserActionNodeLikeRemoteEvent(
+            payload: payload,
+            username: username,
+          ));
         },
         PayloadType.userCreateSecondaryNode: (UserCreateSecondaryNode payload) {
           // send created secondary on my node
@@ -281,6 +282,11 @@ class _UserLayoutState extends State<UserLayout> {
         },
         PayloadType.userPresenceInfo: (UserPresenceInfo payload) {
           realTimeBloc.add(RealTimeUserPresenceEvent(
+            payload: payload,
+          ));
+        },
+        PayloadType.pollVotesUpdate: (PollVotesUpdate payload) {
+          userActionBloc.add(UserActionRemoteAddVoteToPollEvent(
             payload: payload,
           ));
         }

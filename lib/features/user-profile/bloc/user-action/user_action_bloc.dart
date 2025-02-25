@@ -131,6 +131,30 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         _handleUserActionNewSecondaryNodeRemoteEvent);
 
     on<UserActionAddVoteToPollEvent>(_handleUserActionAddVoteToPollEvent);
+    on<UserActionRemoteAddVoteToPollEvent>(
+        _handleUserActionRemoteAddVoteToPollEvent);
+  }
+
+  FutureOr<void> _handleUserActionRemoteAddVoteToPollEvent(
+      UserActionRemoteAddVoteToPollEvent event,
+      Emitter<UserActionState> emit) async {
+    final payload = event.payload;
+    final String pollId = payload.pollId;
+    final String pollKey = generatePollNodeKey(pollId);
+
+    final poll = graph.getValueByKey(pollKey);
+
+    if (poll is! PollEntity) {
+      return;
+    }
+
+    poll.updateVotes(payload.votes);
+    emit(UserActionVoteAddSuccessState(
+      pollId: pollId,
+      commentCount: poll.commentsCount,
+      likeCount: poll.likesCount,
+      options: poll.options,
+    ));
   }
 
   FutureOr<void> _handleUserActionAddVoteToPollEvent(
@@ -139,11 +163,13 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     String username = event.username;
     PollOption option = event.option;
 
+    final String pollKey = generatePollNodeKey(pollId);
+    final poll = graph.getValueByKey(pollKey)! as PollEntity;
+    if (poll.isEnded) return;
+
     if (pollAddVote.contains(pollId)) return;
     pollAddVote.add(pollId);
 
-    final String pollKey = generatePollNodeKey(pollId);
-    final poll = graph.getValueByKey(pollKey)! as PollEntity;
     final currVote = poll.userVote;
 
     try {
@@ -167,6 +193,13 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
         likeCount: poll.likesCount,
         options: poll.options,
       ));
+
+      PollVotesUpdate payload = PollVotesUpdate(
+        from: username,
+        pollId: pollId,
+        votes: poll.getVotes,
+      );
+      event.client?.sendPayload(payload);
     } catch (e) {
       // revert optimistic update
       if (currVote == null) {
