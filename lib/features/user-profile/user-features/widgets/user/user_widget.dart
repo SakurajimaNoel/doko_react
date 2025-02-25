@@ -4,6 +4,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
+import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
@@ -320,6 +321,20 @@ class UserWidget extends StatelessWidget {
             username: profileUsername,
             currentUser: currentUser,
           ));
+    }
+
+    bool redirect = this.redirect;
+    if (redirect) {
+      // check is user profile page and skip redirect
+      final String routeName = GoRouter.of(context).currentRouteName ?? "";
+      final Map<String, String> pathParams =
+          GoRouter.of(context).currentRoutePathParameters;
+      if ((routeName == RouterConstants.userProfile &&
+              pathParams["username"] == getUsernameFromUserKey(userKey) ||
+          (routeName == RouterConstants.profile &&
+              getUsernameFromUserKey(userKey) == currentUser))) {
+        redirect = false;
+      }
     }
 
     return BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
