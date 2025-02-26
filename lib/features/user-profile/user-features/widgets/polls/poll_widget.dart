@@ -249,7 +249,7 @@ class _PollOptions extends StatelessWidget {
               for (var option in poll.options)
                 Builder(
                   builder: (context) {
-                    bool displayResult = selected || !poll.isActive;
+                    bool displayResult = selected || poll.isEnded;
 
                     bool myOption = poll.userVote == option.option;
                     final color = !displayResult
@@ -289,7 +289,11 @@ class _PollOptions extends StatelessWidget {
                           borderRadius:
                               BorderRadius.circular(Constants.radius * 0.625),
                           onTap: () {
-                            if (poll.isEnded || myOption) return;
+                            if (myOption) return;
+                            if (poll.isEnded) {
+                              showError("Poll has ended!");
+                              return;
+                            }
 
                             context
                                 .read<UserActionBloc>()

@@ -144,7 +144,7 @@ class PollEntity implements GraphEntityWithUserAction {
   List<OptionEntity> options;
 
   bool get isActive => activeTill.isAfter(DateTime.now());
-  bool get isEnded => !isActive;
+  bool get isEnded => activeTill.isBefore(DateTime.now());
 
   int get totalVotes {
     int count = 0;
@@ -266,7 +266,7 @@ class PollEntity implements GraphEntityWithUserAction {
 
     return PollEntity(
       id: map["id"],
-      createdOn: DateTime.parse(map["createdOn"]),
+      createdOn: DateTime.parse(map["createdOn"]).toLocal(),
       createdBy: key,
       comments: Nodes.empty(),
       likesCount: map["likedByConnection"]["totalCount"],
@@ -276,7 +276,7 @@ class PollEntity implements GraphEntityWithUserAction {
       question: map["question"],
       userVote: userVote,
       options: pollOptions,
-      activeTill: DateTime.parse(map["activeTill"]),
+      activeTill: DateTime.parse(map["activeTill"]).toLocal(),
     );
   }
 }

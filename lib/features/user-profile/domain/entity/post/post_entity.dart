@@ -113,7 +113,7 @@ class PostEntity implements UserActionEntityWithMediaItems {
     return PostEntity(
       id: map["id"],
       caption: map["caption"],
-      createdOn: DateTime.parse(map["createdOn"]),
+      createdOn: DateTime.parse(map["createdOn"]).toLocal(),
       content: mediaContent,
       createdBy: key,
       comments: Nodes.empty(),

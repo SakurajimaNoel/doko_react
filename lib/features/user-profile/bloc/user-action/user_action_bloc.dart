@@ -5,6 +5,7 @@ import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/features/user-profile/domain/entity/poll/poll_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -166,6 +167,13 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     final String pollKey = generatePollNodeKey(pollId);
     final poll = graph.getValueByKey(pollKey)! as PollEntity;
     if (poll.isEnded) return;
+
+    print(poll.activeTill.toString());
+    print(poll.createdOn.toString());
+    print(DateTime.now().toString());
+    print(poll.activeTill.isUtc);
+    print(poll.createdOn.isUtc);
+    showInfo("${poll.isEnded} && ${poll.isActive}");
 
     if (pollAddVote.contains(pollId)) return;
     pollAddVote.add(pollId);

@@ -106,7 +106,7 @@ class DiscussionEntity implements UserActionEntityWithMediaItems {
 
     return DiscussionEntity(
       id: map["id"],
-      createdOn: DateTime.parse(map["createdOn"]),
+      createdOn: DateTime.parse(map["createdOn"]).toLocal(),
       media: mediaContent,
       createdBy: key,
       comments: Nodes.empty(),

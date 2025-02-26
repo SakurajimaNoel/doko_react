@@ -169,7 +169,7 @@ class GraphqlMutations {
             "update": {
               "edge": {
                 "status": FriendStatus.accepted,
-                "addedOn": DateTime.now().toIso8601String(),
+                "addedOn": DateTime.now().toUtc().toIso8601String(),
               }
             }
           }
@@ -933,7 +933,7 @@ class GraphqlMutations {
         {
           "question": poll.question,
           "options": poll.options,
-          "activeTill": poll.activeTill.toIso8601String(),
+          "activeTill": poll.activeTill.toUtc().toIso8601String(),
           "createdBy": {
             "connect": {
               "where": {
@@ -1086,7 +1086,7 @@ class GraphqlMutations {
               {
                 "overwrite": true,
                 "edge": {
-                  "addedOn": DateTime.now().toIso8601String(),
+                  "addedOn": DateTime.now().toUtc().toIso8601String(),
                   "option": option.value,
                 },
                 "where": {

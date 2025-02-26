@@ -1,5 +1,3 @@
-
-
 /// this defines user to user relation between
 /// any two users
 class UserRelationInfo {
@@ -17,7 +15,7 @@ class UserRelationInfo {
     return UserRelationInfo(
       requestedBy: map["requestedBy"],
       status: map["status"],
-      addedOn: DateTime.parse(map["addedOn"]),
+      addedOn: DateTime.parse(map["addedOn"]).toLocal(),
     );
   }
 

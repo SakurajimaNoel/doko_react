@@ -195,8 +195,8 @@ class CompleteUserEntity extends UserEntity {
     return CompleteUserEntity.fromUserEntity(
       user: user,
       bio: map["bio"] ?? "",
-      dob: DateTime.parse(map["dob"]),
-      createdOn: DateTime.parse(map["createdOn"]),
+      dob: DateTime.parse(map["dob"]), // this is only date string
+      createdOn: DateTime.parse(map["createdOn"]).toLocal(),
       postsCount: map["postsAggregate"]["count"],
       friendsCount: map["friendsAggregate"]["count"],
       discussionCount: map["discussionsAggregate"]["count"],

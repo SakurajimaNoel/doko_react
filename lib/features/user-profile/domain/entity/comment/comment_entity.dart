@@ -107,7 +107,7 @@ class CommentEntity implements GraphEntityWithUserAction {
 
     return CommentEntity(
       id: map["id"],
-      createdOn: DateTime.parse(map["createdOn"]),
+      createdOn: DateTime.parse(map["createdOn"]).toLocal(),
       commentBy: "user:$commentByUsername",
       media: media,
       content: content,
