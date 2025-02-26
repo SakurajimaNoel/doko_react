@@ -25,6 +25,14 @@ class _CreatePollPageState extends State<CreatePollPage> {
   int activeDuration = 1;
 
   @override
+  void dispose() {
+    for (var option in options) {
+      option.controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
 
@@ -106,7 +114,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
                           horizontalTitleGap: 0,
                           minVerticalPadding: Constants.gap * 0.625,
                           title: TextField(
-                            // enabled: false,
+                            controller: options[index].controller,
                             onChanged: (String? value) {
                               value ??= "";
 
@@ -122,6 +130,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
                               suffixIcon: options.length > 2
                                   ? IconButton(
                                       onPressed: () {
+                                        options[index].controller.dispose();
                                         setState(() {
                                           options.removeAt(index);
                                         });

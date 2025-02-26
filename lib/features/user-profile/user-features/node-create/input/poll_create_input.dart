@@ -1,4 +1,5 @@
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
+import 'package:flutter/cupertino.dart';
 
 class PollPublishPageData {
   const PollPublishPageData({
@@ -16,10 +17,12 @@ class PollPublishPageData {
 class PollOptionInput {
   PollOptionInput({
     this.value = "",
-  }) : key = generateUniqueString();
+  })  : key = generateUniqueString(),
+        controller = TextEditingController(text: value);
 
   final String key;
   String value;
+  TextEditingController controller;
 
   void updateValue(String newValue) {
     value = newValue;
