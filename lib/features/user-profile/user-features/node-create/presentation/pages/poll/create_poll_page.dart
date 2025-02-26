@@ -26,6 +26,8 @@ class _CreatePollPageState extends State<CreatePollPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currTheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Create new poll"),
@@ -40,10 +42,18 @@ class _CreatePollPageState extends State<CreatePollPage> {
               child: CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
-                    child: Wrap(
-                      spacing: Constants.gap,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: Constants.gap * 0.5,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Poll active duration: "),
+                        const Text(
+                          "Poll active duration:",
+                          style: TextStyle(
+                            fontSize: Constants.fontSize,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                         DropdownMenu<int>(
                           initialSelection: activeDuration,
                           onSelected: (int? newDuration) {
@@ -65,7 +75,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
                   ),
                   const SliverPadding(
                     padding: EdgeInsets.symmetric(
-                      vertical: Constants.gap * 0.5,
+                      vertical: Constants.gap * 0.75,
                     ),
                   ),
                   SliverToBoxAdapter(
@@ -75,6 +85,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
                         border: OutlineInputBorder(),
                         labelText: "*Question",
                         hintText: "Question...",
+                        counterText: "",
                       ),
                       maxLength: Constants.pollQuestionSizeLimit,
                     ),
@@ -108,6 +119,19 @@ class _CreatePollPageState extends State<CreatePollPage> {
                               labelText: "Option ${index + 1}",
                               hintText: "Option ${index + 1}...",
                               counterText: "",
+                              suffixIcon: options.length > 2
+                                  ? IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          options.removeAt(index);
+                                        });
+                                      },
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: currTheme.error,
+                                      ),
+                                    )
+                                  : null,
                             ),
                             maxLength: Constants.pollOptionSizeLimit,
                             maxLines: 3,
@@ -132,140 +156,24 @@ class _CreatePollPageState extends State<CreatePollPage> {
                       });
                     },
                   ),
-
-                  // SliverToBoxAdapter(
-                  //   child: Container(
-                  //     padding: const EdgeInsets.all(Constants.padding),
-                  //     constraints: BoxConstraints(
-                  //       minHeight: constraints.maxHeight,
-                  //       maxHeight: constraints.maxHeight,
-                  //     ),
-                  //     child: Column(
-                  //       crossAxisAlignment: CrossAxisAlignment.start,
-                  //       spacing: Constants.gap,
-                  //       mainAxisSize: MainAxisSize.min,
-                  //       children: [
-                  //         Wrap(
-                  //           spacing: Constants.gap,
-                  //           children: [
-                  //             const Text("Poll active duration: "),
-                  //             DropdownMenu<int>(
-                  //               initialSelection: activeDuration,
-                  //               onSelected: (int? newDuration) {
-                  //                 activeDuration = newDuration ?? 1;
-                  //               },
-                  //               dropdownMenuEntries: [
-                  //                 ...List<DropdownMenuEntry<int>>.generate(
-                  //                     Constants.pollMaxActiveDuration,
-                  //                     (int index) {
-                  //                   int val = index + 1;
-                  //                   return DropdownMenuEntry(
-                  //                     value: val,
-                  //                     label:
-                  //                         "$val day${index > 0 ? "s" : ""}",
-                  //                   );
-                  //                 })
-                  //               ],
-                  //             ),
-                  //           ],
-                  //         ),
-                  //         TextField(
-                  //           controller: questionController,
-                  //           decoration: const InputDecoration(
-                  //             border: OutlineInputBorder(),
-                  //             labelText: "*Question",
-                  //             hintText: "Question...",
-                  //           ),
-                  //           maxLength: Constants.pollQuestionSizeLimit,
-                  //         ),
-                  //         Flexible(
-                  //           child: ReorderableList(
-                  //             itemBuilder: (BuildContext context, int index) {
-                  //               return Text(
-                  //                 "hello",
-                  //                 key: ValueKey(index),
-                  //               );
-                  //             },
-                  //             itemCount: options.length,
-                  //             onReorder: (int prevIndex, int newIndex) {
-                  //               setState(() {
-                  //                 if (prevIndex < newIndex) {
-                  //                   newIndex -= 1;
-                  //                 }
-                  //                 var option = options.removeAt(prevIndex);
-                  //                 options.insert(newIndex, option);
-                  //               });
-                  //             },
-                  //           ),
-                  //         ),
-                  //         // ReorderableListView(
-                  //         //   shrinkWrap: true,
-                  //         //   children: [
-                  //         //     for (int i = 0; i < options.length; i++)
-                  //         //       ListTile(
-                  //         //         key: Key(options[i].key),
-                  //         //         title: TextField(
-                  //         //           onChanged: (String? value) {
-                  //         //             value ??= "";
-                  //         //
-                  //         //             setState(() {
-                  //         //               options[i].updateValue(value!);
-                  //         //             });
-                  //         //           },
-                  //         //           onTapOutside: (_) {
-                  //         //             FocusManager.instance.primaryFocus
-                  //         //                 ?.unfocus();
-                  //         //           },
-                  //         //           decoration: InputDecoration(
-                  //         //             border: const OutlineInputBorder(),
-                  //         //             labelText: "Option ${i + 1}",
-                  //         //             hintText: "Option ${i + 1}...",
-                  //         //           ),
-                  //         //           maxLength: Constants.pollOptionSizeLimit,
-                  //         //         ),
-                  //         //         leading: options.length > 2
-                  //         //             ? InkWell(
-                  //         //                 onTap: () {
-                  //         //                   setState(() {
-                  //         //                     options.removeAt(i);
-                  //         //                   });
-                  //         //                 },
-                  //         //                 child: const Icon(
-                  //         //                   Icons.delete,
-                  //         //                   color: Colors.redAccent,
-                  //         //                 ),
-                  //         //               )
-                  //         //             : null,
-                  //         //         trailing: ReorderableDragStartListener(
-                  //         //           key: Key(options[i].key),
-                  //         //           index: i,
-                  //         //           child: const Icon(Icons.drag_handle),
-                  //         //         ),
-                  //         //       ),
-                  //         //   ],
-                  //         //   onReorder: (int prevIndex, int newIndex) {
-                  //         //     setState(() {
-                  //         //       if (prevIndex < newIndex) {
-                  //         //         newIndex -= 1;
-                  //         //       }
-                  //         //       var option = options.removeAt(prevIndex);
-                  //         //       options.insert(newIndex, option);
-                  //         //     });
-                  //         //   },
-                  //         // ),
-                  //         // if (options.length < 5)
-                  //         //   TextButton(
-                  //         //     onPressed: () {
-                  //         //       setState(() {
-                  //         //         options.add(PollOptionInput());
-                  //         //       });
-                  //         //     },
-                  //         //     child: const Text("Add option"),
-                  //         //   ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
+                  if (options.length < 5)
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: Constants.gap,
+                      ),
+                      sliver: SliverToBoxAdapter(
+                        child: Center(
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                options.add(PollOptionInput());
+                              });
+                            },
+                            child: const Text("Add option"),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
