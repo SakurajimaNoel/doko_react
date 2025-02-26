@@ -5,98 +5,94 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 class TypingStatusWidget extends StatelessWidget {
-  const TypingStatusWidget({
+  const TypingStatusWidget.sticker({
     super.key,
     required this.username,
-  }) : canHide = false;
+  }) : text = false;
 
   /// this is used in inbox page
-  const TypingStatusWidget.canHide({
+  const TypingStatusWidget.text({
     super.key,
     required this.username,
-  }) : canHide = true;
+  }) : text = true;
 
   final String username;
-  final bool canHide;
+
+  // same behaviour as typing status widget wrapper
+  final bool text;
 
   @override
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool shrink = constraints.maxWidth < 215;
-        double animationFactor = shrink ? 2 : 3;
-        double animationBoxFactor = shrink ? 0.5 : 1;
-        double textFactor = shrink ? 1 : 1.125;
+    if (text) {
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          bool shrink = constraints.maxWidth < 215;
+          double animationFactor = shrink ? 2 : 3;
+          double animationBoxFactor = shrink ? 0.5 : 1;
+          double textFactor = shrink ? 1 : 1.125;
 
-        bool shouldHide = constraints.maxWidth < 175;
+          bool hideUsername = constraints.maxWidth < 175;
 
-        return Padding(
-          padding: const EdgeInsets.only(
-            bottom: Constants.gap * 0.5,
-          ),
-          child: Row(
+          String typingText;
+          if (hideUsername) {
+            typingText = "Typing";
+          } else {
+            typingText = "@${trimText(
+              username,
+              len: shrink ? 12 : 50,
+            )} is typing";
+          }
+
+          return Row(
             mainAxisSize: MainAxisSize.min,
             spacing: Constants.gap * 0.25,
             children: [
-              if (canHide) ...[
-                !shouldHide
-                    ? Text(
-                        "@${trimText(
-                          username,
-                          len: shrink ? 12 : 50,
-                        )} is typing",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: Constants.smallFontSize * textFactor,
-                          color: currTheme.primary,
+              Text(
+                typingText,
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: Constants.smallFontSize * textFactor,
+                  color: currTheme.primary,
+                ),
+              ),
+              SizedBox(
+                height: Constants.height * 1 * animationBoxFactor,
+                width: Constants.height * 2 * animationBoxFactor,
+                child: OverflowBox(
+                  minHeight: Constants.iconButtonSize * animationFactor,
+                  maxHeight: Constants.iconButtonSize * animationFactor,
+                  maxWidth: Constants.iconButtonSize * animationFactor,
+                  minWidth: Constants.iconButtonSize * animationFactor,
+                  child: Lottie.asset(
+                    "assets/typing-animation.lottie",
+                    decoder: lottieDecoder,
+                    delegates: LottieDelegates(
+                      values: [
+                        ValueDelegate.color(
+                          const ["**"],
+                          value: currTheme.primary,
                         ),
-                      )
-                    : Text(
-                        "Typing",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: Constants.smallFontSize * textFactor,
-                          color: currTheme.primary,
-                        ),
-                      ),
-                SizedBox(
-                  height: Constants.height * 1 * animationBoxFactor,
-                  width: Constants.height * 2 * animationBoxFactor,
-                  child: OverflowBox(
-                    minHeight: Constants.iconButtonSize * animationFactor,
-                    maxHeight: Constants.iconButtonSize * animationFactor,
-                    maxWidth: Constants.iconButtonSize * animationFactor,
-                    minWidth: Constants.iconButtonSize * animationFactor,
-                    child: Lottie.asset(
-                      "assets/typing-animation.lottie",
-                      decoder: lottieDecoder,
-                      delegates: LottieDelegates(
-                        values: [
-                          ValueDelegate.color(
-                            const ["**"],
-                            value: currTheme.primary,
-                          ),
-                        ],
-                      ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-              if (!canHide)
-                SizedBox(
-                  height: Constants.height * 6,
-                  width: Constants.height * 6,
-                  child: Lottie.asset(
-                    "assets/typing-animation-sticker.lottie",
-                    decoder: lottieDecoder,
-                  ),
-                )
+              ),
             ],
-          ),
-        );
-      },
+          );
+        },
+      );
+    }
+
+    // status sticker
+    return SizedBox(
+      height: Constants.height * 4,
+      width: Constants.height * 4,
+      child: Lottie.asset(
+        "assets/typing-animation-sticker.lottie",
+        decoder: lottieDecoder,
+      ),
     );
   }
 }

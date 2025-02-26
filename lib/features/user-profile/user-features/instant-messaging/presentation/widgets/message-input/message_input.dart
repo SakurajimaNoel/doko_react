@@ -137,13 +137,8 @@ class _MessageInputState extends State<MessageInput> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Constants.padding,
-          ),
-          child: TypingStatusWidgetWrapper(
-            username: widget.archiveUser,
-          ),
+        TypingStatusWidgetWrapper.sticker(
+          username: widget.archiveUser,
         ),
         Builder(
           builder: (context) {

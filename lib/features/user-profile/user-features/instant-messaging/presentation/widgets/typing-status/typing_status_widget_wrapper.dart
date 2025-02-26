@@ -6,24 +6,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TypingStatusWidgetWrapper extends StatefulWidget {
-  const TypingStatusWidgetWrapper({
+  const TypingStatusWidgetWrapper.sticker({
     super.key,
     required this.username,
     this.child,
-  }) : canHide = false;
+  })  : sticker = true,
+        text = false;
 
-  const TypingStatusWidgetWrapper.canHide({
+  const TypingStatusWidgetWrapper.text({
     super.key,
     required this.username,
     this.child,
-  }) : canHide = true;
+  })  : text = true,
+        sticker = false;
 
   final String username;
 
-  /// will username be hidden when screen size become small
-  final bool canHide;
+  /// sticker and text defines type of typing widget that will be displayed
+  /// in case of sticker overlay will be there
+  final bool sticker;
+  final bool text;
 
   /// child will be rendered instead of typing when typing ends
+  /// child will be present when it is rendered in inbox page
   final Widget? child;
 
   @override
@@ -34,9 +39,18 @@ class TypingStatusWidgetWrapper extends StatefulWidget {
 class _TypingStatusWidgetWrapperState extends State<TypingStatusWidgetWrapper> {
   final typingStatusEndDebounce = Debounce(Constants.typingStatusEventDuration);
 
+  final link = LayerLink();
+  final OverlayPortalController overlayPortalController =
+      OverlayPortalController();
+
   @override
   void dispose() {
     typingStatusEndDebounce.dispose();
+
+    if (widget.sticker && overlayPortalController.isShowing) {
+      overlayPortalController.hide();
+    }
+
     super.dispose();
   }
 
@@ -49,8 +63,16 @@ class _TypingStatusWidgetWrapperState extends State<TypingStatusWidgetWrapper> {
             state.typing == true;
       },
       listener: (context, state) {
+        if (!overlayPortalController.isShowing && widget.sticker) {
+          overlayPortalController.show();
+        }
+
         // this will only work if start is called
         typingStatusEndDebounce(() {
+          if (overlayPortalController.isShowing) {
+            overlayPortalController.hide();
+          }
+
           context.read<RealTimeBloc>().add(RealTimeTypingStatusEndEvent(
                 username: widget.username,
               ));
@@ -63,19 +85,35 @@ class _TypingStatusWidgetWrapperState extends State<TypingStatusWidgetWrapper> {
       builder: (context, state) {
         bool show = state is RealTimeTypingStatusState && state.typing;
 
-        if (widget.canHide && show) {
-          return TypingStatusWidget.canHide(
+        if (widget.text && show) {
+          return TypingStatusWidget.text(
             username: widget.username,
           );
         }
 
-        if (show) {
-          return TypingStatusWidget(
-            username: widget.username,
-          );
-        }
+        Widget child =
+            widget.child == null ? const SizedBox.shrink() : widget.child!;
 
-        return widget.child != null ? widget.child! : const SizedBox.shrink();
+        return CompositedTransformTarget(
+          link: link,
+          child: OverlayPortal(
+            controller: overlayPortalController,
+            overlayChildBuilder: (context) {
+              return CompositedTransformFollower(
+                link: link,
+                targetAnchor: Alignment.topLeft,
+                followerAnchor: Alignment.bottomLeft,
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: TypingStatusWidget.sticker(
+                    username: widget.username,
+                  ),
+                ),
+              );
+            },
+            child: child,
+          ),
+        );
       },
     );
   }

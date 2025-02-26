@@ -89,7 +89,7 @@ class MessageInboxPage extends StatelessWidget {
         baseFontSize: Constants.smallFontSize * 1.125,
         trim: 20,
       ),
-      subtitle: TypingStatusWidgetWrapper.canHide(
+      subtitle: TypingStatusWidgetWrapper.text(
         username: username,
         child: Text(inboxText),
       ),
