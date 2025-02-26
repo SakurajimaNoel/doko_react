@@ -26,6 +26,22 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
+        actionsPadding: const EdgeInsets.symmetric(
+          horizontal: Constants.padding,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              showAboutDialog(
+                context: context,
+                applicationVersion: "1.0.0",
+                applicationIcon: Image.asset("assets/logo.png"),
+                applicationName: "Doki",
+              );
+            },
+            child: const Text("More info"),
+          )
+        ],
       ),
       body: ListView.separated(
         padding: const EdgeInsets.all(Constants.padding),
