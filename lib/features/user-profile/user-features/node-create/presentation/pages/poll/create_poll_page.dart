@@ -14,8 +14,8 @@ class CreatePollPage extends StatefulWidget {
 
 class _CreatePollPageState extends State<CreatePollPage> {
   final TextEditingController questionController = TextEditingController();
-  final List<PollOptionInput> options =
-      List<PollOptionInput>.generate(2, (int index) => PollOptionInput());
+  final List<PollOptionInput> options = List<PollOptionInput>.generate(
+      Constants.pollOptionsLimit, (int index) => PollOptionInput());
 
   final List<String> info = [
     "You can long press on any option to reorder.",
@@ -35,119 +35,239 @@ class _CreatePollPageState extends State<CreatePollPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  child: Container(
-                    padding: const EdgeInsets.all(Constants.padding),
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            child: Padding(
+              padding: const EdgeInsets.all(Constants.padding),
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Wrap(
                       spacing: Constants.gap,
                       children: [
-                        Wrap(
-                          spacing: Constants.gap,
-                          children: [
-                            const Text("Poll active duration: "),
-                            DropdownMenu<int>(
-                              initialSelection: activeDuration,
-                              onSelected: (int? newDuration) {
-                                activeDuration = newDuration ?? 1;
-                              },
-                              dropdownMenuEntries: [
-                                ...List<DropdownMenuEntry<int>>.generate(
-                                    Constants.pollMaxActiveDuration,
-                                    (int index) {
-                                  int val = index + 1;
-                                  return DropdownMenuEntry(
-                                    value: val,
-                                    label: "$val day${index > 0 ? "s" : ""}",
-                                  );
-                                })
-                              ],
-                            ),
-                          ],
-                        ),
-                        TextField(
-                          controller: questionController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "*Question",
-                            hintText: "Question...",
-                          ),
-                          maxLength: Constants.pollQuestionSizeLimit,
-                        ),
-                        ReorderableListView(
-                          shrinkWrap: true,
-                          children: [
-                            for (int i = 0; i < options.length; i++)
-                              ListTile(
-                                key: Key(options[i].key),
-                                title: TextField(
-                                  onChanged: (String? value) {
-                                    value ??= "";
-
-                                    setState(() {
-                                      options[i].updateValue(value!);
-                                    });
-                                  },
-                                  onTapOutside: (_) {
-                                    FocusManager.instance.primaryFocus
-                                        ?.unfocus();
-                                  },
-                                  decoration: InputDecoration(
-                                    border: const OutlineInputBorder(),
-                                    labelText: "Option ${i + 1}",
-                                    hintText: "Option ${i + 1}...",
-                                  ),
-                                  maxLength: Constants.pollOptionSizeLimit,
-                                ),
-                                leading: options.length > 2
-                                    ? InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            options.removeAt(i);
-                                          });
-                                        },
-                                        child: const Icon(
-                                          Icons.delete,
-                                          color: Colors.redAccent,
-                                        ),
-                                      )
-                                    : null,
-                                trailing: ReorderableDragStartListener(
-                                  key: Key(options[i].key),
-                                  index: i,
-                                  child: const Icon(Icons.drag_handle),
-                                ),
-                              ),
-                          ],
-                          onReorder: (int prevIndex, int newIndex) {
-                            setState(() {
-                              if (prevIndex < newIndex) {
-                                newIndex -= 1;
-                              }
-                              var option = options.removeAt(prevIndex);
-                              options.insert(newIndex, option);
-                            });
+                        const Text("Poll active duration: "),
+                        DropdownMenu<int>(
+                          initialSelection: activeDuration,
+                          onSelected: (int? newDuration) {
+                            activeDuration = newDuration ?? 1;
                           },
+                          dropdownMenuEntries: [
+                            ...List<DropdownMenuEntry<int>>.generate(
+                                Constants.pollMaxActiveDuration, (int index) {
+                              int val = index + 1;
+                              return DropdownMenuEntry(
+                                value: val,
+                                label: "$val day${index > 0 ? "s" : ""}",
+                              );
+                            })
+                          ],
                         ),
-                        if (options.length < 5)
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                options.add(PollOptionInput());
-                              });
-                            },
-                            child: const Text("Add option"),
-                          ),
                       ],
                     ),
                   ),
-                );
-              },
+                  const SliverPadding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: Constants.gap * 0.5,
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: TextField(
+                      controller: questionController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: "*Question",
+                        hintText: "Question...",
+                      ),
+                      maxLength: Constants.pollQuestionSizeLimit,
+                    ),
+                  ),
+                  const SliverToBoxAdapter(
+                    child: Divider(
+                      height: Constants.gap * 2.5,
+                      thickness: Constants.height * 0.1,
+                    ),
+                  ),
+                  SliverReorderableList(
+                    itemBuilder: (BuildContext context, int index) {
+                      return Material(
+                        key: Key(options[index].key),
+                        child: ListTile(
+                          dense: false,
+                          contentPadding: EdgeInsets.zero,
+                          horizontalTitleGap: 0,
+                          minVerticalPadding: Constants.gap * 0.625,
+                          title: TextField(
+                            // enabled: false,
+                            onChanged: (String? value) {
+                              value ??= "";
+
+                              setState(() {
+                                options[index].updateValue(value!);
+                              });
+                            },
+                            decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
+                              labelText: "Option ${index + 1}",
+                              hintText: "Option ${index + 1}...",
+                              counterText: "",
+                            ),
+                            maxLength: Constants.pollOptionSizeLimit,
+                            maxLines: 3,
+                            minLines: 1,
+                          ),
+                          trailing: ReorderableDragStartListener(
+                            key: Key(options[index].key),
+                            index: index,
+                            child: const Icon(Icons.drag_indicator),
+                          ),
+                        ),
+                      );
+                    },
+                    itemCount: options.length,
+                    onReorder: (int prevIndex, int newIndex) {
+                      setState(() {
+                        if (prevIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+                        var option = options.removeAt(prevIndex);
+                        options.insert(newIndex, option);
+                      });
+                    },
+                  ),
+
+                  // SliverToBoxAdapter(
+                  //   child: Container(
+                  //     padding: const EdgeInsets.all(Constants.padding),
+                  //     constraints: BoxConstraints(
+                  //       minHeight: constraints.maxHeight,
+                  //       maxHeight: constraints.maxHeight,
+                  //     ),
+                  //     child: Column(
+                  //       crossAxisAlignment: CrossAxisAlignment.start,
+                  //       spacing: Constants.gap,
+                  //       mainAxisSize: MainAxisSize.min,
+                  //       children: [
+                  //         Wrap(
+                  //           spacing: Constants.gap,
+                  //           children: [
+                  //             const Text("Poll active duration: "),
+                  //             DropdownMenu<int>(
+                  //               initialSelection: activeDuration,
+                  //               onSelected: (int? newDuration) {
+                  //                 activeDuration = newDuration ?? 1;
+                  //               },
+                  //               dropdownMenuEntries: [
+                  //                 ...List<DropdownMenuEntry<int>>.generate(
+                  //                     Constants.pollMaxActiveDuration,
+                  //                     (int index) {
+                  //                   int val = index + 1;
+                  //                   return DropdownMenuEntry(
+                  //                     value: val,
+                  //                     label:
+                  //                         "$val day${index > 0 ? "s" : ""}",
+                  //                   );
+                  //                 })
+                  //               ],
+                  //             ),
+                  //           ],
+                  //         ),
+                  //         TextField(
+                  //           controller: questionController,
+                  //           decoration: const InputDecoration(
+                  //             border: OutlineInputBorder(),
+                  //             labelText: "*Question",
+                  //             hintText: "Question...",
+                  //           ),
+                  //           maxLength: Constants.pollQuestionSizeLimit,
+                  //         ),
+                  //         Flexible(
+                  //           child: ReorderableList(
+                  //             itemBuilder: (BuildContext context, int index) {
+                  //               return Text(
+                  //                 "hello",
+                  //                 key: ValueKey(index),
+                  //               );
+                  //             },
+                  //             itemCount: options.length,
+                  //             onReorder: (int prevIndex, int newIndex) {
+                  //               setState(() {
+                  //                 if (prevIndex < newIndex) {
+                  //                   newIndex -= 1;
+                  //                 }
+                  //                 var option = options.removeAt(prevIndex);
+                  //                 options.insert(newIndex, option);
+                  //               });
+                  //             },
+                  //           ),
+                  //         ),
+                  //         // ReorderableListView(
+                  //         //   shrinkWrap: true,
+                  //         //   children: [
+                  //         //     for (int i = 0; i < options.length; i++)
+                  //         //       ListTile(
+                  //         //         key: Key(options[i].key),
+                  //         //         title: TextField(
+                  //         //           onChanged: (String? value) {
+                  //         //             value ??= "";
+                  //         //
+                  //         //             setState(() {
+                  //         //               options[i].updateValue(value!);
+                  //         //             });
+                  //         //           },
+                  //         //           onTapOutside: (_) {
+                  //         //             FocusManager.instance.primaryFocus
+                  //         //                 ?.unfocus();
+                  //         //           },
+                  //         //           decoration: InputDecoration(
+                  //         //             border: const OutlineInputBorder(),
+                  //         //             labelText: "Option ${i + 1}",
+                  //         //             hintText: "Option ${i + 1}...",
+                  //         //           ),
+                  //         //           maxLength: Constants.pollOptionSizeLimit,
+                  //         //         ),
+                  //         //         leading: options.length > 2
+                  //         //             ? InkWell(
+                  //         //                 onTap: () {
+                  //         //                   setState(() {
+                  //         //                     options.removeAt(i);
+                  //         //                   });
+                  //         //                 },
+                  //         //                 child: const Icon(
+                  //         //                   Icons.delete,
+                  //         //                   color: Colors.redAccent,
+                  //         //                 ),
+                  //         //               )
+                  //         //             : null,
+                  //         //         trailing: ReorderableDragStartListener(
+                  //         //           key: Key(options[i].key),
+                  //         //           index: i,
+                  //         //           child: const Icon(Icons.drag_handle),
+                  //         //         ),
+                  //         //       ),
+                  //         //   ],
+                  //         //   onReorder: (int prevIndex, int newIndex) {
+                  //         //     setState(() {
+                  //         //       if (prevIndex < newIndex) {
+                  //         //         newIndex -= 1;
+                  //         //       }
+                  //         //       var option = options.removeAt(prevIndex);
+                  //         //       options.insert(newIndex, option);
+                  //         //     });
+                  //         //   },
+                  //         // ),
+                  //         // if (options.length < 5)
+                  //         //   TextButton(
+                  //         //     onPressed: () {
+                  //         //       setState(() {
+                  //         //         options.add(PollOptionInput());
+                  //         //       });
+                  //         //     },
+                  //         //     child: const Text("Add option"),
+                  //         //   ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
+                ],
+              ),
             ),
           ),
           Padding(
