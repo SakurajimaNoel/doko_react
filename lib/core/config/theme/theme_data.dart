@@ -11,8 +11,8 @@ class GlobalThemeData {
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: <TargetPlatform, PageTransitionsBuilder>{
-          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
-          TargetPlatform.iOS: FadeForwardsPageTransitionsBuilder(),
+          // TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
+          // TargetPlatform.iOS: FadeForwardsPageTransitionsBuilder(),
         },
       ),
     );

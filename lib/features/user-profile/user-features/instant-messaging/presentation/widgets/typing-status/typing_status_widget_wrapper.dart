@@ -59,10 +59,13 @@ class _TypingStatusWidgetWrapperState extends State<TypingStatusWidgetWrapper> {
     return BlocConsumer<RealTimeBloc, RealTimeState>(
       listenWhen: (previousState, state) {
         return state is RealTimeTypingStatusState &&
-            state.archiveUser == widget.username &&
-            state.typing == true;
+            state.archiveUser == widget.username;
       },
       listener: (context, state) {
+        if (state is RealTimeTypingStatusState && !state.typing) {
+          if (overlayPortalController.isShowing) overlayPortalController.hide();
+          return;
+        }
         if (!overlayPortalController.isShowing && widget.sticker) {
           overlayPortalController.show();
         }

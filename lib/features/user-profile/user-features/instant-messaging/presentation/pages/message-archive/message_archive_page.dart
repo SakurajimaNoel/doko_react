@@ -354,9 +354,8 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                             reverse: true,
                             itemCount: messages.length,
                             cacheExtent: height * 2,
-                            padding: const EdgeInsets.only(
-                              top: Constants.padding * 2,
-                              bottom: Constants.padding * 1,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: Constants.padding * 2,
                             ),
                             separatorBuilder: (context, index) {
                               return const SizedBox(
