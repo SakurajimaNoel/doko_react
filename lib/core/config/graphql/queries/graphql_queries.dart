@@ -86,7 +86,7 @@ class GraphqlQueries {
 
   static String getCompleteUser() {
     return '''
-      query Users(\$where: UserWhere, \$friendsAggregateWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [ContentSort!], \$contentsConnectionWhere2: ContentWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere) {
+      query Users(\$where: UserWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$first: Int, \$sort: [ContentSort!], \$contentsConnectionWhere2: ContentWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere) {
         users(where: \$where) {
           id
           username
@@ -104,8 +104,8 @@ class GraphqlQueries {
           pollsAggregate {
             count
           }
-          friendsAggregate(where: \$friendsAggregateWhere2) {
-            count
+          friendsAggregate:friendsConnection(where: \$friendsConnectionWhere3) {
+            count:totalCount
           }
           friendsConnection(where: \$friendsConnectionWhere2) {
             edges {
@@ -208,16 +208,14 @@ class GraphqlQueries {
       "where": {
         "username_EQ": username,
       },
-      "friendsAggregateWhere2": {
-        "friendsConnection_SOME": {
-          "edge": {
-            "status_EQ": FriendStatus.accepted,
-          }
-        }
-      },
       "friendsConnectionWhere2": {
         "node": {
           "username_EQ": currentUsername,
+        }
+      },
+      "friendsConnectionWhere3": {
+        "edge": {
+          "status_EQ": FriendStatus.accepted,
         }
       },
       "first": GraphqlConstants.nodeLimit,
