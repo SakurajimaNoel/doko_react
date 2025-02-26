@@ -80,9 +80,7 @@ class PostRemoteDataSource {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(GraphqlQueries.getComments(
-            cursor: details.cursor,
-          )),
+          document: gql(GraphqlQueries.getComments()),
           variables: GraphqlQueries.getCommentsVariable(
             details.nodeId,
             nodeType: details.nodeType,

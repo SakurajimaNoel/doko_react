@@ -69,6 +69,11 @@ import "package:doko_react/features/user-profile/user-features/root-node/domain/
 import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/poll-use-case/poll_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/root-node/domain/use-case/post-use-case/post_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/root-node/presentation/bloc/root_node_bloc.dart";
+import "package:doko_react/features/user-profile/user-features/user-feed/data/data-sources/user_feed_remote_data_source.dart";
+import "package:doko_react/features/user-profile/user-features/user-feed/data/repository/user_feed_repo_impl.dart";
+import "package:doko_react/features/user-profile/user-features/user-feed/domain/repository/user_feed_repo.dart";
+import "package:doko_react/features/user-profile/user-features/user-feed/domain/use-case/user-feed-content/content_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/user-feed/presentation/bloc/user_feed_bloc.dart";
 import "package:flutter/foundation.dart";
 import "package:get_it/get_it.dart";
 import "package:graphql/client.dart";
@@ -101,11 +106,38 @@ Future<void> initDependency() async {
 
   _initAuth();
   _initCompleteProfile();
+  _initUserFeed();
   _initProfile();
   _initUserAction();
   _initUserToUserAction();
   _initNodeCreate();
   _initPost();
+}
+
+void _initUserFeed() {
+  serviceLocator.registerFactory<UserFeedRemoteDataSource>(
+    () => UserFeedRemoteDataSource(
+      client: serviceLocator<GraphQLClient>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UserFeedRepo>(
+    () => UserFeedRepoImpl(
+      remoteDataSource: serviceLocator<UserFeedRemoteDataSource>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<ContentUseCase>(
+    () => ContentUseCase(
+      repo: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<UserFeedBloc>(
+    () => UserFeedBloc(
+      contentUseCase: serviceLocator(),
+    ),
+  );
 }
 
 void _initPost() {

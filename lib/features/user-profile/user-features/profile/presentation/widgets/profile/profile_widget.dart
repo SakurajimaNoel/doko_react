@@ -316,10 +316,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             },
           ),
           // discussions
-          BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
+          BlocBuilder<UserActionBloc, UserActionState>(
             buildWhen: (previousState, state) {
-              return (state
-                      is UserToUserActionUpdateUserAcceptedFriendsListState &&
+              return (state is UserActionNewDiscussionState &&
                   (self || state.username == username));
             },
             builder: (context, state) {
@@ -343,10 +342,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             },
           ),
           // polls
-          BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
+          BlocBuilder<UserActionBloc, UserActionState>(
             buildWhen: (previousState, state) {
-              return (state
-                      is UserToUserActionUpdateUserAcceptedFriendsListState &&
+              return (state is UserActionNewPollState &&
                   (self || state.username == username));
             },
             builder: (context, state) {

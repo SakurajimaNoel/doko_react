@@ -260,8 +260,7 @@ class ProfileRemoteDataSource {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document:
-              gql(GraphqlQueries.getUserPostsByUsername(postDetails.cursor)),
+          document: gql(GraphqlQueries.getUserPostsByUsername()),
           variables: GraphqlQueries.getUserPostsByUsernameVariables(
             postDetails.username,
             cursor: postDetails.cursor,
@@ -322,8 +321,7 @@ class ProfileRemoteDataSource {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document:
-              gql(GraphqlQueries.getFriendsByUsername(friendsDetails.cursor)),
+          document: gql(GraphqlQueries.getFriendsByUsername()),
           variables: GraphqlQueries.getFriendsByUsernameVariables(
             friendsDetails.username,
             cursor: friendsDetails.cursor,
@@ -483,8 +481,7 @@ class ProfileRemoteDataSource {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(GraphqlQueries.getPendingIncomingFriendsByUsername(
-              details.cursor)),
+          document: gql(GraphqlQueries.getPendingIncomingFriendsByUsername()),
           variables:
               GraphqlQueries.getPendingIncomingFriendsByUsernameVariables(
             details.username,
@@ -542,8 +539,7 @@ class ProfileRemoteDataSource {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(GraphqlQueries.getPendingOutgoingFriendsByUsername(
-              details.cursor)),
+          document: gql(GraphqlQueries.getPendingOutgoingFriendsByUsername()),
           variables:
               GraphqlQueries.getPendingOutgoingFriendsByUsernameVariables(
             details.username,
@@ -643,8 +639,7 @@ class ProfileRemoteDataSource {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(GraphqlQueries.getUserDiscussionsByUsername(
-              discussionDetails.cursor)),
+          document: gql(GraphqlQueries.getUserDiscussionsByUsername()),
           variables: GraphqlQueries.getUserDiscussionsByUsernameVariables(
             username: discussionDetails.username,
             cursor: discussionDetails.cursor,
@@ -705,8 +700,7 @@ class ProfileRemoteDataSource {
       QueryResult result = await _client.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
-          document:
-              gql(GraphqlQueries.getUserPollsByUsername(pollDetails.cursor)),
+          document: gql(GraphqlQueries.getUserPollsByUsername()),
           variables: GraphqlQueries.getUserPollsByUsernameVariables(
             username: pollDetails.username,
             cursor: pollDetails.cursor,

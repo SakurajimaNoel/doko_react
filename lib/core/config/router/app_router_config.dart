@@ -44,7 +44,7 @@ import 'package:doko_react/features/user-profile/user-features/root-node/present
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/pages/discussion/discussion_page.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/pages/poll/poll_page.dart';
 import 'package:doko_react/features/user-profile/user-features/root-node/presentation/pages/post/post_page.dart';
-import 'package:doko_react/features/user-profile/user-features/user-feed/user_feed_page.dart';
+import 'package:doko_react/features/user-profile/user-features/user-feed/presentation/pages/user_feed_page.dart';
 import 'package:doko_react/features/user-profile/user_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

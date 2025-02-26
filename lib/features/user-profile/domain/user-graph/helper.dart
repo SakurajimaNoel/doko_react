@@ -83,6 +83,10 @@ String getMessageIdFromMessageKey(String messageKey) {
   return messageKey.substring(8);
 }
 
+String generateUserFeedKey() {
+  return "user-feed";
+}
+
 /// function to get inbox item key from message
 String getUsernameFromMessageParams(
   String username, {

@@ -240,7 +240,9 @@ class GraphqlQueries {
         "username_EQ": currentUsername,
       },
       "votesConnectionWhere2": {
-        "node": {"username_EQ": currentUsername}
+        "node": {
+          "username_EQ": currentUsername,
+        }
       },
       "votesConnectionWhere3": {
         "edge": {
@@ -426,39 +428,7 @@ class GraphqlQueries {
   }
 
   // get user accepted friends by username
-  static String getFriendsByUsername(String cursor) {
-    if (cursor.isEmpty) {
-      return """
-       query Users(\$where: UserWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere) {
-        users(where: \$where) {
-          friendsConnection(first: \$first, sort: \$sort, where: \$friendsConnectionWhere2) {
-            pageInfo {
-              endCursor
-              hasNextPage
-            }
-            edges {
-              node {
-                id
-                username
-                name
-                profilePicture
-                friendsConnection(where: \$friendsConnectionWhere3) {
-                  edges {
-                    properties {
-                      requestedBy
-                      status
-                      addedOn
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      """;
-    }
-
+  static String getFriendsByUsername() {
     return """
        query Users(\$where: UserWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$after: String) {
         users(where: \$where) {
@@ -495,32 +465,6 @@ class GraphqlQueries {
     required String cursor,
     required String currentUsername,
   }) {
-    if (cursor.isEmpty) {
-      return {
-        "where": {
-          "username_EQ": username,
-        },
-        "first": GraphqlConstants.nodeLimit,
-        "sort": [
-          {
-            "edge": {
-              "addedOn": "DESC",
-            }
-          }
-        ],
-        "friendsConnectionWhere2": {
-          "edge": {
-            "status_EQ": FriendStatus.accepted,
-          }
-        },
-        "friendsConnectionWhere3": {
-          "node": {
-            "username_EQ": currentUsername,
-          }
-        },
-      };
-    }
-
     return {
       "where": {
         "username_EQ": username,
@@ -548,44 +492,7 @@ class GraphqlQueries {
   }
 
   // get user posts by username
-  static String getUserPostsByUsername(String cursor) {
-    if (cursor.isEmpty) {
-      return """
-      query Query(\$first: Int, \$sort: [PostSort!], \$where: PostWhere, \$likedByWhere2: UserWhere) {
-        postsConnection(first: \$first, sort: \$sort, where: \$where) {
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-          edges {
-            node {
-              id
-              createdOn
-              content
-              caption
-              createdBy {
-                username
-              }
-              likedBy(where: \$likedByWhere2) {
-                username
-              }
-              likedByConnection {
-                totalCount
-              }
-              commentsConnection {
-                totalCount
-              }
-              usersTagged {
-                username
-                profilePicture
-              }
-            }
-          }
-        }
-      }
-      """;
-    }
-
+  static String getUserPostsByUsername() {
     return """
         query Query(\$first: Int, \$sort: [PostSort!], \$where: PostWhere, \$likedByWhere2: UserWhere, \$after: String) {
           postsConnection(first: \$first, sort: \$sort, where: \$where, after: \$after) {
@@ -627,25 +534,6 @@ class GraphqlQueries {
     required String cursor,
     required String currentUsername,
   }) {
-    if (cursor.isEmpty) {
-      return {
-        "where": {
-          "createdBy": {
-            "username_EQ": username,
-          }
-        },
-        "first": GraphqlConstants.nodeLimit,
-        "sort": [
-          {
-            "createdOn": "DESC",
-          }
-        ],
-        "likedByWhere2": {
-          "username_EQ": currentUsername,
-        },
-      };
-    }
-
     return {
       "where": {
         "createdBy": {
@@ -666,45 +554,7 @@ class GraphqlQueries {
   }
 
   // get user discussion
-  static String getUserDiscussionsByUsername(String cursor) {
-    if (cursor.isEmpty) {
-      return """
-      query DiscussionsConnection(\$sort: [DiscussionSort!], \$where: DiscussionWhere, \$likedByWhere2: UserWhere, \$first: Int) {
-        discussionsConnection(sort: \$sort, where: \$where, first: \$first) {
-          pageInfo {
-            endCursor
-            hasNextPage
-          }
-          edges {
-            node {
-              id
-              createdOn
-              title
-              text
-              media
-              createdBy {
-                username
-              }
-              likedBy(where: \$likedByWhere2) {
-                username
-              }
-              likedByConnection {
-                totalCount
-              }
-              commentsConnection {
-                totalCount
-              }
-              usersTagged {
-                username
-                profilePicture
-              }
-            }
-          }
-        }
-      }
-      """;
-    }
-
+  static String getUserDiscussionsByUsername() {
     return """
     query DiscussionsConnection(\$sort: [DiscussionSort!], \$where: DiscussionWhere, \$likedByWhere2: UserWhere, \$first: Int, \$after: String) {
       discussionsConnection(sort: \$sort, where: \$where, first: \$first, after: \$after) {
@@ -747,23 +597,6 @@ class GraphqlQueries {
     required String cursor,
     required String currentUsername,
   }) {
-    if (cursor.isEmpty) {
-      return {
-        "sort": [
-          {"createdOn": "DESC"}
-        ],
-        "where": {
-          "createdBy": {
-            "username_EQ": username,
-          }
-        },
-        "likedByWhere2": {
-          "username_EQ": currentUsername,
-        },
-        "first": GraphqlConstants.nodeLimit,
-      };
-    }
-
     return {
       "sort": [
         {"createdOn": "DESC"}
@@ -781,69 +614,7 @@ class GraphqlQueries {
     };
   }
 
-  static String getUserPollsByUsername(String cursor) {
-    if (cursor.isEmpty) {
-      return """
-      query PollsConnection(\$first: Int, \$sort: [PollSort!], \$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere) {
-        pollsConnection(first: \$first, sort: \$sort, where: \$where) {
-          pageInfo {
-            endCursor
-            hasNextPage
-          }
-          edges {
-            node {
-              id
-              createdOn
-              question
-              options
-              activeTill
-              usersTagged {
-                username
-                profilePicture
-              }
-              likedBy(where: \$likedByWhere2) {
-                username
-              }
-              commentsConnection {
-                totalCount
-              }
-              likedByConnection {
-                totalCount
-              }
-              createdBy {
-                username
-              }
-             
-              selfVote: votesConnection(where: \$votesConnectionWhere2) {
-                edges {
-                  properties {
-                    addedOn
-                    option
-                  }
-                }
-              }
-              optionA: votesConnection (where: \$votesConnectionWhere3){
-                totalCount
-              }
-              optionB: votesConnection (where: \$votesConnectionWhere4){
-                totalCount
-              }
-              optionC: votesConnection (where: \$votesConnectionWhere5){
-                totalCount
-              }
-              optionD: votesConnection (where: \$votesConnectionWhere6){
-                totalCount
-              }
-              optionE: votesConnection (where: \$votesConnectionWhere7){
-                totalCount
-              }
-            }
-          }
-        }
-      }
-      """;
-    }
-
+  static String getUserPollsByUsername() {
     return """
     query PollsConnection(\$first: Int, \$sort: [PollSort!], \$where: PollWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$after: String, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere) {
       pollsConnection(first: \$first, sort: \$sort, where: \$where, after: \$after) {
@@ -911,53 +682,6 @@ class GraphqlQueries {
     required String cursor,
     required String currentUsername,
   }) {
-    if (cursor.isEmpty) {
-      return {
-        "first": GraphqlConstants.nodeLimit,
-        "sort": [
-          {"createdOn": "DESC"}
-        ],
-        "where": {
-          "createdBy": {
-            "username_EQ": username,
-          }
-        },
-        "likedByWhere2": {
-          "username_EQ": currentUsername,
-        },
-        "votesConnectionWhere2": {
-          "node": {
-            "username_EQ": currentUsername,
-          }
-        },
-        "votesConnectionWhere3": {
-          "edge": {
-            "option_EQ": PollOption.optionA.value,
-          }
-        },
-        "votesConnectionWhere4": {
-          "edge": {
-            "option_EQ": PollOption.optionB.value,
-          }
-        },
-        "votesConnectionWhere5": {
-          "edge": {
-            "option_EQ": PollOption.optionC.value,
-          }
-        },
-        "votesConnectionWhere6": {
-          "edge": {
-            "option_EQ": PollOption.optionD.value,
-          }
-        },
-        "votesConnectionWhere7": {
-          "edge": {
-            "option_EQ": PollOption.optionE.value,
-          }
-        },
-      };
-    }
-
     return {
       "first": GraphqlConstants.nodeLimit,
       "after": cursor,
@@ -1006,39 +730,7 @@ class GraphqlQueries {
   }
 
 // get user pending friends outgoing
-  static String getPendingOutgoingFriendsByUsername(String? cursor) {
-    if (cursor == null || cursor.isEmpty) {
-      return """
-        query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!]) {
-          users(where: \$where) {
-            friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort) {
-              pageInfo {
-                endCursor
-                hasNextPage
-              }
-              edges {
-                node {
-                  id
-                  username
-                  name
-                  profilePicture
-                  friendsConnection(where: \$friendsConnectionWhere3) {
-                    edges {
-                      properties {
-                        requestedBy
-                        status
-                        addedOn
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-    """;
-    }
-
+  static String getPendingOutgoingFriendsByUsername() {
     return """
       query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$after: String) {
         users(where: \$where) {
@@ -1074,33 +766,6 @@ class GraphqlQueries {
     String username, {
     String? cursor,
   }) {
-    if (cursor == null || cursor.isEmpty) {
-      return {
-        "where": {
-          "username_EQ": username,
-        },
-        "friendsConnectionWhere2": {
-          "edge": {
-            "status_EQ": FriendStatus.pending,
-            "requestedBy_EQ": username,
-          }
-        },
-        "friendsConnectionWhere3": {
-          "node": {
-            "username_EQ": username,
-          }
-        },
-        "first": GraphqlConstants.nodeLimit,
-        "sort": [
-          {
-            "edge": {
-              "addedOn": "DESC",
-            }
-          }
-        ],
-      };
-    }
-
     return {
       "where": {
         "username_EQ": username,
@@ -1129,39 +794,7 @@ class GraphqlQueries {
   }
 
   // get user pending friends incoming
-  static String getPendingIncomingFriendsByUsername(String? cursor) {
-    if (cursor == null || cursor.isEmpty) {
-      return """
-       query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!]) {
-        users(where: \$where) {
-          friendsConnection(where: \$friendsConnectionWhere2, first: \$first, sort: \$sort) {
-            pageInfo {
-              endCursor
-              hasNextPage
-            }
-            edges {
-              node {
-                id
-                username
-                name
-                profilePicture
-                friendsConnection(where: \$friendsConnectionWhere3) {
-                  edges {
-                    properties {
-                      requestedBy
-                      status
-                      addedOn
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    """;
-    }
-
+  static String getPendingIncomingFriendsByUsername() {
     return """
       query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$friendsConnectionWhere3: UserFriendsConnectionWhere, \$first: Int, \$sort: [UserFriendsConnectionSort!], \$after: String) {
         users(where: \$where) {
@@ -1197,35 +830,6 @@ class GraphqlQueries {
     String username, {
     String? cursor,
   }) {
-    if (cursor == null || cursor.isEmpty) {
-      return {
-        "where": {
-          "username_EQ": username,
-        },
-        "friendsConnectionWhere2": {
-          "edge": {
-            "status_EQ": FriendStatus.pending,
-            "NOT": {
-              "requestedBy_EQ": username,
-            }
-          }
-        },
-        "friendsConnectionWhere3": {
-          "node": {
-            "username_EQ": username,
-          }
-        },
-        "first": GraphqlConstants.nodeLimit,
-        "sort": [
-          {
-            "edge": {
-              "addedOn": "DESC",
-            }
-          }
-        ],
-      };
-    }
-
     return {
       "where": {
         "username_EQ": username,
@@ -1506,60 +1110,7 @@ class GraphqlQueries {
   }
 
   // get comments
-  static String getComments({
-    String? cursor,
-  }) {
-    if (cursor == null || cursor.isEmpty) {
-      return '''
-        query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$sort: [CommentSort!], \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
-          commentsConnection(first: \$first, where: \$where, sort: \$sort) {
-            pageInfo {
-              endCursor
-              hasNextPage
-            }
-            edges {
-              node {
-                id
-                createdOn
-                media
-                content
-                mentions {
-                  username
-                }
-                commentsConnection {
-                  totalCount
-                }
-                likedByConnection {
-                  totalCount
-                }
-                likedBy(where: \$likedByWhere2) {
-                  username
-                }
-                replyOn {
-                  id
-                }
-                commentBy {
-                  id
-                  username
-                  profilePicture
-                  name
-                   friendsConnection(where: \$friendsConnectionWhere2) {
-                    edges {
-                      properties {
-                        addedOn
-                        requestedBy
-                        status
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-    ''';
-    }
-
+  static String getComments() {
     return '''
       query CommentsConnection(\$first: Int, \$where: CommentWhere, \$likedByWhere2: UserWhere, \$sort: [CommentSort!], \$after: String, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
         commentsConnection(first: \$first, where: \$where, sort: \$sort, after: \$after) {
@@ -1619,32 +1170,6 @@ class GraphqlQueries {
   }) {
     String connectionNode = nodeType.nodeName;
     String sort = latestFirst ? "DESC" : "ASC";
-
-    if (cursor == null || cursor.isEmpty) {
-      return {
-        "first": GraphqlConstants.nodeLimit,
-        "where": {
-          "commentOn": {
-            connectionNode: {
-              "id_EQ": nodeId,
-            }
-          }
-        },
-        "likedByWhere2": {
-          "username_EQ": username,
-        },
-        "sort": [
-          {
-            "createdOn": sort,
-          }
-        ],
-        "friendsConnectionWhere2": {
-          "node": {
-            "username_EQ": username,
-          }
-        },
-      };
-    }
 
     return {
       "first": GraphqlConstants.nodeLimit,
@@ -2340,6 +1865,221 @@ class GraphqlQueries {
           "option_EQ": PollOption.optionE.value,
         }
       },
+    };
+  }
+
+  // basic user feed
+  static String userFeed() {
+    return """
+    query ContentsConnection(\$first: Int, \$where: UserFriendsConnectionWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere, \$contentsConnectionWhere2: ContentWhere, \$after: String, \$sort: [ContentSort!]) {
+      contentsConnection(first: \$first, where: \$contentsConnectionWhere2, after: \$after, sort: \$sort) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        edges {
+          node {
+            __typename
+            id
+            createdOn
+            createdBy {
+              id
+              username
+              name
+              profilePicture
+              friendsConnection(where: \$where) {
+                edges {
+                  properties {
+                    addedOn
+                    requestedBy
+                    status
+                  }
+                }
+              }
+            }
+            likedBy(where: \$likedByWhere2) {
+              username
+            }
+            likedByConnection {
+              totalCount
+            }
+            commentsConnection {
+              totalCount
+            }
+            usersTagged {
+              username
+              profilePicture
+            }
+            ... on Post {
+              content
+              caption
+            }
+            ... on Discussion {
+              title
+              text
+              media
+            }
+            ... on Poll {
+              question
+              options
+              activeTill
+              selfVote: votesConnection(where: \$votesConnectionWhere2) {
+                      edges {
+                        properties {
+                          addedOn
+                          option
+                        }
+                      }
+                    }
+                    optionA: votesConnection (where: \$votesConnectionWhere3){
+                      totalCount
+                    }
+                    optionB: votesConnection (where: \$votesConnectionWhere4){
+                      totalCount
+                    }
+                    optionC: votesConnection (where: \$votesConnectionWhere5){
+                      totalCount
+                    }
+                    optionD: votesConnection (where: \$votesConnectionWhere6){
+                      totalCount
+                    }
+                    optionE: votesConnection (where: \$votesConnectionWhere7){
+                      totalCount
+                    }
+            }
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> userFeedVariables({
+    required String username,
+    required String cursor,
+  }) {
+    return {
+      "first": GraphqlConstants.nodeLimit,
+      "after": cursor,
+      "sort": [
+        {
+          "createdOn": "DESC",
+        }
+      ],
+      "where": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "votesConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
+      "votesConnectionWhere3": {
+        "edge": {
+          "option_EQ": PollOption.optionA.value,
+        }
+      },
+      "votesConnectionWhere4": {
+        "edge": {
+          "option_EQ": PollOption.optionB.value,
+        }
+      },
+      "votesConnectionWhere5": {
+        "edge": {
+          "option_EQ": PollOption.optionC.value,
+        }
+      },
+      "votesConnectionWhere6": {
+        "edge": {
+          "option_EQ": PollOption.optionD.value,
+        }
+      },
+      "votesConnectionWhere7": {
+        "edge": {
+          "option_EQ": PollOption.optionE.value,
+        }
+      },
+      "contentsConnectionWhere2": {
+        "OR": [
+          {
+            "createdBy": {
+              "friends_SOME": {
+                "username_IN": username,
+              }
+              // "OR": [
+              //   {
+              //     "friends_SOME": {
+              //       "username_IN": username,
+              //     }
+              //   },
+              //   {
+              //     "username_CONTAINS": "",
+              //   }
+              // ],
+            },
+          },
+          {
+            "likedBy_SOME": {
+              "friends_SOME": {
+                "username_IN": username,
+              }
+            },
+          },
+          {
+            "usersTagged_SOME": {
+              "friends_SOME": {
+                "username_IN": username,
+              }
+            },
+          },
+          {
+            "comments_SOME": {
+              "OR": [
+                {
+                  "commentBy": {
+                    "OR": [
+                      {
+                        "friends_SOME": {
+                          "username_IN": username,
+                        },
+                      },
+                      {
+                        "username_EQ": username,
+                      }
+                    ]
+                  },
+                },
+                {
+                  "mentions_SOME": {
+                    "OR": [
+                      {
+                        "username_IN": username,
+                      },
+                      {
+                        "friends_SOME": {
+                          "username_IN": username,
+                        },
+                      },
+                      // {
+                      //   "likedBy_SOME": {
+                      //     "friends_SOME": {
+                      //       "username_IN": [username,]
+                      //     }
+                      //   },
+                      // }
+                    ],
+                  },
+                }
+              ],
+            }
+          },
+        ],
+      }
     };
   }
 }
