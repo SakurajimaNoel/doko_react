@@ -258,7 +258,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         }
 
         // emitted when user has no friends and query is empty
-        emit(ProfileInitial());
+        emit(ProfileSuccess());
         return;
       }
 
@@ -413,16 +413,16 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
       ));
 
+      // if (event.userDetails.cursor.isEmpty) emit(ProfileSuccess());
+
       emit(ProfileNodeLoadSuccess(
         cursor: event.userDetails.cursor,
       ));
-    } on ApplicationException catch (e) {
+    } catch (e) {
+      String message = Constants.errorMessage;
+      if (e is ApplicationException) message = e.reason;
       emit(ProfileNodeLoadError(
-        message: e.reason,
-      ));
-    } catch (_) {
-      emit(ProfileNodeLoadError(
-        message: Constants.errorMessage,
+        message: message,
       ));
     }
   }
