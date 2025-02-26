@@ -24,6 +24,8 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
       TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
 
+  bool showPassword = false;
+
   @override
   void dispose() {
     currentPasswordController.dispose();
@@ -97,7 +99,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                         children: [
                           TextFormField(
                             enabled: !loading,
-                            obscureText: true,
+                            obscureText: !showPassword,
                             controller: currentPasswordController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -107,17 +109,28 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                             },
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
-                            decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: "Current Password",
-                                hintText: "Current Password..."),
+                            decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
+                              labelText: "Current Password",
+                              hintText: "Current Password...",
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    showPassword = !showPassword;
+                                  });
+                                },
+                                icon: showPassword
+                                    ? const Icon(Icons.visibility)
+                                    : const Icon(Icons.visibility_off),
+                              ),
+                            ),
                           ),
                           const SizedBox(
                             height: Constants.gap * 1.5,
                           ),
                           TextFormField(
                             enabled: !loading,
-                            obscureText: true,
+                            obscureText: !showPassword,
                             controller: newPasswordController,
                             validator: (value) {
                               return validatePassword(value)
@@ -126,10 +139,21 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                             },
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
-                            decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: "New Password",
-                                hintText: "New Password..."),
+                            decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
+                              labelText: "New Password",
+                              hintText: "New Password...",
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    showPassword = !showPassword;
+                                  });
+                                },
+                                icon: showPassword
+                                    ? const Icon(Icons.visibility)
+                                    : const Icon(Icons.visibility_off),
+                              ),
+                            ),
                           ),
                           const SizedBox(
                             height: Constants.gap * 1.5,

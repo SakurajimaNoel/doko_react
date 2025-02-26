@@ -25,6 +25,8 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  bool showPassword = false;
+
   @override
   void dispose() {
     emailController.dispose();
@@ -143,7 +145,7 @@ class _LoginPageState extends State<LoginPage> {
                                         ],
                                         controller: passwordController,
                                         enabled: !loading,
-                                        obscureText: true,
+                                        obscureText: !showPassword,
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
                                             return "Password can't be empty";
@@ -152,10 +154,21 @@ class _LoginPageState extends State<LoginPage> {
                                         },
                                         autovalidateMode:
                                             AutovalidateMode.onUserInteraction,
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
+                                        decoration: InputDecoration(
+                                          border: const OutlineInputBorder(),
                                           labelText: "Password",
                                           hintText: "Password...",
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                showPassword = !showPassword;
+                                              });
+                                            },
+                                            icon: showPassword
+                                                ? const Icon(Icons.visibility)
+                                                : const Icon(
+                                                    Icons.visibility_off),
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(

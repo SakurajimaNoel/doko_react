@@ -30,6 +30,8 @@ class _ConfirmResetPasswordPageState extends State<ConfirmResetPasswordPage> {
   final TextEditingController codeController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  bool showPassword = false;
+
   @override
   void dispose() {
     codeController.dispose();
@@ -137,7 +139,7 @@ class _ConfirmResetPasswordPageState extends State<ConfirmResetPasswordPage> {
                             TextFormField(
                               controller: passwordController,
                               enabled: !loading,
-                              obscureText: true,
+                              obscureText: !showPassword,
                               validator: (value) {
                                 return validatePassword(value)
                                     ? null
@@ -145,10 +147,21 @@ class _ConfirmResetPasswordPageState extends State<ConfirmResetPasswordPage> {
                               },
                               autovalidateMode:
                                   AutovalidateMode.onUserInteraction,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
+                              decoration:  InputDecoration(
+                                border:const OutlineInputBorder(),
                                 labelText: "New Password",
                                 hintText: "New Password...",
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      showPassword = !showPassword;
+                                    });
+                                  },
+                                  icon: showPassword
+                                      ? const Icon(Icons.visibility)
+                                      : const Icon(
+                                      Icons.visibility_off),
+                                ),
                               ),
                             ),
                             const SizedBox(
@@ -156,7 +169,7 @@ class _ConfirmResetPasswordPageState extends State<ConfirmResetPasswordPage> {
                             ),
                             TextFormField(
                               enabled: !loading,
-                              obscureText: true,
+                              obscureText: !showPassword,
                               validator: (value) {
                                 if (value == null) return "Invalid value.";
 
@@ -167,10 +180,21 @@ class _ConfirmResetPasswordPageState extends State<ConfirmResetPasswordPage> {
                               },
                               autovalidateMode:
                                   AutovalidateMode.onUserInteraction,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
+                              decoration:  InputDecoration(
+                                border:const OutlineInputBorder(),
                                 labelText: "Confirm Password",
                                 hintText: "Confirm Password...",
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      showPassword = !showPassword;
+                                    });
+                                  },
+                                  icon: showPassword
+                                      ? const Icon(Icons.visibility)
+                                      : const Icon(
+                                      Icons.visibility_off),
+                                ),
                               ),
                             ),
                           ],

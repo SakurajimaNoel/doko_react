@@ -14,8 +14,8 @@ class CreatePollPage extends StatefulWidget {
 
 class _CreatePollPageState extends State<CreatePollPage> {
   final TextEditingController questionController = TextEditingController();
-  final List<PollOptionInput> options = List<PollOptionInput>.generate(
-      Constants.pollOptionsLimit, (int index) => PollOptionInput());
+  final List<PollOptionInput> options =
+      List<PollOptionInput>.generate(2, (int index) => PollOptionInput());
 
   final List<String> info = [
     "You can long press on any option to reorder.",

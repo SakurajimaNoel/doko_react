@@ -24,6 +24,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  bool showPassword = false;
+
   @override
   void dispose() {
     emailController.dispose();
@@ -128,7 +130,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     TextFormField(
                                       controller: passwordController,
                                       enabled: !loading,
-                                      obscureText: true,
+                                      obscureText: !showPassword,
                                       autofillHints: [
                                         AutofillHints.newPassword,
                                       ],
@@ -139,10 +141,21 @@ class _SignUpPageState extends State<SignUpPage> {
                                       },
                                       autovalidateMode:
                                           AutovalidateMode.onUserInteraction,
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(),
+                                      decoration: InputDecoration(
+                                        border: const OutlineInputBorder(),
                                         labelText: "Password",
                                         hintText: "Password...",
+                                        suffixIcon: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              showPassword = !showPassword;
+                                            });
+                                          },
+                                          icon: showPassword
+                                              ? const Icon(Icons.visibility)
+                                              : const Icon(
+                                                  Icons.visibility_off),
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(
@@ -153,7 +166,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                       autofillHints: [
                                         AutofillHints.newPassword,
                                       ],
-                                      obscureText: true,
+                                      obscureText: !showPassword,
                                       validator: (value) {
                                         if (value == null) {
                                           return "Invalid value.";
@@ -167,10 +180,21 @@ class _SignUpPageState extends State<SignUpPage> {
                                       },
                                       autovalidateMode:
                                           AutovalidateMode.onUserInteraction,
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(),
+                                      decoration: InputDecoration(
+                                        border: const OutlineInputBorder(),
                                         labelText: "Confirm Password",
                                         hintText: "Confirm Password...",
+                                        suffixIcon: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              showPassword = !showPassword;
+                                            });
+                                          },
+                                          icon: showPassword
+                                              ? const Icon(Icons.visibility)
+                                              : const Icon(
+                                                  Icons.visibility_off),
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(
