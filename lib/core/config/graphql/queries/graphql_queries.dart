@@ -2008,33 +2008,44 @@ class GraphqlQueries {
         "OR": [
           {
             "createdBy": {
-              "friends_SOME": {
-                "username_IN": username,
-              }
-              // "OR": [
-              //   {
-              //     "friends_SOME": {
-              //       "username_IN": username,
-              //     }
-              //   },
-              //   {
-              //     "username_CONTAINS": "",
-              //   }
-              // ],
+              "OR": [
+                {
+                  "friends_SOME": {
+                    "username_IN": username,
+                  }
+                },
+                {
+                  "username_EQ": username,
+                }
+              ],
             },
           },
           {
             "likedBy_SOME": {
-              "friends_SOME": {
-                "username_IN": username,
-              }
+              "OR": [
+                {
+                  "friends_SOME": {
+                    "username_IN": username,
+                  }
+                },
+                {
+                  "username_EQ": username,
+                }
+              ]
             },
           },
           {
             "usersTagged_SOME": {
-              "friends_SOME": {
-                "username_IN": username,
-              }
+              "OR": [
+                {
+                  "friends_SOME": {
+                    "username_IN": username,
+                  }
+                },
+                {
+                  "username_IN": username,
+                }
+              ]
             },
           },
           {
