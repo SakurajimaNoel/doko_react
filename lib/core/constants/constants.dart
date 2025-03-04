@@ -109,7 +109,7 @@ class Constants {
   static const double dividerThickness = _root * 0.125;
 
   // scroll offset
-  static const double scrollOffset = _root * 25;
+  static const double scrollOffset = _root * 20;
 
   // instant messaging media
   static int archiveMedia = (_root * 25).round();

@@ -371,12 +371,20 @@ class _PollOptions extends StatelessWidget {
                     const SizedBox(
                       width: double.infinity,
                     ),
-                    preview
-                        ? Text(getPollStatusText(
-                            poll.activeTill,
-                            format: "MMM d y, hh:mm a",
-                          ))
-                        : Text(getPollStatusText(poll.activeTill)),
+                    poll.isEnded
+                        ? const Text(
+                            "Ended",
+                            style: TextStyle(
+                              color: Colors.redAccent,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          )
+                        : preview
+                            ? Text(getPollStatusText(
+                                poll.activeTill,
+                                format: "MMM d y, hh:mm a",
+                              ))
+                            : Text(getPollStatusText(poll.activeTill)),
                     Text(
                       "${displayNumberFormat(poll.totalVotes)} Votes",
                     ),
