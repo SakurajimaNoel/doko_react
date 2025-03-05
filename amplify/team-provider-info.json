@@ -19,7 +19,7 @@
         }
       },
       "auth": {
-        "dokoreact20865141": {
+        "dokoreact": {
           "userPoolId": "ap-south-1_8FDnHEsKB",
           "userPoolName": "doki_users",
           "webClientId": "5kl98seknsnmvdg307nhmip21c",

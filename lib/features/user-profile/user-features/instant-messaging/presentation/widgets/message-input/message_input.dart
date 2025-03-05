@@ -110,7 +110,7 @@ class _MessageInputState extends State<MessageInput> {
         ChatMessage message = ChatMessage(
           from: username,
           to: widget.archiveUser,
-          id: generateUniqueString(),
+          id: generateTimeBasedUniqueString(),
           subject: MessageSubject.mediaExternal,
           body: gifURL,
           sendAt: DateTime.now(),
@@ -257,7 +257,7 @@ class _MessageInputState extends State<MessageInput> {
                         ChatMessage message = ChatMessage(
                           from: username,
                           to: widget.archiveUser,
-                          id: generateUniqueString(),
+                          id: generateTimeBasedUniqueString(),
                           subject: MessageSubject.text,
                           body: messageBody,
                           sendAt: DateTime.now(),

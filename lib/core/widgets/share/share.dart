@@ -492,7 +492,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                   ChatMessage message = ChatMessage(
                                     from: username,
                                     to: userToSend,
-                                    id: generateUniqueString(),
+                                    id: generateTimeBasedUniqueString(),
                                     subject: widget.subject,
                                     body: widget.nodeIdentifier,
                                     sendAt: DateTime.now(),

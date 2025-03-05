@@ -362,7 +362,7 @@ class _UserLayoutState extends State<UserLayout> {
       client.sendPayload(ChatMessage(
         from: username,
         to: "rohan_verma__",
-        id: generateUniqueString(),
+        id: generateTimeBasedUniqueString(),
         subject: MessageSubject.text,
         body: generateRandomString(),
         sendAt: DateTime.now(),

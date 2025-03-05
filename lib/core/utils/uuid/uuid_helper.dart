@@ -1,5 +1,11 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:uuid/uuid.dart';
+
+const uuid = Uuid();
 
 String generateUniqueString() {
-  return UUID.getUUID();
+  return uuid.v4();
+}
+
+String generateTimeBasedUniqueString() {
+  return uuid.v7();
 }

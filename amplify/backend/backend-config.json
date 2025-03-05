@@ -1,6 +1,7 @@
 {
+  "api": {},
   "auth": {
-    "dokoreact20865141": {
+    "dokoreact": {
       "customAuth": false,
       "dependsOn": [],
       "providerPlugin": "awscloudformation",
@@ -9,91 +10,91 @@
     }
   },
   "parameters": {
-    "AMPLIFY_auth_dokoreact20865141_allowUnauthenticatedIdentities": {
+    "AMPLIFY_auth_dokoreact_allowUnauthenticatedIdentities": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "dokoreact20865141"
+          "resourceName": "dokoreact"
         }
       ]
     },
-    "AMPLIFY_auth_dokoreact20865141_authRoleArn": {
+    "AMPLIFY_auth_dokoreact_authRoleArn": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "dokoreact20865141"
+          "resourceName": "dokoreact"
         }
       ]
     },
-    "AMPLIFY_auth_dokoreact20865141_authRoleName": {
+    "AMPLIFY_auth_dokoreact_authRoleName": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "dokoreact20865141"
+          "resourceName": "dokoreact"
         }
       ]
     },
-    "AMPLIFY_auth_dokoreact20865141_identityPoolId": {
+    "AMPLIFY_auth_dokoreact_identityPoolId": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "dokoreact20865141"
+          "resourceName": "dokoreact"
         }
       ]
     },
-    "AMPLIFY_auth_dokoreact20865141_identityPoolName": {
+    "AMPLIFY_auth_dokoreact_identityPoolName": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "dokoreact20865141"
+          "resourceName": "dokoreact"
         }
       ]
     },
-    "AMPLIFY_auth_dokoreact20865141_nativeClientId": {
+    "AMPLIFY_auth_dokoreact_nativeClientId": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "dokoreact20865141"
+          "resourceName": "dokoreact"
         }
       ]
     },
-    "AMPLIFY_auth_dokoreact20865141_unauthRoleArn": {
+    "AMPLIFY_auth_dokoreact_unauthRoleArn": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "dokoreact20865141"
+          "resourceName": "dokoreact"
         }
       ]
     },
-    "AMPLIFY_auth_dokoreact20865141_unauthRoleName": {
+    "AMPLIFY_auth_dokoreact_unauthRoleName": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "dokoreact20865141"
+          "resourceName": "dokoreact"
         }
       ]
     },
-    "AMPLIFY_auth_dokoreact20865141_userPoolId": {
+    "AMPLIFY_auth_dokoreact_userPoolId": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "dokoreact20865141"
+          "resourceName": "dokoreact"
         }
       ]
     },
-    "AMPLIFY_auth_dokoreact20865141_userPoolName": {
+    "AMPLIFY_auth_dokoreact_userPoolName": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "dokoreact20865141"
+          "resourceName": "dokoreact"
         }
       ]
     },
-    "AMPLIFY_auth_dokoreact20865141_webClientId": {
+    "AMPLIFY_auth_dokoreact_webClientId": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "dokoreact20865141"
+          "resourceName": "dokoreact"
         }
       ]
     },
