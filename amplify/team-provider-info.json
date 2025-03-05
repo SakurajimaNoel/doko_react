@@ -32,6 +32,9 @@
           "unauthRoleArn": "arn:aws:iam::019253667737:role/service-role/unauthenticated-role",
           "unauthRoleName": "unauthenticated-role"
         }
+      },
+      "api": {
+        "dokoreact": {}
       }
     }
   }
