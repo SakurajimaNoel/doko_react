@@ -28,7 +28,7 @@ export 'MessageInbox.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "be79488345c940bb4a3b0c7f94492a7e";
+  String version = "3541b337791167373292e34c40ad6a17";
   @override
   List<amplify_core.ModelSchema> modelSchemas = [MessageArchive.schema, MessageInbox.schema];
   @override
