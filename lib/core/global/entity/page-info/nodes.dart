@@ -24,11 +24,13 @@ class Nodes implements GraphEntity {
     _empty = false;
   }
 
+  // add list at end
   void addEntityItems(List<String> newItems) {
     newItems.removeWhere((item) => _newInserts.contains(item));
     items.addAll(newItems);
   }
 
+  // add to start
   void addItem(String newItem) {
     if (_newInserts.contains(newItem)) return;
 
@@ -36,6 +38,7 @@ class Nodes implements GraphEntity {
     items.insert(0, newItem);
   }
 
+  // add item at last
   void addItemAtLast(String newItem) {
     if (_newInserts.contains(newItem)) return;
 

@@ -339,14 +339,8 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
 
                         final archive =
                             graph.getValueByKey(archiveKey)! as ArchiveEntity;
-                        final messages = archive.currentSessionMessages
-                            .toList(
-                              growable: false,
-                            )
-                            .reversed
-                            .toList(
-                              growable: false,
-                            );
+                        final messages = archive.items;
+
                         return ListViewObserver(
                           controller: observerController,
                           child: ListView.separated(

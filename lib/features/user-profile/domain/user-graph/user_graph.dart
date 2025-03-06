@@ -751,12 +751,13 @@ class UserGraph {
     } else {
       // create inbox
       inbox = InboxEntity.empty();
-      inbox.addItems([inboxItemKey]);
+      inbox.addEntityItems([inboxItemKey]);
     }
 
     addEntity(inboxKey, inbox);
   }
 
+  // todo handle all the message methods to handle remote messages to
   void addNewMessage(ChatMessage message, String username) {
     // add new message
     String messageKey = generateMessageKey(message.id);
@@ -776,13 +777,11 @@ class UserGraph {
     String archiveKey = generateArchiveKey(archiveUser);
     ArchiveEntity archiveEntity;
     if (!containsKey(archiveKey)) {
-      archiveEntity = ArchiveEntity(
-        archiveMessages: Nodes.empty(),
-        currentSessionMessages: {messageKey},
-      );
+      archiveEntity = ArchiveEntity.empty();
+      archiveEntity.addItem(messageKey);
     } else {
       archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
-      archiveEntity.addCurrentSessionMessages(messageKey);
+      archiveEntity.addItem(messageKey);
     }
 
     addEntity(archiveKey, archiveEntity);
@@ -899,7 +898,7 @@ class UserGraph {
       if (!containsKey(archiveKey)) return;
 
       final archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
-      archiveEntity.removeMessage(messageKey);
+      archiveEntity.removeItem(messageKey);
     }
   }
 }
