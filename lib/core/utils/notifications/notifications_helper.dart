@@ -74,6 +74,7 @@ NiceInAppNotification createNewNotification({
 NiceToast createNewToast({
   required String message,
   required ToastType type,
+  VoidCallback? onTap,
 }) {
   final backgroundColor = type == ToastType.error
       ? Colors.redAccent
@@ -93,6 +94,7 @@ NiceToast createNewToast({
     closingAnimationDuration: const Duration(
       milliseconds: 250,
     ),
+    onTap: onTap,
     dismissDirection: DismissDirection.up,
     message: Text(
       message,

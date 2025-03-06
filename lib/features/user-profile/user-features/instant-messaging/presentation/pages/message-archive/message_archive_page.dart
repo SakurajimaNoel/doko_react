@@ -93,6 +93,17 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
     super.dispose();
   }
 
+  // used with down icon and when new message arrives
+  void handleScrollToBottom() {
+    controller.animateTo(
+      0,
+      duration: const Duration(
+        milliseconds: Constants.maxScrollDuration,
+      ),
+      curve: Curves.fastOutSlowIn,
+    );
+  }
+
   Widget buildItem(BuildContext context, int index, List<String> messages) {
     bool showDate = false;
 
@@ -168,15 +179,7 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
               floatingActionButton: show
                   ? FloatingActionButton(
                       mini: true,
-                      onPressed: () {
-                        controller.animateTo(
-                          0,
-                          duration: const Duration(
-                            milliseconds: Constants.maxScrollDuration,
-                          ),
-                          curve: Curves.fastOutSlowIn,
-                        );
-                      },
+                      onPressed: handleScrollToBottom,
                       shape: const CircleBorder(),
                       child: const Icon(Icons.arrow_downward),
                     )
@@ -320,7 +323,33 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: BlocBuilder<RealTimeBloc, RealTimeState>(
+                    child: BlocConsumer<RealTimeBloc, RealTimeState>(
+                      listenWhen: (previousState, state) {
+                        return (state is RealTimeNewMessageState &&
+                            state.archiveUser == widget.username);
+                      },
+                      listener: (context, state) {
+                        if (state is RealTimeNewMessageState) {
+                          // check if message is self than scroll to bottom
+                          String messageId = state.id;
+                          String messageKey = generateMessageKey(messageId);
+
+                          final messageEntity =
+                              graph.getValueByKey(messageKey)! as MessageEntity;
+
+                          if (messageEntity.message.from == currentUser) {
+                            handleScrollToBottom();
+                          } else {
+                            // handle remote messages like showing you have new message in debounce way
+                            if (controller.offset > height) {
+                              showInfo(
+                                "You have received new messages",
+                                onTap: handleScrollToBottom,
+                              );
+                            }
+                          }
+                        }
+                      },
                       buildWhen: (previousState, state) {
                         return (state is RealTimeNewMessageState &&
                                 state.archiveUser == widget.username) ||
