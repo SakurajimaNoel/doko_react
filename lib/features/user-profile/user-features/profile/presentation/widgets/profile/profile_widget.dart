@@ -276,12 +276,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                   foregroundColor: currTheme.secondary,
                 ),
                 onPressed: () {
-                  context.pushNamed(
-                    RouterConstants.profilePages,
-                    pathParameters: {
-                      "username": username,
-                    },
-                  );
+                  // context.pushNamed(
+                  //   RouterConstants.profilePages,
+                  //   pathParameters: {
+                  //     "username": username,
+                  //   },
+                  // );
                 },
                 icon: const Icon(Icons.pages),
                 label: Text("Pages: ${displayNumberFormat(user.pageCount)}"),

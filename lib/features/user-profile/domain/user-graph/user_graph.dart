@@ -5,6 +5,7 @@ import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
+import 'package:doko_react/core/utils/instant-messaging/message_preview.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/discussion/discussion_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
@@ -793,14 +794,14 @@ class UserGraph {
     if (!containsKey(inboxItemKey)) {
       // create inbox item entity
       inboxItem = InboxItemEntity(
-        messages: Queue<String>(),
-        activity: LatestActivity.empty(),
+        user: archiveUser,
       );
     } else {
       inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
     }
 
-    inboxItem.addNewMessage(messageKey, message.sendAt);
+    inboxItem.updateDisplayText(
+        messagePreview(message, username), message.sendAt);
     addEntity(inboxItemKey, inboxItem);
 
     _reorderUserInbox(inboxItemKey);
@@ -821,18 +822,19 @@ class UserGraph {
     if (!containsKey(inboxItemKey)) {
       // create inbox item entity
       inboxItem = InboxItemEntity(
-        messages: Queue<String>(),
-        activity: LatestActivity.empty(),
+        user: archiveUser,
       );
     } else {
       inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
     }
 
-    InboxLastActivity activity =
-        self ? InboxLastActivity.selfEdit : InboxLastActivity.remoteEdit;
-    inboxItem.activity.updateLatestActivity(
-      activity: activity,
-      lastActivityTime: message.editedOn,
+    String displayText = "You edited the message.";
+    if (!self) {
+      displayText = "@$archiveUser edited the message.";
+    }
+    inboxItem.updateDisplayText(
+      displayText,
+      message.editedOn,
     );
     addEntity(inboxItemKey, inboxItem);
 
@@ -855,47 +857,66 @@ class UserGraph {
       to: message.to,
       from: message.from,
     );
+
     bool self = username == message.from;
-    // if delete for everyone update inbox status too
-    if (message.everyone) {
+    String archiveKey = generateArchiveKey(archiveUser);
+
+    bool requireInboxUpdate = message.everyone;
+    if (containsKey(archiveKey)) {
+      final archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
+      String firstMessageKey =
+          getMessageIdFromMessageKey(archiveEntity.items.first);
+      requireInboxUpdate =
+          requireInboxUpdate || message.id.contains(firstMessageKey);
+    }
+
+    if (requireInboxUpdate) {
       // update inbox item entity
       String inboxItemKey = generateInboxItemKey(archiveUser);
 
       InboxItemEntity inboxItem;
-      InboxLastActivity activity = self
-          ? InboxLastActivity.selfDeleteAll
-          : InboxLastActivity.remoteDeleteAll;
+      String? displayText;
+      DateTime? deletedTime;
+
+      if (message.everyone) {
+        deletedTime = DateTime.now();
+        if (self) {
+          displayText = "You deleted the message.";
+        } else {
+          displayText = "@$archiveUser deleted the message.";
+        }
+      }
+
       if (!containsKey(inboxItemKey)) {
         // create inbox item entity
         inboxItem = InboxItemEntity(
-          messages: Queue<String>(),
-          activity: LatestActivity.empty(),
+          user: archiveUser,
         );
       } else {
         inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
       }
 
-      inboxItem.activity.updateLatestActivity(
-        activity: activity,
+      inboxItem.updateDisplayText(
+        displayText,
+        deletedTime,
       );
       addEntity(inboxItemKey, inboxItem);
 
       // update inbox order
-      _reorderUserInbox(inboxItemKey);
+      if (message.everyone) _reorderUserInbox(inboxItemKey);
     }
 
     for (String messageId in message.id) {
       String messageKey = generateMessageKey(messageId);
-      if (!containsKey(messageKey)) continue;
+      if (containsKey(messageKey)) {
+        final messageEntity = getValueByKey(messageKey)! as MessageEntity;
+        messageEntity.deleteMessage();
 
-      final messageEntity = getValueByKey(messageKey)! as MessageEntity;
-      messageEntity.deleteMessage();
-
-      addEntity(messageKey, messageEntity);
+        addEntity(messageKey, messageEntity);
+      }
 
       // remove from list too
-      String archiveKey = generateArchiveKey(archiveUser);
-      if (!containsKey(archiveKey)) return;
+      if (!containsKey(archiveKey)) break;
 
       final archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
       archiveEntity.removeItem(messageKey);

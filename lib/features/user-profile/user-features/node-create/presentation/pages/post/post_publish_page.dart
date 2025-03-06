@@ -56,7 +56,6 @@ class _PostPublishPageState extends State<PostPublishPage> {
               String message = "Successfully created new post.";
               showSuccess(message);
 
-              // todo: also add post to tagged user
               context.read<UserActionBloc>().add(
                     UserActionNewPostEvent(
                       postId: widget.postDetails.postId,
@@ -65,7 +64,6 @@ class _PostPublishPageState extends State<PostPublishPage> {
                     ),
                   );
 
-              // todo: also added tagged user details here
               // send to remote users
               final client = context.read<WebsocketClientProvider>().client;
               if (client != null && client.isActive) {

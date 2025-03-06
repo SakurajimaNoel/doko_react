@@ -1,11 +1,7 @@
-import 'dart:collection';
-
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
-import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
-import 'package:doko_react/core/utils/instant-messaging/message_preview.dart';
+import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
-import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -18,25 +14,10 @@ import 'package:go_router/go_router.dart';
 class MessageInboxPage extends StatelessWidget {
   const MessageInboxPage({super.key});
 
-  MessageEntity? findFirstValidMessage(Queue<String> message) {
-    UserGraph graph = UserGraph();
-    for (String messageKey in message) {
-      if (!graph.containsKey(messageKey)) continue;
-
-      final item = graph.getValueByKey(messageKey)! as MessageEntity;
-      if (item.deleted) continue;
-      return item;
-    }
-
-    return null;
-  }
-
   Widget buildItems(BuildContext context, int index, List<String> items) {
     final currTheme = Theme.of(context).colorScheme;
 
     UserGraph graph = UserGraph();
-    final currentUser =
-        (context.read<UserBloc>().state as UserCompleteState).username;
 
     final inboxItemKey = items[index];
     final username = getUsernameFromInboxItemKey(inboxItemKey);
@@ -45,13 +26,11 @@ class MessageInboxPage extends StatelessWidget {
     final inboxItemEntity =
         graph.getValueByKey(inboxItemKey)! as InboxItemEntity;
 
-    String? inboxText = inboxItemEntity.activity.getActivityText(username);
-    String? inboxActivityTime = inboxItemEntity.activity.getActivityTime();
-    if (inboxText == null) {
-      final latestMessage = findFirstValidMessage(inboxItemEntity.messages);
-      inboxText = latestMessage == null
-          ? "Start the conversation"
-          : messagePreview(latestMessage.message, currentUser);
+    String? inboxText = inboxItemEntity.displayText ?? "Start the conversation";
+    String? inboxActivityTime;
+    if (inboxItemEntity.lastActivityTime != null) {
+      inboxActivityTime =
+          formatDateTimeToTimeString(inboxItemEntity.lastActivityTime!);
     }
 
     bool selected = false;
