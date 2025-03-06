@@ -75,6 +75,7 @@ import "package:doko_react/features/user-profile/user-features/user-feed/data/re
 import "package:doko_react/features/user-profile/user-features/user-feed/domain/repository/user_feed_repo.dart";
 import "package:doko_react/features/user-profile/user-features/user-feed/domain/use-case/user-feed-content/content_use_case.dart";
 import "package:doko_react/features/user-profile/user-features/user-feed/presentation/bloc/user_feed_bloc.dart";
+import "package:doko_react/models/ModelProvider.dart";
 import "package:flutter/foundation.dart";
 import "package:get_it/get_it.dart";
 import "package:graphql/client.dart";
@@ -579,7 +580,13 @@ Future<void> _configureAmplify() async {
   try {
     await Amplify.addPlugin(AmplifyAuthCognito());
     await Amplify.addPlugin(AmplifyStorageS3());
-    await Amplify.addPlugin(AmplifyAPI());
+    await Amplify.addPlugin(
+      AmplifyAPI(
+        options: APIPluginOptions(
+          modelProvider: ModelProvider.instance,
+        ),
+      ),
+    );
     await Amplify.configure(amplifyconfig);
 
     safePrint("Successfully configured amplify");
