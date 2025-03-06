@@ -26,7 +26,8 @@ class MessageInboxPage extends StatelessWidget {
     final inboxItemEntity =
         graph.getValueByKey(inboxItemKey)! as InboxItemEntity;
 
-    String? inboxText = inboxItemEntity.displayText ?? "Start the conversation";
+    String? inboxText =
+        inboxItemEntity.displayText ?? "Start the conversation.";
     String? inboxActivityTime;
     if (inboxItemEntity.lastActivityTime != null) {
       inboxActivityTime =

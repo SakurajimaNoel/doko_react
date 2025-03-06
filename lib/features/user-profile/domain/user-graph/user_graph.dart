@@ -864,10 +864,26 @@ class UserGraph {
     bool requireInboxUpdate = message.everyone;
     if (containsKey(archiveKey)) {
       final archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
-      String firstMessageKey =
+      String firstMessageId =
           getMessageIdFromMessageKey(archiveEntity.items.first);
       requireInboxUpdate =
-          requireInboxUpdate || message.id.contains(firstMessageKey);
+          requireInboxUpdate || message.id.contains(firstMessageId);
+    }
+
+    for (String messageId in message.id) {
+      String messageKey = generateMessageKey(messageId);
+      if (containsKey(messageKey)) {
+        final messageEntity = getValueByKey(messageKey)! as MessageEntity;
+        messageEntity.deleteMessage();
+
+        addEntity(messageKey, messageEntity);
+      }
+
+      // remove from list too
+      if (!containsKey(archiveKey)) break;
+
+      final archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
+      archiveEntity.removeItem(messageKey);
     }
 
     if (requireInboxUpdate) {
@@ -884,6 +900,16 @@ class UserGraph {
           displayText = "You deleted the message.";
         } else {
           displayText = "@$archiveUser deleted the message.";
+        }
+      } else if (containsKey(archiveKey)) {
+        final archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
+        String? messageKey = archiveEntity.items.firstOrNull;
+
+        if (messageKey != null && containsKey(messageKey)) {
+          MessageEntity latestMessage =
+              getValueByKey(messageKey)! as MessageEntity;
+          displayText = messagePreview(latestMessage.message, username);
+          deletedTime = latestMessage.message.sendAt;
         }
       }
 
@@ -904,22 +930,6 @@ class UserGraph {
 
       // update inbox order
       if (message.everyone) _reorderUserInbox(inboxItemKey);
-    }
-
-    for (String messageId in message.id) {
-      String messageKey = generateMessageKey(messageId);
-      if (containsKey(messageKey)) {
-        final messageEntity = getValueByKey(messageKey)! as MessageEntity;
-        messageEntity.deleteMessage();
-
-        addEntity(messageKey, messageEntity);
-      }
-
-      // remove from list too
-      if (!containsKey(archiveKey)) break;
-
-      final archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
-      archiveEntity.removeItem(messageKey);
     }
   }
 }
