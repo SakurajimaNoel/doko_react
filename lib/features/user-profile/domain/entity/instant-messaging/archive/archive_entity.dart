@@ -1,28 +1,11 @@
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
-import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 
-class ArchiveEntity implements GraphEntity {
+/// nodes wrapper for archive entity
+class ArchiveEntity extends Nodes {
   ArchiveEntity({
-    required this.archiveMessages,
-    required this.currentSessionMessages,
+    required super.pageInfo,
+    required super.items,
   });
 
-  // todo: handle messages in better way try SplayTreeSet
-  Nodes archiveMessages;
-
-  // latest messages are at front
-  Set<String> currentSessionMessages;
-
-  void addCurrentSessionMessages(String message) {
-    currentSessionMessages.add(message);
-  }
-
-  void removeMessage(String message) {
-    if (currentSessionMessages.contains(message)) {
-      currentSessionMessages.remove(message);
-      return;
-    }
-
-    archiveMessages.removeItem(message);
-  }
+  ArchiveEntity.empty() : super.empty();
 }

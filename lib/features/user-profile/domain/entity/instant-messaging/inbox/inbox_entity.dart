@@ -1,38 +1,13 @@
-import 'package:doko_react/core/global/entity/page-info/page_info.dart';
-import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
+import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 
-class InboxEntity implements GraphEntity {
+/// this defines reorder to make the given inbox item at first
+class InboxEntity extends Nodes {
   InboxEntity({
-    required PageInfo pageInfo,
-    required List<String> inboxItems,
-  })  : _pageInfo = pageInfo,
-        _empty = false,
-        items = Set<String>.from(inboxItems);
+    required super.pageInfo,
+    required super.items,
+  });
 
-  InboxEntity.empty()
-      : _pageInfo = PageInfo.empty(),
-        _empty = true,
-        items = <String>{};
-
-  PageInfo _pageInfo;
-  Set<String> items;
-
-  bool _empty = true;
-
-  PageInfo get pageInfo => _pageInfo;
-
-  bool get isEmpty => _empty;
-
-  bool get isNotEmpty => !_empty;
-
-  void updatePageInfo(PageInfo pageInfo) {
-    _pageInfo = pageInfo;
-    _empty = false;
-  }
-
-  void addItems(List<String> inboxItems) {
-    items.addAll(inboxItems);
-  }
+  InboxEntity.empty() : super.empty();
 
   void reorder(String inboxItemKey) {
     items.remove(inboxItemKey);
