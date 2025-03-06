@@ -111,3 +111,12 @@ DokiNodeType? getNodeTypeFromKey(String key) {
   return null;
   // if(key.startsWith("page")) return DokiNodeType.page;
 }
+
+// helper function to create message archive from sender and recipient
+String createMessageArchiveKey(String userA, String userB) {
+  if (userA.compareTo(userB) <= 0) {
+    return '$userA@$userB';
+  } else {
+    return '$userB@$userA';
+  }
+}
