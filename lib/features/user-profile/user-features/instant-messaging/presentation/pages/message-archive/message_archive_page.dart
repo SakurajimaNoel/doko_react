@@ -9,6 +9,7 @@ import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.d
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/bloc/instant_messaging_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/provider/archive_message_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/archive-item/archive_item.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/message-input/message_input.dart';
@@ -342,6 +343,7 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                           } else {
                             // handle remote messages like showing you have new message in debounce way
                             if (controller.offset > height) {
+                              // todo also update unread to false in dynamodb also update when first opening the archive page
                               showInfo(
                                 "You have received new messages",
                                 onTap: handleScrollToBottom,
@@ -394,8 +396,11 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
                       },
                     ),
                   ),
-                  MessageInput(
-                    archiveUser: widget.username,
+                  BlocProvider(
+                    create: (context) => InstantMessagingBloc(),
+                    child: MessageInput(
+                      archiveUser: widget.username,
+                    ),
                   ),
                 ],
               ),

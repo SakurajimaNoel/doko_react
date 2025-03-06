@@ -12,6 +12,7 @@ import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.d
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/bloc/instant_messaging_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
@@ -49,11 +50,20 @@ class Share extends StatelessWidget {
               currentUsername: username,
             );
 
-            return BlocProvider(
-              create: (context) => serviceLocator<ProfileBloc>()
-                ..add(GetUserFriendsEvent(
-                  userDetails: details,
-                )),
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) => serviceLocator<ProfileBloc>()
+                    ..add(
+                      GetUserFriendsEvent(
+                        userDetails: details,
+                      ),
+                    ),
+                ),
+                BlocProvider(
+                  create: (context) => InstantMessagingBloc(),
+                ),
+              ],
               child: _ShareDetails(
                 controller: controller,
                 subject: subject,
@@ -486,6 +496,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                     .read<WebsocketClientProvider>()
                                     .client;
 
+// todo handle this using instant messaging bloc
                                 final realTimeBloc =
                                     context.read<RealTimeBloc>();
                                 for (String userToSend in selectedUsers) {

@@ -107,6 +107,7 @@ class _MessageInputState extends State<MessageInput> {
         sending = true;
         final archiveMessageProvider = context.read<ArchiveMessageProvider>();
 
+        // todo handle this using instant messaging bloc
         ChatMessage message = ChatMessage(
           from: username,
           to: widget.archiveUser,
@@ -251,6 +252,7 @@ class _MessageInputState extends State<MessageInput> {
                         if (sending) return;
                         sending = true;
 
+// todo handle this using instant messaging bloc
                         final archiveMessageProvider =
                             context.read<ArchiveMessageProvider>();
 
