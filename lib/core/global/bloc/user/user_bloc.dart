@@ -49,7 +49,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     try {
       emit(UserLoadingState());
       final userDetails = await getUser();
-      GraphQLClient client = GraphqlConfig.getGraphQLClient();
+      GraphQLClient client = GraphqlConfig.getApiGraphQLClient().client;
 
       QueryResult result = await client.query(
         QueryOptions(

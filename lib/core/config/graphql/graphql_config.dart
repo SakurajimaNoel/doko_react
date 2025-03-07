@@ -1,10 +1,13 @@
 import 'package:doko_react/core/global/auth/auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:graphql/client.dart';
 
+part "graphql_client.dart";
+
 class GraphqlConfig {
-  static final _httpLink = HttpLink(dotenv.env["GRAPHQL_ENDPOINT"]!);
+  static final _apiHttpLink = HttpLink(dotenv.env["GRAPHQL_ENDPOINT"]!);
+  static final _messageArchiveHttpLink =
+      HttpLink(dotenv.env["MESSAGE_ARCHIVE_ENDPOINT"]!);
 
   static final _authLink = AuthLink(getToken: () async {
     final tokenEntity = await getUserToken();
@@ -12,13 +15,15 @@ class GraphqlConfig {
     return "Bearer $token";
   });
 
-  static GraphQLClient? _client;
+  static GraphQLClient? _graphApiClient;
+  static GraphQLClient? _messageArchiveApiClient;
 
-  static GraphQLClient getGraphQLClient() {
-    if (_client == null) {
-      Link link = _authLink.concat(_httpLink);
+  /// used with normal graph api
+  static GraphApiClient getApiGraphQLClient() {
+    if (_graphApiClient == null) {
+      Link link = _authLink.concat(_apiHttpLink);
 
-      _client = GraphQLClient(
+      _graphApiClient = GraphQLClient(
         link: link,
         cache: GraphQLCache(
           store: HiveStore(),
@@ -29,10 +34,29 @@ class GraphqlConfig {
       );
     }
 
-    return _client!;
+    return GraphApiClient(
+      client: _graphApiClient!,
+    );
   }
 
-  // new client used with provider
-  static ValueNotifier<GraphQLClient> client =
-      ValueNotifier(getGraphQLClient());
+  /// used with message archive
+  static MessageArchiveApiClient getMessageArchiveGraphQLClient() {
+    if (_messageArchiveApiClient == null) {
+      Link link = _authLink.concat(_messageArchiveHttpLink);
+
+      _messageArchiveApiClient = GraphQLClient(
+        link: link,
+        cache: GraphQLCache(
+          store: HiveStore(),
+        ),
+        queryRequestTimeout: const Duration(
+          seconds: 30,
+        ),
+      );
+    }
+
+    return MessageArchiveApiClient(
+      client: _messageArchiveApiClient!,
+    );
+  }
 }

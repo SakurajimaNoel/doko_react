@@ -78,7 +78,6 @@ import "package:doko_react/features/user-profile/user-features/user-feed/present
 import "package:doko_react/models/ModelProvider.dart";
 import "package:flutter/foundation.dart";
 import "package:get_it/get_it.dart";
-import "package:graphql/client.dart";
 import "package:hive_flutter/adapters.dart";
 import "package:hydrated_bloc/hydrated_bloc.dart";
 import "package:path_provider/path_provider.dart";
@@ -98,8 +97,12 @@ Future<void> initDependency() async {
         : HydratedStorageDirectory((await getTemporaryDirectory()).path),
   );
 
-  serviceLocator.registerLazySingleton<GraphQLClient>(
-    () => GraphqlConfig.getGraphQLClient(),
+  serviceLocator.registerLazySingleton<GraphApiClient>(
+    () => GraphqlConfig.getApiGraphQLClient(),
+  );
+
+  serviceLocator.registerLazySingleton<MessageArchiveApiClient>(
+    () => GraphqlConfig.getMessageArchiveGraphQLClient(),
   );
 
   serviceLocator.registerLazySingleton<AuthCategory>(
@@ -119,7 +122,7 @@ Future<void> initDependency() async {
 void _initUserFeed() {
   serviceLocator.registerFactory<UserFeedRemoteDataSource>(
     () => UserFeedRemoteDataSource(
-      client: serviceLocator<GraphQLClient>(),
+      client: serviceLocator<GraphApiClient>().client,
     ),
   );
 
@@ -145,7 +148,7 @@ void _initUserFeed() {
 void _initPost() {
   serviceLocator.registerFactory<PostRemoteDataSource>(
     () => PostRemoteDataSource(
-      client: serviceLocator<GraphQLClient>(),
+      client: serviceLocator<GraphApiClient>().client,
     ),
   );
 
@@ -199,7 +202,7 @@ void _initPost() {
 void _initNodeCreate() {
   serviceLocator.registerFactory<NodeCreateRemoteDataSource>(
     () => NodeCreateRemoteDataSource(
-      client: serviceLocator<GraphQLClient>(),
+      client: serviceLocator<GraphApiClient>().client,
     ),
   );
 
@@ -280,7 +283,7 @@ void _initUserToUserAction() {
 void _initUserAction() {
   serviceLocator.registerFactory<UserProfileRemoteDataSource>(
     () => UserProfileRemoteDataSource(
-      client: serviceLocator<GraphQLClient>(),
+      client: serviceLocator<GraphApiClient>().client,
     ),
   );
 
@@ -341,7 +344,7 @@ void _initUserAction() {
 void _initProfile() {
   serviceLocator.registerFactory<ProfileRemoteDataSource>(
     () => ProfileRemoteDataSource(
-      client: serviceLocator<GraphQLClient>(),
+      client: serviceLocator<GraphApiClient>().client,
     ),
   );
 
@@ -544,7 +547,7 @@ void _initAuth() {
 void _initCompleteProfile() {
   serviceLocator.registerFactory<CompleteProfileRemoteDataSource>(
     () => CompleteProfileRemoteDataSource(
-      client: serviceLocator<GraphQLClient>(),
+      client: serviceLocator<GraphApiClient>().client,
     ),
   );
 
