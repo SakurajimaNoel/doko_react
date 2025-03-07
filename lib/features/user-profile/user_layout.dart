@@ -68,12 +68,6 @@ class _UserLayoutState extends State<UserLayout> {
         /// refresh whole app if user comes back after [Constants.backgroundDurationLimit]
         backgroundWhen = DateTime.now();
       } else {
-        /// process event if on foreground
-        if (retryOnForeground != null) {
-          retryOnForeground!();
-          retryOnForeground = null;
-        }
-
         DateTime now = DateTime.now();
         if (backgroundWhen == null) return;
 
@@ -83,6 +77,13 @@ class _UserLayoutState extends State<UserLayout> {
         /// refresh the whole app after [Constants.backgroundDurationLimit]
         if (diff.inMinutes > Constants.backgroundDurationLimit) {
           refreshApp();
+          return;
+        }
+
+        /// process event if on foreground
+        if (retryOnForeground != null) {
+          retryOnForeground!();
+          retryOnForeground = null;
         }
       }
     });

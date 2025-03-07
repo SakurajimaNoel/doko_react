@@ -1,4 +1,5 @@
 import 'package:doki_websocket_client/doki_websocket_client.dart';
+import 'package:doko_react/core/config/router/app_router_config.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
@@ -33,7 +34,8 @@ class MessageArchivePage extends StatefulWidget {
   State<MessageArchivePage> createState() => _MessageArchivePageState();
 }
 
-class _MessageArchivePageState extends State<MessageArchivePage> {
+class _MessageArchivePageState extends State<MessageArchivePage>
+    with RouteAware, WidgetsBindingObserver {
   final FocusNode focusNode = FocusNode();
   final ScrollController controller = ScrollController();
   bool show = false;
@@ -56,11 +58,43 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
     );
     controller.addListener(handleScroll);
 
-    // subscribe to user presence
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      subscribeUserPresence();
+    }
+  }
+
+  @override
+  void didPush() {
+    super.didPush();
+    // Route was pushed onto navigator and is now the topmost route.
+    subscribeUserPresence();
+  }
+
+  @override
+  void didPopNext() {
+    super.didPopNext();
+    // Covering route was popped off the navigator.
+    subscribeUserPresence();
+  }
+
+  void subscribeUserPresence({
+    bool subscribe = true,
+  }) {
     final client = websocketClientProvider.client;
     final UserPresenceSubscription subscription = UserPresenceSubscription(
       from: currentUser,
-      subscribe: true,
+      subscribe: subscribe,
       user: widget.username,
     );
 
@@ -86,10 +120,22 @@ class _MessageArchivePageState extends State<MessageArchivePage> {
   }
 
   @override
+  void deactivate() {
+    // unsubscribe to user presence
+    subscribeUserPresence(
+      subscribe: false,
+    );
+
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
     focusNode.dispose();
     controller.removeListener(handleScroll);
     controller.dispose();
+    routeObserver.unsubscribe(this);
+    WidgetsBinding.instance.removeObserver(this);
 
     super.dispose();
   }

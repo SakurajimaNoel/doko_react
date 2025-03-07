@@ -50,11 +50,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
+
 class AppRouterConfig {
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
   static final _sectionNavigatorKey = GlobalKey<NavigatorState>();
 
   static final GoRouter router = GoRouter(
+    observers: [routeObserver],
     navigatorKey: rootNavigatorKey,
     initialLocation: "/loading",
     redirect: (BuildContext context, GoRouterState state) {
