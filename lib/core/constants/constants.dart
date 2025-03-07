@@ -16,7 +16,7 @@ class Constants {
   static const Duration notificationDuration = Duration(
     seconds: 3,
   );
-  static const int backgroundDurationLimit = 60;
+  static const int backgroundDurationLimit = 30;
   static const Duration pingInterval = Duration(
     seconds: 10,
   );
