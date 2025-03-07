@@ -203,6 +203,7 @@ class _PollOptions extends StatelessWidget {
     PollSubscription subscription = PollSubscription(
       from: currentUser,
       pollId: pollId,
+      subscribe: true,
     );
 
     final client = context.read<WebsocketClientProvider>().client;

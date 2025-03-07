@@ -7,6 +7,7 @@ class Heading extends StatelessWidget {
     super.key,
     this.size,
     this.color,
+    this.fontWeight,
   }) : centred = true;
 
   const Heading.left(
@@ -14,12 +15,14 @@ class Heading extends StatelessWidget {
     super.key,
     this.size,
     this.color,
+    this.fontWeight,
   }) : centred = false;
 
   final String text;
   final double? size;
   final bool centred;
   final Color? color;
+  final FontWeight? fontWeight;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,7 @@ class Heading extends StatelessWidget {
       textAlign: centred ? TextAlign.center : TextAlign.left,
       style: TextStyle(
         fontSize: size ?? Constants.heading1,
-        fontWeight: FontWeight.bold,
+        fontWeight: fontWeight ?? FontWeight.bold,
         color: color,
       ),
     );

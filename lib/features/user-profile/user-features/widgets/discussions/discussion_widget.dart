@@ -137,6 +137,7 @@ class DiscussionWidget extends StatelessWidget {
                   child: Heading.left(
                     discussion.title,
                     size: Constants.heading4 * scaleFactor,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 if (discussion.media.isNotEmpty) ...[
