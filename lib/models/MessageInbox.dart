@@ -99,22 +99,32 @@ class MessageInbox extends amplify_core.Model {
     }
   }
   
-  amplify_core.TemporalDateTime? get createdAt {
-    return _createdAt;
+  amplify_core.TemporalDateTime get createdAt {
+    try {
+      return _createdAt!;
+    } catch(e) {
+      throw amplify_core.AmplifyCodeGenModelException(
+          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
   }
   
   amplify_core.TemporalDateTime? get updatedAt {
     return _updatedAt;
   }
   
-  const MessageInbox._internal({required user, required inboxUser, displayText, required unread, createdAt, updatedAt}): _user = user, _inboxUser = inboxUser, _displayText = displayText, _unread = unread, _createdAt = createdAt, _updatedAt = updatedAt;
+  const MessageInbox._internal({required user, required inboxUser, displayText, required unread, required createdAt, updatedAt}): _user = user, _inboxUser = inboxUser, _displayText = displayText, _unread = unread, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory MessageInbox({required String user, required String inboxUser, String? displayText, required bool unread}) {
+  factory MessageInbox({required String user, required String inboxUser, String? displayText, required bool unread, required amplify_core.TemporalDateTime createdAt}) {
     return MessageInbox._internal(
       user: user,
       inboxUser: inboxUser,
       displayText: displayText,
-      unread: unread);
+      unread: unread,
+      createdAt: createdAt);
   }
   
   bool equals(Object other) {
@@ -128,7 +138,8 @@ class MessageInbox extends amplify_core.Model {
       _user == other._user &&
       _inboxUser == other._inboxUser &&
       _displayText == other._displayText &&
-      _unread == other._unread;
+      _unread == other._unread &&
+      _createdAt == other._createdAt;
   }
   
   @override
@@ -150,23 +161,26 @@ class MessageInbox extends amplify_core.Model {
     return buffer.toString();
   }
   
-  MessageInbox copyWith({String? displayText, bool? unread}) {
+  MessageInbox copyWith({String? displayText, bool? unread, amplify_core.TemporalDateTime? createdAt}) {
     return MessageInbox._internal(
       user: user,
       inboxUser: inboxUser,
       displayText: displayText ?? this.displayText,
-      unread: unread ?? this.unread);
+      unread: unread ?? this.unread,
+      createdAt: createdAt ?? this.createdAt);
   }
   
   MessageInbox copyWithModelFieldValues({
     ModelFieldValue<String?>? displayText,
-    ModelFieldValue<bool>? unread
+    ModelFieldValue<bool>? unread,
+    ModelFieldValue<amplify_core.TemporalDateTime>? createdAt
   }) {
     return MessageInbox._internal(
       user: user,
       inboxUser: inboxUser,
       displayText: displayText == null ? this.displayText : displayText.value,
-      unread: unread == null ? this.unread : unread.value
+      unread: unread == null ? this.unread : unread.value,
+      createdAt: createdAt == null ? this.createdAt : createdAt.value
     );
   }
   
@@ -196,6 +210,7 @@ class MessageInbox extends amplify_core.Model {
   static final INBOXUSER = amplify_core.QueryField(fieldName: "inboxUser");
   static final DISPLAYTEXT = amplify_core.QueryField(fieldName: "displayText");
   static final UNREAD = amplify_core.QueryField(fieldName: "unread");
+  static final CREATEDAT = amplify_core.QueryField(fieldName: "createdAt");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "MessageInbox";
     modelSchemaDefinition.pluralName = "MessageInboxes";
@@ -212,7 +227,8 @@ class MessageInbox extends amplify_core.Model {
     ];
     
     modelSchemaDefinition.indexes = [
-      amplify_core.ModelIndex(fields: const ["user", "inboxUser"], name: null)
+      amplify_core.ModelIndex(fields: const ["user", "inboxUser"], name: null),
+      amplify_core.ModelIndex(fields: const ["user", "createdAt"], name: "messageInboxesByUserAndCreatedAt")
     ];
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
@@ -239,10 +255,9 @@ class MessageInbox extends amplify_core.Model {
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.bool)
     ));
     
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
-      fieldName: 'createdAt',
-      isRequired: false,
-      isReadOnly: true,
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: MessageInbox.CREATEDAT,
+      isRequired: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)
     ));
     
