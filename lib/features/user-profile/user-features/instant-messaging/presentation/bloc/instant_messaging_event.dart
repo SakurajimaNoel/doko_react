@@ -36,7 +36,6 @@ class InstantMessagingEditMessageEvent extends InstantMessagingEvent {
   final Client? client;
 }
 
-/// used with deleting for everyone
 class InstantMessagingDeleteMessageEvent extends InstantMessagingEvent {
   const InstantMessagingDeleteMessageEvent({
     required this.message,
