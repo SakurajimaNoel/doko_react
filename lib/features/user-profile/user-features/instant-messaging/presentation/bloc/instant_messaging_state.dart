@@ -10,27 +10,22 @@ final class InstantMessagingInitial extends InstantMessagingState {
 }
 
 final class InstantMessagingSuccessState extends InstantMessagingState {
-  const InstantMessagingSuccessState({
-    required this.messageId,
-    required this.now,
-  });
+  InstantMessagingSuccessState() : now = DateTime.now();
 
-  final List<String> messageId;
   final DateTime now;
 
   @override
-  List<Object> get props => [messageId, now];
+  List<Object> get props => [now];
 }
 
 final class InstantMessagingErrorState extends InstantMessagingState {
-  const InstantMessagingErrorState({
-    required this.messageId,
-    required this.now,
-  });
+  InstantMessagingErrorState({
+    required this.message,
+  }) : now = DateTime.now();
 
-  final List<String> messageId;
   final DateTime now;
+  final String message;
 
   @override
-  List<Object> get props => [messageId, now];
+  List<Object> get props => [now, message];
 }

@@ -485,82 +485,82 @@ class _ShareDetailsState extends State<_ShareDetails> {
                         ),
                         child: const Text("More share options."),
                       )
-                    : FilledButton(
-                        onPressed: selectedUsers.isEmpty
-                            ? null
-                            : () async {
-                                if (sending) return;
-                                sending = true;
+                    : BlocConsumer<InstantMessagingBloc, InstantMessagingState>(
+                        listener: (context, state) {
+                          sending = false;
+                          if (state is InstantMessagingErrorState) {
+                            showError(state.message);
+                            return;
+                          }
 
-                                final client = context
-                                    .read<WebsocketClientProvider>()
-                                    .client;
+                          if (state is! InstantMessagingSuccessState) return;
+                          String successMessage;
+                          String messageEnd =
+                              "with $selectedLength user${selectedLength > 1 ? "s" : ""}";
+                          switch (widget.subject) {
+                            case MessageSubject.dokiUser:
+                              successMessage =
+                                  "Shared @${widget.nodeIdentifier} profile $messageEnd";
+                            case MessageSubject.dokiPost:
+                              successMessage = "Shared post $messageEnd";
+                            case MessageSubject.dokiPage:
+                              successMessage = "Shared page $messageEnd";
+                            case MessageSubject.dokiDiscussion:
+                              successMessage = "Shared discussion $messageEnd";
+                            case MessageSubject.dokiPolls:
+                              successMessage = "Shared polls $messageEnd";
+                            default:
+                              successMessage = "";
+                          }
 
-// todo handle this using instant messaging bloc
-                                final realTimeBloc =
-                                    context.read<RealTimeBloc>();
-                                for (String userToSend in selectedUsers) {
-                                  ChatMessage message = ChatMessage(
-                                    from: username,
-                                    to: userToSend,
-                                    id: generateTimeBasedUniqueString(),
-                                    subject: widget.subject,
-                                    body: widget.nodeIdentifier,
-                                    sendAt: DateTime.now(),
-                                  );
+                          if (successMessage.isNotEmpty) {
+                            showSuccess(successMessage);
+                          }
+                          if (mounted) context.pop();
+                        },
+                        builder: (context, state) {
+                          return FilledButton(
+                            onPressed: selectedUsers.isEmpty
+                                ? null
+                                : () async {
+                                    if (sending) return;
+                                    sending = true;
 
-                                  bool result =
-                                      await client?.sendPayload(message) ??
-                                          false;
+                                    final client = context
+                                        .read<WebsocketClientProvider>()
+                                        .client;
+                                    final realTimeBloc =
+                                        context.read<RealTimeBloc>();
+                                    final List<ChatMessage> messages = [];
 
-                                  sending = false;
+                                    for (String userToSend in selectedUsers) {
+                                      ChatMessage message = ChatMessage(
+                                        from: username,
+                                        to: userToSend,
+                                        id: generateTimeBasedUniqueString(),
+                                        subject: widget.subject,
+                                        body: widget.nodeIdentifier,
+                                        sendAt: DateTime.now(),
+                                      );
+                                      messages.add(message);
+                                    }
 
-                                  if (result) {
-                                    // fire bloc event
-                                    realTimeBloc.add(RealTimeNewMessageEvent(
-                                      message: message,
-                                      username: username,
-                                      client: client,
-                                    ));
-                                  } else {
-                                    showError(
-                                        Constants.websocketNotConnectedError);
-                                    return;
-                                  }
-                                }
-
-                                String successMessage;
-                                String messageEnd =
-                                    "with $selectedLength user${selectedLength > 1 ? "s" : ""}";
-                                switch (widget.subject) {
-                                  case MessageSubject.dokiUser:
-                                    successMessage =
-                                        "Shared @${widget.nodeIdentifier} profile $messageEnd";
-                                  case MessageSubject.dokiPost:
-                                    successMessage = "Shared post $messageEnd";
-                                  case MessageSubject.dokiPage:
-                                    successMessage = "Shared page $messageEnd";
-                                  case MessageSubject.dokiDiscussion:
-                                    successMessage =
-                                        "Shared discussion $messageEnd";
-                                  case MessageSubject.dokiPolls:
-                                    successMessage = "Shared polls $messageEnd";
-                                  default:
-                                    successMessage = "";
-                                }
-
-                                if (successMessage.isNotEmpty) {
-                                  showSuccess(successMessage);
-                                }
-                                if (mounted) contextPop();
-                              },
-                        style: FilledButton.styleFrom(
-                          minimumSize: const Size(
-                            Constants.buttonWidth,
-                            Constants.buttonHeight,
-                          ),
-                        ),
-                        child: Text(sendText),
+                                    context.read<InstantMessagingBloc>().add(
+                                            InstantMessagingSendNewMessageToMultipleUserEvent(
+                                          messages: messages,
+                                          client: client,
+                                          realTimeBloc: realTimeBloc,
+                                        ));
+                                  },
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size(
+                                Constants.buttonWidth,
+                                Constants.buttonHeight,
+                              ),
+                            ),
+                            child: Text(sendText),
+                          );
+                        },
                       ),
               ),
             ],
@@ -568,10 +568,6 @@ class _ShareDetailsState extends State<_ShareDetails> {
         },
       ),
     );
-  }
-
-  void contextPop() {
-    context.pop();
   }
 }
 

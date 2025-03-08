@@ -4,7 +4,8 @@ sealed class InstantMessagingEvent {
   const InstantMessagingEvent();
 }
 
-sealed class InstantMessagingSendNewMessageEvent extends InstantMessagingEvent {
+/// used with sending individual message
+class InstantMessagingSendNewMessageEvent extends InstantMessagingEvent {
   const InstantMessagingSendNewMessageEvent({
     required this.message,
     required this.client,
@@ -14,7 +15,20 @@ sealed class InstantMessagingSendNewMessageEvent extends InstantMessagingEvent {
   final Client? client;
 }
 
-sealed class InstantMessagingEditMessageEvent extends InstantMessagingEvent {
+class InstantMessagingSendNewMessageToMultipleUserEvent
+    extends InstantMessagingEvent {
+  const InstantMessagingSendNewMessageToMultipleUserEvent({
+    required this.messages,
+    required this.client,
+    required this.realTimeBloc,
+  });
+
+  final List<ChatMessage> messages;
+  final Client? client;
+  final RealTimeBloc realTimeBloc;
+}
+
+class InstantMessagingEditMessageEvent extends InstantMessagingEvent {
   const InstantMessagingEditMessageEvent({
     required this.message,
     required this.client,
@@ -24,12 +38,23 @@ sealed class InstantMessagingEditMessageEvent extends InstantMessagingEvent {
   final Client? client;
 }
 
-sealed class InstantMessagingDeleteMessageEvent extends InstantMessagingEvent {
+/// used with deleting for everyone
+class InstantMessagingDeleteMessageEvent extends InstantMessagingEvent {
   const InstantMessagingDeleteMessageEvent({
     required this.message,
     required this.client,
   });
 
   final DeleteMessage message;
+  final Client? client;
+}
+
+class InstantMessagingDeleteMultipleMessageEvent extends InstantMessagingEvent {
+  const InstantMessagingDeleteMultipleMessageEvent({
+    required this.messages,
+    required this.client,
+  });
+
+  final List<DeleteMessage> messages;
   final Client? client;
 }
