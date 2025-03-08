@@ -520,6 +520,7 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                     realTimeBloc.add(RealTimeNewMessageEvent(
                                       message: message,
                                       username: username,
+                                      client: client,
                                     ));
                                   } else {
                                     showError(

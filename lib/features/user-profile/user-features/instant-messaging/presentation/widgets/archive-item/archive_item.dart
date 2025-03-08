@@ -127,9 +127,7 @@ class _ArchiveItemState extends State<ArchiveItem>
       deleting = false;
       if (result) {
         realTimeBloc.add(RealTimeDeleteMessageEvent(
-          message: deleteMessage,
-          username: username,
-        ));
+            message: deleteMessage, username: username, client: client));
         archiveMessageProvider.clearSelect();
       } else {
         showError(Constants.websocketNotConnectedError);
@@ -753,6 +751,7 @@ class _EditMessageState extends State<_EditMessage> {
               realTimeBloc.add(RealTimeEditMessageEvent(
                 message: editedMessage,
                 username: username,
+                client: client,
               ));
 
               showSuccess("Message edited.");

@@ -125,6 +125,7 @@ class _MessageInputState extends State<MessageInput> {
           realTimeBloc.add(RealTimeNewMessageEvent(
             message: message,
             username: username,
+            client: client,
           ));
           archiveMessageProvider.reset();
         } else {
@@ -276,6 +277,7 @@ class _MessageInputState extends State<MessageInput> {
                           realTimeBloc.add(RealTimeNewMessageEvent(
                             message: message,
                             username: username,
+                            client: client,
                           ));
 
                           controller.clear();

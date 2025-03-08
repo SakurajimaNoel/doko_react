@@ -7,10 +7,12 @@ final class RealTimeNewMessageEvent extends RealTimeEvent {
   RealTimeNewMessageEvent({
     required this.message,
     required this.username,
+    required this.client,
   });
 
   final String username;
   final ChatMessage message;
+  final Client? client;
 }
 
 final class RealTimeTypingStatusEvent extends RealTimeEvent {
@@ -34,20 +36,24 @@ final class RealTimeEditMessageEvent extends RealTimeEvent {
   RealTimeEditMessageEvent({
     required this.message,
     required this.username,
+    required this.client,
   });
 
   final EditMessage message;
   final String username;
+  final Client? client;
 }
 
 final class RealTimeDeleteMessageEvent extends RealTimeEvent {
   RealTimeDeleteMessageEvent({
     required this.message,
     required this.username,
+    required this.client,
   });
 
   final DeleteMessage message;
   final String username;
+  final Client? client;
 }
 
 final class RealTimeUserPresenceEvent extends RealTimeEvent {
@@ -56,4 +62,15 @@ final class RealTimeUserPresenceEvent extends RealTimeEvent {
   });
 
   final UserPresenceInfo payload;
+}
+
+/// mark inbox item as read
+final class RealTimeMarkInboxAsReadEvent extends RealTimeEvent {
+  RealTimeMarkInboxAsReadEvent({
+    required this.username,
+    required this.client,
+  });
+
+  final String username;
+  final Client? client;
 }

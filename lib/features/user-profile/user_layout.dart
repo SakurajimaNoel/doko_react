@@ -153,6 +153,7 @@ class _UserLayoutState extends State<UserLayout> {
           realTimeBloc.add(RealTimeNewMessageEvent(
             message: message,
             username: username,
+            client: client,
           ));
         },
         PayloadType.typingStatus: (TypingStatus status) {
@@ -164,12 +165,14 @@ class _UserLayoutState extends State<UserLayout> {
           realTimeBloc.add(RealTimeEditMessageEvent(
             message: message,
             username: username,
+            client: client,
           ));
         },
         PayloadType.deleteMessage: (DeleteMessage message) {
           realTimeBloc.add(RealTimeDeleteMessageEvent(
             message: message,
             username: username,
+            client: client,
           ));
         },
         PayloadType.userSendFriendRequest: (UserSendFriendRequest request) {

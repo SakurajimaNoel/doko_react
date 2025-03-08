@@ -132,7 +132,6 @@ class _UserFeedPageState extends State<UserFeedPage> {
   Widget build(BuildContext context) {
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
-    final currTheme = Theme.of(context).colorScheme;
 
     final scrollCacheHeight = MediaQuery.sizeOf(context).height * 2;
 

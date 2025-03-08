@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:doki_websocket_client/doki_websocket_client.dart';
+import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,6 +24,27 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
         username: event.payload.user,
       ));
     });
+    on<RealTimeMarkInboxAsReadEvent>(_handleRealTimeMarkInboxAsReadEvent);
+  }
+
+  FutureOr<void> _handleRealTimeMarkInboxAsReadEvent(
+      RealTimeMarkInboxAsReadEvent event, Emitter<RealTimeState> emit) async {
+    String inboxKey = generateInboxItemKey(event.username);
+    final inboxItem = graph.getValueByKey(inboxKey);
+
+    bool initialStatus = true;
+    if (inboxItem is InboxItemEntity) {
+      initialStatus = inboxItem.unread;
+      inboxItem.updateUnread(false);
+    }
+
+    if (initialStatus) {
+      /// todo: update in dynamodb too
+    }
+    emit(RealTimeUserInboxUpdateState());
+
+    /// also send read event to websocket server to handle it
+    /// when handling everything from backend
   }
 
   FutureOr<void> _handleRealTimeNewMessageEvent(
@@ -43,9 +65,17 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
       from: message.from,
     );
 
-    emit(RealTimeTypingStatusState(
-      archiveUser: archiveUser,
-      typing: false,
+    bool self = message.from == event.username;
+
+    if (self) {
+      add(RealTimeMarkInboxAsReadEvent(
+        username: archiveUser,
+        client: event.client,
+      ));
+    }
+
+    add(RealTimeTypingStatusEndEvent(
+      username: archiveUser,
     ));
 
     emit(RealTimeNewMessageState(
@@ -80,6 +110,15 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
       to: event.message.to,
       from: event.message.from,
     );
+    bool self = event.message.from == event.username;
+
+    if (self) {
+      add(RealTimeMarkInboxAsReadEvent(
+        username: archiveUser,
+        client: event.client,
+      ));
+    }
+
     emit(RealTimeEditMessageState(
       id: event.message.id,
       archiveUser: archiveUser,
@@ -95,6 +134,15 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
       to: event.message.to,
       from: event.message.from,
     );
+    bool self = event.message.from == event.username;
+
+    if (self) {
+      add(RealTimeMarkInboxAsReadEvent(
+        username: archiveUser,
+        client: event.client,
+      ));
+    }
+
     graph.deleteMessage(event.message, event.username);
 
     emit(RealTimeDeleteMessageState(

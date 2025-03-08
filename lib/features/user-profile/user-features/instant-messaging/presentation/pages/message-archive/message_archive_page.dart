@@ -70,7 +70,7 @@ class _MessageArchivePageState extends State<MessageArchivePage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      subscribeUserPresence();
+      handleArchiveActions();
     }
   }
 
@@ -78,14 +78,29 @@ class _MessageArchivePageState extends State<MessageArchivePage>
   void didPush() {
     super.didPush();
     // Route was pushed onto navigator and is now the topmost route.
-    subscribeUserPresence();
+    handleArchiveActions();
   }
 
   @override
   void didPopNext() {
     super.didPopNext();
     // Covering route was popped off the navigator.
+    handleArchiveActions();
+  }
+
+  void handleArchiveActions() {
+    /// archive actions include
+    /// 1) subscribing to user presence
+    /// 2) making inbox read for the current conversation
     subscribeUserPresence();
+    markArchiveRead();
+  }
+
+  void markArchiveRead() {
+    context.read<RealTimeBloc>().add(RealTimeMarkInboxAsReadEvent(
+          username: widget.username,
+          client: context.read<WebsocketClientProvider>().client,
+        ));
   }
 
   void subscribeUserPresence({
@@ -349,6 +364,7 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                             realTimeBloc.add(RealTimeDeleteMessageEvent(
                               message: deleteMessage,
                               username: username,
+                              client: client,
                             ));
                             archiveMessageProvider.clearSelect();
                           } else {
@@ -389,11 +405,13 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                           } else {
                             // handle remote messages like showing you have new message in debounce way
                             if (controller.offset > height) {
-                              // todo also update unread to false in dynamodb also update when first opening the archive page
                               showInfo(
-                                "You have received new messages",
+                                "You have received new messages.",
                                 onTap: handleScrollToBottom,
                               );
+
+                              // as in the same page
+                              markArchiveRead();
                             }
                           }
                         }
