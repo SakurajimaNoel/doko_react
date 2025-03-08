@@ -20,12 +20,10 @@ class InstantMessagingSendNewMessageToMultipleUserEvent
   const InstantMessagingSendNewMessageToMultipleUserEvent({
     required this.messages,
     required this.client,
-    required this.realTimeBloc,
   });
 
   final List<ChatMessage> messages;
   final Client? client;
-  final RealTimeBloc realTimeBloc;
 }
 
 class InstantMessagingEditMessageEvent extends InstantMessagingEvent {

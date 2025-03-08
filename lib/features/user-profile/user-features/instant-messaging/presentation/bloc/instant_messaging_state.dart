@@ -18,6 +18,24 @@ final class InstantMessagingSuccessState extends InstantMessagingState {
   List<Object> get props => [now];
 }
 
+final class InstantMessagingSendMessageToMultipleUserSuccessState
+    extends InstantMessagingSuccessState {
+  InstantMessagingSendMessageToMultipleUserSuccessState({
+    required this.messages,
+  });
+
+  final List<ChatMessage> messages;
+}
+
+final class InstantMessagingSendMessageSuccessState
+    extends InstantMessagingSuccessState {
+  InstantMessagingSendMessageSuccessState({
+    required this.message,
+  });
+
+  final ChatMessage message;
+}
+
 final class InstantMessagingErrorState extends InstantMessagingState {
   InstantMessagingErrorState({
     required this.message,
@@ -28,4 +46,17 @@ final class InstantMessagingErrorState extends InstantMessagingState {
 
   @override
   List<Object> get props => [now, message];
+}
+
+final class InstantMessagingSendMessageToMultipleUserErrorState
+    extends InstantMessagingErrorState {
+  InstantMessagingSendMessageToMultipleUserErrorState({
+    required this.messagesSent,
+    required super.message,
+  });
+
+  final List<ChatMessage> messagesSent;
+
+  @override
+  List<Object> get props => [];
 }

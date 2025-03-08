@@ -213,264 +213,268 @@ class _MessageArchivePageState extends State<MessageArchivePage>
         archiveUser: widget.username,
         controller: observerController,
       ),
-      child: Builder(
-        builder: (context) {
-          return PopScope(
-            canPop: false,
-            onPopInvokedWithResult: (bool didPop, _) {
-              if (didPop) return;
+      child: BlocProvider(
+        create: (context) => InstantMessagingBloc(),
+        child: Builder(
+          builder: (context) {
+            return PopScope(
+              canPop: false,
+              onPopInvokedWithResult: (bool didPop, _) {
+                if (didPop) return;
 
-              final archiveMessageProvider =
-                  context.read<ArchiveMessageProvider>();
-              if (archiveMessageProvider.hasSelection()) {
-                archiveMessageProvider.clearSelect();
-                return;
-              }
+                final archiveMessageProvider =
+                    context.read<ArchiveMessageProvider>();
+                if (archiveMessageProvider.hasSelection()) {
+                  archiveMessageProvider.clearSelect();
+                  return;
+                }
 
-              if (focusNode.hasFocus) {
-                FocusManager.instance.primaryFocus?.unfocus();
-                return;
-              }
+                if (focusNode.hasFocus) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  return;
+                }
 
-              context.pop();
-            },
-            child: Scaffold(
-              floatingActionButtonLocation: const CustomFABLocation(
-                offsetY: Constants.height * 2,
-              ),
-              floatingActionButton: show
-                  ? FloatingActionButton(
-                      mini: true,
-                      onPressed: handleScrollToBottom,
-                      shape: const CircleBorder(),
-                      child: const Icon(Icons.arrow_downward),
-                    )
-                  : null,
-              appBar: AppBar(
-                backgroundColor: currTheme.surfaceContainer,
-                title: InkWell(
-                  onTap: () {
-                    context.pushNamed(
-                      RouterConstants.messageArchiveProfile,
-                      pathParameters: {
-                        "username": widget.username,
-                      },
-                    );
-                  },
-                  onLongPress: () {
-                    Clipboard.setData(ClipboardData(
-                      text: widget.username,
-                    )).then((value) {});
-                  },
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      bool shrink = constraints.maxWidth < 150;
-                      double shrinkFactor = shrink ? 0.75 : 1;
-                      double infoFactor = shrink ? 1 : 0.625;
+                context.pop();
+              },
+              child: Scaffold(
+                floatingActionButtonLocation: const CustomFABLocation(
+                  offsetY: Constants.height * 2,
+                ),
+                floatingActionButton: show
+                    ? FloatingActionButton(
+                        mini: true,
+                        onPressed: handleScrollToBottom,
+                        shape: const CircleBorder(),
+                        child: const Icon(Icons.arrow_downward),
+                      )
+                    : null,
+                appBar: AppBar(
+                  backgroundColor: currTheme.surfaceContainer,
+                  title: InkWell(
+                    onTap: () {
+                      context.pushNamed(
+                        RouterConstants.messageArchiveProfile,
+                        pathParameters: {
+                          "username": widget.username,
+                        },
+                      );
+                    },
+                    onLongPress: () {
+                      Clipboard.setData(ClipboardData(
+                        text: widget.username,
+                      )).then((value) {});
+                    },
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        bool shrink = constraints.maxWidth < 150;
+                        double shrinkFactor = shrink ? 0.75 : 1;
+                        double infoFactor = shrink ? 1 : 0.625;
 
-                      return Row(
-                        spacing: Constants.gap * shrinkFactor,
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          if (!shrink)
-                            UserWidget.avtar(
-                              userKey: generateUserNodeKey(widget.username),
-                            ),
-                          BlocBuilder<RealTimeBloc, RealTimeState>(
-                            buildWhen: (previousState, state) {
-                              return state is RealTimeUserPresenceState &&
-                                  state.username == widget.username;
-                            },
-                            builder: (context, state) {
-                              bool? online;
-                              if (state is RealTimeUserPresenceState &&
-                                  state.username == widget.username) {
-                                online = state.online;
-                              }
+                        return Row(
+                          spacing: Constants.gap * shrinkFactor,
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            if (!shrink)
+                              UserWidget.avtar(
+                                userKey: generateUserNodeKey(widget.username),
+                              ),
+                            BlocBuilder<RealTimeBloc, RealTimeState>(
+                              buildWhen: (previousState, state) {
+                                return state is RealTimeUserPresenceState &&
+                                    state.username == widget.username;
+                              },
+                              builder: (context, state) {
+                                bool? online;
+                                if (state is RealTimeUserPresenceState &&
+                                    state.username == widget.username) {
+                                  online = state.online;
+                                }
 
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                spacing: Constants.gap * 0.125,
-                                children: [
-                                  SizedBox(
-                                    width: constraints.maxWidth * infoFactor,
-                                    child: UserWidget.name(
-                                      userKey:
-                                          generateUserNodeKey(widget.username),
-                                      baseFontSize: Constants.fontSize * 1.125,
-                                    ),
-                                  ),
-                                  if (online != null)
-                                    Text(
-                                      online ? "Online" : "Offline",
-                                      style: TextStyle(
-                                        fontSize: Constants.smallFontSize,
-                                        fontWeight: FontWeight.w600,
-                                        color: online
-                                            ? Colors.green
-                                            : Colors.redAccent,
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  spacing: Constants.gap * 0.125,
+                                  children: [
+                                    SizedBox(
+                                      width: constraints.maxWidth * infoFactor,
+                                      child: UserWidget.name(
+                                        userKey: generateUserNodeKey(
+                                            widget.username),
+                                        baseFontSize:
+                                            Constants.fontSize * 1.125,
                                       ),
                                     ),
-                                ],
-                              );
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                actionsPadding: const EdgeInsets.symmetric(
-                  horizontal: Constants.gap,
-                ),
-                actions: [
-                  Builder(
-                    builder: (context) {
-                      final selectedMessages = context
-                          .watch<ArchiveMessageProvider>()
-                          .selectedMessages;
-
-                      if (selectedMessages.isEmpty) {
-                        return const SizedBox.shrink();
-                      }
-
-                      return IconButton(
-                        onPressed: () async {
-                          final client =
-                              context.read<WebsocketClientProvider>().client;
-                          if (client == null) {
-                            showError("You are not connected.");
-                          }
-                          final realTimeBloc = context.read<RealTimeBloc>();
-                          final username = (context.read<UserBloc>().state
-                                  as UserCompleteState)
-                              .username;
-                          final archiveMessageProvider =
-                              context.read<ArchiveMessageProvider>();
-
-                          DeleteMessage deleteMessage = DeleteMessage(
-                            from: username,
-                            to: widget.username,
-                            id: archiveMessageProvider.selectedMessages.toList(
-                              growable: false,
+                                    if (online != null)
+                                      Text(
+                                        online ? "Online" : "Offline",
+                                        style: TextStyle(
+                                          fontSize: Constants.smallFontSize,
+                                          fontWeight: FontWeight.w600,
+                                          color: online
+                                              ? Colors.green
+                                              : Colors.redAccent,
+                                        ),
+                                      ),
+                                  ],
+                                );
+                              },
                             ),
-                            everyone: false,
-                          );
-
-                          bool result =
-                              await client!.sendPayload(deleteMessage);
-                          if (result) {
-                            realTimeBloc.add(RealTimeDeleteMessageEvent(
-                              message: deleteMessage,
-                              username: username,
-                              client: client,
-                            ));
-                            archiveMessageProvider.clearSelect();
-                          } else {
-                            showError(
-                                "Failed to delete ${archiveMessageProvider.selectedMessages.length} messages.");
-                          }
-                        },
-                        color: currTheme.error,
-                        icon: Badge(
-                          label: Text(selectedMessages.length.toString()),
-                          child: const Icon(Icons.delete_forever),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              body: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: BlocConsumer<RealTimeBloc, RealTimeState>(
-                      listenWhen: (previousState, state) {
-                        return (state is RealTimeNewMessageState &&
-                            state.archiveUser == widget.username);
-                      },
-                      listener: (context, state) {
-                        if (state is RealTimeNewMessageState) {
-                          // check if message is self than scroll to bottom
-                          String messageId = state.id;
-                          String messageKey = generateMessageKey(messageId);
-
-                          final messageEntity =
-                              graph.getValueByKey(messageKey)! as MessageEntity;
-
-                          if (messageEntity.message.from == currentUser) {
-                            handleScrollToBottom();
-                          } else {
-                            // handle remote messages like showing you have new message in debounce way
-                            if (controller.offset > height) {
-                              showInfo(
-                                "You have received new messages.",
-                                onTap: handleScrollToBottom,
-                              );
-
-                              // as in the same page
-                              markArchiveRead();
-                            }
-                          }
-                        }
-                      },
-                      buildWhen: (previousState, state) {
-                        return (state is RealTimeNewMessageState &&
-                                state.archiveUser == widget.username) ||
-                            (state is RealTimeDeleteMessageState &&
-                                state.archiveUser == widget.username);
-                      },
-                      builder: (context, state) {
-                        final UserGraph graph = UserGraph();
-                        String archiveKey = generateArchiveKey(widget.username);
-                        String inboxKey = generateInboxItemKey(widget.username);
-
-                        if (!graph.containsKey(archiveKey)) {
-                          // check inbox if elements are present and show them before fetching archive messaging
-                          return const SizedBox.shrink();
-                        }
-
-                        final archive =
-                            graph.getValueByKey(archiveKey)! as ArchiveEntity;
-                        final messages = archive.items;
-
-                        return ListViewObserver(
-                          controller: observerController,
-                          child: ListView.separated(
-                            controller: controller,
-                            reverse: true,
-                            itemCount: messages.length,
-                            cacheExtent: height * 2,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: Constants.padding * 2,
-                            ),
-                            separatorBuilder: (context, index) {
-                              return const SizedBox(
-                                height: Constants.gap * 0.5,
-                              );
-                            },
-                            itemBuilder: (BuildContext context, int index) {
-                              return buildItem(
-                                  context, index, messages.toList());
-                            },
-                          ),
+                          ],
                         );
                       },
                     ),
                   ),
-                  BlocProvider(
-                    create: (context) => InstantMessagingBloc(),
-                    child: MessageInput(
+                  actionsPadding: const EdgeInsets.symmetric(
+                    horizontal: Constants.gap,
+                  ),
+                  actions: [
+                    Builder(
+                      builder: (context) {
+                        final selectedMessages = context
+                            .watch<ArchiveMessageProvider>()
+                            .selectedMessages;
+
+                        if (selectedMessages.isEmpty) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return IconButton(
+                          onPressed: () async {
+                            final client =
+                                context.read<WebsocketClientProvider>().client;
+                            if (client == null) {
+                              showError("You are not connected.");
+                            }
+                            final realTimeBloc = context.read<RealTimeBloc>();
+                            final username = (context.read<UserBloc>().state
+                                    as UserCompleteState)
+                                .username;
+                            final archiveMessageProvider =
+                                context.read<ArchiveMessageProvider>();
+
+                            DeleteMessage deleteMessage = DeleteMessage(
+                              from: username,
+                              to: widget.username,
+                              id: archiveMessageProvider.selectedMessages
+                                  .toList(
+                                growable: false,
+                              ),
+                              everyone: false,
+                            );
+
+                            bool result =
+                                await client!.sendPayload(deleteMessage);
+                            if (result) {
+                              realTimeBloc.add(RealTimeDeleteMessageEvent(
+                                message: deleteMessage,
+                                username: username,
+                                client: client,
+                              ));
+                              archiveMessageProvider.clearSelect();
+                            } else {
+                              showError(
+                                  "Failed to delete ${archiveMessageProvider.selectedMessages.length} messages.");
+                            }
+                          },
+                          color: currTheme.error,
+                          icon: Badge(
+                            label: Text(selectedMessages.length.toString()),
+                            child: const Icon(Icons.delete_forever),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                body: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: BlocConsumer<RealTimeBloc, RealTimeState>(
+                        listenWhen: (previousState, state) {
+                          return (state is RealTimeNewMessageState &&
+                              state.archiveUser == widget.username);
+                        },
+                        listener: (context, state) {
+                          if (state is RealTimeNewMessageState) {
+                            // check if message is self than scroll to bottom
+                            String messageId = state.id;
+                            String messageKey = generateMessageKey(messageId);
+
+                            final messageEntity = graph
+                                .getValueByKey(messageKey)! as MessageEntity;
+
+                            if (messageEntity.message.from == currentUser) {
+                              handleScrollToBottom();
+                            } else {
+                              // handle remote messages like showing you have new message in debounce way
+                              if (controller.offset > height) {
+                                showInfo(
+                                  "You have received new messages.",
+                                  onTap: handleScrollToBottom,
+                                );
+
+                                // as in the same page
+                                markArchiveRead();
+                              }
+                            }
+                          }
+                        },
+                        buildWhen: (previousState, state) {
+                          return (state is RealTimeNewMessageState &&
+                                  state.archiveUser == widget.username) ||
+                              (state is RealTimeDeleteMessageState &&
+                                  state.archiveUser == widget.username);
+                        },
+                        builder: (context, state) {
+                          final UserGraph graph = UserGraph();
+                          String archiveKey =
+                              generateArchiveKey(widget.username);
+                          String inboxKey =
+                              generateInboxItemKey(widget.username);
+
+                          if (!graph.containsKey(archiveKey)) {
+                            // check inbox if elements are present and show them before fetching archive messaging
+                            return const SizedBox.shrink();
+                          }
+
+                          final archive =
+                              graph.getValueByKey(archiveKey)! as ArchiveEntity;
+                          final messages = archive.items;
+
+                          return ListViewObserver(
+                            controller: observerController,
+                            child: ListView.separated(
+                              controller: controller,
+                              reverse: true,
+                              itemCount: messages.length,
+                              cacheExtent: height * 2,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: Constants.padding * 2,
+                              ),
+                              separatorBuilder: (context, index) {
+                                return const SizedBox(
+                                  height: Constants.gap * 0.5,
+                                );
+                              },
+                              itemBuilder: (BuildContext context, int index) {
+                                return buildItem(
+                                    context, index, messages.toList());
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    MessageInput(
                       archiveUser: widget.username,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

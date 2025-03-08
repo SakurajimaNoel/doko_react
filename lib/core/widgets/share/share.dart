@@ -485,15 +485,41 @@ class _ShareDetailsState extends State<_ShareDetails> {
                         ),
                         child: const Text("More share options."),
                       )
-                    : BlocConsumer<InstantMessagingBloc, InstantMessagingState>(
+                    : BlocListener<InstantMessagingBloc, InstantMessagingState>(
                         listener: (context, state) {
                           sending = false;
-                          if (state is InstantMessagingErrorState) {
+
+                          final client =
+                              context.read<WebsocketClientProvider>().client;
+                          final realTimeBloc = context.read<RealTimeBloc>();
+
+                          if (state
+                              is InstantMessagingSendMessageToMultipleUserErrorState) {
                             showError(state.message);
+                            // update inbox for sent messages
+                            for (var message in state.messagesSent) {
+                              realTimeBloc.add(RealTimeNewMessageEvent(
+                                message: message,
+                                username: username,
+                                client: client,
+                              ));
+                            }
                             return;
                           }
 
-                          if (state is! InstantMessagingSuccessState) return;
+                          if (state
+                              is! InstantMessagingSendMessageToMultipleUserSuccessState) {
+                            return;
+                          }
+
+                          for (var message in state.messages) {
+                            realTimeBloc.add(RealTimeNewMessageEvent(
+                              message: message,
+                              username: username,
+                              client: client,
+                            ));
+                          }
+
                           String successMessage;
                           String messageEnd =
                               "with $selectedLength user${selectedLength > 1 ? "s" : ""}";
@@ -518,49 +544,46 @@ class _ShareDetailsState extends State<_ShareDetails> {
                           }
                           if (mounted) context.pop();
                         },
-                        builder: (context, state) {
-                          return FilledButton(
-                            onPressed: selectedUsers.isEmpty
-                                ? null
-                                : () async {
-                                    if (sending) return;
-                                    sending = true;
+                        child: FilledButton(
+                          onPressed: selectedUsers.isEmpty
+                              ? null
+                              : () async {
+                                  if (sending) return;
+                                  sending = true;
 
-                                    final client = context
-                                        .read<WebsocketClientProvider>()
-                                        .client;
-                                    final realTimeBloc =
-                                        context.read<RealTimeBloc>();
-                                    final List<ChatMessage> messages = [];
+                                  final client = context
+                                      .read<WebsocketClientProvider>()
+                                      .client;
+                                  final realTimeBloc =
+                                      context.read<RealTimeBloc>();
+                                  final List<ChatMessage> messages = [];
 
-                                    for (String userToSend in selectedUsers) {
-                                      ChatMessage message = ChatMessage(
-                                        from: username,
-                                        to: userToSend,
-                                        id: generateTimeBasedUniqueString(),
-                                        subject: widget.subject,
-                                        body: widget.nodeIdentifier,
-                                        sendAt: DateTime.now(),
-                                      );
-                                      messages.add(message);
-                                    }
+                                  for (String userToSend in selectedUsers) {
+                                    ChatMessage message = ChatMessage(
+                                      from: username,
+                                      to: userToSend,
+                                      id: generateTimeBasedUniqueString(),
+                                      subject: widget.subject,
+                                      body: widget.nodeIdentifier,
+                                      sendAt: DateTime.now(),
+                                    );
+                                    messages.add(message);
+                                  }
 
-                                    context.read<InstantMessagingBloc>().add(
-                                            InstantMessagingSendNewMessageToMultipleUserEvent(
-                                          messages: messages,
-                                          client: client,
-                                          realTimeBloc: realTimeBloc,
-                                        ));
-                                  },
-                            style: FilledButton.styleFrom(
-                              minimumSize: const Size(
-                                Constants.buttonWidth,
-                                Constants.buttonHeight,
-                              ),
+                                  context.read<InstantMessagingBloc>().add(
+                                          InstantMessagingSendNewMessageToMultipleUserEvent(
+                                        messages: messages,
+                                        client: client,
+                                      ));
+                                },
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size(
+                              Constants.buttonWidth,
+                              Constants.buttonHeight,
                             ),
-                            child: Text(sendText),
-                          );
-                        },
+                          ),
+                          child: Text(sendText),
+                        ),
                       ),
               ),
             ],

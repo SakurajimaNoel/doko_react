@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
-import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'instant_messaging_event.dart';
@@ -25,37 +25,58 @@ class InstantMessagingBloc
         _handleInstantMessagingDeleteMultipleMessageEvent);
   }
 
+  /// todo handle updating of user inbox
+
   FutureOr<void> _handleInstantMessagingSendNewMessageEvent(
       InstantMessagingSendNewMessageEvent event,
-      Emitter<InstantMessagingState> emit) async {}
+      Emitter<InstantMessagingState> emit) async {
+    try {
+      final message = event.message;
+      final client = event.client;
+
+      bool result = await client?.sendPayload(message) ?? false;
+      if (!result) {
+        throw const ApplicationException(
+          reason: Constants.websocketNotConnectedError,
+        );
+      }
+      HapticFeedback.vibrate();
+      emit(InstantMessagingSendMessageSuccessState(
+        message: event.message,
+      ));
+    } catch (_) {
+      emit(InstantMessagingErrorState(
+        message: Constants.websocketNotConnectedError,
+      ));
+    }
+  }
 
   FutureOr<void> _handleInstantMessagingSendNewMessageToMultipleUserEvent(
       InstantMessagingSendNewMessageToMultipleUserEvent event,
       Emitter<InstantMessagingState> emit) async {
+    List<ChatMessage> messagesSent = [];
     try {
       // send message to clients
       final messages = event.messages;
       final client = event.client;
       for (var message in messages) {
         bool result = await client?.sendPayload(message) ?? false;
-        if (result) {
-          /// calling another bloc from inside of another bloc is not recommended
-          event.realTimeBloc.add(RealTimeNewMessageEvent(
-            message: message,
-            username: message.from, // this will by current user's username
-            client: client,
-          ));
-        } else {
+        if (!result) {
           throw const ApplicationException(
             reason: Constants.websocketNotConnectedError,
           );
         }
+
+        messagesSent.add(message);
       }
 
-      emit(InstantMessagingSuccessState());
+      emit(InstantMessagingSendMessageToMultipleUserSuccessState(
+        messages: messages,
+      ));
     } catch (_) {
-      emit(InstantMessagingErrorState(
+      emit(InstantMessagingSendMessageToMultipleUserErrorState(
         message: Constants.websocketNotConnectedError,
+        messagesSent: messagesSent,
       ));
     }
   }
