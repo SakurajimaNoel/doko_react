@@ -81,7 +81,24 @@ class InstantMessagingBloc
 
   FutureOr<void> _handleInstantMessagingEditMessageEvent(
       InstantMessagingEditMessageEvent event,
-      Emitter<InstantMessagingState> emit) async {}
+      Emitter<InstantMessagingState> emit) async {
+    try {
+      bool result = await event.client?.sendPayload(event.message) ?? false;
+      if (!result) {
+        throw const ApplicationException(
+          reason: Constants.websocketNotConnectedError,
+        );
+      }
+
+      emit(InstantMessagingEditMessageSuccessState(
+        message: event.message,
+      ));
+    } catch (_) {
+      emit(InstantMessagingEditMessageErrorState(
+        message: Constants.websocketNotConnectedError,
+      ));
+    }
+  }
 
   FutureOr<void> _handleInstantMessagingDeleteMessageEvent(
       InstantMessagingDeleteMessageEvent event,

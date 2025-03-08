@@ -98,6 +98,7 @@ class _ArchiveItemState extends State<ArchiveItem>
 
     final archiveMessageProvider = context.read<ArchiveMessageProvider>();
     bool deleting = false;
+    final imBloc = context.read<InstantMessagingBloc>();
 
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
@@ -113,8 +114,6 @@ class _ArchiveItemState extends State<ArchiveItem>
     }) {
       if (deleting) return;
       deleting = true;
-
-      final archiveMessageProvider = context.read<ArchiveMessageProvider>();
 
       DeleteMessage deleteMessage = DeleteMessage(
         from: username,
@@ -195,9 +194,12 @@ class _ArchiveItemState extends State<ArchiveItem>
                             builder: (context) {
                               return ChangeNotifierProvider.value(
                                 value: archiveMessageProvider,
-                                child: _EditMessage(
-                                  messageId: widget.messageId,
-                                  body: message.body,
+                                child: BlocProvider.value(
+                                  value: imBloc,
+                                  child: _EditMessage(
+                                    messageId: widget.messageId,
+                                    body: message.body,
+                                  ),
                                 ),
                               );
                             },
@@ -686,89 +688,94 @@ class _EditMessageState extends State<_EditMessage> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
+    final client = context.read<WebsocketClientProvider>().client;
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
 
-    return AlertDialog(
-      title: const Text("Edit message"),
-      content: SizedBox(
-        width: width,
-        child: TextField(
-          controller: controller,
-          minLines: 2,
-          maxLines: 6,
-          autofocus: true,
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(
-              Constants.messageLimit,
-              maxLengthEnforcement: MaxLengthEnforcement.enforced,
+    return BlocListener<InstantMessagingBloc, InstantMessagingState>(
+      listenWhen: (previousState, state) {
+        return state is InstantMessagingEditMessageSuccessState ||
+            state is InstantMessagingEditMessageSuccessState;
+      },
+      listener: (context, state) {
+        updating = false;
+        if (state is InstantMessagingEditMessageErrorState) {
+          showError(state.message);
+          return;
+        }
+
+        if (state is! InstantMessagingEditMessageSuccessState) return;
+
+        context.read<RealTimeBloc>().add(RealTimeEditMessageEvent(
+              message: state.message,
+              username: username,
+              client: client,
+            ));
+
+        showSuccess("Message edited.");
+        if (mounted) context.pop();
+      },
+      child: AlertDialog(
+        title: const Text("Edit message"),
+        content: SizedBox(
+          width: width,
+          child: TextField(
+            controller: controller,
+            minLines: 2,
+            maxLines: 6,
+            autofocus: true,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(
+                Constants.messageLimit,
+                maxLengthEnforcement: MaxLengthEnforcement.enforced,
+              ),
+            ],
+            decoration: const InputDecoration(
+              hintText: "Edit your message here...",
+              border: OutlineInputBorder(),
             ),
-          ],
-          decoration: const InputDecoration(
-            hintText: "Edit your message here...",
-            border: OutlineInputBorder(),
           ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              context.pop();
+            },
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              String newBody = controller.text.trim();
+
+              if (newBody.isEmpty) {
+                showError("Message can't be empty.");
+                return;
+              }
+              if (updating) return;
+              updating = true;
+
+              final archiveMessageProvider =
+                  context.read<ArchiveMessageProvider>();
+
+              EditMessage editedMessage = EditMessage(
+                from: username,
+                to: archiveMessageProvider.archiveUser,
+                id: widget.messageId,
+                body: newBody,
+                editedOn: DateTime.now(),
+              );
+
+              context
+                  .read<InstantMessagingBloc>()
+                  .add(InstantMessagingEditMessageEvent(
+                    message: editedMessage,
+                    client: client,
+                  ));
+            },
+            child: const Text("Edit"),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            context.pop();
-          },
-          child: const Text("Cancel"),
-        ),
-        TextButton(
-          onPressed: () async {
-            String newBody = controller.text.trim();
-
-            if (newBody.isEmpty) {
-              showError("Message can't be empty.");
-              return;
-            }
-            if (updating) return;
-            updating = true;
-
-            final client = context.read<WebsocketClientProvider>().client;
-
-            final realTimeBloc = context.read<RealTimeBloc>();
-            final archiveMessageProvider =
-                context.read<ArchiveMessageProvider>();
-            final username =
-                (context.read<UserBloc>().state as UserCompleteState).username;
-            EditMessage editedMessage = EditMessage(
-              from: username,
-              to: archiveMessageProvider.archiveUser,
-              id: widget.messageId,
-              body: newBody,
-              editedOn: DateTime.now(),
-            );
-
-            bool result = await client?.sendPayload(editedMessage) ?? false;
-            updating = false;
-
-            if (result) {
-              // success
-              realTimeBloc.add(RealTimeEditMessageEvent(
-                message: editedMessage,
-                username: username,
-                client: client,
-              ));
-
-              showSuccess("Message edited.");
-            } else {
-              showError(Constants.websocketNotConnectedError);
-              return;
-            }
-
-            if (mounted) {
-              contextPop();
-            }
-          },
-          child: const Text("Edit"),
-        ),
-      ],
     );
-  }
-
-  void contextPop() {
-    context.pop();
   }
 }

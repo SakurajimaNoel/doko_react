@@ -97,3 +97,26 @@ final class InstantMessagingDeleteMessageErrorState
   @override
   List<Object> get props => [];
 }
+
+/// edit message state
+final class InstantMessagingEditMessageSuccessState
+    extends InstantMessagingSuccessState {
+  InstantMessagingEditMessageSuccessState({
+    required this.message,
+  });
+
+  final EditMessage message;
+
+  @override
+  List<Object> get props => [message];
+}
+
+final class InstantMessagingEditMessageErrorState
+    extends InstantMessagingErrorState {
+  InstantMessagingEditMessageErrorState({
+    required super.message,
+  });
+
+  @override
+  List<Object> get props => [];
+}
