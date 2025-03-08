@@ -27,12 +27,14 @@ class ContentMediaSelectionWidget extends StatefulWidget {
     required this.nodeId,
     required this.nodeType,
     required this.onMediaChange,
+    required this.onVideoProcessingChange,
   });
 
   final List<String> info;
   final String nodeId;
   final DokiNodeType nodeType;
   final ValueSetter<List<MediaContent>> onMediaChange;
+  final ValueSetter<bool> onVideoProcessingChange;
 
   @override
   State<ContentMediaSelectionWidget> createState() =>
@@ -72,6 +74,7 @@ class _ContentMediaSelectionWidgetState
 
   Future<void> handleVideo(String item) async {
     compressingVideo = true;
+    widget.onVideoProcessingChange(compressingVideo);
 
     String? thumbnail = await VideoActions.getVideoThumbnail(item);
 
@@ -95,6 +98,7 @@ class _ContentMediaSelectionWidgetState
 
     String? compressedVideo = await VideoActions.compressVideo(item);
     compressingVideo = false;
+    widget.onVideoProcessingChange(compressingVideo);
 
     if (compressedVideo == null) {
       // handle failed case

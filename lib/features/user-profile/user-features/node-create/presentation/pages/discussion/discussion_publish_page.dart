@@ -31,6 +31,8 @@ class DiscussionPublishPage extends StatefulWidget {
 }
 
 class _DiscussionPublishPageState extends State<DiscussionPublishPage> {
+  bool videoProcessing = false;
+
   final List<String> mediaInfo = [
     "Keep your videos under ${Constants.videoDurationPost.inSeconds} seconds. Longer videos will be automatically trimmed.",
   ];
@@ -126,6 +128,9 @@ class _DiscussionPublishPageState extends State<DiscussionPublishPage> {
                                 onMediaChange: (List<MediaContent> newMedia) {
                                   content = newMedia;
                                 },
+                                onVideoProcessingChange: (bool isProcessing) {
+                                  videoProcessing = isProcessing;
+                                },
                               ),
                               UsersTaggedWidget(
                                 onRemove: (String user) {
@@ -148,6 +153,11 @@ class _DiscussionPublishPageState extends State<DiscussionPublishPage> {
                     onPressed: uploading
                         ? null
                         : () {
+                            if (videoProcessing) {
+                              showInfo(
+                                  "Please wait for video processing to finish.");
+                              return;
+                            }
                             // call bloc
                             final username = (context.read<UserBloc>().state
                                     as UserCompleteState)
