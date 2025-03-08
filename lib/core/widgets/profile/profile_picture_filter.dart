@@ -28,22 +28,20 @@ class ProfilePictureFilter extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             stops: [
-              0,
-              0.625,
               0.75,
+              0.875,
+              0.925,
               1,
             ],
             colors: [
               Colors.transparent,
-              currTheme.primary.withValues(
-                alpha: 0.25,
-              ),
-              currTheme.primary.withValues(
+              currTheme.surface.withValues(
                 alpha: 0.5,
               ),
-              currTheme.primary.withValues(
+              currTheme.surface.withValues(
                 alpha: 0.75,
               ),
+              currTheme.surface,
             ],
           ),
         ),
@@ -64,14 +62,14 @@ class ProfilePictureFilter extends StatelessWidget {
           end: Alignment.bottomCenter,
           stops: [
             0,
-            0.425,
+            0.275,
             0.75,
             0.875,
             0.925,
             1,
           ],
           colors: [
-            currTheme.primaryContainer.withValues(
+            currTheme.surface.withValues(
               alpha: 0.625,
             ),
             Colors.transparent,
@@ -80,7 +78,7 @@ class ProfilePictureFilter extends StatelessWidget {
               alpha: 0.25,
             ),
             currTheme.surface.withValues(
-              alpha: 0.625,
+              alpha: 0.5,
             ),
             currTheme.surface,
           ],

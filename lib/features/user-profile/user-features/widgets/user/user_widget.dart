@@ -541,7 +541,7 @@ class UserWidget extends StatelessWidget {
         children: [
           Heading.left(
             "@$username",
-            color: currTheme.onPrimary,
+            color: currTheme.onSurface,
             size: Constants.heading4,
           )
         ],
@@ -554,13 +554,13 @@ class UserWidget extends StatelessWidget {
       children: [
         Heading.left(
           user.name,
-          color: currTheme.onPrimary,
+          color: currTheme.onSurface,
           size: Constants.heading4,
         ),
         Heading.left(
           "@${user.username}",
           size: Constants.fontSize,
-          color: currTheme.onPrimary,
+          color: currTheme.onSurface,
         )
       ],
     );

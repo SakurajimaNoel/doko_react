@@ -323,7 +323,7 @@ class _ProfileSelectionState extends State<_ProfileSelection> {
         fit: StackFit.expand,
         children: [
           getProfileImage(height),
-          ProfilePictureFilter(
+          ProfilePictureFilter.preview(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
