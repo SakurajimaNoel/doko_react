@@ -21,8 +21,6 @@ class InstantMessagingBloc
         _handleInstantMessagingEditMessageEvent);
     on<InstantMessagingDeleteMessageEvent>(
         _handleInstantMessagingDeleteMessageEvent);
-    on<InstantMessagingDeleteMultipleMessageEvent>(
-        _handleInstantMessagingDeleteMultipleMessageEvent);
   }
 
   /// todo handle updating of user inbox
@@ -45,7 +43,7 @@ class InstantMessagingBloc
         message: event.message,
       ));
     } catch (_) {
-      emit(InstantMessagingErrorState(
+      emit(InstantMessagingSendMessageErrorState(
         message: Constants.websocketNotConnectedError,
       ));
     }
@@ -87,9 +85,23 @@ class InstantMessagingBloc
 
   FutureOr<void> _handleInstantMessagingDeleteMessageEvent(
       InstantMessagingDeleteMessageEvent event,
-      Emitter<InstantMessagingState> emit) async {}
+      Emitter<InstantMessagingState> emit) async {
+    try {
+      bool result = await event.client?.sendPayload(event.message) ?? false;
+      if (!result) {
+        throw const ApplicationException(
+          reason: Constants.websocketNotConnectedError,
+        );
+      }
 
-  FutureOr<void> _handleInstantMessagingDeleteMultipleMessageEvent(
-      InstantMessagingDeleteMultipleMessageEvent event,
-      Emitter<InstantMessagingState> emit) async {}
+      emit(InstantMessagingDeleteMessageSuccessState(
+        message: event.message,
+      ));
+    } catch (_) {
+      emit(InstantMessagingDeleteMessageErrorState(
+        message: Constants.websocketNotConnectedError,
+        multiple: event.message.id.length > 1,
+      ));
+    }
+  }
 }

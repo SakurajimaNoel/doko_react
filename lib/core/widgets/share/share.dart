@@ -486,6 +486,12 @@ class _ShareDetailsState extends State<_ShareDetails> {
                         child: const Text("More share options."),
                       )
                     : BlocListener<InstantMessagingBloc, InstantMessagingState>(
+                        listenWhen: (previousState, state) {
+                          return state
+                                  is InstantMessagingSendMessageToMultipleUserErrorState ||
+                              state
+                                  is InstantMessagingSendMessageToMultipleUserSuccessState;
+                        },
                         listener: (context, state) {
                           sending = false;
 

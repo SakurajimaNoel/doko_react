@@ -131,9 +131,14 @@ class _MessageInputState extends State<MessageInput> {
     );
 
     return BlocListener<InstantMessagingBloc, InstantMessagingState>(
+      listenWhen: (previousState, state) {
+        return state is InstantMessagingSendMessageErrorState ||
+            state is InstantMessagingSendMessageSuccessState;
+      },
       listener: (context, state) {
         sending = false;
-        if (state is InstantMessagingErrorState) {
+
+        if (state is InstantMessagingSendMessageErrorState) {
           showError(state.message);
           return;
         }

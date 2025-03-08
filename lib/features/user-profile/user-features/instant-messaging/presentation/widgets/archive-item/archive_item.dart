@@ -18,6 +18,7 @@ import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bl
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/message-body-type/message_body_type.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/bloc/instant_messaging_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/provider/archive_message_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/discussions/discussion_preview_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/polls/poll_widget.dart';
@@ -98,22 +99,21 @@ class _ArchiveItemState extends State<ArchiveItem>
     final archiveMessageProvider = context.read<ArchiveMessageProvider>();
     bool deleting = false;
 
+    final username =
+        (context.read<UserBloc>().state as UserCompleteState).username;
+    final client = context.read<WebsocketClientProvider>().client;
+
     final UserGraph graph = UserGraph();
     MessageEntity messageEntity =
         graph.getValueByKey(widget.messageKey)! as MessageEntity;
     final message = messageEntity.message;
 
-    Future<void> deleteMessage({
+    void deleteMessage({
       required bool everyone,
-    }) async {
+    }) {
       if (deleting) return;
       deleting = true;
 
-      final client = context.read<WebsocketClientProvider>().client;
-
-      final realTimeBloc = context.read<RealTimeBloc>();
-      final username =
-          (context.read<UserBloc>().state as UserCompleteState).username;
       final archiveMessageProvider = context.read<ArchiveMessageProvider>();
 
       DeleteMessage deleteMessage = DeleteMessage(
@@ -123,15 +123,13 @@ class _ArchiveItemState extends State<ArchiveItem>
         everyone: everyone,
       );
 
-      bool result = await client?.sendPayload(deleteMessage) ?? false;
-      deleting = false;
-      if (result) {
-        realTimeBloc.add(RealTimeDeleteMessageEvent(
-            message: deleteMessage, username: username, client: client));
-        archiveMessageProvider.clearSelect();
-      } else {
-        showError(Constants.websocketNotConnectedError);
-      }
+      // this is handled in message archive page
+      context
+          .read<InstantMessagingBloc>()
+          .add(InstantMessagingDeleteMessageEvent(
+            message: deleteMessage,
+            client: client,
+          ));
     }
 
     showModalBottomSheet(

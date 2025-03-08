@@ -18,6 +18,19 @@ final class InstantMessagingSuccessState extends InstantMessagingState {
   List<Object> get props => [now];
 }
 
+final class InstantMessagingErrorState extends InstantMessagingState {
+  InstantMessagingErrorState({
+    required this.message,
+  }) : now = DateTime.now();
+
+  final DateTime now;
+  final String message;
+
+  @override
+  List<Object> get props => [now, message];
+}
+
+/// message send states
 final class InstantMessagingSendMessageToMultipleUserSuccessState
     extends InstantMessagingSuccessState {
   InstantMessagingSendMessageToMultipleUserSuccessState({
@@ -36,16 +49,14 @@ final class InstantMessagingSendMessageSuccessState
   final ChatMessage message;
 }
 
-final class InstantMessagingErrorState extends InstantMessagingState {
-  InstantMessagingErrorState({
-    required this.message,
-  }) : now = DateTime.now();
-
-  final DateTime now;
-  final String message;
+final class InstantMessagingSendMessageErrorState
+    extends InstantMessagingErrorState {
+  InstantMessagingSendMessageErrorState({
+    required super.message,
+  });
 
   @override
-  List<Object> get props => [now, message];
+  List<Object> get props => [];
 }
 
 final class InstantMessagingSendMessageToMultipleUserErrorState
@@ -56,6 +67,32 @@ final class InstantMessagingSendMessageToMultipleUserErrorState
   });
 
   final List<ChatMessage> messagesSent;
+
+  @override
+  List<Object> get props => [messagesSent];
+}
+
+/// delete message state
+final class InstantMessagingDeleteMessageSuccessState
+    extends InstantMessagingSuccessState {
+  InstantMessagingDeleteMessageSuccessState({
+    required this.message,
+  });
+
+  final DeleteMessage message;
+
+  @override
+  List<Object> get props => [message];
+}
+
+final class InstantMessagingDeleteMessageErrorState
+    extends InstantMessagingErrorState {
+  InstantMessagingDeleteMessageErrorState({
+    required super.message,
+    required this.multiple,
+  });
+
+  final bool multiple;
 
   @override
   List<Object> get props => [];

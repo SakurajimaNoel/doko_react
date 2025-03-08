@@ -39,6 +39,7 @@ class _MessageArchivePageState extends State<MessageArchivePage>
   final FocusNode focusNode = FocusNode();
   final ScrollController controller = ScrollController();
   bool show = false;
+  bool deleting = false;
 
   late final WebsocketClientProvider websocketClientProvider =
       context.read<WebsocketClientProvider>();
@@ -217,6 +218,10 @@ class _MessageArchivePageState extends State<MessageArchivePage>
         create: (context) => InstantMessagingBloc(),
         child: Builder(
           builder: (context) {
+            final client = context.read<WebsocketClientProvider>().client;
+            final archiveMessageProvider =
+                context.read<ArchiveMessageProvider>();
+
             return PopScope(
               canPop: false,
               onPopInvokedWithResult: (bool didPop, _) {
@@ -328,61 +333,82 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                     horizontal: Constants.gap,
                   ),
                   actions: [
-                    Builder(
-                      builder: (context) {
-                        final selectedMessages = context
-                            .watch<ArchiveMessageProvider>()
-                            .selectedMessages;
+                    BlocListener<InstantMessagingBloc, InstantMessagingState>(
+                      listenWhen: (previousState, state) {
+                        return state
+                                is InstantMessagingDeleteMessageSuccessState ||
+                            state is InstantMessagingDeleteMessageErrorState;
+                      },
+                      listener: (context, state) {
+                        if (deleting) deleting = false;
 
-                        if (selectedMessages.isEmpty) {
-                          return const SizedBox.shrink();
+                        if (state is InstantMessagingDeleteMessageErrorState) {
+                          if (state.multiple) {
+                            showError("Failed to delete selected messages.");
+                          } else {
+                            showError(state.message);
+                          }
+                          return;
                         }
 
-                        return IconButton(
-                          onPressed: () async {
-                            final client =
-                                context.read<WebsocketClientProvider>().client;
-                            if (client == null) {
-                              showError("You are not connected.");
-                            }
-                            final realTimeBloc = context.read<RealTimeBloc>();
-                            final username = (context.read<UserBloc>().state
-                                    as UserCompleteState)
-                                .username;
-                            final archiveMessageProvider =
-                                context.read<ArchiveMessageProvider>();
+                        if (state
+                            is! InstantMessagingDeleteMessageSuccessState) {
+                          return;
+                        }
 
-                            DeleteMessage deleteMessage = DeleteMessage(
-                              from: username,
-                              to: widget.username,
-                              id: archiveMessageProvider.selectedMessages
-                                  .toList(
-                                growable: false,
-                              ),
-                              everyone: false,
-                            );
-
-                            bool result =
-                                await client!.sendPayload(deleteMessage);
-                            if (result) {
-                              realTimeBloc.add(RealTimeDeleteMessageEvent(
-                                message: deleteMessage,
-                                username: username,
-                                client: client,
-                              ));
-                              archiveMessageProvider.clearSelect();
-                            } else {
-                              showError(
-                                  "Failed to delete ${archiveMessageProvider.selectedMessages.length} messages.");
-                            }
-                          },
-                          color: currTheme.error,
-                          icon: Badge(
-                            label: Text(selectedMessages.length.toString()),
-                            child: const Icon(Icons.delete_forever),
-                          ),
-                        );
+                        context
+                            .read<RealTimeBloc>()
+                            .add(RealTimeDeleteMessageEvent(
+                              message: state.message,
+                              username: state.message.from,
+                              client: client,
+                            ));
+                        archiveMessageProvider.clearSelect();
                       },
+                      child: Builder(
+                        builder: (context) {
+                          final selectedMessages = context
+                              .watch<ArchiveMessageProvider>()
+                              .selectedMessages;
+
+                          if (selectedMessages.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+
+                          return IconButton(
+                            onPressed: () {
+                              if (deleting) return;
+                              deleting = true;
+
+                              final username = (context.read<UserBloc>().state
+                                      as UserCompleteState)
+                                  .username;
+
+                              DeleteMessage deleteMessage = DeleteMessage(
+                                from: username,
+                                to: widget.username,
+                                id: archiveMessageProvider.selectedMessages
+                                    .toList(
+                                  growable: false,
+                                ),
+                                everyone: false,
+                              );
+
+                              context
+                                  .read<InstantMessagingBloc>()
+                                  .add(InstantMessagingDeleteMessageEvent(
+                                    message: deleteMessage,
+                                    client: client,
+                                  ));
+                            },
+                            color: currTheme.error,
+                            icon: Badge(
+                              label: Text(selectedMessages.length.toString()),
+                              child: const Icon(Icons.delete_forever),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),

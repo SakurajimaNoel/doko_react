@@ -46,13 +46,3 @@ class InstantMessagingDeleteMessageEvent extends InstantMessagingEvent {
   final DeleteMessage message;
   final Client? client;
 }
-
-class InstantMessagingDeleteMultipleMessageEvent extends InstantMessagingEvent {
-  const InstantMessagingDeleteMultipleMessageEvent({
-    required this.messages,
-    required this.client,
-  });
-
-  final List<DeleteMessage> messages;
-  final Client? client;
-}
