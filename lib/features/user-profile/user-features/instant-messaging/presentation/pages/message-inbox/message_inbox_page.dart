@@ -15,8 +15,8 @@ class MessageInboxPage extends StatelessWidget {
   const MessageInboxPage({super.key});
 
   Widget buildItems(BuildContext context, int index, List<String> items) {
+    index = items.length - 1 - index; // latest item is at the end
     final currTheme = Theme.of(context).colorScheme;
-
     UserGraph graph = UserGraph();
 
     final inboxItemKey = items[index];
@@ -71,9 +71,47 @@ class MessageInboxPage extends StatelessWidget {
       ),
       subtitle: TypingStatusWidgetWrapper.text(
         username: username,
-        child: Text(inboxText),
+        child: Text(
+          inboxText,
+          style: TextStyle(
+            fontSize: inboxItemEntity.unread
+                ? Constants.fontSize * 0.875
+                : Constants.smallFontSize,
+            fontWeight:
+                inboxItemEntity.unread ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
       ),
-      trailing: inboxActivityTime == null ? null : Text(inboxActivityTime),
+      trailing: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: Constants.gap * 0.25,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          if (inboxActivityTime != null) Text(inboxActivityTime),
+          if (inboxItemEntity.unread)
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: currTheme.primaryContainer,
+                borderRadius: BorderRadius.circular(Constants.radius * 0.5),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: Constants.padding * 0.125,
+                  horizontal: Constants.padding * 0.25,
+                ),
+                child: Text(
+                  "New",
+                  style: TextStyle(
+                    fontSize: Constants.smallFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: currTheme.onPrimaryContainer,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -98,9 +136,7 @@ class MessageInboxPage extends StatelessWidget {
       ),
       body: BlocBuilder<RealTimeBloc, RealTimeState>(
         buildWhen: (previousState, state) {
-          return state is RealTimeNewMessageState ||
-              state is RealTimeEditMessageState ||
-              state is RealTimeDeleteMessageState;
+          return state is RealTimeUserInboxUpdateState;
         },
         builder: (context, state) {
           final UserGraph graph = UserGraph();
@@ -125,14 +161,7 @@ class MessageInboxPage extends StatelessWidget {
           }
 
           final inbox = graph.getValueByKey(inboxKey)! as InboxEntity;
-          final items = inbox.items
-              .toList(
-                growable: false,
-              )
-              .reversed
-              .toList(
-                growable: false,
-              );
+          final items = inbox.items;
 
           return ListView.separated(
             padding: const EdgeInsets.only(

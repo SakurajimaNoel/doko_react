@@ -6,6 +6,9 @@ import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
+import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/user-feed/input/user_feed_input.dart';
 import 'package:doko_react/features/user-profile/user-features/user-feed/presentation/bloc/user_feed_bloc.dart';
@@ -162,12 +165,40 @@ class _UserFeedPageState extends State<UserFeedPage> {
             onPressed: () {
               context.pushNamed(RouterConstants.messageInbox);
             },
-            color: currTheme.primary,
-            icon: const Badge(
-              label: Text("99+"),
-              child: Icon(
-                Icons.chat,
-              ),
+            // color: currTheme.primary,
+            icon: BlocBuilder<RealTimeBloc, RealTimeState>(
+              buildWhen: (previousState, state) {
+                return state is RealTimeUserInboxUpdateState;
+              },
+              builder: (context, state) {
+                final UserGraph graph = UserGraph();
+                final inboxKey = generateInboxKey();
+
+                int unreadCount = 0;
+                if (graph.containsKey(inboxKey)) {
+                  final inbox = graph.getValueByKey(inboxKey)! as InboxEntity;
+                  for (String key in inbox.items) {
+                    final inboxItemEntity =
+                        graph.getValueByKey(key)! as InboxItemEntity;
+
+                    if (inboxItemEntity.unread) {
+                      unreadCount++;
+                    }
+                  }
+                }
+
+                bool showLabel = unreadCount > 0;
+                String labelText =
+                    unreadCount > 15 ? "15+" : unreadCount.toString();
+
+                return Badge(
+                  label: Text(labelText),
+                  isLabelVisible: showLabel,
+                  child: const Icon(
+                    Icons.chat,
+                  ),
+                );
+              },
             ),
           ),
         ],

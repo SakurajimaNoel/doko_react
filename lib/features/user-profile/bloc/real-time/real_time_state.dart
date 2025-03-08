@@ -9,8 +9,18 @@ final class RealTimeInitial extends RealTimeState {
   List<Object> get props => [];
 }
 
-final class RealTimeNewMessageState extends RealTimeState {
-  const RealTimeNewMessageState({
+/// state used with user inbox icon in home page
+final class RealTimeUserInboxUpdateState extends RealTimeState {
+  RealTimeUserInboxUpdateState() : now = DateTime.now();
+
+  final DateTime now;
+
+  @override
+  List<Object?> get props => [now];
+}
+
+final class RealTimeNewMessageState extends RealTimeUserInboxUpdateState {
+  RealTimeNewMessageState({
     required this.id,
     required this.archiveUser,
   });
@@ -36,7 +46,7 @@ final class RealTimeTypingStatusState extends RealTimeState {
   List<Object?> get props => [archiveUser, statusAt, typing];
 }
 
-final class RealTimeEditMessageState extends RealTimeState {
+final class RealTimeEditMessageState extends RealTimeUserInboxUpdateState {
   RealTimeEditMessageState({
     required this.id,
     required this.archiveUser,
@@ -50,7 +60,7 @@ final class RealTimeEditMessageState extends RealTimeState {
   List<Object?> get props => [id, editedAt, archiveUser];
 }
 
-final class RealTimeDeleteMessageState extends RealTimeState {
+final class RealTimeDeleteMessageState extends RealTimeUserInboxUpdateState {
   RealTimeDeleteMessageState({
     required this.id,
     required this.archiveUser,

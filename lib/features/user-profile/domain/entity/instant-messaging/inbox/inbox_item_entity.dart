@@ -5,14 +5,20 @@ class InboxItemEntity implements GraphEntity {
     required this.user,
     this.lastActivityTime,
     this.displayText,
+    required this.unread,
   });
 
   final String user;
   DateTime? lastActivityTime;
   String? displayText;
+  bool unread;
 
   void updateDisplayText(String? text, DateTime? activityTime) {
     displayText = text;
     lastActivityTime = activityTime;
+  }
+
+  void updateUnread(bool newUnread) {
+    unread = newUnread;
   }
 }

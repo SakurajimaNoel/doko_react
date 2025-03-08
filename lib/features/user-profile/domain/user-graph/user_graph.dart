@@ -766,6 +766,8 @@ class UserGraph {
       message: message,
     );
 
+    bool self = username == message.from;
+
     addEntity(messageKey, messageEntity);
 
     String archiveUser = getUsernameFromMessageParams(
@@ -795,6 +797,7 @@ class UserGraph {
       // create inbox item entity
       inboxItem = InboxItemEntity(
         user: archiveUser,
+        unread: !self,
       );
     } else {
       inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
@@ -802,6 +805,7 @@ class UserGraph {
 
     inboxItem.updateDisplayText(
         messagePreview(message, username), message.sendAt);
+    inboxItem.updateUnread(!self);
     addEntity(inboxItemKey, inboxItem);
 
     _reorderUserInbox(inboxItemKey);
@@ -823,6 +827,7 @@ class UserGraph {
       // create inbox item entity
       inboxItem = InboxItemEntity(
         user: archiveUser,
+        unread: !self,
       );
     } else {
       inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
@@ -836,6 +841,7 @@ class UserGraph {
       displayText,
       message.editedOn,
     );
+    inboxItem.updateUnread(!self);
     addEntity(inboxItemKey, inboxItem);
 
     // update inbox order
@@ -917,6 +923,7 @@ class UserGraph {
         // create inbox item entity
         inboxItem = InboxItemEntity(
           user: archiveUser,
+          unread: !self,
         );
       } else {
         inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
@@ -926,6 +933,7 @@ class UserGraph {
         displayText,
         deletedTime,
       );
+      inboxItem.updateUnread(!self);
       addEntity(inboxItemKey, inboxItem);
 
       // update inbox order

@@ -9,6 +9,8 @@ class InboxEntity extends Nodes {
 
   InboxEntity.empty() : super.empty();
 
+  /// latest item will be at the end
+  /// use items.length - 1 - currInd to get corresponding index in sorted order based on time
   void reorder(String inboxItemKey) {
     items.remove(inboxItemKey);
     items.add(inboxItemKey);
