@@ -110,28 +110,36 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
     if (!self) {
       return [
-        FilledButton.tonalIcon(
+        TextButton(
           onPressed: handleUserProfileShare,
-          icon: const Icon(Icons.share),
-          style: FilledButton.styleFrom(
+          // icon: const Icon(Icons.share),
+          style: TextButton.styleFrom(
             minimumSize: Size.zero,
-            padding: const EdgeInsets.symmetric(
-              vertical: Constants.padding * 0.5,
-              horizontal: Constants.padding * 0.75,
-            ),
+            // padding: const EdgeInsets.symmetric(
+            //   vertical: Constants.padding * 0.5,
+            //   horizontal: Constants.padding * 0.75,
+            // ),
+
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          label: const Text("Share"),
+          child: Text(
+            "Share",
+            style: TextStyle(
+              color: currTheme.onSurface,
+              fontWeight: FontWeight.w600,
+              fontSize: Constants.fontSize,
+            ),
+          ),
         ),
       ];
     }
 
     return [
-      IconButton.filledTonal(
+      IconButton(
         onPressed: () {
           context.pushNamed(RouterConstants.settings);
         },
-        color: currTheme.onPrimaryContainer,
+        color: currTheme.onSurface,
         icon: const Icon(
           Icons.settings,
         ),

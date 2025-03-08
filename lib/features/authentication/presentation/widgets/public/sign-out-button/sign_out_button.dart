@@ -1,4 +1,3 @@
-import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
@@ -30,24 +29,20 @@ class _SignOutButtonState extends State<SignOutButton> {
         },
         listener: stateActions,
         builder: (context, state) {
-          return FilledButton(
+          return TextButton(
             onPressed: () {
               context.read<AuthenticationBloc>().add(LogoutEvent());
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: currTheme.error,
+            style: TextButton.styleFrom(
+              // backgroundColor: currTheme.error,
               minimumSize: Size.zero,
-              padding: const EdgeInsets.symmetric(
-                vertical: Constants.padding * 0.5,
-                horizontal: Constants.padding * 0.75,
-              ),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             child: Text(
               "Sign out",
               style: TextStyle(
-                color: currTheme.onError,
-                fontSize: Constants.smallFontSize,
+                color: currTheme.error,
+                fontWeight: FontWeight.w600,
               ),
             ),
           );
