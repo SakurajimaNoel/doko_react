@@ -1,5 +1,5 @@
 import 'package:doko_react/core/constants/constants.dart';
-import 'package:doko_react/core/widgets/get-user-modal/get_user_modal.dart';
+import 'package:doko_react/core/widgets/user-quick-action-widget/user_quick_action_widget.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
@@ -75,15 +75,19 @@ class _UsersTaggedWidgetState extends State<UsersTaggedWidget> {
         Center(
           child: FilledButton.tonalIcon(
             onPressed: () {
-              GetUserModal.getUserModal(
+              UserQuickActionWidget.showUserModal(
                 context: context,
-                onDone: (selected) {
+                onDone: (selected) async {
                   setState(() {
                     usersTagged = selected;
                   });
                   widget.onSelected(selected);
+                  return true;
                 },
                 selected: usersTagged,
+                limit: Constants.userTagLimit,
+                limitReachedLabel:
+                    "You can tag up to ${Constants.userTagLimit} users.",
               );
             },
             icon: const Icon(Icons.person),

@@ -16,16 +16,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class GetUserModal extends StatelessWidget {
-  const GetUserModal({
+part 'types.dart';
+
+class UserQuickActionWidget extends StatelessWidget {
+  const UserQuickActionWidget({
     super.key,
   });
 
-  static void getUserModal({
+  static void showUserModal({
     required BuildContext context,
-    required ValueSetter<List<String>> onDone,
-    required List<String> selected,
+    required QuickActionComplete onDone,
+    List<String>? selected,
     bool onlyFriends = true,
+    required int limit,
+    required String limitReachedLabel,
+    String actionLabel = "Done",
+    Widget? whenEmptySelection,
   }) {
     showModalBottomSheet(
       useRootNavigator: true,
@@ -54,7 +60,11 @@ class GetUserModal extends StatelessWidget {
                 controller: controller,
                 onlyFriends: onlyFriends,
                 onDone: onDone,
-                selected: selected,
+                selected: selected ?? [],
+                limit: limit,
+                limitReachedLabel: limitReachedLabel,
+                actionLabel: actionLabel,
+                whenEmptySelection: whenEmptySelection,
               ),
             );
           },
@@ -76,13 +86,23 @@ class _GetUserDetails extends StatefulWidget {
     required this.onlyFriends,
     required this.onDone,
     required this.selected,
+    required this.limit,
+    required this.limitReachedLabel,
+    required this.actionLabel,
+    this.whenEmptySelection,
   });
 
   final ScrollController controller;
   final bool onlyFriends;
 
-  final ValueSetter<List<String>> onDone;
+  final QuickActionComplete onDone;
   final List<String> selected;
+
+  final int limit;
+  final String limitReachedLabel;
+
+  final String actionLabel;
+  final Widget? whenEmptySelection;
 
   @override
   State<_GetUserDetails> createState() => _GetUserDetailsState();
@@ -99,6 +119,7 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
   late final bool onlyFriends = widget.onlyFriends;
 
   List<String> tempSearchResults = [];
+  bool handlingDone = false;
 
   @override
   void initState() {
@@ -121,10 +142,11 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
     if (selected) {
       selectedUsers.remove(username);
     } else {
-      if (selectedLength < Constants.userTagLimit) {
+      if (selectedLength < widget.limit) {
         selectedUsers.add(username);
       } else {
-        showInfo("You can tag up to ${Constants.userTagLimit} users.");
+        showInfo(widget.limitReachedLabel);
+        return;
       }
     }
 
@@ -191,6 +213,9 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
       username: username,
       currentUsername: username,
     );
+
+    bool showEmptySelection =
+        widget.whenEmptySelection != null && selectedUsers.isEmpty;
 
     return SizedBox(
       width: width,
@@ -442,20 +467,27 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
               ),
               Padding(
                 padding: const EdgeInsets.all(Constants.padding),
-                child: FilledButton(
-                  onPressed: () {
-                    // call value setter from parents
-                    widget.onDone(selectedUsers);
-                    contextPop();
-                  },
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(
-                      Constants.buttonWidth,
-                      Constants.buttonHeight,
-                    ),
-                  ),
-                  child: const Text("Done"),
-                ),
+                child: showEmptySelection
+                    ? widget.whenEmptySelection
+                    : FilledButton(
+                        onPressed: () async {
+                          if (handlingDone) return;
+                          handlingDone = true;
+                          // call value setter from parents
+                          if (await widget.onDone(selectedUsers)) {
+                            contextPop();
+                          } else {
+                            handlingDone = false;
+                          }
+                        },
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size(
+                            Constants.buttonWidth,
+                            Constants.buttonHeight,
+                          ),
+                        ),
+                        child: Text(widget.actionLabel),
+                      ),
               ),
             ],
           );

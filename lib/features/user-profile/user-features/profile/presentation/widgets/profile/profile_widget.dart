@@ -717,10 +717,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           height: Constants.gap * 2,
                         ),
                       ),
-                      // ProfilePost(
-                      //   username: username,
-                      //   key: ObjectKey(latestFetch),
-                      // ),
                       Timeline(
                         username: username,
                         key: ObjectKey(latestFetch),
