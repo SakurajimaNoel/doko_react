@@ -25,7 +25,7 @@ class InboxItemEntity implements GraphEntity {
   static InboxItemEntity createEntity(Map<String, dynamic> map) {
     return InboxItemEntity(
       user: map["inboxUser"],
-      unread: bool.parse(map["unread"]),
+      unread: map["unread"],
       displayText: map["displayText"],
       lastActivityTime: DateTime.parse(map["createdAt"]).toLocal(),
     );

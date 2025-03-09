@@ -38,12 +38,12 @@ class MessageEntity implements GraphEntity {
       body: map["body"],
       sendAt: DateTime.parse(map["createdAt"]).toLocal(),
       replyOn: map["replyFor"],
-      forwarded: bool.parse(map["forwarded"]),
+      forwarded: map["forwarded"],
     );
 
     return MessageEntity(
       message: message,
-      edited: bool.parse(map["edited"]),
+      edited: map["edited"],
     );
   }
 }
