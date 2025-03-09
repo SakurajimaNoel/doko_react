@@ -46,4 +46,18 @@ class InstantMessagingDeleteMessageEvent extends InstantMessagingEvent {
 }
 
 /// querying user inbox and archives
-class InstantMessagingGetUserInbox extends InstantMessagingEvent {}
+class InstantMessagingGetUserInbox extends InstantMessagingEvent {
+  const InstantMessagingGetUserInbox({
+    required this.details,
+  });
+
+  final InboxQueryInput details;
+}
+
+class InstantMessagingGetUserArchive extends InstantMessagingEvent {
+  const InstantMessagingGetUserArchive({
+    required this.details,
+  });
+
+  final ArchiveQueryInput details;
+}

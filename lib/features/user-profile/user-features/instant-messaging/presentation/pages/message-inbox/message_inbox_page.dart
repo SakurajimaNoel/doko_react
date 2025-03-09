@@ -1,23 +1,58 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/inbox-query-input/inbox_query_input.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/bloc/instant_messaging_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/typing-status/typing_status_widget_wrapper.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
+import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class MessageInboxPage extends StatelessWidget {
+class MessageInboxPage extends StatefulWidget {
   const MessageInboxPage({super.key});
 
-  Widget buildItems(BuildContext context, int index, List<String> items) {
-    index = items.length - 1 - index; // latest item is at the end
+  @override
+  State<MessageInboxPage> createState() => _MessageInboxPageState();
+}
+
+class _MessageInboxPageState extends State<MessageInboxPage> {
+  bool loading = false;
+  Widget buildItems(BuildContext context, int index) {
     final currTheme = Theme.of(context).colorScheme;
     UserGraph graph = UserGraph();
+
+    String key = generateInboxKey();
+    InboxEntity inbox = graph.getValueByKey(key)! as InboxEntity;
+    List<String> items = inbox.items.reversed.toList();
+
+    if (index >= items.length) {
+      if (!inbox.pageInfo.hasNextPage) {
+        return const SizedBox.shrink();
+      }
+
+      if (!loading) {
+        loading = true;
+        context.read<InstantMessagingBloc>().add(InstantMessagingGetUserInbox(
+                details: InboxQueryInput(
+              cursor: inbox.pageInfo.endCursor ?? "",
+              username: (context.read<UserBloc>().state as UserCompleteState)
+                  .username,
+            )));
+      }
+
+      return const Center(
+        child: SmallLoadingIndicator(),
+      );
+    }
 
     final inboxItemKey = items[index];
     final username = getUsernameFromInboxItemKey(inboxItemKey);
@@ -134,51 +169,79 @@ class MessageInboxPage extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<RealTimeBloc, RealTimeState>(
-        buildWhen: (previousState, state) {
-          return state is RealTimeUserInboxUpdateState;
-        },
-        builder: (context, state) {
-          final UserGraph graph = UserGraph();
-          final inboxKey = generateInboxKey();
+      body: BlocProvider(
+        create: (context) => serviceLocator<InstantMessagingBloc>()
+          ..add(InstantMessagingGetUserInbox(
+              details: InboxQueryInput(
+            cursor: "",
+            username:
+                (context.read<UserBloc>().state as UserCompleteState).username,
+          ))),
+        child: BlocConsumer<InstantMessagingBloc, InstantMessagingState>(
+          listener: (context, state) {
+            loading = false;
+            if (state is InstantMessagingErrorState) {
+              showError(state.message);
+              return;
+            }
+          },
+          builder: (context, state) {
+            return BlocBuilder<RealTimeBloc, RealTimeState>(
+              buildWhen: (previousState, state) {
+                return state is RealTimeUserInboxUpdateState;
+              },
+              builder: (context, _) {
+                bool loading = state is InstantMessagingInitial;
 
-          if (!graph.containsKey(inboxKey)) {
-            return const Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: Text(
-                    "No inbox items right now.",
-                    style: TextStyle(
-                      fontSize: Constants.fontSize,
-                      fontWeight: FontWeight.w500,
-                    ),
+                final UserGraph graph = UserGraph();
+                final inboxKey = generateInboxKey();
+
+                if (loading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                final inbox = graph.getValueByKey(inboxKey)! as InboxEntity;
+                final items = inbox.items;
+
+                if (items.isEmpty) {
+                  return const Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Text(
+                          "No inbox items right now.",
+                          style: TextStyle(
+                            fontSize: Constants.fontSize,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.only(
+                    bottom: Constants.padding,
+                    top: Constants.padding * 0.5,
                   ),
-                ),
-              ],
+                  itemBuilder: (BuildContext context, int index) {
+                    return buildItems(context, index);
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(
+                      height: Constants.gap,
+                    );
+                  },
+                  itemCount: items.length + 1,
+                );
+              },
             );
-          }
-
-          final inbox = graph.getValueByKey(inboxKey)! as InboxEntity;
-          final items = inbox.items;
-
-          return ListView.separated(
-            padding: const EdgeInsets.only(
-              bottom: Constants.padding,
-              top: Constants.padding * 0.5,
-            ),
-            itemBuilder: (BuildContext context, int index) {
-              return buildItems(context, index, items);
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              return const SizedBox(
-                height: Constants.gap,
-              );
-            },
-            itemCount: items.length,
-          );
-        },
+          },
+        ),
       ),
     );
   }

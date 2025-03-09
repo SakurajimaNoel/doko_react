@@ -24,6 +24,9 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
         username: event.payload.user,
       ));
     });
+    on<RealTimeInboxUpdateEvent>((event, emit) {
+      emit(RealTimeUserInboxUpdateState());
+    });
     on<RealTimeMarkInboxAsReadEvent>(_handleRealTimeMarkInboxAsReadEvent);
   }
 

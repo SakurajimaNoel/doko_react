@@ -3,8 +3,13 @@ import 'dart:async';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
+import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
+import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
+import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/domain/use-case/archive-use-case/archive_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/domain/use-case/inbox-use-case/inbox_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/archive-query-input/archive_query_input.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/inbox-query-input/inbox_query_input.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +21,8 @@ class InstantMessagingBloc
     extends Bloc<InstantMessagingEvent, InstantMessagingState> {
   final ArchiveUseCase archiveUseCase;
   final InboxUseCase inboxUseCase;
+
+  final UserGraph graph = UserGraph();
 
   InstantMessagingBloc({
     required this.archiveUseCase,
@@ -29,6 +36,58 @@ class InstantMessagingBloc
         _handleInstantMessagingEditMessageEvent);
     on<InstantMessagingDeleteMessageEvent>(
         _handleInstantMessagingDeleteMessageEvent);
+    on<InstantMessagingGetUserInbox>(_handleInstantMessagingGetUserInbox);
+    on<InstantMessagingGetUserArchive>(_handleInstantMessagingGetUserArchive);
+  }
+
+  FutureOr<void> _handleInstantMessagingGetUserInbox(
+      InstantMessagingGetUserInbox event,
+      Emitter<InstantMessagingState> emit) async {
+    try {
+      String inboxKey = generateInboxKey();
+      var inbox = graph.getValueByKey(inboxKey);
+      if (inbox is InboxEntity &&
+          event.details.cursor.isEmpty &&
+          inbox.isNotEmpty) {
+        emit(InstantMessagingSuccessState());
+        return;
+      }
+
+      await inboxUseCase(event.details);
+      emit(InstantMessagingSuccessState());
+    } catch (e) {
+      String reason = Constants.errorMessage;
+      if (e is ApplicationException) reason = e.reason;
+
+      emit(InstantMessagingErrorState(
+        message: reason,
+      ));
+    }
+  }
+
+  FutureOr<void> _handleInstantMessagingGetUserArchive(
+      InstantMessagingGetUserArchive event,
+      Emitter<InstantMessagingState> emit) async {
+    try {
+      String archiveKey = generateArchiveKey(event.details.username);
+      var archive = graph.getValueByKey(archiveKey);
+      if (archive is ArchiveEntity &&
+          event.details.cursor.isEmpty &&
+          archive.isNotEmpty) {
+        emit(InstantMessagingSuccessState());
+        return;
+      }
+
+      await archiveUseCase(event.details);
+      emit(InstantMessagingSuccessState());
+    } catch (e) {
+      String reason = Constants.errorMessage;
+      if (e is ApplicationException) reason = e.reason;
+
+      emit(InstantMessagingErrorState(
+        message: reason,
+      ));
+    }
   }
 
   /// todo handle updating of user inbox

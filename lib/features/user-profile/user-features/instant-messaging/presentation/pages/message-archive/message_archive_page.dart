@@ -6,11 +6,13 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/message-forward/message_forward.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/archive-query-input/archive_query_input.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/bloc/instant_messaging_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/provider/archive_message_provider.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/archive-item/archive_item.dart';
@@ -51,6 +53,8 @@ class _MessageArchivePageState extends State<MessageArchivePage>
   final UserGraph graph = UserGraph();
   late final currentUser =
       (context.read<UserBloc>().state as UserCompleteState).username;
+
+  bool loading = false;
 
   @override
   void initState() {
@@ -169,14 +173,38 @@ class _MessageArchivePageState extends State<MessageArchivePage>
     );
   }
 
-  Widget buildItem(BuildContext context, int index, List<String> messages) {
+  Widget buildItem(BuildContext context, int index) {
     bool showDate = false;
+    UserGraph graph = UserGraph();
+    String key = generateArchiveKey(widget.username);
+    final archive = graph.getValueByKey(key)! as ArchiveEntity;
+    final messages = archive.items;
+
+    if (index >= messages.length) {
+      if (!archive.pageInfo.hasNextPage) {
+        return const SizedBox.shrink();
+      }
+
+      if (!loading) {
+        loading = true;
+        context.read<InstantMessagingBloc>().add(InstantMessagingGetUserArchive(
+                details: ArchiveQueryInput(
+              cursor: archive.pageInfo.endCursor ?? "",
+              username: widget.username,
+              currentUser: (context.read<UserBloc>().state as UserCompleteState)
+                  .username,
+            )));
+      }
+
+      return const Center(
+        child: SmallLoadingIndicator(),
+      );
+    }
 
     /// show date will be true if current message and previous message are not on same day
     if (index == messages.length - 1) {
       showDate = true;
     } else {
-      UserGraph graph = UserGraph();
       final currMessage =
           graph.getValueByKey(messages[index])! as MessageEntity;
       final prevMessage =
@@ -217,7 +245,13 @@ class _MessageArchivePageState extends State<MessageArchivePage>
         controller: observerController,
       ),
       child: BlocProvider(
-        create: (context) => serviceLocator<InstantMessagingBloc>(),
+        create: (context) => serviceLocator<InstantMessagingBloc>()
+          ..add(InstantMessagingGetUserArchive(
+              details: ArchiveQueryInput(
+            username: widget.username,
+            cursor: "",
+            currentUser: currentUser,
+          ))),
         child: Builder(
           builder: (context) {
             final client = context.read<WebsocketClientProvider>().client;
@@ -453,86 +487,112 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                     ),
                   ],
                 ),
-                body: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: BlocConsumer<RealTimeBloc, RealTimeState>(
-                        listenWhen: (previousState, state) {
-                          return (state is RealTimeUserInboxUpdateState &&
-                              state.archiveUser == widget.username);
-                        },
-                        listener: (context, state) {
-                          if (state is RealTimeNewMessageState) {
-                            // check if message is self than scroll to bottom
-                            String messageId = state.id;
-                            String messageKey = generateMessageKey(messageId);
+                body: BlocConsumer<InstantMessagingBloc, InstantMessagingState>(
+                  listenWhen: (previousState, state) {
+                    return state.runtimeType == InstantMessagingErrorState ||
+                        state.runtimeType == InstantMessagingSuccessState;
+                  },
+                  listener: (context, state) {
+                    loading = false;
+                    if (state is InstantMessagingErrorState) {
+                      showError(state.message);
+                      return;
+                    }
+                  },
+                  buildWhen: (prevState, state) {
+                    return state.runtimeType == InstantMessagingErrorState ||
+                        state.runtimeType == InstantMessagingSuccessState;
+                  },
+                  builder: (context, state) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: BlocConsumer<RealTimeBloc, RealTimeState>(
+                            listenWhen: (previousState, state) {
+                              return (state is RealTimeUserInboxUpdateState &&
+                                  state.archiveUser == widget.username);
+                            },
+                            listener: (context, state) {
+                              if (state is RealTimeNewMessageState) {
+                                // check if message is self than scroll to bottom
+                                String messageId = state.id;
+                                String messageKey =
+                                    generateMessageKey(messageId);
 
-                            final messageEntity = graph
-                                .getValueByKey(messageKey)! as MessageEntity;
+                                final messageEntity =
+                                    graph.getValueByKey(messageKey)!
+                                        as MessageEntity;
 
-                            if (messageEntity.message.from == currentUser) {
-                              handleScrollToBottom();
-                            } else {
-                              // handle remote messages like showing you have new message in debounce way
-                              if (controller.offset > height) {
-                                showInfo(
-                                  "You have received new messages.",
-                                  onTap: handleScrollToBottom,
+                                if (messageEntity.message.from == currentUser) {
+                                  handleScrollToBottom();
+                                } else {
+                                  // handle remote messages like showing you have new message in debounce way
+                                  if (controller.offset > height) {
+                                    showInfo(
+                                      "You have received new messages.",
+                                      onTap: handleScrollToBottom,
+                                    );
+                                  }
+                                }
+                              }
+                              markArchiveRead();
+                            },
+                            buildWhen: (previousState, state) {
+                              return (state is RealTimeUserInboxUpdateState &&
+                                  state.archiveUser == widget.username);
+                            },
+                            builder: (context, _) {
+                              bool loading = state is InstantMessagingInitial;
+
+                              final UserGraph graph = UserGraph();
+                              String archiveKey =
+                                  generateArchiveKey(widget.username);
+
+                              if (loading) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
                                 );
                               }
-                            }
-                          }
-                          markArchiveRead();
-                        },
-                        buildWhen: (previousState, state) {
-                          return (state is RealTimeUserInboxUpdateState &&
-                              state.archiveUser == widget.username);
-                        },
-                        builder: (context, state) {
-                          final UserGraph graph = UserGraph();
-                          String archiveKey =
-                              generateArchiveKey(widget.username);
-                          String inboxKey =
-                              generateInboxItemKey(widget.username);
 
-                          if (!graph.containsKey(archiveKey)) {
-                            // check inbox if elements are present and show them before fetching archive messaging
-                            return const SizedBox.shrink();
-                          }
+                              final archive = graph.getValueByKey(archiveKey)!
+                                  as ArchiveEntity;
+                              final messages = archive.items;
 
-                          final archive =
-                              graph.getValueByKey(archiveKey)! as ArchiveEntity;
-                          final messages = archive.items;
+                              if (messages.isEmpty) {
+                                return const SizedBox.shrink();
+                              }
 
-                          return ListViewObserver(
-                            controller: observerController,
-                            child: ListView.separated(
-                              controller: controller,
-                              reverse: true,
-                              itemCount: messages.length,
-                              cacheExtent: height * 2,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: Constants.padding * 2,
-                              ),
-                              separatorBuilder: (context, index) {
-                                return const SizedBox(
-                                  height: Constants.gap * 0.5,
-                                );
-                              },
-                              itemBuilder: (BuildContext context, int index) {
-                                return buildItem(
-                                    context, index, messages.toList());
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    MessageInput(
-                      archiveUser: widget.username,
-                    ),
-                  ],
+                              return ListViewObserver(
+                                controller: observerController,
+                                child: ListView.separated(
+                                  controller: controller,
+                                  reverse: true,
+                                  itemCount: messages.length + 1,
+                                  cacheExtent: height * 2,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: Constants.padding * 2,
+                                  ),
+                                  separatorBuilder: (context, index) {
+                                    return const SizedBox(
+                                      height: Constants.gap * 0.5,
+                                    );
+                                  },
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return buildItem(context, index);
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        MessageInput(
+                          archiveUser: widget.username,
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             );

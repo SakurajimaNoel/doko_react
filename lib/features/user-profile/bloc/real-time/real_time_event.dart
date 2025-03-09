@@ -68,3 +68,6 @@ final class RealTimeMarkInboxAsReadEvent extends RealTimeEvent {
   final String username;
   final Client? client;
 }
+
+/// real time inbox update event, this is called initially when fetching user inbox in user-feed page
+final class RealTimeInboxUpdateEvent extends RealTimeEvent {}

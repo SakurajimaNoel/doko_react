@@ -10,6 +10,8 @@ import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.d
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/inbox-query-input/inbox_query_input.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/bloc/instant_messaging_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/user-feed/input/user_feed_input.dart';
 import 'package:doko_react/features/user-profile/user-features/user-feed/presentation/bloc/user_feed_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/discussions/discussion_widget.dart';
@@ -214,12 +216,31 @@ class _UserFeedPageState extends State<UserFeedPage> {
           listenWhen: (previousState, state) {
             return state is UserFeedGetResponseState;
           },
-          listener: (context, state) {
+          listener: (context, state) async {
             loading = false;
 
             if (state is UserFeedGetResponseErrorState) {
               showError(state.message);
             }
+
+            final instantMessagingBloc = serviceLocator<InstantMessagingBloc>();
+            final realTimeBloc = context.read<RealTimeBloc>();
+
+            Future imBloc = instantMessagingBloc.stream.first;
+            instantMessagingBloc.add(InstantMessagingGetUserInbox(
+              details: InboxQueryInput(
+                cursor: "",
+                username: username,
+              ),
+            ));
+
+            final imState = await imBloc;
+            if (imState is InstantMessagingErrorState) {
+              showError(imState.message);
+              return;
+            }
+
+            realTimeBloc.add(RealTimeInboxUpdateEvent());
           },
           buildWhen: (previousState, state) {
             return state is UserFeedGetResponseState;
