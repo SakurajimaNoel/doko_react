@@ -103,6 +103,23 @@ class _UserLayoutState extends State<UserLayout> {
       onReconnectSuccess: () {
         /// find latest message from inbox and fetch based on that
         showSuccess("Reconnected to websocket server.");
+
+        // if on message archive page resubscribe to presence events
+        String currentRoute = GoRouter.of(context).currentRouteName ?? "";
+        final Map<String, String> pathParams =
+            GoRouter.of(context).currentRoutePathParameters;
+        final userToSubscribe = pathParams["username"];
+        if (currentRoute == RouterConstants.messageArchive &&
+            userToSubscribe != null &&
+            userToSubscribe != username) {
+          final UserPresenceSubscription subscription =
+              UserPresenceSubscription(
+            from: username,
+            subscribe: true,
+            user: userToSubscribe,
+          );
+          client.sendPayload(subscription);
+        }
       },
       onConnectionClosure: (retry) async {
         StreamSubscription<InternetConnectionStatus>? internetSubscription;
@@ -153,7 +170,6 @@ class _UserLayoutState extends State<UserLayout> {
           realTimeBloc.add(RealTimeNewMessageEvent(
             message: message,
             username: username,
-            client: client,
           ));
         },
         PayloadType.typingStatus: (TypingStatus status) {
@@ -165,14 +181,12 @@ class _UserLayoutState extends State<UserLayout> {
           realTimeBloc.add(RealTimeEditMessageEvent(
             message: message,
             username: username,
-            client: client,
           ));
         },
         PayloadType.deleteMessage: (DeleteMessage message) {
           realTimeBloc.add(RealTimeDeleteMessageEvent(
             message: message,
             username: username,
-            client: client,
           ));
         },
         PayloadType.userSendFriendRequest: (UserSendFriendRequest request) {
