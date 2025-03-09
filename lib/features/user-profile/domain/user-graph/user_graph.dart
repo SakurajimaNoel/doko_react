@@ -56,6 +56,10 @@ class UserGraph {
     _graph[key] = entity;
   }
 
+  void removeEntity(String key) {
+    _graph.remove(key);
+  }
+
   /// basic function to add map to userGraph
   /// this is used where list of items are added to the graph
   /// like user root nodes list, root nodes comments and comments replies
@@ -758,6 +762,21 @@ class UserGraph {
     addEntity(inboxKey, inbox);
   }
 
+  /// used when fetching user inbox
+  void addInboxItems(List<String> items, PageInfo info) {
+    InboxEntity inbox;
+    String inboxKey = generateInboxKey();
+
+    if (containsKey(inboxKey)) {
+      inbox = getValueByKey(inboxKey)! as InboxEntity;
+    } else {
+      inbox = InboxEntity.empty();
+    }
+
+    inbox.addEntityItems(items);
+    inbox.updatePageInfo(info);
+  }
+
   // todo handle all the message methods to handle remote messages to
   void addNewMessage(ChatMessage message, String username) {
     // add new message
@@ -867,77 +886,48 @@ class UserGraph {
     bool self = username == message.from;
     String archiveKey = generateArchiveKey(archiveUser);
 
-    bool requireInboxUpdate = message.everyone;
-    if (containsKey(archiveKey)) {
-      final archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
-      String firstMessageId =
-          getMessageIdFromMessageKey(archiveEntity.items.first);
-      requireInboxUpdate =
-          requireInboxUpdate || message.id.contains(firstMessageId);
-    }
-
     for (String messageId in message.id) {
       String messageKey = generateMessageKey(messageId);
-      if (containsKey(messageKey)) {
-        final messageEntity = getValueByKey(messageKey)! as MessageEntity;
-        messageEntity.deleteMessage();
-
-        addEntity(messageKey, messageEntity);
-      }
+      removeEntity(messageKey);
 
       // remove from list too
-      if (!containsKey(archiveKey)) break;
+      if (!containsKey(archiveKey)) continue;
 
       final archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
       archiveEntity.removeItem(messageKey);
     }
 
-    if (requireInboxUpdate) {
-      // update inbox item entity
-      String inboxItemKey = generateInboxItemKey(archiveUser);
+    // update inbox item entity
+    String inboxItemKey = generateInboxItemKey(archiveUser);
 
-      InboxItemEntity inboxItem;
-      String? displayText;
-      DateTime? deletedTime;
+    InboxItemEntity inboxItem;
+    String displayText;
+    DateTime deletedTime = DateTime.now();
 
-      if (message.everyone) {
-        deletedTime = DateTime.now();
-        if (self) {
-          displayText = "You deleted the message.";
-        } else {
-          displayText = "@$archiveUser deleted the message.";
-        }
-      } else if (containsKey(archiveKey)) {
-        final archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
-        String? messageKey = archiveEntity.items.firstOrNull;
-
-        if (messageKey != null && containsKey(messageKey)) {
-          MessageEntity latestMessage =
-              getValueByKey(messageKey)! as MessageEntity;
-          displayText = messagePreview(latestMessage.message, username);
-          deletedTime = latestMessage.message.sendAt;
-        }
-      }
-
-      if (!containsKey(inboxItemKey)) {
-        // create inbox item entity
-        inboxItem = InboxItemEntity(
-          user: archiveUser,
-          unread: !self,
-        );
-      } else {
-        inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
-      }
-
-      inboxItem.updateDisplayText(
-        displayText,
-        deletedTime,
-      );
-      inboxItem.updateUnread(!self);
-      addEntity(inboxItemKey, inboxItem);
-
-      // update inbox order
-      if (message.everyone) _reorderUserInbox(inboxItemKey);
+    if (self) {
+      displayText = "You deleted the message.";
+    } else {
+      displayText = "@$archiveUser deleted the message.";
     }
+
+    if (!containsKey(inboxItemKey)) {
+      // create inbox item entity
+      inboxItem = InboxItemEntity(
+        user: archiveUser,
+        unread: !self,
+      );
+    } else {
+      inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
+    }
+
+    inboxItem.updateDisplayText(
+      displayText,
+      deletedTime,
+    );
+    inboxItem.updateUnread(!self);
+    addEntity(inboxItemKey, inboxItem);
+
+    // update inbox order
+    _reorderUserInbox(inboxItemKey);
   }
 }

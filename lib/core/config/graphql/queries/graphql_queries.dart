@@ -2093,4 +2093,41 @@ class GraphqlQueries {
       }
     };
   }
+
+  // user inbox user details
+  static String getUserDetailsForInbox() {
+    return """
+    query Users(\$where: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere) {
+      users(where: \$where) {
+        id
+        username
+        name
+        profilePicture
+        friendsConnection(where: \$friendsConnectionWhere2) {
+          edges {
+            properties {
+              addedOn
+              requestedBy
+              status
+            }
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> getUserDetailsForInboxVariables(
+      List<String> users, String username) {
+    return {
+      "where": {
+        "username_IN": users,
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      }
+    };
+  }
 }

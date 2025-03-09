@@ -60,8 +60,8 @@ class MessageArchiveQueries {
   static String getMessageArchive(String cursor) {
     if (cursor.isEmpty) {
       return """
-      query ListMessageArchives(\$archive: String, \$limit: Int, \$sortDirection: ModelSortDirection) {
-        listMessageArchives(archive: \$archive, limit: \$limit, sortDirection: \$sortDirection) {
+      query ListMessageArchives(\$archive: String, \$limit: Int, \$sortDirection: ModelSortDirection, \$filter: ModelMessageArchiveFilterInput) {
+        listMessageArchives(archive: \$archive, limit: \$limit, sortDirection: \$sortDirection, filter: \$filter) {
           nextToken
           items {
             archive
@@ -71,6 +71,7 @@ class MessageArchiveQueries {
             body
             createdAt
             deleted
+            forwarded
             edited
             id
             replyFor
@@ -81,8 +82,8 @@ class MessageArchiveQueries {
     }
 
     return """
-    query ListMessageArchives(\$archive: String, \$limit: Int, \$sortDirection: ModelSortDirection, \$nextToken: String) {
-      listMessageArchives(archive: \$archive, limit: \$limit, sortDirection: \$sortDirection, nextToken: \$nextToken) {
+    query ListMessageArchives(\$archive: String, \$limit: Int, \$sortDirection: ModelSortDirection, \$nextToken: String, \$filter: ModelMessageArchiveFilterInput) {
+      listMessageArchives(archive: \$archive, limit: \$limit, sortDirection: \$sortDirection, nextToken: \$nextToken, filter: \$filter) {
         nextToken
         items {
           archive
@@ -92,6 +93,7 @@ class MessageArchiveQueries {
           body
           createdAt
           deleted
+          forwarded
           edited
           id
           replyFor
@@ -110,6 +112,11 @@ class MessageArchiveQueries {
         "archive": archive,
         "limit": 50,
         "sortDirection": "DESC",
+        "filter": {
+          "deleted": {
+            "eq": false,
+          }
+        },
       };
     }
 
@@ -118,6 +125,11 @@ class MessageArchiveQueries {
       "limit": 50,
       "sortDirection": "DESC",
       "nextToken": cursor,
+      "filter": {
+        "deleted": {
+          "eq": false,
+        }
+      },
     };
   }
 
@@ -134,6 +146,7 @@ class MessageArchiveQueries {
           body
           createdAt
           deleted
+          forwarded
           edited
           id
           replyFor
