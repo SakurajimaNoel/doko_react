@@ -113,7 +113,7 @@ class Constants {
 
   // instant messaging media
   static int archiveMedia = (_root * 25).round();
-  static const int shareLimit = 1 << 4;
+  static const int shareLimit = 1 << 6;
   static const int messageLimit = 1 << 14;
   static const int messageDisplayLimit = 1 << 9;
   static final RegExp emailRegexMessage =

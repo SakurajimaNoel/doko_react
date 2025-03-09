@@ -15,9 +15,8 @@ class InstantMessagingSendNewMessageEvent extends InstantMessagingEvent {
   final Client? client;
 }
 
-class InstantMessagingSendNewMessageToMultipleUserEvent
-    extends InstantMessagingEvent {
-  const InstantMessagingSendNewMessageToMultipleUserEvent({
+class InstantMessagingSendMultipleMessageEvent extends InstantMessagingEvent {
+  const InstantMessagingSendMultipleMessageEvent({
     required this.messages,
     required this.client,
   });

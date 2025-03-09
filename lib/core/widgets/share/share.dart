@@ -23,8 +23,8 @@ class Share extends StatelessWidget {
   }) {
     final instantMessagingBloc = InstantMessagingBloc();
 
-    // todo handle this here
     UserQuickActionWidget.showUserModal(
+      onlyFriends: false,
       context: context,
       onDone: (selectedUsers) async {
         int selectedLength = selectedUsers.length;
@@ -48,8 +48,7 @@ class Share extends StatelessWidget {
         }
 
         Future imBloc = instantMessagingBloc.stream.first;
-        instantMessagingBloc
-            .add(InstantMessagingSendNewMessageToMultipleUserEvent(
+        instantMessagingBloc.add(InstantMessagingSendMultipleMessageEvent(
           messages: messages,
           client: client,
         ));

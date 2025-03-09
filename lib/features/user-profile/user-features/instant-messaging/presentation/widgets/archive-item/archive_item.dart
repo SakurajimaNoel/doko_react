@@ -13,6 +13,7 @@ import 'package:doko_react/core/utils/instant-messaging/message_preview.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/message-forward/message_forward.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
@@ -222,19 +223,19 @@ class _ArchiveItemState extends State<ArchiveItem>
                           color: currTheme.secondary,
                         ),
                       ),
-                    // InkWell(
-                    //   onTap: () {
-                    //     deleteMessage(
-                    //       everyone: false,
-                    //     );
-                    //     context.pop();
-                    //   },
-                    //   child: _ArchiveItemOptions(
-                    //     icon: Icons.delete,
-                    //     label: "Delete",
-                    //     color: currTheme.error,
-                    //   ),
-                    // ),
+                    InkWell(
+                      onTap: () {
+                        MessageForward.forward(
+                          context: context,
+                          messagesToForward: [message],
+                        );
+                      },
+                      child: _ArchiveItemOptions(
+                        icon: Icons.forward_to_inbox,
+                        label: "Forward",
+                        color: currTheme.secondary,
+                      ),
+                    ),
                     if (self)
                       InkWell(
                         onTap: () {
@@ -552,6 +553,12 @@ class _ArchiveItemState extends State<ArchiveItem>
                                     );
                                   },
                                 ),
+                              if (messageEntity.message.forwarded)
+                                const Text("Forwarded",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: Constants.smallFontSize * 0.875,
+                                    )),
                               getMessageItem(message.subject, self),
                             ],
                           ),

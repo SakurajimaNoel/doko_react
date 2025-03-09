@@ -6,6 +6,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/message-forward/message_forward.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
@@ -374,37 +375,77 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                             return const SizedBox.shrink();
                           }
 
-                          /// todo handle this show delete icon only when self messages otherwise only forward icon
-                          return IconButton(
-                            onPressed: () {
-                              if (deleting) return;
-                              deleting = true;
+                          bool showDeleteIcon = true;
+                          List<ChatMessage> messageToForward = [];
+                          for (var messageId in selectedMessages) {
+                            var key = generateMessageKey(messageId);
+                            var message = graph.getValueByKey(key);
+                            final username = (context.read<UserBloc>().state
+                                    as UserCompleteState)
+                                .username;
 
-                              final username = (context.read<UserBloc>().state
-                                      as UserCompleteState)
-                                  .username;
+                            if (message is MessageEntity) {
+                              messageToForward.add(message.message);
+                              if (message.message.from != username) {
+                                showDeleteIcon = false;
+                              }
+                            }
+                          }
 
-                              DeleteMessage deleteMessage = DeleteMessage(
-                                from: username,
-                                to: widget.username,
-                                id: archiveMessageProvider.selectedMessages
-                                    .toList(
-                                  growable: false,
+                          return Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  MessageForward.forward(
+                                    context: context,
+                                    messagesToForward: messageToForward,
+                                  );
+                                },
+                                color: currTheme.primary,
+                                icon: Badge(
+                                  backgroundColor: currTheme.primaryContainer,
+                                  textColor: currTheme.onPrimaryContainer,
+                                  label:
+                                      Text(selectedMessages.length.toString()),
+                                  child: const Icon(Icons.forward_to_inbox),
                                 ),
-                              );
+                              ),
+                              if (showDeleteIcon)
+                                IconButton(
+                                  onPressed: () {
+                                    if (deleting) return;
+                                    deleting = true;
 
-                              context
-                                  .read<InstantMessagingBloc>()
-                                  .add(InstantMessagingDeleteMessageEvent(
-                                    message: deleteMessage,
-                                    client: client,
-                                  ));
-                            },
-                            color: currTheme.error,
-                            icon: Badge(
-                              label: Text(selectedMessages.length.toString()),
-                              child: const Icon(Icons.delete_forever),
-                            ),
+                                    final username = (context
+                                            .read<UserBloc>()
+                                            .state as UserCompleteState)
+                                        .username;
+
+                                    DeleteMessage deleteMessage = DeleteMessage(
+                                      from: username,
+                                      to: widget.username,
+                                      id: archiveMessageProvider
+                                          .selectedMessages
+                                          .toList(
+                                        growable: false,
+                                      ),
+                                    );
+
+                                    context
+                                        .read<InstantMessagingBloc>()
+                                        .add(InstantMessagingDeleteMessageEvent(
+                                          message: deleteMessage,
+                                          client: client,
+                                        ));
+                                  },
+                                  color: currTheme.error,
+                                  icon: Badge(
+                                    label: Text(
+                                        selectedMessages.length.toString()),
+                                    child: const Icon(Icons.delete_forever),
+                                  ),
+                                ),
+                            ],
                           );
                         },
                       ),

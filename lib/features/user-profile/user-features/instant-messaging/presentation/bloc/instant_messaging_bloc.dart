@@ -15,8 +15,8 @@ class InstantMessagingBloc
   InstantMessagingBloc() : super(InstantMessagingInitial()) {
     on<InstantMessagingSendNewMessageEvent>(
         _handleInstantMessagingSendNewMessageEvent);
-    on<InstantMessagingSendNewMessageToMultipleUserEvent>(
-        _handleInstantMessagingSendNewMessageToMultipleUserEvent);
+    on<InstantMessagingSendMultipleMessageEvent>(
+        _handleInstantMessagingSendMultipleMessageEvent);
     on<InstantMessagingEditMessageEvent>(
         _handleInstantMessagingEditMessageEvent);
     on<InstantMessagingDeleteMessageEvent>(
@@ -49,8 +49,9 @@ class InstantMessagingBloc
     }
   }
 
-  FutureOr<void> _handleInstantMessagingSendNewMessageToMultipleUserEvent(
-      InstantMessagingSendNewMessageToMultipleUserEvent event,
+  /// todo update status for single user only once in case of message forwarding
+  FutureOr<void> _handleInstantMessagingSendMultipleMessageEvent(
+      InstantMessagingSendMultipleMessageEvent event,
       Emitter<InstantMessagingState> emit) async {
     List<ChatMessage> messagesSent = [];
     try {
