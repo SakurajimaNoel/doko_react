@@ -775,6 +775,29 @@ class UserGraph {
 
     inbox.addEntityItems(items);
     inbox.updatePageInfo(info);
+
+    addEntity(inboxKey, inbox);
+  }
+
+  void addArchiveItems({
+    required String archive,
+    required List<String> items,
+    required PageInfo info,
+  }) {
+    // get archive
+    ArchiveEntity archiveEntity;
+    String archiveKey = generateArchiveKey(archive);
+
+    if (containsKey(archiveKey)) {
+      archiveEntity = getValueByKey(archiveKey)! as ArchiveEntity;
+    } else {
+      archiveEntity = ArchiveEntity.empty();
+    }
+
+    archiveEntity.addEntityItems(items);
+    archiveEntity.updatePageInfo(info);
+
+    addEntity(archiveKey, archiveEntity);
   }
 
   // todo handle all the message methods to handle remote messages to

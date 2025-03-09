@@ -7,6 +7,7 @@ import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/user-quick-action-widget/user_quick_action_widget.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/bloc/instant_messaging_bloc.dart';
+import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart' as share_external;
@@ -21,7 +22,7 @@ class Share extends StatelessWidget {
     required MessageSubject subject,
     required String nodeIdentifier,
   }) {
-    final instantMessagingBloc = InstantMessagingBloc();
+    final instantMessagingBloc = serviceLocator<InstantMessagingBloc>();
 
     UserQuickActionWidget.showUserModal(
       onlyFriends: false,

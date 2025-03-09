@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/domain/use-case/archive-use-case/archive_use_case.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/domain/use-case/inbox-use-case/inbox_use_case.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,7 +14,13 @@ part 'instant_messaging_state.dart';
 
 class InstantMessagingBloc
     extends Bloc<InstantMessagingEvent, InstantMessagingState> {
-  InstantMessagingBloc() : super(InstantMessagingInitial()) {
+  final ArchiveUseCase archiveUseCase;
+  final InboxUseCase inboxUseCase;
+
+  InstantMessagingBloc({
+    required this.archiveUseCase,
+    required this.inboxUseCase,
+  }) : super(InstantMessagingInitial()) {
     on<InstantMessagingSendNewMessageEvent>(
         _handleInstantMessagingSendNewMessageEvent);
     on<InstantMessagingSendMultipleMessageEvent>(

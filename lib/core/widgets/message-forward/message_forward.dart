@@ -10,6 +10,7 @@ import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/user-quick-action-widget/user_quick_action_widget.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/bloc/instant_messaging_bloc.dart';
+import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,7 @@ class MessageForward extends StatelessWidget {
     required BuildContext context,
     required List<ChatMessage> messagesToForward,
   }) {
-    final instantMessagingBloc = InstantMessagingBloc();
+    final instantMessagingBloc = serviceLocator<InstantMessagingBloc>();
     messagesToForward.sort((a, b) => a.sendAt.compareTo(b.sendAt));
 
     UserQuickActionWidget.showUserModal(

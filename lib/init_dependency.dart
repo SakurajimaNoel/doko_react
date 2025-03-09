@@ -38,6 +38,12 @@ import "package:doko_react/features/user-profile/domain/use-case/user-to-user-re
 import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_create_friend_relation_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/user-to-user-relation/user_remove_friend_relation_use_case.dart";
 import "package:doko_react/features/user-profile/domain/use-case/user/user_get.dart";
+import "package:doko_react/features/user-profile/user-features/instant-messaging/data/remote-data-source/instant_messaging_remote_data_source.dart";
+import "package:doko_react/features/user-profile/user-features/instant-messaging/data/repository/instant_messaging_repository_impl.dart";
+import "package:doko_react/features/user-profile/user-features/instant-messaging/domain/repository/instant_messaging_repository.dart";
+import "package:doko_react/features/user-profile/user-features/instant-messaging/domain/use-case/archive-use-case/archive_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/instant-messaging/domain/use-case/inbox-use-case/inbox_use_case.dart";
+import "package:doko_react/features/user-profile/user-features/instant-messaging/presentation/bloc/instant_messaging_bloc.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/data/data-source/node_create_remote_data_source.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/data/repository/node_create_repository_impl.dart";
 import "package:doko_react/features/user-profile/user-features/node-create/domain/repository/node_create_repository.dart";
@@ -117,6 +123,40 @@ Future<void> initDependency() async {
   _initUserToUserAction();
   _initNodeCreate();
   _initPost();
+  _initMessageArchive();
+}
+
+void _initMessageArchive() {
+  serviceLocator.registerFactory<InstantMessagingRemoteDataSource>(
+    () => InstantMessagingRemoteDataSource(
+      apiClient: serviceLocator<GraphApiClient>().client,
+      messageArchiveClient: serviceLocator<MessageArchiveApiClient>().client,
+    ),
+  );
+
+  serviceLocator.registerFactory<InstantMessagingRepository>(
+    () => InstantMessagingRepositoryImpl(
+      dataSource: serviceLocator<InstantMessagingRemoteDataSource>(),
+    ),
+  );
+
+  serviceLocator.registerFactory<ArchiveUseCase>(
+    () => ArchiveUseCase(
+      repository: serviceLocator(),
+    ),
+  );
+  serviceLocator.registerFactory<InboxUseCase>(
+    () => InboxUseCase(
+      repository: serviceLocator(),
+    ),
+  );
+
+  serviceLocator.registerFactory<InstantMessagingBloc>(
+    () => InstantMessagingBloc(
+      archiveUseCase: serviceLocator(),
+      inboxUseCase: serviceLocator(),
+    ),
+  );
 }
 
 void _initUserFeed() {

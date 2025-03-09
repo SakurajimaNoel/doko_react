@@ -16,6 +16,7 @@ import 'package:doko_react/features/user-profile/user-features/instant-messaging
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/archive-item/archive_item.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/message-input/message_input.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
+import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -216,7 +217,7 @@ class _MessageArchivePageState extends State<MessageArchivePage>
         controller: observerController,
       ),
       child: BlocProvider(
-        create: (context) => InstantMessagingBloc(),
+        create: (context) => serviceLocator<InstantMessagingBloc>(),
         child: Builder(
           builder: (context) {
             final client = context.read<WebsocketClientProvider>().client;

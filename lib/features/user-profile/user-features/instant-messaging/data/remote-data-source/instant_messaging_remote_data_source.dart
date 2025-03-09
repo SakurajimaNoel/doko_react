@@ -2,9 +2,11 @@ import 'package:doko_react/core/config/graphql/queries/graphql_queries.dart';
 import 'package:doko_react/core/config/graphql/queries/message_archive_queries.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/entity/page-info/page_info.dart';
+import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/archive-query-input/archive_query_input.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/inbox-query-input/inbox_query_input.dart';
 import 'package:graphql/client.dart';
 
@@ -55,7 +57,7 @@ class InstantMessagingRemoteDataSource {
   Future<bool> getUserInbox(InboxQueryInput details) async {
     try {
       // first fetch user inbox
-      QueryResult inboxResult = await messageArchiveClient.query(
+      QueryResult result = await messageArchiveClient.query(
         QueryOptions(
           fetchPolicy: FetchPolicy.networkOnly,
           document: gql(MessageArchiveQueries.getUserInbox(details.cursor)),
@@ -66,13 +68,13 @@ class InstantMessagingRemoteDataSource {
         ),
       );
 
-      if (inboxResult.hasException) {
+      if (result.hasException) {
         throw const ApplicationException(
           reason: "Problem getting user inbox data.",
         );
       }
 
-      Map inboxData = inboxResult.data?["messageInboxesByUserAndCreatedAt"];
+      Map inboxData = result.data?["messageInboxesByUserAndCreatedAt"];
       String nextToken = inboxData["nextToken"] ?? "";
       PageInfo info = PageInfo(
         endCursor: nextToken,
@@ -103,6 +105,54 @@ class InstantMessagingRemoteDataSource {
 
       // fetch users
       return _getUserDetails(usersToFetch, details.username);
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getUserArchive(ArchiveQueryInput details) async {
+    try {
+      QueryResult result = await messageArchiveClient.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document:
+              gql(MessageArchiveQueries.getMessageArchive(details.cursor)),
+          variables: MessageArchiveQueries.getMessageArchiveVariables(
+            archive: details.username,
+            cursor: details.cursor,
+          ),
+        ),
+      );
+
+      if (result.hasException) {
+        throw const ApplicationException(
+          reason: "Problem getting user messages.",
+        );
+      }
+
+      Map archiveData = result.data?["listMessageArchives"];
+      String nextToken = archiveData["nextToken"] ?? "";
+      PageInfo info = PageInfo(
+        endCursor: nextToken,
+        hasNextPage: nextToken.isNotEmpty,
+      );
+      List archiveList = archiveData["items"];
+      List<String> archiveItems = [];
+
+      for (var item in archiveList) {
+        MessageEntity entity = MessageEntity.createEntity(item);
+        String messageKey = generateMessageKey(entity.message.id);
+        graph.addEntity(messageKey, entity);
+
+        archiveItems.add(messageKey);
+      }
+      graph.addArchiveItems(
+        archive: details.username,
+        items: archiveItems,
+        info: info,
+      );
+
+      return true;
     } catch (_) {
       rethrow;
     }
