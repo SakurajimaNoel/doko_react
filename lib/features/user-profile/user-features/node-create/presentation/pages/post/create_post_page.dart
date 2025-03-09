@@ -74,7 +74,6 @@ class CreatePostPageState extends State<CreatePostPage> {
             padding: const EdgeInsets.all(Constants.padding),
             child: FilledButton(
               onPressed: () {
-                /// todo handle video processing
                 if (videoProcessing) {
                   showInfo("Please wait for video processing to finish.");
                   return;

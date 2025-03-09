@@ -105,8 +105,9 @@ class _MessageArchivePageState extends State<MessageArchivePage>
 
   void markArchiveRead() {
     context.read<RealTimeBloc>().add(RealTimeMarkInboxAsReadEvent(
-          username: widget.username,
+          archive: widget.username,
           client: context.read<WebsocketClientProvider>().client,
+          currentUser: currentUser,
         ));
   }
 

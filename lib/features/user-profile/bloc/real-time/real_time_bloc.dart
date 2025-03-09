@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:amplify_flutter/amplify_flutter.dart' hide Emitter;
 import 'package:doki_websocket_client/doki_websocket_client.dart';
+import 'package:doko_react/core/config/graphql/mutations/message_archive_mutations.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:equatable/equatable.dart';
@@ -32,7 +34,7 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
 
   FutureOr<void> _handleRealTimeMarkInboxAsReadEvent(
       RealTimeMarkInboxAsReadEvent event, Emitter<RealTimeState> emit) async {
-    String inboxKey = generateInboxItemKey(event.username);
+    String inboxKey = generateInboxItemKey(event.archive);
     final inboxItem = graph.getValueByKey(inboxKey);
 
     bool initialStatus = true;
@@ -42,7 +44,18 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
     }
 
     if (initialStatus) {
-      /// todo: update in dynamodb too
+      // ignoring error here
+      await Amplify.API
+          .mutate(
+            request: GraphQLRequest(
+              document: MessageArchiveMutations.markInboxAsRead(),
+              variables: MessageArchiveMutations.markInboxAsReadVariables(
+                inboxUser: event.archive,
+                user: event.currentUser,
+              ),
+            ),
+          )
+          .response;
     }
     emit(RealTimeUserInboxUpdateState());
 

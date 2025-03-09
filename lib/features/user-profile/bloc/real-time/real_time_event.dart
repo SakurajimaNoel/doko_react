@@ -61,12 +61,14 @@ final class RealTimeUserPresenceEvent extends RealTimeEvent {
 /// mark inbox item as read
 final class RealTimeMarkInboxAsReadEvent extends RealTimeEvent {
   RealTimeMarkInboxAsReadEvent({
-    required this.username,
+    required this.currentUser,
     required this.client,
+    required this.archive,
   });
 
-  final String username;
+  final String currentUser;
   final Client? client;
+  final String archive;
 }
 
 /// real time inbox update event, this is called initially when fetching user inbox in user-feed page
