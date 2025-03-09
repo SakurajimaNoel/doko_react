@@ -11,25 +11,27 @@ final class RealTimeInitial extends RealTimeState {
 
 /// state used with user inbox icon in home page
 final class RealTimeUserInboxUpdateState extends RealTimeState {
-  RealTimeUserInboxUpdateState() : now = DateTime.now();
+  RealTimeUserInboxUpdateState({
+    this.archiveUser,
+  }) : now = DateTime.now();
 
   final DateTime now;
+  final String? archiveUser;
 
   @override
-  List<Object?> get props => [now];
+  List<Object?> get props => [now, archiveUser];
 }
 
 final class RealTimeNewMessageState extends RealTimeUserInboxUpdateState {
   RealTimeNewMessageState({
     required this.id,
-    required this.archiveUser,
+    required super.archiveUser,
   });
 
   final String id;
-  final String archiveUser;
 
   @override
-  List<Object?> get props => [id, archiveUser];
+  List<Object?> get props => [id];
 }
 
 final class RealTimeTypingStatusState extends RealTimeState {
@@ -49,29 +51,25 @@ final class RealTimeTypingStatusState extends RealTimeState {
 final class RealTimeEditMessageState extends RealTimeUserInboxUpdateState {
   RealTimeEditMessageState({
     required this.id,
-    required this.archiveUser,
+    required super.archiveUser,
   });
 
   final String id;
-  final String archiveUser;
-  final DateTime editedAt = DateTime.now();
 
   @override
-  List<Object?> get props => [id, editedAt, archiveUser];
+  List<Object?> get props => [id];
 }
 
 final class RealTimeDeleteMessageState extends RealTimeUserInboxUpdateState {
   RealTimeDeleteMessageState({
     required this.id,
-    required this.archiveUser,
+    required super.archiveUser,
   });
 
   final List<String> id;
-  final String archiveUser;
-  final DateTime editedAt = DateTime.now();
 
   @override
-  List<Object?> get props => [id.toString(), editedAt, archiveUser];
+  List<Object?> get props => [id.toString()];
 }
 
 final class RealTimeUserPresenceState extends RealTimeState {

@@ -45,3 +45,6 @@ class InstantMessagingDeleteMessageEvent extends InstantMessagingEvent {
   final DeleteMessage message;
   final Client? client;
 }
+
+/// querying user inbox and archives
+class InstantMessagingGetUserInbox extends InstantMessagingEvent {}

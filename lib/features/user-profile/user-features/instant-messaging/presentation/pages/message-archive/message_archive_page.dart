@@ -361,7 +361,6 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                             .add(RealTimeDeleteMessageEvent(
                               message: state.message,
                               username: state.message.from,
-                              client: client,
                             ));
                         archiveMessageProvider.clearSelect();
                       },
@@ -375,6 +374,7 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                             return const SizedBox.shrink();
                           }
 
+                          /// todo handle this show delete icon only when self messages otherwise only forward icon
                           return IconButton(
                             onPressed: () {
                               if (deleting) return;
@@ -391,7 +391,6 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                                     .toList(
                                   growable: false,
                                 ),
-                                everyone: false,
                               );
 
                               context
@@ -418,7 +417,7 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                     Expanded(
                       child: BlocConsumer<RealTimeBloc, RealTimeState>(
                         listenWhen: (previousState, state) {
-                          return (state is RealTimeNewMessageState &&
+                          return (state is RealTimeUserInboxUpdateState &&
                               state.archiveUser == widget.username);
                         },
                         listener: (context, state) {
@@ -439,18 +438,14 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                                   "You have received new messages.",
                                   onTap: handleScrollToBottom,
                                 );
-
-                                // as in the same page
-                                markArchiveRead();
                               }
                             }
                           }
+                          markArchiveRead();
                         },
                         buildWhen: (previousState, state) {
-                          return (state is RealTimeNewMessageState &&
-                                  state.archiveUser == widget.username) ||
-                              (state is RealTimeDeleteMessageState &&
-                                  state.archiveUser == widget.username);
+                          return (state is RealTimeUserInboxUpdateState &&
+                              state.archiveUser == widget.username);
                         },
                         builder: (context, state) {
                           final UserGraph graph = UserGraph();

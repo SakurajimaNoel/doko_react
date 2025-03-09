@@ -495,8 +495,6 @@ class _ShareDetailsState extends State<_ShareDetails> {
                         listener: (context, state) {
                           sending = false;
 
-                          final client =
-                              context.read<WebsocketClientProvider>().client;
                           final realTimeBloc = context.read<RealTimeBloc>();
 
                           if (state
@@ -507,7 +505,6 @@ class _ShareDetailsState extends State<_ShareDetails> {
                               realTimeBloc.add(RealTimeNewMessageEvent(
                                 message: message,
                                 username: username,
-                                client: client,
                               ));
                             }
                             return;
@@ -522,7 +519,6 @@ class _ShareDetailsState extends State<_ShareDetails> {
                             realTimeBloc.add(RealTimeNewMessageEvent(
                               message: message,
                               username: username,
-                              client: client,
                             ));
                           }
 
@@ -560,8 +556,6 @@ class _ShareDetailsState extends State<_ShareDetails> {
                                   final client = context
                                       .read<WebsocketClientProvider>()
                                       .client;
-                                  final realTimeBloc =
-                                      context.read<RealTimeBloc>();
                                   final List<ChatMessage> messages = [];
 
                                   for (String userToSend in selectedUsers) {

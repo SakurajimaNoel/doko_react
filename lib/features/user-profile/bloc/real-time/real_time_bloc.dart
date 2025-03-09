@@ -65,15 +65,6 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
       from: message.from,
     );
 
-    bool self = message.from == event.username;
-
-    if (self) {
-      add(RealTimeMarkInboxAsReadEvent(
-        username: archiveUser,
-        client: event.client,
-      ));
-    }
-
     add(RealTimeTypingStatusEndEvent(
       username: archiveUser,
     ));
@@ -110,14 +101,6 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
       to: event.message.to,
       from: event.message.from,
     );
-    bool self = event.message.from == event.username;
-
-    if (self) {
-      add(RealTimeMarkInboxAsReadEvent(
-        username: archiveUser,
-        client: event.client,
-      ));
-    }
 
     emit(RealTimeEditMessageState(
       id: event.message.id,
@@ -134,14 +117,6 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
       to: event.message.to,
       from: event.message.from,
     );
-    bool self = event.message.from == event.username;
-
-    if (self) {
-      add(RealTimeMarkInboxAsReadEvent(
-        username: archiveUser,
-        client: event.client,
-      ));
-    }
 
     graph.deleteMessage(event.message, event.username);
 

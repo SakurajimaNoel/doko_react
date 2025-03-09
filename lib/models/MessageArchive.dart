@@ -33,7 +33,8 @@ class MessageArchive extends amplify_core.Model {
   final String? _subject;
   final String? _body;
   final bool? _edited;
-  final int? _deleted;
+  final bool? _deleted;
+  final bool? _forwarded;
   final String? _replyFor;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
@@ -139,9 +140,22 @@ class MessageArchive extends amplify_core.Model {
     }
   }
   
-  int get deleted {
+  bool get deleted {
     try {
       return _deleted!;
+    } catch(e) {
+      throw amplify_core.AmplifyCodeGenModelException(
+          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
+  }
+  
+  bool get forwarded {
+    try {
+      return _forwarded!;
     } catch(e) {
       throw amplify_core.AmplifyCodeGenModelException(
           amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
@@ -164,9 +178,9 @@ class MessageArchive extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const MessageArchive._internal({required this.id, required archive, required from, required to, required subject, required body, required edited, required deleted, replyFor, createdAt, updatedAt}): _archive = archive, _from = from, _to = to, _subject = subject, _body = body, _edited = edited, _deleted = deleted, _replyFor = replyFor, _createdAt = createdAt, _updatedAt = updatedAt;
+  const MessageArchive._internal({required this.id, required archive, required from, required to, required subject, required body, required edited, required deleted, required forwarded, replyFor, createdAt, updatedAt}): _archive = archive, _from = from, _to = to, _subject = subject, _body = body, _edited = edited, _deleted = deleted, _forwarded = forwarded, _replyFor = replyFor, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory MessageArchive({String? id, required String archive, required String from, required String to, required String subject, required String body, required bool edited, required int deleted, String? replyFor}) {
+  factory MessageArchive({String? id, required String archive, required String from, required String to, required String subject, required String body, required bool edited, required bool deleted, required bool forwarded, String? replyFor}) {
     return MessageArchive._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       archive: archive,
@@ -176,6 +190,7 @@ class MessageArchive extends amplify_core.Model {
       body: body,
       edited: edited,
       deleted: deleted,
+      forwarded: forwarded,
       replyFor: replyFor);
   }
   
@@ -195,6 +210,7 @@ class MessageArchive extends amplify_core.Model {
       _body == other._body &&
       _edited == other._edited &&
       _deleted == other._deleted &&
+      _forwarded == other._forwarded &&
       _replyFor == other._replyFor;
   }
   
@@ -214,6 +230,7 @@ class MessageArchive extends amplify_core.Model {
     buffer.write("body=" + "$_body" + ", ");
     buffer.write("edited=" + (_edited != null ? _edited!.toString() : "null") + ", ");
     buffer.write("deleted=" + (_deleted != null ? _deleted!.toString() : "null") + ", ");
+    buffer.write("forwarded=" + (_forwarded != null ? _forwarded!.toString() : "null") + ", ");
     buffer.write("replyFor=" + "$_replyFor" + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
@@ -222,7 +239,7 @@ class MessageArchive extends amplify_core.Model {
     return buffer.toString();
   }
   
-  MessageArchive copyWith({String? from, String? to, String? subject, String? body, bool? edited, int? deleted, String? replyFor}) {
+  MessageArchive copyWith({String? from, String? to, String? subject, String? body, bool? edited, bool? deleted, bool? forwarded, String? replyFor}) {
     return MessageArchive._internal(
       id: id,
       archive: archive,
@@ -232,6 +249,7 @@ class MessageArchive extends amplify_core.Model {
       body: body ?? this.body,
       edited: edited ?? this.edited,
       deleted: deleted ?? this.deleted,
+      forwarded: forwarded ?? this.forwarded,
       replyFor: replyFor ?? this.replyFor);
   }
   
@@ -241,7 +259,8 @@ class MessageArchive extends amplify_core.Model {
     ModelFieldValue<String>? subject,
     ModelFieldValue<String>? body,
     ModelFieldValue<bool>? edited,
-    ModelFieldValue<int>? deleted,
+    ModelFieldValue<bool>? deleted,
+    ModelFieldValue<bool>? forwarded,
     ModelFieldValue<String?>? replyFor
   }) {
     return MessageArchive._internal(
@@ -253,6 +272,7 @@ class MessageArchive extends amplify_core.Model {
       body: body == null ? this.body : body.value,
       edited: edited == null ? this.edited : edited.value,
       deleted: deleted == null ? this.deleted : deleted.value,
+      forwarded: forwarded == null ? this.forwarded : forwarded.value,
       replyFor: replyFor == null ? this.replyFor : replyFor.value
     );
   }
@@ -265,13 +285,14 @@ class MessageArchive extends amplify_core.Model {
       _subject = json['subject'],
       _body = json['body'],
       _edited = json['edited'],
-      _deleted = (json['deleted'] as num?)?.toInt(),
+      _deleted = json['deleted'],
+      _forwarded = json['forwarded'],
       _replyFor = json['replyFor'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'archive': _archive, 'from': _from, 'to': _to, 'subject': _subject, 'body': _body, 'edited': _edited, 'deleted': _deleted, 'replyFor': _replyFor, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'archive': _archive, 'from': _from, 'to': _to, 'subject': _subject, 'body': _body, 'edited': _edited, 'deleted': _deleted, 'forwarded': _forwarded, 'replyFor': _replyFor, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
@@ -283,6 +304,7 @@ class MessageArchive extends amplify_core.Model {
     'body': _body,
     'edited': _edited,
     'deleted': _deleted,
+    'forwarded': _forwarded,
     'replyFor': _replyFor,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
@@ -297,6 +319,7 @@ class MessageArchive extends amplify_core.Model {
   static final BODY = amplify_core.QueryField(fieldName: "body");
   static final EDITED = amplify_core.QueryField(fieldName: "edited");
   static final DELETED = amplify_core.QueryField(fieldName: "deleted");
+  static final FORWARDED = amplify_core.QueryField(fieldName: "forwarded");
   static final REPLYFOR = amplify_core.QueryField(fieldName: "replyFor");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "MessageArchive";
@@ -358,7 +381,13 @@ class MessageArchive extends amplify_core.Model {
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
       key: MessageArchive.DELETED,
       isRequired: true,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int)
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.bool)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: MessageArchive.FORWARDED,
+      isRequired: true,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.bool)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(

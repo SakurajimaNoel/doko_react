@@ -4,17 +4,16 @@ import 'package:doko_react/features/user-profile/domain/entity/profile_entity.da
 class MessageEntity implements GraphEntity {
   MessageEntity({
     required ChatMessage message,
-  }) : _message = message;
+    bool edited = false,
+  })  : _message = message,
+        _edited = edited;
 
   ChatMessage _message;
   bool _edited = false;
-  bool _deleted = false;
 
   ChatMessage get message => _message;
 
   bool get edited => _edited;
-
-  bool get deleted => _deleted;
 
   int? listIndex;
 
@@ -26,11 +25,25 @@ class MessageEntity implements GraphEntity {
     _setEdited();
   }
 
-  void deleteMessage() {
-    _deleted = true;
-  }
-
   void _setEdited() {
     _edited = true;
+  }
+
+  static MessageEntity createEntity(Map<String, dynamic> map) {
+    ChatMessage message = ChatMessage(
+      from: map["from"],
+      to: map["to"],
+      id: map["id"],
+      subject: MessageSubject.fromValue(map["subject"]),
+      body: map["body"],
+      sendAt: DateTime.parse(map["createdAt"]).toLocal(),
+      replyOn: map["replyFor"],
+      forwarded: bool.parse(map["forwarded"]),
+    );
+
+    return MessageEntity(
+      message: message,
+      edited: bool.parse(map["edited"]),
+    );
   }
 }

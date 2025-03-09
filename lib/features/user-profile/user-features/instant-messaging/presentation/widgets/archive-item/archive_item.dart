@@ -109,9 +109,7 @@ class _ArchiveItemState extends State<ArchiveItem>
         graph.getValueByKey(widget.messageKey)! as MessageEntity;
     final message = messageEntity.message;
 
-    void deleteMessage({
-      required bool everyone,
-    }) {
+    void deleteMessage() {
       if (deleting) return;
       deleting = true;
 
@@ -119,7 +117,6 @@ class _ArchiveItemState extends State<ArchiveItem>
         from: username,
         to: archiveMessageProvider.archiveUser,
         id: [widget.messageId],
-        everyone: everyone,
       );
 
       // this is handled in message archive page
@@ -225,30 +222,28 @@ class _ArchiveItemState extends State<ArchiveItem>
                           color: currTheme.secondary,
                         ),
                       ),
-                    InkWell(
-                      onTap: () {
-                        deleteMessage(
-                          everyone: false,
-                        );
-                        context.pop();
-                      },
-                      child: _ArchiveItemOptions(
-                        icon: Icons.delete,
-                        label: "Delete",
-                        color: currTheme.error,
-                      ),
-                    ),
+                    // InkWell(
+                    //   onTap: () {
+                    //     deleteMessage(
+                    //       everyone: false,
+                    //     );
+                    //     context.pop();
+                    //   },
+                    //   child: _ArchiveItemOptions(
+                    //     icon: Icons.delete,
+                    //     label: "Delete",
+                    //     color: currTheme.error,
+                    //   ),
+                    // ),
                     if (self)
                       InkWell(
                         onTap: () {
-                          deleteMessage(
-                            everyone: true,
-                          );
+                          deleteMessage();
                           context.pop();
                         },
                         child: _ArchiveItemOptions(
                           icon: Icons.delete_forever,
-                          label: "Delete for everyone",
+                          label: "Delete message",
                           color: currTheme.error,
                         ),
                       ),
@@ -434,6 +429,7 @@ class _ArchiveItemState extends State<ArchiveItem>
                                 ? CrossAxisAlignment.end
                                 : CrossAxisAlignment.start,
                             children: [
+                              // show message reply
                               if (message.replyOn != null)
                                 Builder(
                                   builder: (context) {
@@ -442,23 +438,16 @@ class _ArchiveItemState extends State<ArchiveItem>
                                     final messageEntity =
                                         graph.getValueByKey(messageKey);
                                     String displayMessageReply = "";
-                                    bool deleted = false;
+                                    bool notLoaded = false;
 
                                     if (messageEntity is MessageEntity) {
                                       displayMessageReply = messageReplyPreview(
                                           messageEntity.message.subject,
                                           messageEntity.message.body);
-
-                                      if (messageEntity.deleted) {
-                                        deleted = true;
-                                        displayMessageReply =
-                                            "This message is deleted";
-                                      }
                                     } else {
-                                      /// todo: based on message presence display message
-                                      /// if deleted show message is deleted or loading when loading
                                       displayMessageReply =
-                                          "Message doesn't exist any more";
+                                          "Message could not be loaded.";
+                                      notLoaded = true;
                                     }
 
                                     return Material(
@@ -468,8 +457,10 @@ class _ArchiveItemState extends State<ArchiveItem>
                                       clipBehavior: Clip.antiAlias,
                                       child: InkWell(
                                         onTap: () {
-                                          if (deleted) {
-                                            showInfo("This message is deleted");
+                                          if (notLoaded) {
+                                            showInfo(displayMessageReply);
+
+                                            /// todo can get messages from this to present
                                             return;
                                           }
 
@@ -709,7 +700,6 @@ class _EditMessageState extends State<_EditMessage> {
         context.read<RealTimeBloc>().add(RealTimeEditMessageEvent(
               message: state.message,
               username: username,
-              client: client,
             ));
 
         showSuccess("Message edited.");

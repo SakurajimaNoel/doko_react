@@ -109,7 +109,6 @@ class _MessageInputState extends State<MessageInput> {
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
     final realTimeBloc = context.read<RealTimeBloc>();
-    final client = context.read<WebsocketClientProvider>().client;
 
     Widget gifPicker = GifPicker(
       handleSelection: (String gifURL) async {
@@ -152,7 +151,6 @@ class _MessageInputState extends State<MessageInput> {
         realTimeBloc.add(RealTimeNewMessageEvent(
           message: state.message,
           username: username,
-          client: client,
         ));
       },
       child: Column(
