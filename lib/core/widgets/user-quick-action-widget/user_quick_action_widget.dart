@@ -262,13 +262,12 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
             tempSearchResults = state.searchResults;
           }
           List<String> searchDisplay = tempSearchResults.toList();
-          searchDisplay.removeWhere(
-            (String userKey) =>
-                selectedUsers.contains(
-                  getUsernameFromUserKey(userKey),
-                ) ||
-                username == getUsernameFromUserKey(userKey),
-          );
+          searchDisplay.removeWhere((String userKey) => selectedUsers.contains(
+                    getUsernameFromUserKey(userKey),
+                  )
+              //     ||
+              // username == getUsernameFromUserKey(userKey),
+              );
 
           if (state is ProfileLoading || state is ProfileInitial) {
             return const Center(
