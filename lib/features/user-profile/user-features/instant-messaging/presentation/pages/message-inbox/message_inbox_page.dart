@@ -3,6 +3,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
@@ -10,6 +11,7 @@ import 'package:doko_react/features/user-profile/domain/entity/instant-messaging
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/inbox-query-input/inbox_query_input.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/bloc/instant_messaging_bloc.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/archive-item-options/archive_item_options.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/typing-status/typing_status_widget_wrapper.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:doko_react/init_dependency.dart';
@@ -26,13 +28,89 @@ class MessageInboxPage extends StatefulWidget {
 
 class _MessageInboxPageState extends State<MessageInboxPage> {
   bool loading = false;
+
+  void showInboxItemOptions(
+      BuildContext context, String user, String inboxUser) {
+    final width = MediaQuery.sizeOf(context).width;
+    final currTheme = Theme.of(context).colorScheme;
+    final height = MediaQuery.sizeOf(context).height / 2;
+
+    final instantMessagingBloc = context.read<InstantMessagingBloc>();
+
+    showModalBottomSheet(
+      useRootNavigator: true,
+      context: context,
+      showDragHandle: true,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.only(
+            bottom: Constants.padding,
+          ),
+          constraints: BoxConstraints(
+            maxHeight: height,
+          ),
+          width: width,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: Constants.gap * 0.5,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: Constants.padding,
+                  ),
+                  child: Heading.left(
+                    "Inbox options...",
+                    size: Constants.fontSize * 1.25,
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    context.pop();
+                    context.pushNamed(RouterConstants.userProfile,
+                        pathParameters: {
+                          "username": inboxUser,
+                        });
+                  },
+                  child: ArchiveItemOptions(
+                    avtar: UserWidget.avtarSmall(
+                      userKey: generateUserNodeKey(inboxUser),
+                    ),
+                    label: "Profile",
+                    color: currTheme.secondary,
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    context.pop();
+                    instantMessagingBloc.add(InstantMessagingDeleteInboxEntry(
+                      user: user,
+                      inboxUser: inboxUser,
+                    ));
+                  },
+                  child: ArchiveItemOptions(
+                    icon: Icons.delete,
+                    label: "Remove",
+                    color: currTheme.error,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget buildItems(BuildContext context, int index) {
     final currTheme = Theme.of(context).colorScheme;
     UserGraph graph = UserGraph();
 
     String key = generateInboxKey();
     InboxEntity inbox = graph.getValueByKey(key)! as InboxEntity;
-    List<String> items = inbox.items.reversed.toList();
+    List<String> items = inbox.items;
 
     if (index >= items.length) {
       if (!inbox.pageInfo.hasNextPage) {
@@ -69,7 +147,6 @@ class _MessageInboxPageState extends State<MessageInboxPage> {
           formatDateTimeToTimeString(inboxItemEntity.lastActivityTime!);
     }
 
-    bool selected = false;
     return ListTile(
       onTap: () {
         context.pushNamed(
@@ -79,25 +156,23 @@ class _MessageInboxPageState extends State<MessageInboxPage> {
           },
         );
       },
+      onLongPress: () {
+        showInboxItemOptions(
+          context,
+          (context.read<UserBloc>().state as UserCompleteState).username,
+          username,
+        );
+      },
       selectedTileColor: currTheme.primaryContainer,
       selectedColor: currTheme.onPrimaryContainer,
-      selected: selected,
       dense: true,
       contentPadding: const EdgeInsets.symmetric(
         horizontal: Constants.padding,
       ),
       minVerticalPadding: Constants.padding * 0.5,
-      leading: selected
-          ? CircleAvatar(
-              backgroundColor: currTheme.onPrimaryContainer,
-              child: Icon(
-                Icons.check,
-                color: currTheme.primaryContainer,
-              ),
-            )
-          : UserWidget.avtar(
-              userKey: userKey,
-            ),
+      leading: UserWidget.avtar(
+        userKey: userKey,
+      ),
       title: UserWidget.name(
         userKey: userKey,
         bold: true,

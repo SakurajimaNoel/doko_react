@@ -21,6 +21,7 @@ import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.da
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/message-body-type/message_body_type.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/bloc/instant_messaging_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/provider/archive_message_provider.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/archive-item-options/archive_item_options.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/discussions/discussion_preview_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/polls/poll_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/posts/post_preview_widget.dart';
@@ -144,6 +145,7 @@ class _ArchiveItemState extends State<ArchiveItem>
           ),
           width: width,
           child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               spacing: Constants.gap * 0.5,
@@ -158,99 +160,93 @@ class _ArchiveItemState extends State<ArchiveItem>
                     size: Constants.fontSize * 1.25,
                   ),
                 ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: Constants.gap * 0.5,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        archiveMessageProvider.selectMessage(widget.messageId);
-                        context.pop();
-                      },
-                      child: _ArchiveItemOptions(
-                        icon: Icons.check,
-                        label: "Select",
-                        color: currTheme.secondary,
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        archiveMessageProvider.addReply(widget.messageId);
-                        context.pop();
-                      },
-                      child: _ArchiveItemOptions(
-                        icon: Icons.reply,
-                        label: "Reply",
-                        color: currTheme.secondary,
-                      ),
-                    ),
-                    if (self && message.subject == MessageSubject.text)
-                      InkWell(
-                        onTap: () {
-                          context.pop();
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return ChangeNotifierProvider.value(
-                                value: archiveMessageProvider,
-                                child: BlocProvider.value(
-                                  value: imBloc,
-                                  child: _EditMessage(
-                                    messageId: widget.messageId,
-                                    body: message.body,
-                                  ),
-                                ),
-                              );
-                            },
+                InkWell(
+                  onTap: () {
+                    archiveMessageProvider.selectMessage(widget.messageId);
+                    context.pop();
+                  },
+                  child: ArchiveItemOptions(
+                    icon: Icons.check,
+                    label: "Select",
+                    color: currTheme.secondary,
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    archiveMessageProvider.addReply(widget.messageId);
+                    context.pop();
+                  },
+                  child: ArchiveItemOptions(
+                    icon: Icons.reply,
+                    label: "Reply",
+                    color: currTheme.secondary,
+                  ),
+                ),
+                if (self && message.subject == MessageSubject.text)
+                  InkWell(
+                    onTap: () {
+                      context.pop();
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return ChangeNotifierProvider.value(
+                            value: archiveMessageProvider,
+                            child: BlocProvider.value(
+                              value: imBloc,
+                              child: _EditMessage(
+                                messageId: widget.messageId,
+                                body: message.body,
+                              ),
+                            ),
                           );
                         },
-                        child: _ArchiveItemOptions(
-                          icon: Icons.edit,
-                          label: "Edit message",
-                          color: currTheme.secondary,
-                        ),
-                      ),
-                    if (message.subject == MessageSubject.text)
-                      InkWell(
-                        onTap: () {
-                          Clipboard.setData(ClipboardData(
-                            text: message.body,
-                          ));
-                          context.pop();
-                        },
-                        child: _ArchiveItemOptions(
-                          icon: Icons.copy,
-                          label: "Copy message",
-                          color: currTheme.secondary,
-                        ),
-                      ),
-                    InkWell(
-                      onTap: () {
-                        MessageForward.forward(
-                          context: context,
-                          messagesToForward: [message],
-                        );
-                      },
-                      child: _ArchiveItemOptions(
-                        icon: Icons.forward_to_inbox,
-                        label: "Forward",
-                        color: currTheme.secondary,
-                      ),
+                      );
+                    },
+                    child: ArchiveItemOptions(
+                      icon: Icons.edit,
+                      label: "Edit message",
+                      color: currTheme.secondary,
                     ),
-                    if (self)
-                      InkWell(
-                        onTap: () {
-                          deleteMessage();
-                          context.pop();
-                        },
-                        child: _ArchiveItemOptions(
-                          icon: Icons.delete_forever,
-                          label: "Delete message",
-                          color: currTheme.error,
-                        ),
-                      ),
-                  ],
+                  ),
+                if (message.subject == MessageSubject.text)
+                  InkWell(
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(
+                        text: message.body,
+                      ));
+                      context.pop();
+                    },
+                    child: ArchiveItemOptions(
+                      icon: Icons.copy,
+                      label: "Copy message",
+                      color: currTheme.secondary,
+                    ),
+                  ),
+                InkWell(
+                  onTap: () {
+                    MessageForward.forward(
+                      context: context,
+                      messagesToForward: [message],
+                    );
+                  },
+                  child: ArchiveItemOptions(
+                    icon: Icons.forward_to_inbox,
+                    label: "Forward",
+                    color: currTheme.secondary,
+                  ),
                 ),
+                if (self)
+                  InkWell(
+                    onTap: () {
+                      deleteMessage();
+                      context.pop();
+                    },
+                    child: ArchiveItemOptions(
+                      icon: Icons.delete_forever,
+                      label: "Delete message",
+                      color: currTheme.error,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -618,43 +614,6 @@ class _AddDayToast extends StatelessWidget {
         ),
         child,
       ],
-    );
-  }
-}
-
-class _ArchiveItemOptions extends StatelessWidget {
-  const _ArchiveItemOptions({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(Constants.padding),
-      child: Row(
-        spacing: Constants.gap * 1,
-        children: [
-          Icon(
-            icon,
-            color: color,
-            size: Constants.iconButtonSize * 0.5,
-          ),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: Constants.fontSize * 0.875,
-              fontWeight: FontWeight.w500,
-              color: color,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

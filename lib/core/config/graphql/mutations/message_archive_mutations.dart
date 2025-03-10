@@ -47,6 +47,29 @@ class MessageArchiveMutations {
     };
   }
 
+  /// delete inbox entry
+  static String deleteInboxEntry() {
+    return """
+    mutation DeleteMessageInbox(\$input: DeleteMessageInboxInput!) {
+      deleteMessageInbox(input:\$input) {
+        user
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> deleteInboxEntryVariables({
+    required String user,
+    required String inboxUser,
+  }) {
+    return {
+      "input": {
+        "inboxUser": inboxUser,
+        "user": user,
+      }
+    };
+  }
+
   /// add messages to archive
   static String addMessageToArchive() {
     return """
