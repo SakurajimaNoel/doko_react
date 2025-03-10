@@ -177,8 +177,15 @@ class InstantMessagingBloc
         unread: true,
       );
 
+      List<InboxMutationInput> inboxItems = [];
+      inboxItems.add(myInbox);
+      if (myInbox.user != remoteInbox.user &&
+          myInbox.inboxUser != remoteInbox.user) {
+        inboxItems.add(remoteInbox);
+      }
+
       await Future.wait([
-        _updateInbox([myInbox, remoteInbox]),
+        _updateInbox(inboxItems),
         _addMessageToArchive([message]),
       ]);
     } catch (_) {
