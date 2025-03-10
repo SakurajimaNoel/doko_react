@@ -800,7 +800,7 @@ class UserGraph {
     addEntity(archiveKey, archiveEntity);
   }
 
-  // todo handle all the message methods to handle remote messages to
+
   void addNewMessage(ChatMessage message, String username) {
     // add new message
     String messageKey = generateMessageKey(message.id);
