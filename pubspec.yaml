@@ -47,6 +47,7 @@ dependencies:
   equatable: ^2.0.5
   password_strength: ^0.2.0
   flutter_bloc: ^9.0.0
+  bloc_concurrency: ^0.3.0
   get_it: ^8.0.2
   hydrated_bloc: ^10.0.0
   meta: ^1.15.0

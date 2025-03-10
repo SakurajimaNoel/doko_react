@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:amplify_api/amplify_api.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/graphql/mutations/message_archive_mutations.dart';
 import 'package:doko_react/core/constants/constants.dart';
@@ -44,7 +45,10 @@ class InstantMessagingBloc
         _handleInstantMessagingDeleteInboxEntry);
     on<InstantMessagingDeleteMessageEvent>(
         _handleInstantMessagingDeleteMessageEvent);
-    on<InstantMessagingGetUserInbox>(_handleInstantMessagingGetUserInbox);
+    on<InstantMessagingGetUserInbox>(
+      _handleInstantMessagingGetUserInbox,
+      transformer: droppable(),
+    );
     on<InstantMessagingGetUserArchive>(_handleInstantMessagingGetUserArchive);
   }
 

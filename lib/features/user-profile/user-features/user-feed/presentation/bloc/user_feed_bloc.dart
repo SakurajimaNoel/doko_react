@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/features/user-profile/user-features/user-feed/domain/use-case/user-feed-content/content_use_case.dart';
@@ -16,7 +17,10 @@ class UserFeedBloc extends Bloc<UserFeedEvent, UserFeedState> {
   UserFeedBloc({
     required this.contentUseCase,
   }) : super(UserFeedLoading()) {
-    on<UserFeedGetEvent>(_handleUserFeedGetEvent);
+    on<UserFeedGetEvent>(
+      _handleUserFeedGetEvent,
+      transformer: droppable(),
+    );
   }
 
   FutureOr<void> _handleUserFeedGetEvent(
