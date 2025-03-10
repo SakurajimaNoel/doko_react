@@ -376,20 +376,20 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                           return const SizedBox.shrink();
                         }
 
-                        List<ChatMessage> messageToForward = [];
-                        for (var messageId in selectedMessages) {
-                          var key = generateMessageKey(messageId);
-                          var message = graph.getValueByKey(key);
-
-                          if (message is MessageEntity) {
-                            messageToForward.add(message.message);
-                          }
-                        }
-
                         return Row(
                           children: [
                             IconButton(
                               onPressed: () {
+                                List<ChatMessage> messageToForward = [];
+                                for (var messageId in selectedMessages) {
+                                  var key = generateMessageKey(messageId);
+                                  var message = graph.getValueByKey(key);
+
+                                  if (message is MessageEntity) {
+                                    messageToForward.add(message.message);
+                                  }
+                                }
+
                                 MessageForward.forward(
                                   context: context,
                                   messagesToForward: messageToForward,
@@ -442,6 +442,14 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                         );
                       },
                     ),
+                    // IconButton(
+                    //   onPressed: () {},
+                    //   icon: const Icon(Icons.call),
+                    // ),
+                    // IconButton(
+                    //   onPressed: () {},
+                    //   icon: const Icon(Icons.video_call),
+                    // ),
                   ],
                 ),
                 body: BlocConsumer<InstantMessagingBloc, InstantMessagingState>(
