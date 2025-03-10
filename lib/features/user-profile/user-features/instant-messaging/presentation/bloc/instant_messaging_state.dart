@@ -89,10 +89,10 @@ final class InstantMessagingDeleteMessageErrorState
     extends InstantMessagingErrorState {
   InstantMessagingDeleteMessageErrorState({
     required super.message,
-    required this.multiple,
+    // required this.multiple,
   });
 
-  final bool multiple;
+  // final bool multiple;
 
   @override
   List<Object> get props => [];

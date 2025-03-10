@@ -35,6 +35,10 @@
       },
       "api": {
         "dokoreact": {}
+      },
+      "custom": {
+        "customResolvers": {},
+        "batchCreateMessageInboxResolver": {}
       }
     }
   }

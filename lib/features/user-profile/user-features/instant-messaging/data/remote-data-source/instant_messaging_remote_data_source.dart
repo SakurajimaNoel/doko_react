@@ -81,7 +81,6 @@ class InstantMessagingRemoteDataSource {
         hasNextPage: nextToken.isNotEmpty,
       );
       List inboxList = inboxData["items"];
-
       // inbox item key
       List<String> inboxItems = [];
       List<String> usersToFetch = [];
@@ -118,7 +117,7 @@ class InstantMessagingRemoteDataSource {
           document:
               gql(MessageArchiveQueries.getMessageArchive(details.cursor)),
           variables: MessageArchiveQueries.getMessageArchiveVariables(
-            archive: details.username,
+            archive: details.getArchive(),
             cursor: details.cursor,
           ),
         ),
@@ -137,6 +136,7 @@ class InstantMessagingRemoteDataSource {
         hasNextPage: nextToken.isNotEmpty,
       );
       List archiveList = archiveData["items"];
+
       List<String> archiveItems = [];
 
       for (var item in archiveList) {

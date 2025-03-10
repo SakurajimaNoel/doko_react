@@ -431,7 +431,8 @@ class _ArchiveItemState extends State<ArchiveItem>
                                 : CrossAxisAlignment.start,
                             children: [
                               // show message reply
-                              if (message.replyOn != null)
+                              if (message.replyOn != null &&
+                                  message.replyOn!.isNotEmpty)
                                 Builder(
                                   builder: (context) {
                                     String messageKey =

@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:amplify_api/amplify_api.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
+import 'package:doko_react/core/config/graphql/mutations/message_archive_mutations.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
+import 'package:doko_react/core/global/api/api.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -90,6 +93,40 @@ class InstantMessagingBloc
     }
   }
 
+  Future<void> _addMessageToArchive(List<ChatMessage> messages) async {
+    int batchSize = 20;
+    for (int i = 0; i < messages.length; i += batchSize) {
+      final batch = messages.sublist(
+        i,
+        i + batchSize > messages.length ? messages.length : i + batchSize,
+      );
+      await mutate(GraphQLRequest(
+        document: MessageArchiveMutations.addMessageToArchive(),
+        variables: MessageArchiveMutations.addMessageToArchiveVariables(
+          messages: batch,
+        ),
+      ));
+    }
+  }
+
+  Future<void> _editMessageInArchive(EditMessage message) async {
+    await mutate(GraphQLRequest(
+      document: MessageArchiveMutations.editMessageInArchive(),
+      variables: MessageArchiveMutations.editMessageInArchiveVariables(
+        message,
+      ),
+    ));
+  }
+
+  Future<void> _deleteMessageInArchive(DeleteMessage message) async {
+    await mutate(GraphQLRequest(
+      document: MessageArchiveMutations.deleteMessageInArchive(),
+      variables: MessageArchiveMutations.deleteMessageInArchiveVariables(
+        message,
+      ),
+    ));
+  }
+
   /// todo handle updating of user inbox
 
   FutureOr<void> _handleInstantMessagingSendNewMessageEvent(
@@ -109,6 +146,7 @@ class InstantMessagingBloc
       emit(InstantMessagingSendMessageSuccessState(
         message: event.message,
       ));
+      await _addMessageToArchive([message]);
     } catch (_) {
       emit(InstantMessagingSendMessageErrorState(
         message: Constants.websocketNotConnectedError,
@@ -139,11 +177,13 @@ class InstantMessagingBloc
       emit(InstantMessagingSendMessageToMultipleUserSuccessState(
         messages: messages,
       ));
+      await _addMessageToArchive(messages);
     } catch (_) {
       emit(InstantMessagingSendMessageToMultipleUserErrorState(
         message: Constants.websocketNotConnectedError,
         messagesSent: messagesSent,
       ));
+      await _addMessageToArchive(messagesSent);
     }
   }
 
@@ -161,6 +201,7 @@ class InstantMessagingBloc
       emit(InstantMessagingEditMessageSuccessState(
         message: event.message,
       ));
+      await _editMessageInArchive(event.message);
     } catch (_) {
       emit(InstantMessagingEditMessageErrorState(
         message: Constants.websocketNotConnectedError,
@@ -182,10 +223,11 @@ class InstantMessagingBloc
       emit(InstantMessagingDeleteMessageSuccessState(
         message: event.message,
       ));
+      await _deleteMessageInArchive(event.message);
     } catch (_) {
       emit(InstantMessagingDeleteMessageErrorState(
         message: Constants.websocketNotConnectedError,
-        multiple: event.message.id.length > 1,
+        // multiple: event.message.id.length > 1,
       ));
     }
   }

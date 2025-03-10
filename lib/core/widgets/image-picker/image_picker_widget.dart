@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/preferences/preferences_bloc.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -214,7 +214,7 @@ class ImagePickerWidget extends StatelessWidget {
   }
 
   Future<void> handleSaveOnCapture(String path) async {
-    Isolate.spawn<String>(addFileToUserDevice, path);
+    await compute(addFileToUserDevice, path);
   }
 
   Future<void> selectVideoFromGallery() async {

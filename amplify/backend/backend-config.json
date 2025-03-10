@@ -34,6 +34,36 @@
       "serviceType": "imported"
     }
   },
+  "custom": {
+    "batchCreateMessageInboxResolver": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ],
+          "category": "api",
+          "resourceName": "dokoreact"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "customCDK"
+    },
+    "customResolvers": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ],
+          "category": "api",
+          "resourceName": "dokoreact"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "customCDK"
+    }
+  },
   "parameters": {
     "AMPLIFY_auth_dokoreact_allowUnauthenticatedIdentities": {
       "usedBy": [

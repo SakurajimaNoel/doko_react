@@ -255,10 +255,6 @@ class _MessageArchivePageState extends State<MessageArchivePage>
           ))),
         child: Builder(
           builder: (context) {
-            final client = context.read<WebsocketClientProvider>().client;
-            final archiveMessageProvider =
-                context.read<ArchiveMessageProvider>();
-
             return PopScope(
               canPop: false,
               onPopInvokedWithResult: (bool didPop, _) {
@@ -370,121 +366,81 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                     horizontal: Constants.gap,
                   ),
                   actions: [
-                    BlocListener<InstantMessagingBloc, InstantMessagingState>(
-                      listenWhen: (previousState, state) {
-                        return state
-                                is InstantMessagingDeleteMessageSuccessState ||
-                            state is InstantMessagingDeleteMessageErrorState;
-                      },
-                      listener: (context, state) {
-                        if (deleting) deleting = false;
+                    Builder(
+                      builder: (context) {
+                        final selectedMessages = context
+                            .watch<ArchiveMessageProvider>()
+                            .selectedMessages;
 
-                        if (state is InstantMessagingDeleteMessageErrorState) {
-                          if (state.multiple) {
-                            showError("Failed to delete selected messages.");
-                          } else {
-                            showError(state.message);
-                          }
-                          return;
+                        if (selectedMessages.isEmpty) {
+                          return const SizedBox.shrink();
                         }
 
-                        if (state
-                            is! InstantMessagingDeleteMessageSuccessState) {
-                          return;
+                        List<ChatMessage> messageToForward = [];
+                        for (var messageId in selectedMessages) {
+                          var key = generateMessageKey(messageId);
+                          var message = graph.getValueByKey(key);
+
+                          if (message is MessageEntity) {
+                            messageToForward.add(message.message);
+                          }
                         }
 
-                        context
-                            .read<RealTimeBloc>()
-                            .add(RealTimeDeleteMessageEvent(
-                              message: state.message,
-                              username: state.message.from,
-                            ));
-                        archiveMessageProvider.clearSelect();
-                      },
-                      child: Builder(
-                        builder: (context) {
-                          final selectedMessages = context
-                              .watch<ArchiveMessageProvider>()
-                              .selectedMessages;
-
-                          if (selectedMessages.isEmpty) {
-                            return const SizedBox.shrink();
-                          }
-
-                          bool showDeleteIcon = true;
-                          List<ChatMessage> messageToForward = [];
-                          for (var messageId in selectedMessages) {
-                            var key = generateMessageKey(messageId);
-                            var message = graph.getValueByKey(key);
-                            final username = (context.read<UserBloc>().state
-                                    as UserCompleteState)
-                                .username;
-
-                            if (message is MessageEntity) {
-                              messageToForward.add(message.message);
-                              if (message.message.from != username) {
-                                showDeleteIcon = false;
-                              }
-                            }
-                          }
-
-                          return Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  MessageForward.forward(
-                                    context: context,
-                                    messagesToForward: messageToForward,
-                                  );
-                                },
-                                color: currTheme.primary,
-                                icon: Badge(
-                                  backgroundColor: currTheme.primaryContainer,
-                                  textColor: currTheme.onPrimaryContainer,
-                                  label:
-                                      Text(selectedMessages.length.toString()),
-                                  child: const Icon(Icons.forward_to_inbox),
-                                ),
+                        return Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                MessageForward.forward(
+                                  context: context,
+                                  messagesToForward: messageToForward,
+                                );
+                              },
+                              color: currTheme.primary,
+                              icon: Badge(
+                                backgroundColor: currTheme.primaryContainer,
+                                textColor: currTheme.onPrimaryContainer,
+                                label: Text(selectedMessages.length.toString()),
+                                child: const Icon(Icons.forward_to_inbox),
                               ),
-                              if (showDeleteIcon)
-                                IconButton(
-                                  onPressed: () {
-                                    if (deleting) return;
-                                    deleting = true;
-
-                                    final username = (context
-                                            .read<UserBloc>()
-                                            .state as UserCompleteState)
-                                        .username;
-
-                                    DeleteMessage deleteMessage = DeleteMessage(
-                                      from: username,
-                                      to: widget.username,
-                                      id: archiveMessageProvider
-                                          .selectedMessages
-                                          .toList(
-                                        growable: false,
-                                      ),
-                                    );
-
-                                    context
-                                        .read<InstantMessagingBloc>()
-                                        .add(InstantMessagingDeleteMessageEvent(
-                                          message: deleteMessage,
-                                          client: client,
-                                        ));
-                                  },
-                                  color: currTheme.error,
-                                  icon: Badge(
-                                    label: Text(
-                                        selectedMessages.length.toString()),
-                                    child: const Icon(Icons.delete_forever),
-                                  ),
-                                ),
-                            ],
-                          );
-                        },
-                      ),
+                            ),
+                            // if (showDeleteIcon)
+                            //   IconButton(
+                            //     onPressed: () {
+                            //       if (deleting) return;
+                            //       deleting = true;
+                            //
+                            //       final username = (context
+                            //               .read<UserBloc>()
+                            //               .state as UserCompleteState)
+                            //           .username;
+                            //
+                            //       DeleteMessage deleteMessage = DeleteMessage(
+                            //         from: username,
+                            //         to: widget.username,
+                            //         id: archiveMessageProvider
+                            //             .selectedMessages
+                            //             .toList(
+                            //           growable: false,
+                            //         ),
+                            //       );
+                            //
+                            //       context
+                            //           .read<InstantMessagingBloc>()
+                            //           .add(InstantMessagingDeleteMessageEvent(
+                            //             message: deleteMessage,
+                            //             client: client,
+                            //           ));
+                            //     },
+                            //     color: currTheme.error,
+                            //     icon: Badge(
+                            //       label: Text(
+                            //           selectedMessages.length.toString()),
+                            //       child: const Icon(Icons.delete_forever),
+                            //     ),
+                            //   ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
