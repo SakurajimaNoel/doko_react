@@ -52,6 +52,7 @@ class Share extends StatelessWidget {
         instantMessagingBloc.add(InstantMessagingSendMultipleMessageEvent(
           messages: messages,
           client: client,
+          username: username,
         ));
 
         final state = await imBloc;

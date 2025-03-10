@@ -2,6 +2,18 @@ import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 
+/// delete text
+const String selfDeleteText = "You deleted the message.";
+String remoteDeleteText(String username) {
+  return "@$username deleted the message.";
+}
+
+/// edit text
+const String selfEditText = "You edited the message.";
+String remoteEditText(String username) {
+  return "@$username edited the message.";
+}
+
 String messagePreview(ChatMessage message, String username) {
   bool self = message.from == username;
 

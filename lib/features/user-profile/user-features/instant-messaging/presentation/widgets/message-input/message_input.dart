@@ -100,6 +100,7 @@ class _MessageInputState extends State<MessageInput> {
         .add(InstantMessagingSendNewMessageEvent(
           message: message,
           client: client,
+          username: username,
         ));
   }
 

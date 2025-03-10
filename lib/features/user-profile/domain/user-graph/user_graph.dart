@@ -875,9 +875,9 @@ class UserGraph {
       inboxItem = getValueByKey(inboxItemKey)! as InboxItemEntity;
     }
 
-    String displayText = "You edited the message.";
+    String displayText = selfEditText;
     if (!self) {
-      displayText = "@$archiveUser edited the message.";
+      displayText = remoteEditText(archiveUser);
     }
     inboxItem.updateDisplayText(
       displayText,
@@ -928,9 +928,9 @@ class UserGraph {
     DateTime deletedTime = DateTime.now();
 
     if (self) {
-      displayText = "You deleted the message.";
+      displayText = selfDeleteText;
     } else {
-      displayText = "@$archiveUser deleted the message.";
+      displayText = remoteDeleteText(archiveUser);
     }
 
     if (!containsKey(inboxItemKey)) {

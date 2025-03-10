@@ -57,6 +57,7 @@ class MessageForward extends StatelessWidget {
         instantMessagingBloc.add(InstantMessagingSendMultipleMessageEvent(
           messages: messages,
           client: client,
+          username: username,
         ));
 
         final pushReplacementNamed = context.pushReplacementNamed;

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:amplify_api/amplify_api.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
@@ -6,12 +7,14 @@ import 'package:doko_react/core/config/graphql/mutations/message_archive_mutatio
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/exceptions/application_exceptions.dart';
 import 'package:doko_react/core/global/api/api.dart';
+import 'package:doko_react/core/utils/instant-messaging/message_preview.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/domain/use-case/archive-use-case/archive_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/domain/use-case/inbox-use-case/inbox_use_case.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/archive-query-input/archive_query_input.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/inbox-mutation-input/inbox_mutation_input.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/inbox-query-input/inbox_query_input.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
@@ -127,7 +130,21 @@ class InstantMessagingBloc
     ));
   }
 
-  /// todo handle updating of user inbox
+  Future<void> _updateInbox(List<InboxMutationInput> details) async {
+    int batchSize = 20;
+    for (int i = 0; i < details.length; i += batchSize) {
+      final batch = details.sublist(
+        i,
+        i + batchSize > details.length ? details.length : i + batchSize,
+      );
+      await mutate(GraphQLRequest(
+        document: MessageArchiveMutations.updateUserInbox(),
+        variables: MessageArchiveMutations.updateUserInboxVariables(
+          inboxDetails: batch,
+        ),
+      ));
+    }
+  }
 
   FutureOr<void> _handleInstantMessagingSendNewMessageEvent(
       InstantMessagingSendNewMessageEvent event,
@@ -146,7 +163,24 @@ class InstantMessagingBloc
       emit(InstantMessagingSendMessageSuccessState(
         message: event.message,
       ));
-      await _addMessageToArchive([message]);
+
+      final myInbox = InboxMutationInput(
+        user: event.username,
+        inboxUser: message.to,
+        displayText: messagePreview(message, event.username),
+        unread: false,
+      );
+      final remoteInbox = InboxMutationInput(
+        user: message.to,
+        inboxUser: event.username,
+        displayText: messagePreview(message, message.to),
+        unread: true,
+      );
+
+      await Future.wait([
+        _updateInbox([myInbox, remoteInbox]),
+        _addMessageToArchive([message]),
+      ]);
     } catch (_) {
       emit(InstantMessagingSendMessageErrorState(
         message: Constants.websocketNotConnectedError,
@@ -154,7 +188,38 @@ class InstantMessagingBloc
     }
   }
 
-  /// todo update status for single user only once in case of message forwarding
+  Future<void> _updateInboxForMultipleMessages(
+      List<ChatMessage> messages, String username) async {
+    Set<String> seen = HashSet();
+    List<ChatMessage> uniqueMessages = [];
+
+    for (int i = messages.length - 1; i >= 0; i--) {
+      if (seen.add(messages[i].to)) {
+        uniqueMessages.add(messages[i]);
+      }
+    }
+
+    List<InboxMutationInput> inboxItems = [];
+    for (var message in uniqueMessages) {
+      inboxItems.addAll([
+        InboxMutationInput(
+          user: username,
+          inboxUser: message.to,
+          displayText: messagePreview(message, username),
+          unread: false,
+        ),
+        InboxMutationInput(
+          user: message.to,
+          inboxUser: username,
+          displayText: messagePreview(message, message.to),
+          unread: true,
+        )
+      ]);
+    }
+
+    await _updateInbox(inboxItems);
+  }
+
   FutureOr<void> _handleInstantMessagingSendMultipleMessageEvent(
       InstantMessagingSendMultipleMessageEvent event,
       Emitter<InstantMessagingState> emit) async {
@@ -177,13 +242,20 @@ class InstantMessagingBloc
       emit(InstantMessagingSendMessageToMultipleUserSuccessState(
         messages: messages,
       ));
-      await _addMessageToArchive(messages);
+
+      await Future.wait([
+        _updateInboxForMultipleMessages(messages, event.username),
+        _addMessageToArchive(messages),
+      ]);
     } catch (_) {
       emit(InstantMessagingSendMessageToMultipleUserErrorState(
         message: Constants.websocketNotConnectedError,
         messagesSent: messagesSent,
       ));
-      await _addMessageToArchive(messagesSent);
+      await Future.wait([
+        _updateInboxForMultipleMessages(messagesSent, event.username),
+        _addMessageToArchive(messagesSent),
+      ]);
     }
   }
 
@@ -201,7 +273,24 @@ class InstantMessagingBloc
       emit(InstantMessagingEditMessageSuccessState(
         message: event.message,
       ));
-      await _editMessageInArchive(event.message);
+
+      final myInbox = InboxMutationInput(
+        user: event.username,
+        inboxUser: event.message.to,
+        displayText: selfEditText,
+        unread: false,
+      );
+      final remoteInbox = InboxMutationInput(
+        user: event.message.to,
+        inboxUser: event.username,
+        displayText: remoteEditText(event.username),
+        unread: true,
+      );
+
+      await Future.wait([
+        _updateInbox([myInbox, remoteInbox]),
+        _editMessageInArchive(event.message)
+      ]);
     } catch (_) {
       emit(InstantMessagingEditMessageErrorState(
         message: Constants.websocketNotConnectedError,
@@ -223,7 +312,24 @@ class InstantMessagingBloc
       emit(InstantMessagingDeleteMessageSuccessState(
         message: event.message,
       ));
-      await _deleteMessageInArchive(event.message);
+
+      final myInbox = InboxMutationInput(
+        user: event.username,
+        inboxUser: event.message.to,
+        displayText: selfDeleteText,
+        unread: false,
+      );
+      final remoteInbox = InboxMutationInput(
+        user: event.message.to,
+        inboxUser: event.username,
+        displayText: remoteDeleteText(event.username),
+        unread: true,
+      );
+
+      await Future.wait([
+        _updateInbox([myInbox, remoteInbox]),
+        _deleteMessageInArchive(event.message),
+      ]);
     } catch (_) {
       emit(InstantMessagingDeleteMessageErrorState(
         message: Constants.websocketNotConnectedError,

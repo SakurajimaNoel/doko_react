@@ -126,6 +126,7 @@ class _ArchiveItemState extends State<ArchiveItem>
           .add(InstantMessagingDeleteMessageEvent(
             message: deleteMessage,
             client: client,
+            username: username,
           ));
     }
 
@@ -768,6 +769,7 @@ class _EditMessageState extends State<_EditMessage> {
                   .add(InstantMessagingEditMessageEvent(
                     message: editedMessage,
                     client: client,
+                    username: username,
                   ));
             },
             child: const Text("Edit"),
