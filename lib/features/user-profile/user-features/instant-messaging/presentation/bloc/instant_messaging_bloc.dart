@@ -40,6 +40,8 @@ class InstantMessagingBloc
         _handleInstantMessagingSendMultipleMessageEvent);
     on<InstantMessagingEditMessageEvent>(
         _handleInstantMessagingEditMessageEvent);
+    on<InstantMessagingDeleteInboxEntry>(
+        _handleInstantMessagingDeleteInboxEntry);
     on<InstantMessagingDeleteMessageEvent>(
         _handleInstantMessagingDeleteMessageEvent);
     on<InstantMessagingGetUserInbox>(_handleInstantMessagingGetUserInbox);
@@ -342,6 +344,29 @@ class InstantMessagingBloc
         message: Constants.websocketNotConnectedError,
         // multiple: event.message.id.length > 1,
       ));
+    }
+  }
+
+  FutureOr<void> _handleInstantMessagingDeleteInboxEntry(
+      InstantMessagingDeleteInboxEntry event,
+      Emitter<InstantMessagingState> emit) async {
+    var res = await mutate(GraphQLRequest(
+      document: MessageArchiveMutations.deleteInboxEntry(),
+      variables: MessageArchiveMutations.deleteInboxEntryVariables(
+        user: event.user,
+        inboxUser: event.inboxUser,
+      ),
+    ));
+
+    if (res.hasErrors) {
+      emit(InstantMessagingErrorState(
+        message: Constants.errorMessage,
+      ));
+    } else {
+      graph.removeEntryFromInbox(
+        inboxUser: event.inboxUser,
+      );
+      emit(InstantMessagingSuccessState());
     }
   }
 }

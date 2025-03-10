@@ -800,7 +800,6 @@ class UserGraph {
     addEntity(archiveKey, archiveEntity);
   }
 
-
   void addNewMessage(ChatMessage message, String username) {
     // add new message
     String messageKey = generateMessageKey(message.id);
@@ -952,5 +951,17 @@ class UserGraph {
 
     // update inbox order
     _reorderUserInbox(inboxItemKey);
+  }
+
+  void removeEntryFromInbox({
+    required String inboxUser,
+  }) {
+    String key = generateInboxKey();
+    var inbox = getValueByKey(key);
+
+    if (inbox is InboxEntity) {
+      inbox.removeItem(generateInboxItemKey(inboxUser));
+      addEntity(key, inbox);
+    }
   }
 }

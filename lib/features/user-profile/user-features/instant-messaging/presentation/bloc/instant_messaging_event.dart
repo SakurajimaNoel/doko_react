@@ -69,3 +69,14 @@ class InstantMessagingGetUserArchive extends InstantMessagingEvent {
 
   final ArchiveQueryInput details;
 }
+
+/// delete inbox entry
+class InstantMessagingDeleteInboxEntry extends InstantMessagingEvent {
+  const InstantMessagingDeleteInboxEntry({
+    required this.user,
+    required this.inboxUser,
+  });
+
+  final String user;
+  final String inboxUser;
+}
