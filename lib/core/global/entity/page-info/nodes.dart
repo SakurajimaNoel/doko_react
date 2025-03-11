@@ -27,6 +27,7 @@ class Nodes implements GraphEntity {
   // add list at end
   void addEntityItems(List<String> newItems) {
     newItems.removeWhere((item) => _newInserts.contains(item));
+    _newInserts.addAll(newItems);
     items.addAll(newItems);
   }
 

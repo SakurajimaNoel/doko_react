@@ -103,11 +103,12 @@ class InstantMessagingBloc
   }
 
   Future<void> _addMessageToArchive(List<ChatMessage> messages) async {
-    int batchSize = 20;
-    for (int i = 0; i < messages.length; i += batchSize) {
+    for (int i = 0; i < messages.length; i += Constants.batchSize) {
       final batch = messages.sublist(
         i,
-        i + batchSize > messages.length ? messages.length : i + batchSize,
+        i + Constants.batchSize > messages.length
+            ? messages.length
+            : i + Constants.batchSize,
       );
       await mutate(GraphQLRequest(
         document: MessageArchiveMutations.addMessageToArchive(),
@@ -137,11 +138,12 @@ class InstantMessagingBloc
   }
 
   Future<void> _updateInbox(List<InboxMutationInput> details) async {
-    int batchSize = 20;
-    for (int i = 0; i < details.length; i += batchSize) {
+    for (int i = 0; i < details.length; i += Constants.batchSize) {
       final batch = details.sublist(
         i,
-        i + batchSize > details.length ? details.length : i + batchSize,
+        i + Constants.batchSize > details.length
+            ? details.length
+            : i + Constants.batchSize,
       );
       await mutate(GraphQLRequest(
         document: MessageArchiveMutations.updateUserInbox(),

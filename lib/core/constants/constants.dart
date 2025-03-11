@@ -127,4 +127,5 @@ class Constants {
   ); // used for both firing end events and sending typing events
   static const int maxScrollDuration = 500; // in milliseconds
   static const String websocketNotConnectedError = "You are not connected";
+  static const int batchSize = 25;
 }
