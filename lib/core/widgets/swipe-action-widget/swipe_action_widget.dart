@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+enum SwipeDirection {
+  left,
+  right,
+}
+
 class SwipeActionWidget extends StatefulWidget {
   const SwipeActionWidget({
     super.key,
     required this.onSwipeSuccess,
     required this.child,
+    this.swipeDirection = SwipeDirection.left,
   });
 
   final VoidCallback onSwipeSuccess;
   final Widget child;
+  final SwipeDirection swipeDirection;
 
   @override
   State<SwipeActionWidget> createState() => _SwipeActionWidgetState();
@@ -20,7 +27,7 @@ class _SwipeActionWidgetState extends State<SwipeActionWidget>
   late final VoidCallback onSwipeSuccess;
 
   double start = 0;
-  double left = 0;
+  double offsetX = 0;
 
   bool dragging = false;
   bool shouldCallOnEnd = false;
@@ -44,7 +51,7 @@ class _SwipeActionWidgetState extends State<SwipeActionWidget>
 
   void updateLeftValue() {
     setState(() {
-      left = animation.value;
+      offsetX = animation.value;
     });
   }
 
@@ -64,7 +71,7 @@ class _SwipeActionWidgetState extends State<SwipeActionWidget>
 
     start = 0;
 
-    animation = Tween<double>(begin: left, end: 0).animate(controller);
+    animation = Tween<double>(begin: offsetX, end: 0).animate(controller);
     controller.forward(
       from: 0,
     );
@@ -76,16 +83,23 @@ class _SwipeActionWidgetState extends State<SwipeActionWidget>
     super.dispose();
   }
 
+  bool isInvalidOffsetX(double offsetX) {
+    if (widget.swipeDirection == SwipeDirection.left) {
+      return offsetX < 0;
+    }
+    return offsetX > 0;
+  }
+
   @override
   Widget build(BuildContext context) {
-    var offset = MediaQuery.sizeOf(context).width / 4;
+    var threshold = MediaQuery.sizeOf(context).width / 4;
     const double minLimit = 150;
-    if (offset < minLimit) {
-      offset = minLimit;
+    if (threshold < minLimit) {
+      threshold = minLimit;
     }
 
     return Transform.translate(
-      offset: Offset(left, 0),
+      offset: Offset(offsetX, 0),
       child: GestureDetector(
         onHorizontalDragStart: (details) {
           controller.stop();
@@ -95,13 +109,13 @@ class _SwipeActionWidgetState extends State<SwipeActionWidget>
         onHorizontalDragUpdate: (details) {
           if (!dragging) return;
 
-          left = details.localPosition.dx;
-          left -= start;
+          offsetX = details.localPosition.dx;
+          offsetX -= start;
 
-          if (left < 0) left = 0;
+          if (isInvalidOffsetX(offsetX)) offsetX = 0;
           setState(() {});
 
-          if (left > offset) {
+          if (offsetX.abs() > threshold) {
             handleCrossThreshold();
           } else {
             shouldCallOnEnd = false;
