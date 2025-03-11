@@ -100,7 +100,8 @@ class _ArchiveItemState extends State<ArchiveItem>
 
     final archiveMessageProvider = context.read<ArchiveMessageProvider>();
     bool deleting = false;
-    final imBloc = context.read<InstantMessagingBloc>();
+    final instantMessagingBloc = context.read<InstantMessagingBloc>();
+    final realTimeBloc = context.read<RealTimeBloc>();
 
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
@@ -111,7 +112,7 @@ class _ArchiveItemState extends State<ArchiveItem>
         graph.getValueByKey(widget.messageKey)! as MessageEntity;
     final message = messageEntity.message;
 
-    void deleteMessage() {
+    Future<void> deleteMessage() async {
       if (deleting) return;
       deleting = true;
 
@@ -122,13 +123,27 @@ class _ArchiveItemState extends State<ArchiveItem>
       );
 
       // this is handled in message archive page
-      context
-          .read<InstantMessagingBloc>()
-          .add(InstantMessagingDeleteMessageEvent(
-            message: deleteMessage,
-            client: client,
-            username: username,
-          ));
+      Future imBloc = instantMessagingBloc.stream.first;
+      instantMessagingBloc.add(InstantMessagingDeleteMessageEvent(
+        message: deleteMessage,
+        client: client,
+        username: username,
+      ));
+      final state = await imBloc;
+
+      if (state is InstantMessagingDeleteMessageErrorState) {
+        showError(state.message);
+        return;
+      }
+
+      if (state is! InstantMessagingDeleteMessageSuccessState) {
+        return;
+      }
+      realTimeBloc.add(RealTimeDeleteMessageEvent(
+        message: state.message,
+        username: state.message.from,
+      ));
+      archiveMessageProvider.clearSelect();
     }
 
     showModalBottomSheet(
@@ -192,7 +207,7 @@ class _ArchiveItemState extends State<ArchiveItem>
                           return ChangeNotifierProvider.value(
                             value: archiveMessageProvider,
                             child: BlocProvider.value(
-                              value: imBloc,
+                              value: instantMessagingBloc,
                               child: _EditMessage(
                                 messageId: widget.messageId,
                                 body: message.body,
