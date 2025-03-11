@@ -14,6 +14,7 @@ import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/message-forward/message_forward.dart';
+import 'package:doko_react/core/widgets/swipe-action-widget/swipe_action_widget.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
@@ -56,42 +57,13 @@ class ArchiveItem extends StatefulWidget {
   State<ArchiveItem> createState() => _ArchiveItemState();
 }
 
-class _ArchiveItemState extends State<ArchiveItem>
-    with SingleTickerProviderStateMixin {
-  late AnimationController controller;
-  late Animation<Offset> animation;
-
+class _ArchiveItemState extends State<ArchiveItem> {
   bool highlight = false;
   final highlightDebounce = Debounce(
     const Duration(
       milliseconds: 1500,
     ),
   );
-
-  @override
-  void initState() {
-    super.initState();
-
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(
-        milliseconds: 100,
-      ),
-    );
-
-    animation = Tween<Offset>(
-      begin: const Offset(0.0, 0.0),
-      end: const Offset(0.375, 0.0),
-    ).animate(
-      CurvedAnimation(curve: Curves.decelerate, parent: controller),
-    );
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
 
   void showMoreOptions(BuildContext context, bool self) {
     final width = MediaQuery.sizeOf(context).width;
@@ -375,214 +347,200 @@ class _ArchiveItemState extends State<ArchiveItem>
     return _AddDayToast(
       date: message.sendAt,
       showDate: widget.showDate,
-      child: GestureDetector(
-        onPanUpdate: (details) {
-          if (details.delta.dx > 10) {
-            controller.forward().whenComplete(() {
-              archiveProvider.addReply(widget.messageId);
-              HapticFeedback.vibrate();
-              controller.reverse().whenComplete(() {});
+      child: BlocListener<UserActionBloc, UserActionState>(
+        listenWhen: (previousState, state) {
+          return state is UserActionNodeHighlightState &&
+              state.nodeId == message.id;
+        },
+        listener: (context, state) {
+          if (!highlight) {
+            setState(() {
+              highlight = true;
             });
           }
-        },
-        child: SlideTransition(
-          key: ValueKey("${message.id}-archive-item-widget"),
-          position: animation,
-          child: BlocListener<UserActionBloc, UserActionState>(
-            listenWhen: (previousState, state) {
-              return state is UserActionNodeHighlightState &&
-                  state.nodeId == message.id;
-            },
-            listener: (context, state) {
-              if (!highlight) {
-                setState(() {
-                  highlight = true;
-                });
-              }
-              highlightDebounce(() {
-                if (highlight) {
-                  setState(() {
-                    highlight = false;
-                  });
-                }
+          highlightDebounce(() {
+            if (highlight) {
+              setState(() {
+                highlight = false;
               });
-            },
-            child: Builder(
-              builder: (context) {
-                final _ = context.watch<ArchiveMessageProvider>();
+            }
+          });
+        },
+        child: Builder(
+          builder: (context) {
+            final _ = context.watch<ArchiveMessageProvider>();
 
-                return Container(
-                  width: double.infinity,
-                  color: highlight
-                      ? currTheme.primaryContainer.withValues(
-                          alpha: 0.75,
-                        )
-                      : archiveProvider.isSelected(widget.messageId)
-                          ? currTheme.secondaryContainer
-                          : Colors.transparent,
-                  child: InkWell(
-                    onLongPress: archiveProvider.canShowMoreOptions()
-                        ? () => showMoreOptions(context, self)
-                        : null,
-                    onTap: archiveProvider.canShowMoreOptions()
-                        ? null
-                        : () => archiveProvider.selectMessage(widget.messageId),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: Constants.padding,
-                        vertical: Constants.padding * 0.5,
-                      ),
-                      child: FractionallySizedBox(
+            return SwipeActionWidget(
+              onSwipeSuccess: () {
+                archiveProvider.addReply(widget.messageId);
+              },
+              child: Container(
+                width: double.infinity,
+                color: highlight
+                    ? currTheme.primaryContainer.withValues(
+                        alpha: 0.75,
+                      )
+                    : archiveProvider.isSelected(widget.messageId)
+                        ? currTheme.secondaryContainer
+                        : Colors.transparent,
+                child: InkWell(
+                  onLongPress: archiveProvider.canShowMoreOptions()
+                      ? () => showMoreOptions(context, self)
+                      : null,
+                  onTap: archiveProvider.canShowMoreOptions()
+                      ? null
+                      : () => archiveProvider.selectMessage(widget.messageId),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: Constants.padding,
+                      vertical: Constants.padding * 0.5,
+                    ),
+                    child: FractionallySizedBox(
+                      alignment: alignment,
+                      widthFactor: 0.8,
+                      child: Align(
                         alignment: alignment,
-                        widthFactor: 0.8,
-                        child: Align(
-                          alignment: alignment,
-                          child: Column(
-                            crossAxisAlignment: self
-                                ? CrossAxisAlignment.end
-                                : CrossAxisAlignment.start,
-                            children: [
-                              // show message reply
-                              if (message.replyOn != null &&
-                                  message.replyOn!.isNotEmpty)
-                                Builder(
-                                  builder: (context) {
-                                    String messageKey =
-                                        generateMessageKey(message.replyOn!);
-                                    final messageEntity =
-                                        graph.getValueByKey(messageKey);
-                                    String displayMessageReply = "";
-                                    bool notLoaded = false;
+                        child: Column(
+                          crossAxisAlignment: self
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          spacing: Constants.gap * 0.025,
+                          children: [
+                            // show message reply
+                            if (message.replyOn != null &&
+                                message.replyOn!.isNotEmpty)
+                              Builder(
+                                builder: (context) {
+                                  String messageKey =
+                                      generateMessageKey(message.replyOn!);
+                                  final messageEntity =
+                                      graph.getValueByKey(messageKey);
+                                  String displayMessageReply = "";
+                                  bool notLoaded = false;
 
-                                    if (messageEntity is MessageEntity) {
-                                      displayMessageReply = messageReplyPreview(
-                                          messageEntity.message.subject,
-                                          messageEntity.message.body);
-                                    } else {
-                                      displayMessageReply =
-                                          "Message could not be loaded.";
-                                      notLoaded = true;
-                                    }
+                                  if (messageEntity is MessageEntity) {
+                                    displayMessageReply = messageReplyPreview(
+                                        messageEntity.message.subject,
+                                        messageEntity.message.body);
+                                  } else {
+                                    displayMessageReply =
+                                        "Message could not be loaded.";
+                                    notLoaded = true;
+                                  }
 
-                                    return Material(
-                                      color: currTheme.surfaceContainer,
-                                      borderRadius: BorderRadius.circular(
-                                          Constants.radius * 0.5),
-                                      clipBehavior: Clip.antiAlias,
-                                      child: InkWell(
-                                        onTap: () {
-                                          if (notLoaded) {
-                                            showInfo(displayMessageReply);
+                                  return Material(
+                                    color: currTheme.surfaceContainer,
+                                    borderRadius: BorderRadius.circular(
+                                        Constants.radius * 0.5),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (notLoaded) {
+                                          showInfo(displayMessageReply);
 
-                                            /// todo can get messages from this to present
-                                            return;
-                                          }
+                                          /// todo can get messages from this to present
+                                          return;
+                                        }
 
-                                          final userActionBloc =
-                                              context.read<UserActionBloc>();
+                                        final userActionBloc =
+                                            context.read<UserActionBloc>();
 
-                                          if (messageEntity is MessageEntity &&
-                                              messageEntity.listIndex != null) {
-                                            int messageIndex =
-                                                messageEntity.listIndex!;
-                                            final observerController = context
-                                                .read<ArchiveMessageProvider>()
-                                                .controller;
+                                        if (messageEntity is MessageEntity &&
+                                            messageEntity.listIndex != null) {
+                                          int messageIndex =
+                                              messageEntity.listIndex!;
+                                          final observerController = context
+                                              .read<ArchiveMessageProvider>()
+                                              .controller;
 
-                                            if (observerController != null) {
-                                              // immediately send the event in case widget is already in view
+                                          if (observerController != null) {
+                                            // immediately send the event in case widget is already in view
+                                            userActionBloc.add(
+                                                UserActionNodeHighlightEvent(
+                                              nodeId: messageEntity.message.id,
+                                            ));
+                                            Timer(
+                                                const Duration(
+                                                  milliseconds: Constants
+                                                      .maxScrollDuration,
+                                                ), () {
+                                              // fire highlight event
                                               userActionBloc.add(
                                                   UserActionNodeHighlightEvent(
                                                 nodeId:
                                                     messageEntity.message.id,
                                               ));
-                                              Timer(
-                                                  const Duration(
-                                                    milliseconds: Constants
-                                                        .maxScrollDuration,
-                                                  ), () {
-                                                // fire highlight event
-                                                userActionBloc.add(
-                                                    UserActionNodeHighlightEvent(
-                                                  nodeId:
-                                                      messageEntity.message.id,
-                                                ));
-                                              });
+                                            });
 
-                                              observerController.animateTo(
-                                                index: messageIndex,
-                                                duration: const Duration(
-                                                  milliseconds: Constants
-                                                      .maxScrollDuration,
-                                                ),
-                                                curve: Curves.fastOutSlowIn,
-                                              );
-                                            }
-                                          }
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(
-                                              Constants.padding * 0.375),
-                                          child: Column(
-                                            children: [
-                                              IntrinsicHeight(
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  spacing:
-                                                      Constants.gap * 0.625,
-                                                  children: [
-                                                    VerticalDivider(
-                                                      thickness:
-                                                          Constants.width *
-                                                              0.375,
-                                                      width: Constants.width *
-                                                          0.375,
-                                                      color: currTheme
-                                                          .inversePrimary,
-                                                    ),
-                                                    Text(
-                                                      displayMessageReply,
-                                                      style: TextStyle(
-                                                        fontSize: Constants
-                                                            .smallFontSize,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: currTheme
-                                                            .onSurface
-                                                            .withValues(
-                                                          alpha: 0.75,
-                                                        ),
-                                                      ),
-                                                      softWrap: true,
-                                                    ),
-                                                  ],
-                                                ),
+                                            observerController.animateTo(
+                                              index: messageIndex,
+                                              duration: const Duration(
+                                                milliseconds:
+                                                    Constants.maxScrollDuration,
                                               ),
-                                            ],
-                                          ),
+                                              curve: Curves.fastOutSlowIn,
+                                            );
+                                          }
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(
+                                            Constants.padding * 0.375),
+                                        child: Column(
+                                          children: [
+                                            IntrinsicHeight(
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                spacing: Constants.gap * 0.625,
+                                                children: [
+                                                  VerticalDivider(
+                                                    thickness:
+                                                        Constants.width * 0.375,
+                                                    width:
+                                                        Constants.width * 0.375,
+                                                    color: currTheme
+                                                        .inversePrimary,
+                                                  ),
+                                                  Text(
+                                                    displayMessageReply,
+                                                    style: TextStyle(
+                                                      fontSize: Constants
+                                                          .smallFontSize,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: currTheme.onSurface
+                                                          .withValues(
+                                                        alpha: 0.75,
+                                                      ),
+                                                    ),
+                                                    softWrap: true,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    );
-                                  },
-                                ),
-                              if (messageEntity.message.forwarded)
-                                const Text("Forwarded",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: Constants.smallFontSize * 0.875,
-                                    )),
-                              getMessageItem(message.subject, self),
-                            ],
-                          ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            if (messageEntity.message.forwarded)
+                              const Text("Forwarded",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: Constants.smallFontSize * 0.875,
+                                  )),
+                            getMessageItem(message.subject, self),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                );
-              },
-            ),
-          ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

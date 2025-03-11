@@ -403,41 +403,6 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                                 child: const Icon(Icons.forward_to_inbox),
                               ),
                             ),
-                            // if (showDeleteIcon)
-                            //   IconButton(
-                            //     onPressed: () {
-                            //       if (deleting) return;
-                            //       deleting = true;
-                            //
-                            //       final username = (context
-                            //               .read<UserBloc>()
-                            //               .state as UserCompleteState)
-                            //           .username;
-                            //
-                            //       DeleteMessage deleteMessage = DeleteMessage(
-                            //         from: username,
-                            //         to: widget.username,
-                            //         id: archiveMessageProvider
-                            //             .selectedMessages
-                            //             .toList(
-                            //           growable: false,
-                            //         ),
-                            //       );
-                            //
-                            //       context
-                            //           .read<InstantMessagingBloc>()
-                            //           .add(InstantMessagingDeleteMessageEvent(
-                            //             message: deleteMessage,
-                            //             client: client,
-                            //           ));
-                            //     },
-                            //     color: currTheme.error,
-                            //     icon: Badge(
-                            //       label: Text(
-                            //           selectedMessages.length.toString()),
-                            //       child: const Icon(Icons.delete_forever),
-                            //     ),
-                            //   ),
                           ],
                         );
                       },
