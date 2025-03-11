@@ -2,7 +2,6 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
-import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
@@ -14,7 +13,6 @@ import 'package:doko_react/features/user-profile/user-features/instant-messaging
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/archive-item-options/archive_item_options.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/typing-status/typing_status_widget_wrapper.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
-import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -119,7 +117,7 @@ class _MessageInboxPageState extends State<MessageInboxPage> {
 
       if (!loading) {
         loading = true;
-        context.read<InstantMessagingBloc>().add(InstantMessagingGetUserInbox(
+        context.read<RealTimeBloc>().add(RealTimeInboxGetEvent(
                 details: InboxQueryInput(
               cursor: inbox.pageInfo.endCursor ?? "",
               username: (context.read<UserBloc>().state as UserCompleteState)
@@ -244,76 +242,71 @@ class _MessageInboxPageState extends State<MessageInboxPage> {
           ),
         ],
       ),
-      body: BlocProvider(
-        create: (context) => serviceLocator<InstantMessagingBloc>()
-          ..add(InstantMessagingGetUserInbox(
+      body: BlocProvider.value(
+        value: context.read<RealTimeBloc>()
+          ..add(RealTimeInboxGetEvent(
               details: InboxQueryInput(
             cursor: "",
             username:
                 (context.read<UserBloc>().state as UserCompleteState).username,
           ))),
-        child: BlocConsumer<InstantMessagingBloc, InstantMessagingState>(
+        child: BlocConsumer<RealTimeBloc, RealTimeState>(
+          listenWhen: (prevState, state) {
+            return state is RealTimeUserInboxUpdateState;
+          },
           listener: (context, state) {
             loading = false;
-            if (state is InstantMessagingErrorState) {
-              showError(state.message);
-              return;
-            }
           },
-          builder: (context, state) {
-            return BlocBuilder<RealTimeBloc, RealTimeState>(
-              buildWhen: (previousState, state) {
-                return state is RealTimeUserInboxUpdateState;
-              },
-              builder: (context, _) {
-                bool loading = state is InstantMessagingInitial;
+          buildWhen: (previousState, state) {
+            return state is RealTimeUserInboxUpdateState;
+          },
+          builder: (context, _) {
+            final UserGraph graph = UserGraph();
+            final inboxKey = generateInboxKey();
 
-                final UserGraph graph = UserGraph();
-                final inboxKey = generateInboxKey();
+            bool loading = !graph.containsKey(inboxKey);
 
-                if (loading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+            if (loading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
 
-                final inbox = graph.getValueByKey(inboxKey)! as InboxEntity;
-                final items = inbox.items;
+            final inbox = graph.getValueByKey(inboxKey)! as InboxEntity;
+            final items = inbox.items;
 
-                if (items.isEmpty) {
-                  return const Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Text(
-                          "No inbox items right now.",
-                          style: TextStyle(
-                            fontSize: Constants.fontSize,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+            if (items.isEmpty) {
+              return const Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Text(
+                      "No inbox items right now.",
+                      style: TextStyle(
+                        fontSize: Constants.fontSize,
+                        fontWeight: FontWeight.w500,
                       ),
-                    ],
-                  );
-                }
-
-                return ListView.separated(
-                  padding: const EdgeInsets.only(
-                    bottom: Constants.padding,
-                    top: Constants.padding * 0.5,
+                    ),
                   ),
-                  itemBuilder: (BuildContext context, int index) {
-                    return buildItems(context, index);
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return const SizedBox(
-                      height: Constants.gap,
-                    );
-                  },
-                  itemCount: items.length + 1,
+                ],
+              );
+            }
+
+            return ListView.separated(
+              padding: const EdgeInsets.only(
+                bottom: Constants.padding,
+                top: Constants.padding * 0.5,
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                return buildItems(context, index);
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return const SizedBox(
+                  height: Constants.gap,
                 );
               },
+              itemCount: items.length + 1,
             );
           },
         ),

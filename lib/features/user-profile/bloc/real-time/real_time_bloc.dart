@@ -1,11 +1,16 @@
 import 'dart:async';
 
 import 'package:amplify_flutter/amplify_flutter.dart' hide Emitter;
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/graphql/mutations/message_archive_mutations.dart';
 import 'package:doko_react/core/global/api/api.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/input/inbox-query-input/inbox_query_input.dart';
+import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/bloc/instant_messaging_bloc.dart';
+import 'package:doko_react/init_dependency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
@@ -31,6 +36,10 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
       emit(RealTimeUserInboxUpdateState());
     });
     on<RealTimeMarkInboxAsReadEvent>(_handleRealTimeMarkInboxAsReadEvent);
+    on<RealTimeInboxGetEvent>(
+      _handleRealTimeInboxGetEvent,
+      transformer: droppable(),
+    );
   }
 
   FutureOr<void> _handleRealTimeMarkInboxAsReadEvent(
@@ -139,5 +148,22 @@ class RealTimeBloc extends Bloc<RealTimeEvent, RealTimeState> {
       id: event.message.id,
       archiveUser: archiveUser,
     ));
+  }
+
+  FutureOr<void> _handleRealTimeInboxGetEvent(
+      RealTimeInboxGetEvent event, Emitter<RealTimeState> emit) async {
+    final instantMessagingBloc = serviceLocator<InstantMessagingBloc>();
+
+    Future imBloc = instantMessagingBloc.stream.first;
+    instantMessagingBloc.add(InstantMessagingGetUserInbox(
+      details: event.details,
+    ));
+
+    final imState = await imBloc;
+    if (imState is InstantMessagingErrorState) {
+      showError(imState.message);
+    }
+
+    add(RealTimeInboxUpdateEvent());
   }
 }

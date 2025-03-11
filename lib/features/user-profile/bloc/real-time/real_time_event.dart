@@ -3,6 +3,14 @@ part of 'real_time_bloc.dart';
 @immutable
 sealed class RealTimeEvent {}
 
+final class RealTimeInboxGetEvent extends RealTimeEvent {
+  RealTimeInboxGetEvent({
+    required this.details,
+  });
+
+  final InboxQueryInput details;
+}
+
 final class RealTimeNewMessageEvent extends RealTimeEvent {
   RealTimeNewMessageEvent({
     required this.message,
