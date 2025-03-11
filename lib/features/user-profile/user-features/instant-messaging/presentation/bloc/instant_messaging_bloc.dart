@@ -185,8 +185,7 @@ class InstantMessagingBloc
 
       List<InboxMutationInput> inboxItems = [];
       inboxItems.add(myInbox);
-      if (myInbox.user != remoteInbox.user &&
-          myInbox.inboxUser != remoteInbox.user) {
+      if (message.from != message.to) {
         inboxItems.add(remoteInbox);
       }
 
