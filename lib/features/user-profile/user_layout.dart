@@ -316,6 +316,9 @@ class _UserLayoutState extends State<UserLayout> {
   }
 
   void refreshApp() {
+    UserGraph graph = UserGraph();
+    graph.reset();
+
     context.read<UserBloc>().add(UserInitEvent());
   }
 
