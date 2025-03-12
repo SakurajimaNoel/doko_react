@@ -115,16 +115,20 @@ class _UserFeedPageState extends State<UserFeedPage> {
 
     if (nodeType == DokiNodeType.post) {
       return PostWidget(
+        key: ValueKey("timeline-$nodeKey"),
         postKey: nodeKey,
       );
     }
 
     if (nodeType == DokiNodeType.discussion) {
       return DiscussionWidget(
+        key: ValueKey("timeline-$nodeKey"),
         discussionKey: nodeKey,
       );
     }
+
     return PollWidget(
+      key: ValueKey("timeline-$nodeKey"),
       pollKey: nodeKey,
     );
   }
@@ -227,27 +231,6 @@ class _UserFeedPageState extends State<UserFeedPage> {
                   cursor: "",
                   username: username,
                 )));
-
-            // final instantMessagingBloc = serviceLocator<InstantMessagingBloc>();
-            //
-            //
-            // final realTimeBloc = context.read<RealTimeBloc>();
-            //
-            // Future imBloc = instantMessagingBloc.stream.first;
-            // instantMessagingBloc.add(InstantMessagingGetUserInbox(
-            //   details: InboxQueryInput(
-            //     cursor: "",
-            //     username: username,
-            //   ),
-            // ));
-            //
-            // final imState = await imBloc;
-            // if (imState is InstantMessagingErrorState) {
-            //   showError(imState.message);
-            //   return;
-            // }
-            //
-            // realTimeBloc.add(RealTimeInboxUpdateEvent());
           },
           buildWhen: (previousState, state) {
             return state is UserFeedGetResponseState;

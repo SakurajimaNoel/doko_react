@@ -81,16 +81,19 @@ class _TimelineState extends State<Timeline> {
 
     if (nodeType == DokiNodeType.post) {
       return PostWidget(
+        key: ValueKey("timeline-$nodeKey"),
         postKey: nodeKey,
       );
     }
 
     if (nodeType == DokiNodeType.discussion) {
       return DiscussionWidget(
+        key: ValueKey("timeline-$nodeKey"),
         discussionKey: nodeKey,
       );
     }
     return PollWidget(
+      key: ValueKey("timeline-$nodeKey"),
       pollKey: nodeKey,
     );
   }
