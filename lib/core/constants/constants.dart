@@ -129,4 +129,8 @@ class Constants {
   static const int maxScrollDuration = 500; // in milliseconds
   static const String websocketNotConnectedError = "You are not connected";
   static const int batchSize = 25;
+
+  // layout
+  static const double compact = 600;
+  static const double medium = 840;
 }

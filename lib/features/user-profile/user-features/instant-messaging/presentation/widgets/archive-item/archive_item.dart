@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
@@ -619,7 +620,7 @@ class _EditMessageState extends State<_EditMessage> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
+    final width = min(MediaQuery.sizeOf(context).width, Constants.compact);
     final client = context.read<WebsocketClientProvider>().client;
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
@@ -648,6 +649,12 @@ class _EditMessageState extends State<_EditMessage> {
       },
       child: AlertDialog(
         title: const Text("Edit message"),
+        scrollable: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+            Constants.radius,
+          ),
+        ),
         content: SizedBox(
           width: width,
           child: TextField(

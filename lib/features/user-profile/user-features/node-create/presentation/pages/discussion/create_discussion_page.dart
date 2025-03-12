@@ -48,42 +48,46 @@ class _CreateDiscussionPageState extends State<CreateDiscussionPage> {
         actions: [
           TextButton(
             onPressed: () {
+              final text = textController.text.trim();
+              if (text.isEmpty) {
+                showInfo("No text to preview.");
+                return;
+              }
+
               showDialog(
                 context: context,
                 builder: (context) {
-                  return AlertDialog(
-                    backgroundColor: currTheme.surface,
-                    title: const Heading(
-                      "Discussion text preview",
-                      size: Constants.heading3,
-                    ),
-                    insetPadding: const EdgeInsets.all(
-                      Constants.padding,
-                    ),
-                    scrollable: true,
-                    contentPadding: const EdgeInsets.all(
-                      Constants.padding,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        Constants.radius,
-                      ),
-                    ),
-                    content: MarkdownDisplayWidget(
-                      data: textController.text,
-                    ),
-                    actionsPadding: const EdgeInsets.all(
-                      Constants.padding * 0.625,
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          context.pop();
-                        },
-                        child: const Text("Close"),
-                      ),
-                    ],
+                  final showFullScreenDialog =
+                      MediaQuery.sizeOf(context).width < Constants.compact;
+
+                  final dialogContent = _CreateDialogContent(
+                    text: text,
+                    background: showFullScreenDialog
+                        ? currTheme.surface
+                        : currTheme.surfaceContainer,
                   );
+
+                  if (showFullScreenDialog) {
+                    return Dialog.fullscreen(
+                      backgroundColor: currTheme.surface,
+                      child: dialogContent,
+                    );
+                  } else {
+                    return Dialog(
+                      backgroundColor: currTheme.surfaceContainer,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          Constants.radius,
+                        ),
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxWidth: Constants.compact,
+                        ),
+                        child: dialogContent,
+                      ),
+                    );
+                  }
                 },
               );
             },
@@ -203,6 +207,57 @@ class _CreateDiscussionPageState extends State<CreateDiscussionPage> {
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _CreateDialogContent extends StatelessWidget {
+  const _CreateDialogContent({
+    required this.text,
+    required this.background,
+  });
+
+  final String text;
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        bottom: Constants.padding,
+        left: Constants.padding,
+        right: Constants.padding,
+      ),
+      child: CustomScrollView(
+        slivers: [
+          PinnedHeaderSliver(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: background,
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: Constants.padding * 0.5,
+                ),
+                child: Heading(
+                  "Discussion text preview",
+                  size: Constants.heading3,
+                ),
+              ),
+            ),
+          ),
+          const SliverPadding(
+            padding: EdgeInsets.symmetric(
+              vertical: Constants.padding * 0.5,
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: MarkdownDisplayWidget(
+              data: text,
+            ),
+          )
+        ],
       ),
     );
   }
