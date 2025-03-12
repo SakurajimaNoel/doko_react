@@ -4,6 +4,7 @@ import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/pull-to-refresh/pull_to_refresh.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -183,7 +184,7 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
               }
 
               // render profile friends
-              return RefreshIndicator(
+              return PullToRefresh(
                 onRefresh: () async {
                   Future profileBloc = context.read<ProfileBloc>().stream.first;
 

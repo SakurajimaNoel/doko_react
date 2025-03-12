@@ -6,6 +6,7 @@ import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/pull-to-refresh/pull_to_refresh.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
@@ -239,7 +240,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
             bool initialLoading = state is UserFeedLoading;
             final userFeed = graph.getValueByKey(userFeedKey);
 
-            return RefreshIndicator(
+            return PullToRefresh(
               onRefresh: () async {
                 final userFeedBloc = context.read<UserFeedBloc>();
                 Future userFeedBlocState = userFeedBloc.stream.first;

@@ -10,6 +10,7 @@ import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
+import 'package:doko_react/core/widgets/pull-to-refresh/pull_to_refresh.dart';
 import 'package:doko_react/core/widgets/share/share.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/public/sign-out-button/sign_out_button.dart';
@@ -574,7 +575,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                   );
                 }
 
-                return RefreshIndicator(
+                return PullToRefresh(
                   onRefresh: () async {
                     final userToUserActionBloc =
                         context.read<UserToUserActionBloc>();

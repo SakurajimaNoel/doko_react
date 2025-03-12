@@ -3,6 +3,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/pull-to-refresh/pull_to_refresh.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
@@ -93,7 +94,7 @@ class _PendingIncomingRequestState extends State<PendingIncomingRequest>
               );
             }
 
-            return RefreshIndicator(
+            return PullToRefresh(
               onRefresh: () async {
                 context.read<ProfileBloc>().add(GetUserPendingIncomingRequest(
                       username: username,
