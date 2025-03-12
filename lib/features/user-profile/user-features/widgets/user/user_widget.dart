@@ -1,9 +1,9 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
-import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
@@ -21,8 +21,6 @@ class UserWidget extends StatelessWidget {
   const UserWidget({
     super.key,
     required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
     this.redirect = false,
   })  : small = false,
         normal = true,
@@ -37,8 +35,6 @@ class UserWidget extends StatelessWidget {
   const UserWidget.small({
     super.key,
     required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
     this.redirect = false,
   })  : small = true,
         normal = false,
@@ -53,8 +49,6 @@ class UserWidget extends StatelessWidget {
   const UserWidget.large({
     super.key,
     required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
     this.redirect = false,
   })  : small = false,
         normal = false,
@@ -70,8 +64,6 @@ class UserWidget extends StatelessWidget {
   const UserWidget.avtar({
     super.key,
     required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
     this.redirect = false,
   })  : small = false,
         normal = true,
@@ -86,8 +78,6 @@ class UserWidget extends StatelessWidget {
   const UserWidget.avtarSmall({
     super.key,
     required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
     this.redirect = false,
   })  : small = true,
         normal = false,
@@ -102,8 +92,6 @@ class UserWidget extends StatelessWidget {
   const UserWidget.avtarLarge({
     super.key,
     required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
     this.redirect = false,
   })  : small = false,
         normal = false,
@@ -119,44 +107,10 @@ class UserWidget extends StatelessWidget {
   const UserWidget.info({
     super.key,
     required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
     this.redirect = false,
   })  : small = false,
         normal = true,
         large = false,
-        name = false,
-        username = false,
-        avtar = false,
-        info = true,
-        preview = false,
-        bold = false;
-
-  const UserWidget.infoSmall({
-    super.key,
-    required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
-    this.redirect = false,
-  })  : small = true,
-        normal = false,
-        large = false,
-        name = false,
-        username = false,
-        avtar = false,
-        info = true,
-        preview = false,
-        bold = false;
-
-  const UserWidget.infoLarge({
-    super.key,
-    required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
-    this.redirect = false,
-  })  : small = false,
-        normal = false,
-        large = true,
         name = false,
         username = false,
         avtar = false,
@@ -168,45 +122,11 @@ class UserWidget extends StatelessWidget {
   const UserWidget.name({
     super.key,
     required this.userKey,
-    this.trim = 30,
     this.bold = false,
-    this.baseFontSize = Constants.fontSize,
     this.redirect = false,
   })  : small = false,
         normal = true,
         large = false,
-        name = true,
-        username = false,
-        avtar = false,
-        info = false,
-        preview = false;
-
-  const UserWidget.nameSmall({
-    super.key,
-    required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
-    this.redirect = false,
-    this.bold = false,
-  })  : small = true,
-        normal = false,
-        large = false,
-        name = true,
-        username = false,
-        avtar = false,
-        info = false,
-        preview = false;
-
-  const UserWidget.nameLarge({
-    super.key,
-    required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
-    this.redirect = false,
-    this.bold = false,
-  })  : small = false,
-        normal = false,
-        large = true,
         name = true,
         username = false,
         avtar = false,
@@ -217,44 +137,10 @@ class UserWidget extends StatelessWidget {
   const UserWidget.username({
     super.key,
     required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
     this.redirect = false,
   })  : small = false,
         normal = true,
         large = false,
-        name = false,
-        username = true,
-        avtar = false,
-        info = false,
-        preview = false,
-        bold = false;
-
-  const UserWidget.usernameSmall({
-    super.key,
-    required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
-    this.redirect = false,
-  })  : small = true,
-        normal = false,
-        large = false,
-        name = false,
-        username = true,
-        avtar = false,
-        info = false,
-        preview = false,
-        bold = false;
-
-  const UserWidget.usernameLarge({
-    super.key,
-    required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
-    this.redirect = false,
-  })  : small = false,
-        normal = false,
-        large = true,
         name = false,
         username = true,
         avtar = false,
@@ -266,8 +152,6 @@ class UserWidget extends StatelessWidget {
   const UserWidget.preview({
     super.key,
     required this.userKey,
-    this.trim = 30,
-    this.baseFontSize = Constants.fontSize,
     this.redirect = false,
   })  : small = false,
         normal = false,
@@ -295,9 +179,6 @@ class UserWidget extends StatelessWidget {
   // widget options
   final bool preview;
 
-  // user info display trim
-  final int trim;
-  final double baseFontSize;
   final bool bold; // only used with name options
 
   // to allow redirect
@@ -608,38 +489,30 @@ class UserWidget extends StatelessWidget {
     required String profileUsername,
     String? name,
   }) {
-    double scaleFactor = 1;
-    if (large) scaleFactor = 1.125;
-    if (small) scaleFactor = 0.875;
-
-    return Text(
-      trimText(
-        name ?? "@$profileUsername",
-        len: trim,
-      ),
+    return AutoSizeText(
+      name ?? "@$profileUsername",
       style: TextStyle(
-        fontSize: baseFontSize * scaleFactor,
         fontWeight: name == null || bold ? FontWeight.bold : null,
+        overflow: TextOverflow.ellipsis,
       ),
+      minFontSize: Constants.smallFontSize,
+      maxLines: 1,
+      maxFontSize: Constants.fontSize * 0.875,
     );
   }
 
   Widget userUsername({
     required String profileUsername,
   }) {
-    double scaleFactor = 1;
-    if (large) scaleFactor = 1.125;
-    if (small) scaleFactor = 0.875;
-
-    return Text(
-      "@${trimText(
-        profileUsername,
-        len: trim,
-      )}",
-      style: TextStyle(
-        fontSize: baseFontSize * scaleFactor,
+    return AutoSizeText(
+      "@$profileUsername",
+      style: const TextStyle(
         fontWeight: FontWeight.bold,
+        overflow: TextOverflow.ellipsis,
       ),
+      minFontSize: Constants.smallFontSize,
+      maxLines: 1,
+      maxFontSize: Constants.fontSize * 0.875,
     );
   }
 
@@ -653,12 +526,16 @@ class UserWidget extends StatelessWidget {
       spacing: Constants.gap * 0.125,
       children: [
         if (user?.name != null)
-          userName(
-            profileUsername: profileUsername,
-            name: user?.name,
+          Flexible(
+            child: userName(
+              profileUsername: profileUsername,
+              name: user?.name,
+            ),
           ),
-        userUsername(
-          profileUsername: profileUsername,
+        Flexible(
+          child: userUsername(
+            profileUsername: profileUsername,
+          ),
         ),
       ],
     );
@@ -675,13 +552,16 @@ class UserWidget extends StatelessWidget {
 
     return Row(
       spacing: Constants.gap * gapScale,
+      mainAxisSize: MainAxisSize.min,
       children: [
         userAvtar(
           profilePicture: user?.profilePicture,
         ),
-        userInfo(
-          profileUsername: profileUsername,
-          user: user,
+        Flexible(
+          child: userInfo(
+            profileUsername: profileUsername,
+            user: user,
+          ),
         ),
       ],
     );

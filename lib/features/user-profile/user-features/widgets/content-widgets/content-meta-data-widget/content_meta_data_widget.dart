@@ -143,75 +143,56 @@ class ContentMetaDataWidget extends StatelessWidget {
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          bool shrink = constraints.maxWidth < Constants.postMetadataWidth;
-          double shrinkFactor = shrink ? 0.875 : 1;
-
-          bool superShrink = constraints.maxWidth < 250;
-          double baseFontSize = Constants.smallFontSize * 1.125;
+          bool shrink = constraints.maxWidth < Constants.shrinkWidth;
 
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: Constants.gap,
             children: [
               usersTagged.isNotEmpty
-                  ? Row(
-                      spacing: Constants.gap * 0.5,
-                      children: [
-                        UsersTaggedAvtarWidget(
-                          usersTagged: usersTagged,
-                          nodeCreatedBy: node.createdBy,
-                          onTap: () {
-                            showTaggedUsers(
-                              context: context,
-                              usersTagged: usersTagged,
-                            );
-                          },
-                        ),
-                        if (!shrink)
-                          UserWidget.info(
-                            userKey: node.createdBy,
-                            baseFontSize: baseFontSize,
-                            trim: 20,
-                            redirect: true,
-                          )
-                        else
-                          UserWidget.infoSmall(
-                            key: ValueKey("${node.createdBy}-with-small-size"),
-                            userKey: node.createdBy,
-                            baseFontSize: baseFontSize,
-                            trim: 16,
-                            redirect: true,
+                  ? Expanded(
+                      child: Row(
+                        spacing: Constants.gap * 0.5,
+                        children: [
+                          UsersTaggedAvtarWidget(
+                            usersTagged: usersTagged,
+                            nodeCreatedBy: node.createdBy,
+                            onTap: () {
+                              showTaggedUsers(
+                                context: context,
+                                usersTagged: usersTagged,
+                              );
+                            },
                           ),
-                      ],
+                          Expanded(
+                            child: UserWidget.info(
+                              userKey: node.createdBy,
+                              redirect: true,
+                            ),
+                          ),
+                        ],
+                      ),
                     )
-                  : !shrink
-                      ? UserWidget(
-                          userKey: node.createdBy,
-                          baseFontSize: baseFontSize,
-                          trim: 20,
-                          redirect: true,
-                        )
-                      : UserWidget.small(
-                          key: ValueKey("${node.createdBy}-with-small-size"),
-                          userKey: node.createdBy,
-                          baseFontSize: baseFontSize,
-                          trim: 16,
-                          redirect: true,
-                        ),
+                  : Expanded(
+                      child: UserWidget(
+                        userKey: node.createdBy,
+                        redirect: true,
+                      ),
+                    ),
               Column(
                 spacing: Constants.gap * 0.25,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  if (!superShrink)
-                    Text(
-                      displayDateDifference(
-                        node.createdOn,
-                        format: shrink ? "d MMM y" : "EEEE, d MMM y",
-                      ),
-                      style: TextStyle(
-                        fontSize: Constants.smallFontSize * shrinkFactor,
-                      ),
+                  Text(
+                    displayDateDifference(
+                      node.createdOn,
+                      format: shrink ? "d MMM y" : "EEEE, d MMM y",
                     ),
+                    style: const TextStyle(
+                      fontSize: Constants.smallFontSize,
+                    ),
+                  ),
                   if (usersTagged.isNotEmpty)
                     InkWell(
                       onTap: () {
@@ -228,7 +209,7 @@ class ContentMetaDataWidget extends StatelessWidget {
                             color: currTheme.primary,
                             size: Constants.iconButtonSize * 0.5,
                           ),
-                          if (!superShrink)
+                          if (!shrink)
                             Text(
                               "Tagged Users",
                               style: TextStyle(

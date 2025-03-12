@@ -62,6 +62,8 @@ class Constants {
   // content
   static const int userTagLimit = 16;
   static const int mediaLimit = 1 << 4;
+  static const double carouselDots = 6;
+  static const double carouselActiveDotScale = 1.5;
 
   // polls
   static const int pollOptionsLimit = 5;
@@ -82,9 +84,8 @@ class Constants {
   static const double actionEdgeGap = _root * 0.125;
   static const int postCaptionLimit = 1 << 10;
   static const int postCaptionDisplayLimit = 1 << 7;
-  static const double carouselDots = 6;
-  static const double carouselActiveDotScale = 1.5;
-  static const double postMetadataWidth = _root * 20;
+
+  static const double shrinkWidth = _root * 20;
 
   // profile
   static const double sliverPersistentHeaderHeight = 50;

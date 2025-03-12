@@ -75,15 +75,9 @@ class FriendWidget extends StatelessWidget {
                     ),
           title: UserWidget.name(
             userKey: userKey,
-            baseFontSize:
-                Constants.smallFontSize * (shrink && !superShrink ? 1 : 1.125),
-            trim: shrink ? 20 : 30,
           ),
-          subtitle: UserWidget.usernameSmall(
+          subtitle: UserWidget.username(
             userKey: userKey,
-            baseFontSize:
-                Constants.smallFontSize * (shrink && !superShrink ? 1 : 1.125),
-            trim: shrink && !superShrink ? 16 : 20,
           ),
         );
       },

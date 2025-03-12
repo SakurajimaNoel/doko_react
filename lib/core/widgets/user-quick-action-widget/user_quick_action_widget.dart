@@ -263,11 +263,8 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
           }
           List<String> searchDisplay = tempSearchResults.toList();
           searchDisplay.removeWhere((String userKey) => selectedUsers.contains(
-                    getUsernameFromUserKey(userKey),
-                  )
-              //     ||
-              // username == getUsernameFromUserKey(userKey),
-              );
+                getUsernameFromUserKey(userKey),
+              ));
 
           if (state is ProfileLoading || state is ProfileInitial) {
             return const Center(
@@ -544,20 +541,22 @@ class _GetUserWidget extends StatelessWidget {
                 UserWidget.avtarLarge(
                   userKey: userKey,
                 ),
-                Column(
-                  spacing: Constants.gap * 0.125,
-                  children: [
-                    UserWidget.nameSmall(
-                      userKey: userKey,
-                      trim: 12,
-                      baseFontSize: Constants.fontSize,
-                    ),
-                    UserWidget.usernameSmall(
-                      userKey: userKey,
-                      trim: 12,
-                      baseFontSize: Constants.smallFontSize,
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    spacing: Constants.gap * 0.125,
+                    children: [
+                      Flexible(
+                        child: UserWidget.name(
+                          userKey: userKey,
+                        ),
+                      ),
+                      Flexible(
+                        child: UserWidget.username(
+                          userKey: userKey,
+                        ),
+                      ),
+                    ],
+                  ),
                 )
               ],
             ),

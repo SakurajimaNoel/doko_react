@@ -338,8 +338,6 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                                       child: UserWidget.name(
                                         userKey: generateUserNodeKey(
                                             widget.username),
-                                        baseFontSize:
-                                            Constants.fontSize * 1.125,
                                       ),
                                     ),
                                     if (online != null)

@@ -139,7 +139,6 @@ class PollWidget extends StatelessWidget {
                             return ContentMetaDataPreviewWidget(
                               nodeType: DokiNodeType.poll,
                               nodeId: poll.id,
-                              width: constraints.maxWidth,
                             );
                           },
                         )

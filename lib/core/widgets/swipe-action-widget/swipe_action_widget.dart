@@ -93,7 +93,7 @@ class _SwipeActionWidgetState extends State<SwipeActionWidget>
   @override
   Widget build(BuildContext context) {
     var threshold = MediaQuery.sizeOf(context).width / 4;
-    const double minLimit = 150;
+    const double minLimit = 100;
     if (threshold < minLimit) {
       threshold = minLimit;
     }
@@ -113,6 +113,7 @@ class _SwipeActionWidgetState extends State<SwipeActionWidget>
           offsetX -= start;
 
           if (isInvalidOffsetX(offsetX)) offsetX = 0;
+          if (offsetX > threshold) offsetX = threshold;
           setState(() {});
 
           if (offsetX.abs() > threshold) {

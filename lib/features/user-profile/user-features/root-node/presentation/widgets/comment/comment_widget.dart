@@ -147,11 +147,6 @@ class _CommentWidgetState extends State<CommentWidget> {
                 bool shrink = min(constraints.maxWidth, width) < 275;
                 bool superShrink = min(constraints.maxWidth, width) < 225;
 
-                // double shrinkFactor = shrink ? 0.875 : 1;
-                double baseFontSize = shrink
-                    ? Constants.smallFontSize
-                    : Constants.smallFontSize * 1.125;
-
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -160,15 +155,11 @@ class _CommentWidgetState extends State<CommentWidget> {
                       UserWidget(
                         userKey: comment.commentBy,
                         key: ValueKey(comment.id),
-                        trim: 20,
-                        baseFontSize: baseFontSize,
                       )
                     else
                       UserWidget.small(
                         userKey: comment.commentBy,
                         key: ValueKey("${comment.id}-shrink"),
-                        trim: 16,
-                        baseFontSize: baseFontSize,
                       ),
                     if (!superShrink)
                       Text(

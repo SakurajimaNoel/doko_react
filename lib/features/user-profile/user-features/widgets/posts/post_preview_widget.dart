@@ -96,7 +96,6 @@ class PostPreviewWidget extends StatelessWidget {
                 ContentMetaDataPreviewWidget(
                   nodeType: DokiNodeType.post,
                   nodeId: post.id,
-                  width: width,
                 ),
                 if (post.content.isNotEmpty)
                   MediaWidget.preview(

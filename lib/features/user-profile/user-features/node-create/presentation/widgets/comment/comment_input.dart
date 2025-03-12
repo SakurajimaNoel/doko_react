@@ -427,7 +427,6 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                     ),
                     title: UserWidget.info(
                       userKey: userKey,
-                      baseFontSize: Constants.smallFontSize * 1.125,
                     ),
                     onTap: () {
                       commentController.addMention(username);

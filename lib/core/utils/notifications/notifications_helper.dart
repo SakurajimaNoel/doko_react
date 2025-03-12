@@ -33,8 +33,6 @@ NiceInAppNotification createNewNotification({
         ? null
         : UserWidget.name(
             userKey: userKey,
-            baseFontSize: Constants.smallFontSize * 1.125,
-            trim: 20,
             bold: true,
           ),
     body: body,

@@ -174,8 +174,6 @@ class _MessageInboxPageState extends State<MessageInboxPage> {
       title: UserWidget.name(
         userKey: userKey,
         bold: true,
-        baseFontSize: Constants.smallFontSize * 1.125,
-        trim: 20,
       ),
       subtitle: TypingStatusWidgetWrapper.text(
         username: username,

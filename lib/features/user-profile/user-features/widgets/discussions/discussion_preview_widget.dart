@@ -97,7 +97,6 @@ class DiscussionPreviewWidget extends StatelessWidget {
                 ContentMetaDataPreviewWidget(
                   nodeType: DokiNodeType.discussion,
                   nodeId: discussion.id,
-                  width: width,
                 ),
                 Heading.left(
                   discussion.title,
