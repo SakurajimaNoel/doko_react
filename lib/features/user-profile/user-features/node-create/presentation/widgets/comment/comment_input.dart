@@ -834,28 +834,30 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                 disabled: adding,
               ),
               const Spacer(),
-              Builder(builder: (context) {
-                final commentProvider = context.watch<NodeCommentProvider>();
+              Builder(
+                builder: (context) {
+                  final commentProvider = context.watch<NodeCommentProvider>();
 
-                return FilledButton.icon(
-                  onPressed: adding
-                      ? null
-                      : () {
-                          handleAddComment();
-                        },
-                  icon: adding
-                      ? null
-                      : commentProvider.isReply
-                          ? const Icon(Icons.reply)
-                          : const Icon(Icons.add),
-                  label: adding
-                      ? const SmallLoadingIndicator.small()
-                      : commentProvider.isReply
-                          ? const Text("Reply")
-                          : const Text("Add"),
-                  style: FilledButton.styleFrom(),
-                );
-              }),
+                  return FilledButton.icon(
+                    onPressed: adding
+                        ? null
+                        : () {
+                            handleAddComment();
+                          },
+                    icon: adding
+                        ? null
+                        : commentProvider.isReply
+                            ? const Icon(Icons.reply)
+                            : const Icon(Icons.add),
+                    label: adding
+                        ? const SmallLoadingIndicator.small()
+                        : commentProvider.isReply
+                            ? const Text("Reply")
+                            : const Text("Add"),
+                    style: FilledButton.styleFrom(),
+                  );
+                },
+              ),
             ],
           );
         },

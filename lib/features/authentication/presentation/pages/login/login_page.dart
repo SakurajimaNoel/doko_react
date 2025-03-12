@@ -97,121 +97,124 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: LayoutBuilder(builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        child: Container(
-                          padding: const EdgeInsets.all(Constants.padding),
-                          constraints: BoxConstraints(
-                            minHeight: constraints.maxHeight,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Heading("Login"),
-                              const SizedBox(
-                                height: Constants.gap * 1.5,
-                              ),
-                              Form(
-                                key: formKey,
-                                child: AutofillGroup(
-                                  child: Column(
-                                    children: [
-                                      TextFormField(
-                                        controller: emailController,
-                                        enabled: !loading,
-                                        autofillHints: [
-                                          AutofillHints.email,
-                                          AutofillHints.username,
-                                        ],
-                                        validator: (value) {
-                                          return validateEmail(value)
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          child: Container(
+                            padding: const EdgeInsets.all(Constants.padding),
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Heading("Login"),
+                                const SizedBox(
+                                  height: Constants.gap * 1.5,
+                                ),
+                                Form(
+                                  key: formKey,
+                                  child: AutofillGroup(
+                                    child: Column(
+                                      children: [
+                                        TextFormField(
+                                          controller: emailController,
+                                          enabled: !loading,
+                                          autofillHints: [
+                                            AutofillHints.email,
+                                            AutofillHints.username,
+                                          ],
+                                          validator: (value) {
+                                            return validateEmail(value)
+                                                ? null
+                                                : "Invalid email address.";
+                                          },
+                                          autovalidateMode: AutovalidateMode
+                                              .onUserInteraction,
+                                          decoration: const InputDecoration(
+                                            border: OutlineInputBorder(),
+                                            labelText: "Email",
+                                            hintText: "Email...",
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: Constants.gap * 1.5,
+                                        ),
+                                        TextFormField(
+                                          autofillHints: [
+                                            AutofillHints.password,
+                                          ],
+                                          controller: passwordController,
+                                          enabled: !loading,
+                                          obscureText: !showPassword,
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return "Password can't be empty";
+                                            }
+                                            return null;
+                                          },
+                                          autovalidateMode: AutovalidateMode
+                                              .onUserInteraction,
+                                          decoration: InputDecoration(
+                                            border: const OutlineInputBorder(),
+                                            labelText: "Password",
+                                            hintText: "Password...",
+                                            suffixIcon: IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  showPassword = !showPassword;
+                                                });
+                                              },
+                                              icon: showPassword
+                                                  ? const Icon(Icons.visibility)
+                                                  : const Icon(
+                                                      Icons.visibility_off),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: Constants.gap * 1.5,
+                                        ),
+                                        FilledButton(
+                                          onPressed: loading
                                               ? null
-                                              : "Invalid email address.";
-                                        },
-                                        autovalidateMode:
-                                            AutovalidateMode.onUserInteraction,
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          labelText: "Email",
-                                          hintText: "Email...",
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: Constants.gap * 1.5,
-                                      ),
-                                      TextFormField(
-                                        autofillHints: [
-                                          AutofillHints.password,
-                                        ],
-                                        controller: passwordController,
-                                        enabled: !loading,
-                                        obscureText: !showPassword,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return "Password can't be empty";
-                                          }
-                                          return null;
-                                        },
-                                        autovalidateMode:
-                                            AutovalidateMode.onUserInteraction,
-                                        decoration: InputDecoration(
-                                          border: const OutlineInputBorder(),
-                                          labelText: "Password",
-                                          hintText: "Password...",
-                                          suffixIcon: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                showPassword = !showPassword;
-                                              });
-                                            },
-                                            icon: showPassword
-                                                ? const Icon(Icons.visibility)
-                                                : const Icon(
-                                                    Icons.visibility_off),
+                                              : () => handleLogin(context),
+                                          style: FilledButton.styleFrom(
+                                            minimumSize: const Size(
+                                              Constants.buttonWidth,
+                                              Constants.buttonHeight,
+                                            ),
                                           ),
+                                          child: loading
+                                              ? const SmallLoadingIndicator()
+                                              : const Text("Login"),
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        height: Constants.gap * 1.5,
-                                      ),
-                                      FilledButton(
-                                        onPressed: loading
-                                            ? null
-                                            : () => handleLogin(context),
-                                        style: FilledButton.styleFrom(
-                                          minimumSize: const Size(
-                                            Constants.buttonWidth,
-                                            Constants.buttonHeight,
-                                          ),
-                                        ),
-                                        child: loading
-                                            ? const SmallLoadingIndicator()
-                                            : const Text("Login"),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(
-                                height: Constants.gap * 0.75,
-                              ),
-                              TextButton(
-                                onPressed: loading
-                                    ? null
-                                    : () {
-                                        context.pushNamed(
-                                            RouterConstants.passwordReset);
-                                      },
-                                style: TextButton.styleFrom(
-                                  foregroundColor: currTheme.secondary,
+                                const SizedBox(
+                                  height: Constants.gap * 0.75,
                                 ),
-                                child: const Text("Forgot Password?"),
-                              ),
-                            ],
+                                TextButton(
+                                  onPressed: loading
+                                      ? null
+                                      : () {
+                                          context.pushNamed(
+                                              RouterConstants.passwordReset);
+                                        },
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: currTheme.secondary,
+                                  ),
+                                  child: const Text("Forgot Password?"),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }),
+                        );
+                      },
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(Constants.padding),

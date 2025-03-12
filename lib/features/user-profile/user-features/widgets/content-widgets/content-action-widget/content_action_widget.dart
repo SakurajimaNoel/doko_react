@@ -48,36 +48,30 @@ class ContentActionWidget extends StatelessWidget {
 
         return LayoutBuilder(
           builder: (context, constraints) {
-            bool shrink = constraints.maxWidth < 285;
-            bool superShrink = constraints.maxWidth < 235;
-
-            double shrinkFactor = shrink
-                ? 0.75
-                : superShrink
-                    ? 0.5
-                    : 1;
+            bool shrink = constraints.maxWidth < 275;
+            double shrinkFactor = shrink ? 0.475 : 1;
+            double buttonShrinkFactor = shrink ? 0.5 : 1;
 
             return Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: Constants.padding * shrinkFactor,
+              padding: const EdgeInsets.symmetric(
+                horizontal: Constants.padding,
               ),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    spacing: Constants.gap,
                     children: [
                       Text(
                         "${displayNumberFormat(node.likesCount)} Like${node.likesCount > 1 ? "s" : ""}",
                         style: TextStyle(
-                          fontSize:
-                              superShrink ? Constants.smallFontSize : null,
+                          fontSize: shrink ? Constants.smallFontSize : null,
                         ),
                       ),
                       Text(
                         "${displayNumberFormat(node.commentsCount)} Comment${node.commentsCount > 1 ? "s" : ""}",
                         style: TextStyle(
-                          fontSize:
-                              superShrink ? Constants.smallFontSize : null,
+                          fontSize: shrink ? Constants.smallFontSize : null,
                         ),
                       ),
                     ],
@@ -86,73 +80,64 @@ class ContentActionWidget extends StatelessWidget {
                     thickness: Constants.dividerThickness * 0.75,
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    spacing:
-                        Constants.gap * shrinkFactor - (superShrink ? 0.9 : 0),
+                    spacing: Constants.gap * shrinkFactor,
                     children: [
-                      Row(
-                        spacing: Constants.gap * shrinkFactor -
-                            (superShrink ? 0.9 : 0),
-                        children: [
-                          LikeWidget(
-                            shrinkFactor: shrinkFactor,
-                            onPress: () {
-                              UserNodeLikeAction payload = UserNodeLikeAction(
-                                from: username,
-                                to: getUsernameFromUserKey(node.createdBy),
-                                isLike: node.userLike,
-                                likeCount: node.likesCount,
-                                commentCount: node.commentsCount,
-                                nodeId: node.id,
-                                nodeType: nodeType.nodeType,
-                                parents: [], // for root node no requirement to get parents
-                              );
-                              context
-                                  .read<UserActionBloc>()
-                                  .add(UserActionNodeLikeEvent(
-                                    nodeId: nodeId,
-                                    nodeType: nodeType,
-                                    userLike: !node.userLike,
-                                    username: username,
-                                    client: context
-                                        .read<WebsocketClientProvider>()
-                                        .client,
-                                    remotePayload: payload,
-                                  ));
-                            },
-                            userLike: node.userLike,
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              if (isNodePage) {
-                                context.read<NodeCommentProvider>()
-                                  ..focusNode.requestFocus()
-                                  ..resetCommentTarget();
-                                return;
-                              }
-
-                              redirectToNodePage();
-                            },
-                            style: TextButton.styleFrom(
-                              foregroundColor: currTheme.secondary,
-                              minimumSize: Size.zero,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: Constants.padding * shrinkFactor,
-                                vertical: Constants.padding * 0.5,
-                              ),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                            child: Text(
-                              "Comment",
-                              style: TextStyle(
-                                fontSize: superShrink
-                                    ? Constants.smallFontSize
-                                    : null,
-                              ),
-                            ),
-                          ),
-                        ],
+                      LikeWidget(
+                        shrinkFactor: shrink ? 0.875 : 1,
+                        onPress: () {
+                          UserNodeLikeAction payload = UserNodeLikeAction(
+                            from: username,
+                            to: getUsernameFromUserKey(node.createdBy),
+                            isLike: node.userLike,
+                            likeCount: node.likesCount,
+                            commentCount: node.commentsCount,
+                            nodeId: node.id,
+                            nodeType: nodeType.nodeType,
+                            parents: [], // for root node no requirement to get parents
+                          );
+                          context
+                              .read<UserActionBloc>()
+                              .add(UserActionNodeLikeEvent(
+                                nodeId: nodeId,
+                                nodeType: nodeType,
+                                userLike: !node.userLike,
+                                username: username,
+                                client: context
+                                    .read<WebsocketClientProvider>()
+                                    .client,
+                                remotePayload: payload,
+                              ));
+                        },
+                        userLike: node.userLike,
                       ),
+                      TextButton(
+                        onPressed: () {
+                          if (isNodePage) {
+                            context.read<NodeCommentProvider>()
+                              ..focusNode.requestFocus()
+                              ..resetCommentTarget();
+                            return;
+                          }
+
+                          redirectToNodePage();
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: currTheme.secondary,
+                          minimumSize: Size.zero,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: Constants.padding * buttonShrinkFactor,
+                            vertical: Constants.padding * 0.425,
+                          ),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          "Comment",
+                          style: TextStyle(
+                            fontSize: shrink ? Constants.smallFontSize : null,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
                       TextButton(
                         onPressed: () {
                           if (isNodePage) {
@@ -170,16 +155,15 @@ class ContentActionWidget extends StatelessWidget {
                           foregroundColor: currTheme.secondary,
                           minimumSize: Size.zero,
                           padding: EdgeInsets.symmetric(
-                            horizontal: Constants.padding * shrinkFactor,
-                            vertical: Constants.padding * 0.5,
+                            horizontal: Constants.padding * buttonShrinkFactor,
+                            vertical: Constants.padding * 0.425,
                           ),
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: Text(
                           "Share",
                           style: TextStyle(
-                            fontSize:
-                                superShrink ? Constants.smallFontSize : null,
+                            fontSize: shrink ? Constants.smallFontSize : null,
                           ),
                         ),
                       ),

@@ -55,87 +55,89 @@ class _ConfirmLoginPageState extends State<ConfirmLoginPage> {
             builder: (context, state) {
               bool loading = state is AuthenticationLoading;
 
-              return LayoutBuilder(builder: (context, constraints) {
-                return SingleChildScrollView(
-                  child: Container(
-                    padding: const EdgeInsets.all(Constants.padding),
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Heading(
-                          "Multi-factor authentication",
-                          size: Constants.heading3,
-                        ),
-                        const SizedBox(
-                          height: Constants.gap * 1.5,
-                        ),
-                        Form(
-                          key: formKey,
-                          child: Column(
-                            children: [
-                              TextFormField(
-                                controller: controller,
-                                keyboardType: TextInputType.number,
-                                enabled: !loading,
-                                maxLength: 6,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(6),
-                                ],
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: "Code",
-                                  hintText: "Code...",
-                                ),
-                                validator: (value) {
-                                  if (value == null ||
-                                      value.isEmpty ||
-                                      value.length > 6) {
-                                    return "Invalid code.";
-                                  }
-
-                                  return null;
-                                },
-                              ),
-                            ],
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: Container(
+                      padding: const EdgeInsets.all(Constants.padding),
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Heading(
+                            "Multi-factor authentication",
+                            size: Constants.heading3,
                           ),
-                        ),
-                        const SizedBox(
-                          height: Constants.gap,
-                        ),
-                        FilledButton(
-                          onPressed: loading
-                              ? null
-                              : () => handleConfirmLogin(context),
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size(
-                              Constants.buttonWidth,
-                              Constants.buttonHeight,
+                          const SizedBox(
+                            height: Constants.gap * 1.5,
+                          ),
+                          Form(
+                            key: formKey,
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                  controller: controller,
+                                  keyboardType: TextInputType.number,
+                                  enabled: !loading,
+                                  maxLength: 6,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(6),
+                                  ],
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: "Code",
+                                    hintText: "Code...",
+                                  ),
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.isEmpty ||
+                                        value.length > 6) {
+                                      return "Invalid code.";
+                                    }
+
+                                    return null;
+                                  },
+                                ),
+                              ],
                             ),
                           ),
-                          child: loading
-                              ? const SmallLoadingIndicator()
-                              : const Text("Continue"),
-                        ),
-                        const SizedBox(
-                          height: Constants.gap,
-                        ),
-                        const Text(
-                          "Check your authenticator app for the code to verify your identity.",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: Constants.smallFontSize,
-                            fontStyle: FontStyle.italic,
+                          const SizedBox(
+                            height: Constants.gap,
                           ),
-                        ),
-                      ],
+                          FilledButton(
+                            onPressed: loading
+                                ? null
+                                : () => handleConfirmLogin(context),
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size(
+                                Constants.buttonWidth,
+                                Constants.buttonHeight,
+                              ),
+                            ),
+                            child: loading
+                                ? const SmallLoadingIndicator()
+                                : const Text("Continue"),
+                          ),
+                          const SizedBox(
+                            height: Constants.gap,
+                          ),
+                          const Text(
+                            "Check your authenticator app for the code to verify your identity.",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              fontSize: Constants.smallFontSize,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              });
+                  );
+                },
+              );
             },
           ),
         ),

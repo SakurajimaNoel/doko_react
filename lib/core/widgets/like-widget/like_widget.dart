@@ -57,10 +57,10 @@ class LikeWidgetState extends State<LikeWidget>
       controller.reset();
     }
 
-    return TextButton(
+    return IconButton(
       style: TextButton.styleFrom(
         minimumSize: Size.zero,
-        padding: const EdgeInsets.all(Constants.padding * 0.125),
+        padding: const EdgeInsets.all(Constants.padding * 0),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       onPressed: () {
@@ -71,7 +71,7 @@ class LikeWidgetState extends State<LikeWidget>
         }
         widget.onPress();
       },
-      child: Lottie.asset(
+      icon: Lottie.asset(
         "assets/like-animation.lottie",
         width: Constants.iconButtonSize * widget.shrinkFactor,
         height: Constants.iconButtonSize * widget.shrinkFactor,

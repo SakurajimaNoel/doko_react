@@ -72,89 +72,91 @@ class _CompleteProfileUsernamePageState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: LayoutBuilder(builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      child: Container(
-                        padding: const EdgeInsets.all(Constants.padding),
-                        constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Heading.left(
-                              "Create Username",
-                              size: Constants.largeFontSize,
-                            ),
-                            const Text(
-                                "Your username, is a unique identifier that allows others to find and connect with your profile. Once created, your username cannot be changed."),
-                            const SizedBox(
-                              height: Constants.gap * 0.5,
-                            ),
-                            const Heading.left(
-                              "Your username must:",
-                              size: Constants.fontSize,
-                            ),
-                            BulletList(usernamePattern),
-                            const SizedBox(
-                              height: Constants.gap * 1.5,
-                            ),
-                            Form(
-                              key: formKey,
-                              child: Stack(
-                                alignment: AlignmentDirectional.centerEnd,
-                                children: [
-                                  TextFormField(
-                                    controller: usernameController,
-                                    validator: (value) {
-                                      return validateUsername(value)
-                                          ? null
-                                          : "Invalid username.";
-                                    },
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    onChanged: (value) {
-                                      if (!validateUsername(value)) return;
-
-                                      // emit username events
-                                      UsernameInput input =
-                                          UsernameInput(username: value);
-                                      context.read<CompleteProfileBloc>().add(
-                                            CompleteProfileUsernameEvent(
-                                              usernameInput: input,
-                                            ),
-                                          );
-                                    },
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: "Username",
-                                      hintText: "Username...",
-                                    ),
-                                  ),
-                                  if (loading)
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                        right: Constants.gap,
-                                      ),
-                                      child: const SmallLoadingIndicator(),
-                                    ),
-                                ],
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        child: Container(
+                          padding: const EdgeInsets.all(Constants.padding),
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Heading.left(
+                                "Create Username",
+                                size: Constants.largeFontSize,
                               ),
-                            ),
-                            const SizedBox(
-                              height: Constants.gap * 0.5,
-                            ),
-                            if (state is CompleteProfileUsernameStatusState)
-                              state.available
-                                  ? StyledText.success(
-                                      state.createDisplayMessage())
-                                  : StyledText.error(
-                                      state.createDisplayMessage()),
-                          ],
+                              const Text(
+                                  "Your username, is a unique identifier that allows others to find and connect with your profile. Once created, your username cannot be changed."),
+                              const SizedBox(
+                                height: Constants.gap * 0.5,
+                              ),
+                              const Heading.left(
+                                "Your username must:",
+                                size: Constants.fontSize,
+                              ),
+                              BulletList(usernamePattern),
+                              const SizedBox(
+                                height: Constants.gap * 1.5,
+                              ),
+                              Form(
+                                key: formKey,
+                                child: Stack(
+                                  alignment: AlignmentDirectional.centerEnd,
+                                  children: [
+                                    TextFormField(
+                                      controller: usernameController,
+                                      validator: (value) {
+                                        return validateUsername(value)
+                                            ? null
+                                            : "Invalid username.";
+                                      },
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      onChanged: (value) {
+                                        if (!validateUsername(value)) return;
+
+                                        // emit username events
+                                        UsernameInput input =
+                                            UsernameInput(username: value);
+                                        context.read<CompleteProfileBloc>().add(
+                                              CompleteProfileUsernameEvent(
+                                                usernameInput: input,
+                                              ),
+                                            );
+                                      },
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: "Username",
+                                        hintText: "Username...",
+                                      ),
+                                    ),
+                                    if (loading)
+                                      Container(
+                                        margin: const EdgeInsets.only(
+                                          right: Constants.gap,
+                                        ),
+                                        child: const SmallLoadingIndicator(),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                height: Constants.gap * 0.5,
+                              ),
+                              if (state is CompleteProfileUsernameStatusState)
+                                state.available
+                                    ? StyledText.success(
+                                        state.createDisplayMessage())
+                                    : StyledText.error(
+                                        state.createDisplayMessage()),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    },
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(Constants.padding),

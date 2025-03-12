@@ -134,13 +134,9 @@ class PollWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   preview
-                      ? LayoutBuilder(
-                          builder: (context, constraints) {
-                            return ContentMetaDataPreviewWidget(
-                              nodeType: DokiNodeType.poll,
-                              nodeId: poll.id,
-                            );
-                          },
+                      ? ContentMetaDataPreviewWidget(
+                          nodeType: DokiNodeType.poll,
+                          nodeId: poll.id,
                         )
                       : ContentMetaDataWidget(
                           nodeKey: pollKey,

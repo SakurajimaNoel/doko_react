@@ -747,21 +747,23 @@ class _UserLayoutState extends State<UserLayout> {
           },
           child: Scaffold(
             body: widget.navigationShell,
-            bottomNavigationBar: Builder(builder: (context) {
-              bool show = context.watch<BottomNavProvider>().show;
+            bottomNavigationBar: Builder(
+              builder: (context) {
+                bool show = context.watch<BottomNavProvider>().show;
 
-              return show
-                  ? NavigationBar(
-                      indicatorColor: (activeIndex != 2 || profileEmpty)
-                          ? currTheme.primary
-                          : Colors.transparent,
-                      selectedIndex: widget.navigationShell.currentIndex,
-                      destinations: getDestinations(user),
-                      onDestinationSelected: (index) =>
-                          onDestinationSelected(index, profileEmpty),
-                    )
-                  : const SizedBox.shrink();
-            }),
+                return show
+                    ? NavigationBar(
+                        indicatorColor: (activeIndex != 2 || profileEmpty)
+                            ? currTheme.primary
+                            : Colors.transparent,
+                        selectedIndex: widget.navigationShell.currentIndex,
+                        destinations: getDestinations(user),
+                        onDestinationSelected: (index) =>
+                            onDestinationSelected(index, profileEmpty),
+                      )
+                    : const SizedBox.shrink();
+              },
+            ),
           ),
         );
       },

@@ -16,8 +16,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class UserWidget extends StatelessWidget {
-  /// this will create normal user widget which allows users to redirect to user profile
-  /// this will contains all the user fields avtar, username and name
+  /// this creates user widget with user avtar, name and username
   const UserWidget({
     super.key,
     required this.userKey,
@@ -60,7 +59,7 @@ class UserWidget extends StatelessWidget {
         preview = false,
         bold = false;
 
-  /// this will only contain user avtar with no option to redirect to user profile
+  /// this will only contain user avtar
   const UserWidget.avtar({
     super.key,
     required this.userKey,
@@ -103,7 +102,7 @@ class UserWidget extends StatelessWidget {
         preview = false,
         bold = false;
 
-  /// this will only contain user info with no option to redirect to user profile
+  /// info includes name and username arranged in column
   const UserWidget.info({
     super.key,
     required this.userKey,
@@ -118,7 +117,6 @@ class UserWidget extends StatelessWidget {
         preview = false,
         bold = false;
 
-  /// this will only contain user name with no option to redirect to user profile
   const UserWidget.name({
     super.key,
     required this.userKey,
@@ -133,7 +131,6 @@ class UserWidget extends StatelessWidget {
         info = false,
         preview = false;
 
-  /// this will only contain user name with no option to redirect to user profile
   const UserWidget.username({
     super.key,
     required this.userKey,
@@ -489,6 +486,8 @@ class UserWidget extends StatelessWidget {
     required String profileUsername,
     String? name,
   }) {
+    /// this is used only when UserWidget.small is used
+    double smallFactor = small ? 0.75 : 0.875;
     return AutoSizeText(
       name ?? "@$profileUsername",
       style: TextStyle(
@@ -497,13 +496,14 @@ class UserWidget extends StatelessWidget {
       ),
       minFontSize: Constants.smallFontSize,
       maxLines: 1,
-      maxFontSize: Constants.fontSize * 0.875,
+      maxFontSize: Constants.fontSize * smallFactor,
     );
   }
 
   Widget userUsername({
     required String profileUsername,
   }) {
+    double smallFactor = small ? 0.75 : 0.875;
     return AutoSizeText(
       "@$profileUsername",
       style: const TextStyle(
@@ -512,7 +512,7 @@ class UserWidget extends StatelessWidget {
       ),
       minFontSize: Constants.smallFontSize,
       maxLines: 1,
-      maxFontSize: Constants.fontSize * 0.875,
+      maxFontSize: Constants.fontSize * smallFactor,
     );
   }
 

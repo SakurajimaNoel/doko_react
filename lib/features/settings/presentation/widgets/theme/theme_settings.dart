@@ -106,18 +106,20 @@ class _AccentWidgetState extends State<_AccentWidget> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Builder(builder: (context) {
-          final currentAccentColor =
-              context.select((ThemeBloc bloc) => bloc.state.accent);
-          return Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: currentAccentColor,
-            ),
-          );
-        }),
+        Builder(
+          builder: (context) {
+            final currentAccentColor =
+                context.select((ThemeBloc bloc) => bloc.state.accent);
+            return Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: currentAccentColor,
+              ),
+            );
+          },
+        ),
         TextButton(
           onPressed: openColorPicker,
           child: const Text('Change Accent'),

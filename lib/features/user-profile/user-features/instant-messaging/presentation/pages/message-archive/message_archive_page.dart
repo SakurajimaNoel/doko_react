@@ -302,62 +302,53 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                         text: widget.username,
                       )).then((value) {});
                     },
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        bool shrink = constraints.maxWidth < 150;
-                        double shrinkFactor = shrink ? 0.75 : 1;
-                        double infoFactor = shrink ? 1 : 0.625;
+                    child: Row(
+                      spacing: Constants.gap,
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        UserWidget.avtar(
+                          userKey: generateUserNodeKey(widget.username),
+                        ),
+                        Expanded(
+                          child: BlocBuilder<RealTimeBloc, RealTimeState>(
+                            buildWhen: (previousState, state) {
+                              return state is RealTimeUserPresenceState &&
+                                  state.username == widget.username;
+                            },
+                            builder: (context, state) {
+                              bool? online;
+                              if (state is RealTimeUserPresenceState &&
+                                  state.username == widget.username) {
+                                online = state.online;
+                              }
 
-                        return Row(
-                          spacing: Constants.gap * shrinkFactor,
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            if (!shrink)
-                              UserWidget.avtar(
-                                userKey: generateUserNodeKey(widget.username),
-                              ),
-                            BlocBuilder<RealTimeBloc, RealTimeState>(
-                              buildWhen: (previousState, state) {
-                                return state is RealTimeUserPresenceState &&
-                                    state.username == widget.username;
-                              },
-                              builder: (context, state) {
-                                bool? online;
-                                if (state is RealTimeUserPresenceState &&
-                                    state.username == widget.username) {
-                                  online = state.online;
-                                }
-
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  spacing: Constants.gap * 0.125,
-                                  children: [
-                                    SizedBox(
-                                      width: constraints.maxWidth * infoFactor,
-                                      child: UserWidget.name(
-                                        userKey: generateUserNodeKey(
-                                            widget.username),
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                spacing: Constants.gap * 0.125,
+                                children: [
+                                  UserWidget.name(
+                                    userKey:
+                                        generateUserNodeKey(widget.username),
+                                    bold: true,
+                                  ),
+                                  if (online != null)
+                                    Text(
+                                      online ? "Online" : "Offline",
+                                      style: TextStyle(
+                                        fontSize: Constants.smallFontSize,
+                                        fontWeight: FontWeight.w600,
+                                        color: online
+                                            ? Colors.green
+                                            : Colors.redAccent,
                                       ),
                                     ),
-                                    if (online != null)
-                                      Text(
-                                        online ? "Online" : "Offline",
-                                        style: TextStyle(
-                                          fontSize: Constants.smallFontSize,
-                                          fontWeight: FontWeight.w600,
-                                          color: online
-                                              ? Colors.green
-                                              : Colors.redAccent,
-                                        ),
-                                      ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ],
-                        );
-                      },
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   actionsPadding: const EdgeInsets.symmetric(

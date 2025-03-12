@@ -110,35 +110,37 @@ class _CompleteProfilePicturePageState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: LayoutBuilder(builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      child: Container(
-                        padding: const EdgeInsets.all(Constants.padding),
-                        constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        child: Container(
+                          padding: const EdgeInsets.all(Constants.padding),
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Heading.left(
+                                "Profile Information",
+                                size: Constants.largeFontSize,
+                              ),
+                              const Text(
+                                  "Almost there! Select an image to add as your profile picture."),
+                              const SizedBox(
+                                height: Constants.gap,
+                              ),
+                              _ImageSelection(
+                                key: const ValueKey("profile-image-selection"),
+                                setProfile: selectProfilePicture,
+                                loading: loading,
+                              ),
+                            ],
+                          ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Heading.left(
-                              "Profile Information",
-                              size: Constants.largeFontSize,
-                            ),
-                            const Text(
-                                "Almost there! Select an image to add as your profile picture."),
-                            const SizedBox(
-                              height: Constants.gap,
-                            ),
-                            _ImageSelection(
-                              key: const ValueKey("profile-image-selection"),
-                              setProfile: selectProfilePicture,
-                              loading: loading,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }),
+                      );
+                    },
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(Constants.padding),

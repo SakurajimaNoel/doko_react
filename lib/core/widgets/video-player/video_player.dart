@@ -224,14 +224,16 @@ class _VideoPlayerState extends State<VideoPlayer> {
                           },
                           iconSize: Constants.width,
                           color: primary,
-                          icon: Builder(builder: (BuildContext context) {
-                            bool audio = context.select(
-                                (PreferencesBloc bloc) => bloc.state.audio);
+                          icon: Builder(
+                            builder: (BuildContext context) {
+                              bool audio = context.select(
+                                  (PreferencesBloc bloc) => bloc.state.audio);
 
-                            return Icon(
-                              audio ? Icons.volume_up : Icons.volume_off,
-                            );
-                          }),
+                              return Icon(
+                                audio ? Icons.volume_up : Icons.volume_off,
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),

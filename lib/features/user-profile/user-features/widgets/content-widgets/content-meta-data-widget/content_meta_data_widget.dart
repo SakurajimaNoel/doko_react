@@ -150,9 +150,9 @@ class ContentMetaDataWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             spacing: Constants.gap,
             children: [
-              usersTagged.isNotEmpty
-                  ? Expanded(
-                      child: Row(
+              Expanded(
+                child: usersTagged.isNotEmpty
+                    ? Row(
                         spacing: Constants.gap * 0.5,
                         children: [
                           UsersTaggedAvtarWidget(
@@ -172,14 +172,12 @@ class ContentMetaDataWidget extends StatelessWidget {
                             ),
                           ),
                         ],
-                      ),
-                    )
-                  : Expanded(
-                      child: UserWidget(
+                      )
+                    : UserWidget(
                         userKey: node.createdBy,
                         redirect: true,
                       ),
-                    ),
+              ),
               Column(
                 spacing: Constants.gap * 0.25,
                 crossAxisAlignment: CrossAxisAlignment.end,

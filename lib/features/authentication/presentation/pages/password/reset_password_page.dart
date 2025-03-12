@@ -23,8 +23,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   final formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
 
-
-
   @override
   void dispose() {
     emailController.dispose();
@@ -84,82 +82,84 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: LayoutBuilder(builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      child: Container(
-                        padding: const EdgeInsets.all(Constants.padding),
-                        constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Heading(
-                              "Password Reset",
-                              size: Constants.heading2,
-                            ),
-                            const SizedBox(
-                              height: Constants.gap * 1.5,
-                            ),
-                            Form(
-                              key: formKey,
-                              child: Column(
-                                children: [
-                                  TextFormField(
-                                    controller: emailController,
-                                    enabled: !loading,
-                                    validator: (value) {
-                                      return validateEmail(value)
-                                          ? null
-                                          : "Invalid email";
-                                    },
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: "Email",
-                                      hintText: "Email...",
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: Constants.gap * 0.5,
-                                  ),
-                                ],
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        child: Container(
+                          padding: const EdgeInsets.all(Constants.padding),
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Heading(
+                                "Password Reset",
+                                size: Constants.heading2,
                               ),
-                            ),
-                            const SizedBox(
-                              height: Constants.gap * 1.5,
-                            ),
-                            FilledButton(
-                              onPressed: loading
-                                  ? null
-                                  : () => handleResetPassword(context),
-                              style: FilledButton.styleFrom(
-                                minimumSize: const Size(
-                                  Constants.buttonWidth,
-                                  Constants.buttonHeight,
+                              const SizedBox(
+                                height: Constants.gap * 1.5,
+                              ),
+                              Form(
+                                key: formKey,
+                                child: Column(
+                                  children: [
+                                    TextFormField(
+                                      controller: emailController,
+                                      enabled: !loading,
+                                      validator: (value) {
+                                        return validateEmail(value)
+                                            ? null
+                                            : "Invalid email";
+                                      },
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: "Email",
+                                        hintText: "Email...",
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: Constants.gap * 0.5,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              child: loading
-                                  ? const SmallLoadingIndicator()
-                                  : const Text("Continue"),
-                            ),
-                            const SizedBox(
-                              height: Constants.gap,
-                            ),
-                            const Text(
-                              "We'll send you a verification code to your email to reset your password.",
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                fontSize: Constants.smallFontSize,
-                                fontStyle: FontStyle.italic,
+                              const SizedBox(
+                                height: Constants.gap * 1.5,
                               ),
-                            ),
-                          ],
+                              FilledButton(
+                                onPressed: loading
+                                    ? null
+                                    : () => handleResetPassword(context),
+                                style: FilledButton.styleFrom(
+                                  minimumSize: const Size(
+                                    Constants.buttonWidth,
+                                    Constants.buttonHeight,
+                                  ),
+                                ),
+                                child: loading
+                                    ? const SmallLoadingIndicator()
+                                    : const Text("Continue"),
+                              ),
+                              const SizedBox(
+                                height: Constants.gap,
+                              ),
+                              const Text(
+                                "We'll send you a verification code to your email to reset your password.",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  fontSize: Constants.smallFontSize,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    },
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(Constants.padding),

@@ -113,7 +113,6 @@ class _SwipeActionWidgetState extends State<SwipeActionWidget>
           offsetX -= start;
 
           if (isInvalidOffsetX(offsetX)) offsetX = 0;
-          if (offsetX > threshold) offsetX = threshold;
           setState(() {});
 
           if (offsetX.abs() > threshold) {

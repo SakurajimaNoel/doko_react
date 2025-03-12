@@ -26,10 +26,7 @@ class FriendWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        bool shrink = constraints.maxWidth < 320;
-        bool superShrink = constraints.maxWidth < 290;
-
-        double shrinkFactor = shrink ? 0.875 : 1;
+        bool shrink = constraints.maxWidth < Constants.shrinkWidth;
 
         return ListTile(
           onTap: () {
@@ -64,14 +61,11 @@ class FriendWidget extends StatelessWidget {
                 ),
           trailing: showMessageOption
               ? null
-              : superShrink
+              : shrink
                   ? null
-                  : Transform.scale(
-                      scale: shrinkFactor,
-                      child: UserToUserRelationWidget(
-                        username: getUsernameFromUserKey(userKey),
-                        key: ValueKey("${userKey}_relation"),
-                      ),
+                  : UserToUserRelationWidget(
+                      username: getUsernameFromUserKey(userKey),
+                      key: ValueKey("${userKey}_relation"),
                     ),
           title: UserWidget.name(
             userKey: userKey,

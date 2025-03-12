@@ -87,39 +87,34 @@ class _CommentWidgetState extends State<CommentWidget> {
           return _CommentWrapper(
             commentId: commentId,
             isReply: widget.isReply,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SizedBox(
-                  height: constraints.maxWidth,
-                  child: Center(
-                    child: isError
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            spacing: Constants.gap * 0.25,
-                            children: [
-                              const StyledText.error(
-                                "Error loading comment.",
-                                size: Constants.smallFontSize * 1.125,
-                              ),
-                              TextButton.icon(
-                                onPressed: () {
-                                  context
-                                      .read<UserActionBloc>()
-                                      .add(UserActionGetCommentByIdEvent(
-                                        username: username,
-                                        commentId: commentId,
-                                      ));
-                                },
-                                label: const Text("Retry"),
-                                icon: const Icon(Icons.refresh),
-                              ),
-                            ],
-                          )
-                        : const SmallLoadingIndicator.small(),
-                  ),
-                );
-              },
+            child: SizedBox(
+              height: Constants.height * 10,
+              child: Center(
+                child: isError
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const StyledText.error(
+                            "Error loading comment.",
+                            size: Constants.smallFontSize * 1.125,
+                          ),
+                          TextButton.icon(
+                            onPressed: () {
+                              context
+                                  .read<UserActionBloc>()
+                                  .add(UserActionGetCommentByIdEvent(
+                                    username: username,
+                                    commentId: commentId,
+                                  ));
+                            },
+                            label: const Text("Retry"),
+                            icon: const Icon(Icons.refresh),
+                          ),
+                        ],
+                      )
+                    : const SmallLoadingIndicator.small(),
+              ),
             ),
           );
         }
@@ -142,26 +137,28 @@ class _CommentWidgetState extends State<CommentWidget> {
                   height: Constants.gap * 0.125,
                 ),
               ],
-              LayoutBuilder(builder: (context, constraints) {
-                final width = MediaQuery.sizeOf(context).width;
-                bool shrink = min(constraints.maxWidth, width) < 275;
-                bool superShrink = min(constraints.maxWidth, width) < 225;
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = MediaQuery.sizeOf(context).width;
+                  bool shrink =
+                      min(constraints.maxWidth, width) < Constants.shrinkWidth;
 
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    if (!shrink && isCommentPage && !widget.isReply)
-                      UserWidget(
-                        userKey: comment.commentBy,
-                        key: ValueKey(comment.id),
-                      )
-                    else
-                      UserWidget.small(
-                        userKey: comment.commentBy,
-                        key: ValueKey("${comment.id}-shrink"),
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    spacing: Constants.gap,
+                    children: [
+                      Expanded(
+                        child: (!shrink && isCommentPage && !widget.isReply)
+                            ? UserWidget(
+                                userKey: comment.commentBy,
+                                key: ValueKey(comment.id),
+                              )
+                            : UserWidget.small(
+                                userKey: comment.commentBy,
+                                key: ValueKey("${comment.id}-shrink"),
+                              ),
                       ),
-                    if (!superShrink)
                       Text(
                         displayDateDifference(
                           comment.createdOn,
@@ -171,9 +168,10 @@ class _CommentWidgetState extends State<CommentWidget> {
                           fontSize: Constants.smallFontSize * 0.875,
                         ),
                       ),
-                  ],
-                );
-              }),
+                    ],
+                  );
+                },
+              ),
               if (comment.media.bucketPath.isNotEmpty)
                 Container(
                   alignment: AlignmentDirectional.topStart,
@@ -812,21 +810,12 @@ class _CommentActionsState extends State<_CommentActions> {
                   ],
                 ),
                 if (!widget.isReply && !widget.isReplyPage)
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final width = MediaQuery.sizeOf(context).width;
-                      bool shrink = width < 250;
-
-                      if (shrink) return const SizedBox.shrink();
-
-                      return Text(
-                        "${displayNumberFormat(comment.commentsCount)} Repl${comment.commentsCount > 1 ? "ies" : "y"}",
-                        style: TextStyle(
-                          color: currTheme.onSurfaceVariant,
-                          fontSize: Constants.smallFontSize * 0.9,
-                        ),
-                      );
-                    },
+                  Text(
+                    "${displayNumberFormat(comment.commentsCount)} Repl${comment.commentsCount > 1 ? "ies" : "y"}",
+                    style: TextStyle(
+                      color: currTheme.onSurfaceVariant,
+                      fontSize: Constants.smallFontSize * 0.9,
+                    ),
                   ),
               ],
             );
