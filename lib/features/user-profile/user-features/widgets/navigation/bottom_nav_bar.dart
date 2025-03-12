@@ -8,20 +8,19 @@ class BottomNavBar extends StatelessWidget {
     required this.onDestinationSelected,
     required this.destinations,
     required this.profileEmpty,
+    required this.indicatorColor,
   });
 
   final int selectedIndex;
   final ValueSetter<int> onDestinationSelected;
   final List<Destinations> destinations;
   final bool profileEmpty;
+  final Color indicatorColor;
 
   @override
   Widget build(BuildContext context) {
-    final currTheme = Theme.of(context).colorScheme;
     return NavigationBar(
-      indicatorColor: (selectedIndex != 2 || profileEmpty)
-          ? currTheme.primary
-          : Colors.transparent,
+      indicatorColor: indicatorColor,
       selectedIndex: selectedIndex,
       onDestinationSelected: onDestinationSelected,
       destinations: destinations.map((destination) {

@@ -724,6 +724,7 @@ class _UserLayoutState extends State<UserLayout> {
         (context.read<UserBloc>().state as UserCompleteState).username;
 
     bool useSideNavRail = MediaQuery.sizeOf(context).width >= Constants.compact;
+    final currTheme = Theme.of(context).colorScheme;
 
     return BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
       buildWhen: (previousState, state) {
@@ -758,6 +759,9 @@ class _UserLayoutState extends State<UserLayout> {
               children: [
                 if (useSideNavRail)
                   SideNavRail(
+                    indicatorColor: (activeIndex != 2 || profileEmpty)
+                        ? currTheme.primary
+                        : Colors.transparent,
                     selectedIndex: widget.navigationShell.currentIndex,
                     onDestinationSelected: (index) =>
                         onDestinationSelected(index, profileEmpty),
@@ -777,6 +781,9 @@ class _UserLayoutState extends State<UserLayout> {
 
                       return show
                           ? BottomNavBar(
+                              indicatorColor: (activeIndex != 2 || profileEmpty)
+                                  ? currTheme.primary
+                                  : Colors.transparent,
                               selectedIndex:
                                   widget.navigationShell.currentIndex,
                               onDestinationSelected: (index) =>
