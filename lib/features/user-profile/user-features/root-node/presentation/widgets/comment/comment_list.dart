@@ -2,6 +2,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
@@ -77,23 +78,29 @@ class _CommentListState extends State<CommentList> {
       );
     }
 
+    Widget? child;
+
     if (parentNodeType == DokiNodeType.comment) {
       final comment = graph.getValueByKey(comments.items[index]);
       if (comment is CommentEntity) {
         comment.index = index;
       }
 
-      return CommentWidget.reply(
+      child = CommentWidget.reply(
+        commentKey: comments.items[index],
+        parentNodeId: parentNodeId,
+        key: ValueKey(getCommentIdFromCommentKey(comments.items[index])),
+      );
+    } else {
+      child = CommentWidget(
         commentKey: comments.items[index],
         parentNodeId: parentNodeId,
         key: ValueKey(getCommentIdFromCommentKey(comments.items[index])),
       );
     }
 
-    return CommentWidget(
-      commentKey: comments.items[index],
-      parentNodeId: parentNodeId,
-      key: ValueKey(getCommentIdFromCommentKey(comments.items[index])),
+    return CompactBox(
+      child: child,
     );
   }
 

@@ -10,6 +10,7 @@ import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.d
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
@@ -185,51 +186,57 @@ class _EditProfilePageState extends State<EditProfilePage> {
               child: ListView(
                 padding: const EdgeInsets.all(Constants.padding),
                 children: [
-                  _ProfileSelection(
-                    key: const ValueKey("profile-picture"),
-                    setProfile: setProfilePicture,
-                    updating: updating,
-                    currentProfile: user.profilePicture,
+                  CompactBox(
+                    child: _ProfileSelection(
+                      key: const ValueKey("profile-picture"),
+                      setProfile: setProfilePicture,
+                      updating: updating,
+                      currentProfile: user.profilePicture,
+                    ),
                   ),
                   const SizedBox(
                     height: Constants.gap * 2,
                   ),
-                  Form(
-                    key: formKey,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          enabled: !updating,
-                          controller: nameController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "Name",
-                            hintText: "Name...",
+                  CompactBox(
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            enabled: !updating,
+                            controller: nameController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: "Name",
+                              hintText: "Name...",
+                            ),
+                            maxLength: Constants.nameLimit,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                           ),
-                          maxLength: Constants.nameLimit,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                        ),
-                        const SizedBox(
-                          height: Constants.gap,
-                        ),
-                        TextFormField(
-                          enabled: !updating,
-                          controller: bioController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "Bio",
-                            hintText: "Bio...",
+                          const SizedBox(
+                            height: Constants.gap,
                           ),
-                          validator: (value) {
-                            return validateBio(value) ? null : "Invalid bio";
-                          },
-                          keyboardType: TextInputType.multiline,
-                          maxLines: 5,
-                          minLines: 5,
-                          maxLength: Constants.bioLimit,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                        ),
-                      ],
+                          TextFormField(
+                            enabled: !updating,
+                            controller: bioController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: "Bio",
+                              hintText: "Bio...",
+                            ),
+                            validator: (value) {
+                              return validateBio(value) ? null : "Invalid bio";
+                            },
+                            keyboardType: TextInputType.multiline,
+                            maxLines: 5,
+                            minLines: 5,
+                            maxLength: Constants.bioLimit,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -310,43 +317,45 @@ class _ProfileSelectionState extends State<_ProfileSelection> {
   Widget build(BuildContext context) {
     final currTheme = Theme.of(context).colorScheme;
 
-    final width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
-    final height = width * (1 / Constants.profile);
-
     bool noPicture = removeProfile ||
         (widget.currentProfile.bucketPath.isEmpty && newProfilePicture == null);
 
-    return SizedBox(
-      width: width,
-      height: height,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          getProfileImage(height),
-          ProfilePictureFilter.preview(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ImagePickerWidget(
-                  onSelection: onSelection,
-                  icon: const Icon(Icons.photo_camera),
-                  disabled: widget.updating,
-                ),
-                if (!noPicture)
-                  IconButton.filled(
-                    onPressed: widget.updating ? null : handleRemove,
-                    icon: const Icon(Icons.delete),
-                    color: currTheme.onError,
-                    style: IconButton.styleFrom(
-                      backgroundColor: currTheme.error,
-                    ),
-                  )
-              ],
+    return LayoutBuilder(builder: (context, constraints) {
+      final width = constraints.maxWidth;
+      final height = width * (1 / Constants.profile);
+
+      return SizedBox(
+        width: width,
+        height: height,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            getProfileImage(height),
+            ProfilePictureFilter.preview(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ImagePickerWidget(
+                    onSelection: onSelection,
+                    icon: const Icon(Icons.photo_camera),
+                    disabled: widget.updating,
+                  ),
+                  if (!noPicture)
+                    IconButton.filled(
+                      onPressed: widget.updating ? null : handleRemove,
+                      icon: const Icon(Icons.delete),
+                      color: currTheme.onError,
+                      style: IconButton.styleFrom(
+                        backgroundColor: currTheme.error,
+                      ),
+                    )
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 
   Widget getProfileImage(double height) {

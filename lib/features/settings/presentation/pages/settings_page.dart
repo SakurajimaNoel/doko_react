@@ -1,4 +1,5 @@
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/widgets/constrained-box/expanded_box.dart';
 import 'package:doko_react/features/settings/presentation/widgets/account/account_settings.dart';
 import 'package:doko_react/features/settings/presentation/widgets/application/application_settings.dart';
 import 'package:doko_react/features/settings/presentation/widgets/theme/theme_settings.dart';
@@ -47,7 +48,9 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.all(Constants.padding),
         itemCount: settingsWidgets.length,
         itemBuilder: (BuildContext context, int index) {
-          return settingsWidgets[index];
+          return ExpandedBox(
+            child: settingsWidgets[index],
+          );
         },
         separatorBuilder: (BuildContext context, int index) {
           return const Divider(

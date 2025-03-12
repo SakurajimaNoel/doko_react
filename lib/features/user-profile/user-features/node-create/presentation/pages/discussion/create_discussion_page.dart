@@ -2,6 +2,7 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/bullet-list/bullet_list.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/markdown-display-widget/markdown_display_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/discussion_create_input.dart';
@@ -115,94 +116,98 @@ class _CreateDiscussionPageState extends State<CreateDiscussionPage> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   return SingleChildScrollView(
-                    child: Container(
-                      padding: const EdgeInsets.all(Constants.padding),
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: Constants.gap * 0.5,
-                        children: [
-                          const Heading.left(
-                            "Just a heads up:",
-                            size: Constants.fontSize,
-                          ),
-                          BulletList(discussionInfo),
-                          const SizedBox(
-                            height: Constants.gap * 0.5,
-                          ),
-                          TextField(
-                            focusNode: titleFocusNode,
-                            controller: titleController,
-                            decoration: const InputDecoration(
-                              alignLabelWithHint: true,
-                              border: OutlineInputBorder(),
-                              labelText: "*Title",
-                              hintText: "Title...",
-                              counterText: "",
+                    child: CompactBox(
+                      child: Container(
+                        padding: const EdgeInsets.all(Constants.padding),
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: Constants.gap * 0.5,
+                          children: [
+                            const Heading.left(
+                              "Just a heads up:",
+                              size: Constants.fontSize,
                             ),
-                            keyboardType: TextInputType.multiline,
-                            maxLines: 4,
-                            minLines: 1,
-                            maxLength: Constants.discussionTitleLimit,
-                          ),
-                          const SizedBox(
-                            height: Constants.gap * 0.25,
-                          ),
-                          TextField(
-                            focusNode: textFocusNode,
-                            controller: textController,
-                            decoration: const InputDecoration(
-                              alignLabelWithHint: true,
-                              border: OutlineInputBorder(),
-                              labelText: "Text",
-                              hintText: "Text or markdown...",
-                              counterText: "",
+                            BulletList(discussionInfo),
+                            const SizedBox(
+                              height: Constants.gap * 0.5,
                             ),
-                            keyboardType: TextInputType.multiline,
-                            maxLines: null,
-                            minLines: 8,
-                            maxLength: Constants.discussionTextLimit,
-                          )
-                        ],
+                            TextField(
+                              focusNode: titleFocusNode,
+                              controller: titleController,
+                              decoration: const InputDecoration(
+                                alignLabelWithHint: true,
+                                border: OutlineInputBorder(),
+                                labelText: "*Title",
+                                hintText: "Title...",
+                                counterText: "",
+                              ),
+                              keyboardType: TextInputType.multiline,
+                              maxLines: 4,
+                              minLines: 1,
+                              maxLength: Constants.discussionTitleLimit,
+                            ),
+                            const SizedBox(
+                              height: Constants.gap * 0.25,
+                            ),
+                            TextField(
+                              focusNode: textFocusNode,
+                              controller: textController,
+                              decoration: const InputDecoration(
+                                alignLabelWithHint: true,
+                                border: OutlineInputBorder(),
+                                labelText: "Text",
+                                hintText: "Text or markdown...",
+                                counterText: "",
+                              ),
+                              keyboardType: TextInputType.multiline,
+                              maxLines: null,
+                              minLines: 8,
+                              maxLength: Constants.discussionTextLimit,
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   );
                 },
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(Constants.padding),
-              child: FilledButton(
-                onPressed: () {
-                  String title = titleController.text.trim();
-                  String text = textController.text.trim();
-                  if (title.isEmpty || title.length < 3) {
-                    showError(
-                        "Title is required and should be minimum of 3 characters.");
-                    return;
-                  }
+            CompactBox(
+              child: Padding(
+                padding: const EdgeInsets.all(Constants.padding),
+                child: FilledButton(
+                  onPressed: () {
+                    String title = titleController.text.trim();
+                    String text = textController.text.trim();
+                    if (title.isEmpty || title.length < 3) {
+                      showError(
+                          "Title is required and should be minimum of 3 characters.");
+                      return;
+                    }
 
-                  Map<String, dynamic> data = {
-                    "discussionDetails": DiscussionPublishPageData(
-                      title: title,
-                      text: text,
+                    Map<String, dynamic> data = {
+                      "discussionDetails": DiscussionPublishPageData(
+                        title: title,
+                        text: text,
+                      ),
+                    };
+
+                    context.pushNamed(
+                      RouterConstants.discussionPublish,
+                      extra: data,
+                    );
+                  },
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(
+                      Constants.buttonWidth,
+                      Constants.buttonHeight,
                     ),
-                  };
-
-                  context.pushNamed(
-                    RouterConstants.discussionPublish,
-                    extra: data,
-                  );
-                },
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size(
-                    Constants.buttonWidth,
-                    Constants.buttonHeight,
                   ),
+                  child: const Text("Continue"),
                 ),
-                child: const Text("Continue"),
               ),
             )
           ],

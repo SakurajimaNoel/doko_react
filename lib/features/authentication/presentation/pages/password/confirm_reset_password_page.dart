@@ -2,6 +2,7 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/authentication/input/authentication_input.dart';
@@ -88,146 +89,149 @@ class _ConfirmResetPasswordPageState extends State<ConfirmResetPasswordPage> {
             return LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  child: Container(
-                    padding: const EdgeInsets.all(Constants.padding),
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Heading(
-                          "Password Reset",
-                          size: Constants.heading2,
-                        ),
-                        const SizedBox(
-                          height: Constants.gap * 1.5,
-                        ),
-                        Form(
-                          key: formKey,
-                          child: Column(
-                            children: [
-                              TextFormField(
-                                controller: codeController,
-                                enabled: !loading,
-                                keyboardType: TextInputType.number,
-                                maxLength: 6,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(6),
-                                ],
-                                validator: (value) {
-                                  if (value == null ||
-                                      value.isEmpty ||
-                                      value.length > 6) {
-                                    return "Invalid code.";
-                                  }
-
-                                  return null;
-                                },
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: "Code",
-                                  hintText: "Code...",
-                                  counterText: '',
-                                ),
-                              ),
-                              const SizedBox(
-                                height: Constants.gap * 1.5,
-                              ),
-                              TextFormField(
-                                controller: passwordController,
-                                enabled: !loading,
-                                obscureText: !showPassword,
-                                validator: (value) {
-                                  return validatePassword(value)
-                                      ? null
-                                      : passwordInvalidateReason(value);
-                                },
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                decoration: InputDecoration(
-                                  border: const OutlineInputBorder(),
-                                  labelText: "New Password",
-                                  hintText: "New Password...",
-                                  suffixIcon: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        showPassword = !showPassword;
-                                      });
-                                    },
-                                    icon: showPassword
-                                        ? const Icon(Icons.visibility)
-                                        : const Icon(Icons.visibility_off),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: Constants.gap * 1.5,
-                              ),
-                              TextFormField(
-                                enabled: !loading,
-                                obscureText: !showPassword,
-                                validator: (value) {
-                                  if (value == null) return "Invalid value.";
-
-                                  return compareString(
-                                          passwordController.text.trim(), value)
-                                      ? null
-                                      : "Both password should match.";
-                                },
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                decoration: InputDecoration(
-                                  border: const OutlineInputBorder(),
-                                  labelText: "Confirm Password",
-                                  hintText: "Confirm Password...",
-                                  suffixIcon: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        showPassword = !showPassword;
-                                      });
-                                    },
-                                    icon: showPassword
-                                        ? const Icon(Icons.visibility)
-                                        : const Icon(Icons.visibility_off),
-                                  ),
-                                ),
-                              ),
-                            ],
+                  child: CompactBox(
+                    child: Container(
+                      padding: const EdgeInsets.all(Constants.padding),
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Heading(
+                            "Password Reset",
+                            size: Constants.heading2,
                           ),
-                        ),
-                        const SizedBox(
-                          height: Constants.gap * 1.5,
-                        ),
-                        FilledButton(
-                          onPressed: loading
-                              ? null
-                              : () => handleConfirmResetPassword(context),
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size(
-                              Constants.buttonWidth,
-                              Constants.buttonHeight,
+                          const SizedBox(
+                            height: Constants.gap * 1.5,
+                          ),
+                          Form(
+                            key: formKey,
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                  controller: codeController,
+                                  enabled: !loading,
+                                  keyboardType: TextInputType.number,
+                                  maxLength: 6,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(6),
+                                  ],
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.isEmpty ||
+                                        value.length > 6) {
+                                      return "Invalid code.";
+                                    }
+
+                                    return null;
+                                  },
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: "Code",
+                                    hintText: "Code...",
+                                    counterText: '',
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: Constants.gap * 1.5,
+                                ),
+                                TextFormField(
+                                  controller: passwordController,
+                                  enabled: !loading,
+                                  obscureText: !showPassword,
+                                  validator: (value) {
+                                    return validatePassword(value)
+                                        ? null
+                                        : passwordInvalidateReason(value);
+                                  },
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  decoration: InputDecoration(
+                                    border: const OutlineInputBorder(),
+                                    labelText: "New Password",
+                                    hintText: "New Password...",
+                                    suffixIcon: IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          showPassword = !showPassword;
+                                        });
+                                      },
+                                      icon: showPassword
+                                          ? const Icon(Icons.visibility)
+                                          : const Icon(Icons.visibility_off),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: Constants.gap * 1.5,
+                                ),
+                                TextFormField(
+                                  enabled: !loading,
+                                  obscureText: !showPassword,
+                                  validator: (value) {
+                                    if (value == null) return "Invalid value.";
+
+                                    return compareString(
+                                            passwordController.text.trim(),
+                                            value)
+                                        ? null
+                                        : "Both password should match.";
+                                  },
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  decoration: InputDecoration(
+                                    border: const OutlineInputBorder(),
+                                    labelText: "Confirm Password",
+                                    hintText: "Confirm Password...",
+                                    suffixIcon: IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          showPassword = !showPassword;
+                                        });
+                                      },
+                                      icon: showPassword
+                                          ? const Icon(Icons.visibility)
+                                          : const Icon(Icons.visibility_off),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          child: loading
-                              ? const SmallLoadingIndicator()
-                              : const Text("Reset"),
-                        ),
-                        const SizedBox(
-                          height: Constants.gap,
-                        ),
-                        const Text(
-                          "We've sent a password reset code to your email. Please check your inbox (and spam folder) for the code.",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: Constants.smallFontSize,
-                            fontStyle: FontStyle.italic,
+                          const SizedBox(
+                            height: Constants.gap * 1.5,
                           ),
-                        ),
-                      ],
+                          FilledButton(
+                            onPressed: loading
+                                ? null
+                                : () => handleConfirmResetPassword(context),
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size(
+                                Constants.buttonWidth,
+                                Constants.buttonHeight,
+                              ),
+                            ),
+                            child: loading
+                                ? const SmallLoadingIndicator()
+                                : const Text("Reset"),
+                          ),
+                          const SizedBox(
+                            height: Constants.gap,
+                          ),
+                          const Text(
+                            "We've sent a password reset code to your email. Please check your inbox (and spam folder) for the code.",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              fontSize: Constants.smallFontSize,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );

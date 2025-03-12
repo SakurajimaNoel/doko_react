@@ -1,6 +1,7 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/public/sign-out-button/sign_out_button.dart';
 import 'package:flutter/material.dart';
@@ -78,87 +79,36 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  child: Container(
-                    padding: const EdgeInsets.all(Constants.padding),
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Heading.left(
-                          "Profile Information",
-                          size: Constants.largeFontSize,
-                        ),
-                        const Text(
-                            "Let's get started! Please fill in the information below to complete your profile. We're excited to have you join Doki."),
-                        const SizedBox(
-                          height: Constants.gap * 1.5,
-                        ),
-                        Form(
-                          key: formKey,
-                          child: Column(
-                            spacing: Constants.gap * 1.25,
-                            children: [
-                              TextFormField(
-                                enabled: false,
-                                controller: usernameController,
-                                decoration: InputDecoration(
-                                  border: const OutlineInputBorder(),
-                                  labelText: "Username*",
-                                  hintText: "Username...",
-                                  disabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: currTheme.outline,
-                                    ),
-                                  ),
-                                  labelStyle: TextStyle(
-                                    color: currTheme.onSurface,
-                                  ),
-                                ),
-                                style: TextStyle(
-                                  color: currTheme.onSurface,
-                                ),
-                              ),
-                              TextFormField(
-                                controller: nameController,
-                                validator: (value) {
-                                  return value == null || value.isEmpty
-                                      ? "Name can't be empty."
-                                      : null;
-                                },
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                onChanged: (value) {},
-                                maxLength: Constants.nameLimit,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: "Name*",
-                                  hintText: "Name...",
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: selectDate,
-                                child: TextFormField(
+                  child: CompactBox(
+                    child: Container(
+                      padding: const EdgeInsets.all(Constants.padding),
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Heading.left(
+                            "Profile Information",
+                            size: Constants.largeFontSize,
+                          ),
+                          const Text(
+                              "Let's get started! Please fill in the information below to complete your profile. We're excited to have you join Doki."),
+                          const SizedBox(
+                            height: Constants.gap * 1.5,
+                          ),
+                          Form(
+                            key: formKey,
+                            child: Column(
+                              spacing: Constants.gap * 1.25,
+                              children: [
+                                TextFormField(
                                   enabled: false,
-                                  controller: dobController,
-                                  validator: (value) {
-                                    if (date == null) {
-                                      return "Date of Birth is required.";
-                                    }
-
-                                    return null;
-                                  },
-                                  autovalidateMode:
-                                      AutovalidateMode.onUserInteraction,
+                                  controller: usernameController,
                                   decoration: InputDecoration(
                                     border: const OutlineInputBorder(),
-                                    labelText: "Date of Birth*",
-                                    hintText: "DOB...",
-                                    suffixIcon: Icon(
-                                      Icons.calendar_month,
-                                      color: currTheme.onSurface,
-                                    ),
+                                    labelText: "Username*",
+                                    hintText: "Username...",
                                     disabledBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
                                         color: currTheme.outline,
@@ -172,28 +122,83 @@ class _CompleteProfileInfoPageState extends State<CompleteProfileInfoPage> {
                                     color: currTheme.onSurface,
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
+                                TextFormField(
+                                  controller: nameController,
+                                  validator: (value) {
+                                    return value == null || value.isEmpty
+                                        ? "Name can't be empty."
+                                        : null;
+                                  },
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  onChanged: (value) {},
+                                  maxLength: Constants.nameLimit,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: "Name*",
+                                    hintText: "Name...",
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: selectDate,
+                                  child: TextFormField(
+                                    enabled: false,
+                                    controller: dobController,
+                                    validator: (value) {
+                                      if (date == null) {
+                                        return "Date of Birth is required.";
+                                      }
+
+                                      return null;
+                                    },
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    decoration: InputDecoration(
+                                      border: const OutlineInputBorder(),
+                                      labelText: "Date of Birth*",
+                                      hintText: "DOB...",
+                                      suffixIcon: Icon(
+                                        Icons.calendar_month,
+                                        color: currTheme.onSurface,
+                                      ),
+                                      disabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: currTheme.outline,
+                                        ),
+                                      ),
+                                      labelStyle: TextStyle(
+                                        color: currTheme.onSurface,
+                                      ),
+                                    ),
+                                    style: TextStyle(
+                                      color: currTheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 );
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(Constants.padding),
-            child: FilledButton(
-              onPressed: handleProfileInfo,
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(
-                  Constants.buttonWidth,
-                  Constants.buttonHeight,
+          CompactBox(
+            child: Padding(
+              padding: const EdgeInsets.all(Constants.padding),
+              child: FilledButton(
+                onPressed: handleProfileInfo,
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(
+                    Constants.buttonWidth,
+                    Constants.buttonHeight,
+                  ),
                 ),
+                child: const Text("Next"),
               ),
-              child: const Text("Next"),
             ),
           ),
         ],

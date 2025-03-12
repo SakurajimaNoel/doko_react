@@ -2,6 +2,7 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/authentication/input/authentication_input.dart';
@@ -85,76 +86,78 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(
-                        child: Container(
-                          padding: const EdgeInsets.all(Constants.padding),
-                          constraints: BoxConstraints(
-                            minHeight: constraints.maxHeight,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Heading(
-                                "Password Reset",
-                                size: Constants.heading2,
-                              ),
-                              const SizedBox(
-                                height: Constants.gap * 1.5,
-                              ),
-                              Form(
-                                key: formKey,
-                                child: Column(
-                                  children: [
-                                    TextFormField(
-                                      controller: emailController,
-                                      enabled: !loading,
-                                      validator: (value) {
-                                        return validateEmail(value)
-                                            ? null
-                                            : "Invalid email";
-                                      },
-                                      autovalidateMode:
-                                          AutovalidateMode.onUserInteraction,
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(),
-                                        labelText: "Email",
-                                        hintText: "Email...",
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: Constants.gap * 0.5,
-                                    ),
-                                  ],
+                        child: CompactBox(
+                          child: Container(
+                            padding: const EdgeInsets.all(Constants.padding),
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Heading(
+                                  "Password Reset",
+                                  size: Constants.heading2,
                                 ),
-                              ),
-                              const SizedBox(
-                                height: Constants.gap * 1.5,
-                              ),
-                              FilledButton(
-                                onPressed: loading
-                                    ? null
-                                    : () => handleResetPassword(context),
-                                style: FilledButton.styleFrom(
-                                  minimumSize: const Size(
-                                    Constants.buttonWidth,
-                                    Constants.buttonHeight,
+                                const SizedBox(
+                                  height: Constants.gap * 1.5,
+                                ),
+                                Form(
+                                  key: formKey,
+                                  child: Column(
+                                    children: [
+                                      TextFormField(
+                                        controller: emailController,
+                                        enabled: !loading,
+                                        validator: (value) {
+                                          return validateEmail(value)
+                                              ? null
+                                              : "Invalid email";
+                                        },
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: "Email",
+                                          hintText: "Email...",
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: Constants.gap * 0.5,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                child: loading
-                                    ? const SmallLoadingIndicator()
-                                    : const Text("Continue"),
-                              ),
-                              const SizedBox(
-                                height: Constants.gap,
-                              ),
-                              const Text(
-                                "We'll send you a verification code to your email to reset your password.",
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                  fontSize: Constants.smallFontSize,
-                                  fontStyle: FontStyle.italic,
+                                const SizedBox(
+                                  height: Constants.gap * 1.5,
                                 ),
-                              ),
-                            ],
+                                FilledButton(
+                                  onPressed: loading
+                                      ? null
+                                      : () => handleResetPassword(context),
+                                  style: FilledButton.styleFrom(
+                                    minimumSize: const Size(
+                                      Constants.buttonWidth,
+                                      Constants.buttonHeight,
+                                    ),
+                                  ),
+                                  child: loading
+                                      ? const SmallLoadingIndicator()
+                                      : const Text("Continue"),
+                                ),
+                                const SizedBox(
+                                  height: Constants.gap,
+                                ),
+                                const Text(
+                                  "We'll send you a verification code to your email to reset your password.",
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    fontSize: Constants.smallFontSize,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );

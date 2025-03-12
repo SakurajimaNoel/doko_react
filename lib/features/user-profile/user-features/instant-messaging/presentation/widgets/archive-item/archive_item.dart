@@ -67,7 +67,7 @@ class _ArchiveItemState extends State<ArchiveItem> {
   );
 
   void showMoreOptions(BuildContext context, bool self) {
-    final width = MediaQuery.sizeOf(context).width;
+    final width = min(MediaQuery.sizeOf(context).width, Constants.compact);
     final currTheme = Theme.of(context).colorScheme;
     final height = MediaQuery.sizeOf(context).height / 2;
 
@@ -345,6 +345,9 @@ class _ArchiveItemState extends State<ArchiveItem> {
     final alignment = self ? Alignment.topRight : Alignment.topLeft;
     final archiveProvider = context.read<ArchiveMessageProvider>();
 
+    final changeFractionalSize =
+        MediaQuery.sizeOf(context).width >= Constants.compact;
+
     return _AddDayToast(
       date: message.sendAt,
       showDate: widget.showDate,
@@ -398,7 +401,7 @@ class _ArchiveItemState extends State<ArchiveItem> {
                     ),
                     child: FractionallySizedBox(
                       alignment: alignment,
-                      widthFactor: 0.8,
+                      widthFactor: changeFractionalSize ? 0.6 : 0.8,
                       child: Align(
                         alignment: alignment,
                         child: Column(

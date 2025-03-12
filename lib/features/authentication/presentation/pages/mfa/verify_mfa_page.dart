@@ -2,6 +2,7 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
@@ -59,79 +60,82 @@ class _VerifyMfaPageState extends State<VerifyMfaPage> {
       appBar: AppBar(
         title: const Text("Complete MFA setup"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(Constants.padding),
-        child: BlocProvider(
-          create: (context) => serviceLocator<AuthenticationBloc>(),
-          child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
-            listenWhen: (previousState, state) {
-              return (state is AuthenticationError ||
-                      state is AuthenticationVerifyMFASuccess) &&
-                  previousState != state;
-            },
-            listener: stateActions,
-            builder: (context, state) {
-              bool loading = state is AuthenticationLoading;
+      body: CompactBox(
+        child: Padding(
+          padding: const EdgeInsets.all(Constants.padding),
+          child: BlocProvider(
+            create: (context) => serviceLocator<AuthenticationBloc>(),
+            child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
+              listenWhen: (previousState, state) {
+                return (state is AuthenticationError ||
+                        state is AuthenticationVerifyMFASuccess) &&
+                    previousState != state;
+              },
+              listener: stateActions,
+              builder: (context, state) {
+                bool loading = state is AuthenticationLoading;
 
-              return Column(
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        const Text(
-                            "Enter the code from your authenticator app to complete the MFA setup and strengthen your account security."),
-                        const SizedBox(
-                          height: Constants.gap * 1.5,
-                        ),
-                        Form(
-                          key: formKey,
-                          child: Column(
-                            children: [
-                              TextFormField(
-                                controller: controller,
-                                keyboardType: TextInputType.number,
-                                enabled: !loading,
-                                maxLength: 6,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(6),
-                                ],
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: "Code",
-                                  hintText: "Code...",
-                                ),
-                                validator: (value) {
-                                  if (value == null ||
-                                      value.isEmpty ||
-                                      value.length > 6) {
-                                    return "Invalid code.";
-                                  }
-
-                                  return null;
-                                },
-                              ),
-                            ],
+                return Column(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const Text(
+                              "Enter the code from your authenticator app to complete the MFA setup and strengthen your account security."),
+                          const SizedBox(
+                            height: Constants.gap * 1.5,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  FilledButton(
-                    onPressed: loading ? null : () => handleVerifyMFA(context),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(
-                        Constants.buttonWidth,
-                        Constants.buttonHeight,
+                          Form(
+                            key: formKey,
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                  controller: controller,
+                                  keyboardType: TextInputType.number,
+                                  enabled: !loading,
+                                  maxLength: 6,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(6),
+                                  ],
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: "Code",
+                                    hintText: "Code...",
+                                  ),
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.isEmpty ||
+                                        value.length > 6) {
+                                      return "Invalid code.";
+                                    }
+
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    child: loading
-                        ? const SmallLoadingIndicator()
-                        : const Text("Complete"),
-                  ),
-                ],
-              );
-            },
+                    FilledButton(
+                      onPressed:
+                          loading ? null : () => handleVerifyMFA(context),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(
+                          Constants.buttonWidth,
+                          Constants.buttonHeight,
+                        ),
+                      ),
+                      child: loading
+                          ? const SmallLoadingIndicator()
+                          : const Text("Complete"),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

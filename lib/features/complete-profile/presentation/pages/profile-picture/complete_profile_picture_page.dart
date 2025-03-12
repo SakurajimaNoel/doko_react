@@ -5,6 +5,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
@@ -113,50 +114,55 @@ class _CompleteProfilePicturePageState
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(
-                        child: Container(
-                          padding: const EdgeInsets.all(Constants.padding),
-                          constraints: BoxConstraints(
-                            minHeight: constraints.maxHeight,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Heading.left(
-                                "Profile Information",
-                                size: Constants.largeFontSize,
-                              ),
-                              const Text(
-                                  "Almost there! Select an image to add as your profile picture."),
-                              const SizedBox(
-                                height: Constants.gap,
-                              ),
-                              _ImageSelection(
-                                key: const ValueKey("profile-image-selection"),
-                                setProfile: selectProfilePicture,
-                                loading: loading,
-                              ),
-                            ],
+                        child: CompactBox(
+                          child: Container(
+                            padding: const EdgeInsets.all(Constants.padding),
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Heading.left(
+                                  "Profile Information",
+                                  size: Constants.largeFontSize,
+                                ),
+                                const Text(
+                                    "Almost there! Select an image to add as your profile picture."),
+                                const SizedBox(
+                                  height: Constants.gap,
+                                ),
+                                _ImageSelection(
+                                  key:
+                                      const ValueKey("profile-image-selection"),
+                                  setProfile: selectProfilePicture,
+                                  loading: loading,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
                     },
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(Constants.padding),
-                  child: FilledButton(
-                    onPressed: profilePicture == null || loading
-                        ? null
-                        : () => handleCompleteProfile(context),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(
-                        Constants.buttonWidth,
-                        Constants.buttonHeight,
+                CompactBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(Constants.padding),
+                    child: FilledButton(
+                      onPressed: profilePicture == null || loading
+                          ? null
+                          : () => handleCompleteProfile(context),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(
+                          Constants.buttonWidth,
+                          Constants.buttonHeight,
+                        ),
                       ),
+                      child: loading
+                          ? const SmallLoadingIndicator()
+                          : const Text("Complete"),
                     ),
-                    child: loading
-                        ? const SmallLoadingIndicator()
-                        : const Text("Complete"),
                   ),
                 ),
               ],

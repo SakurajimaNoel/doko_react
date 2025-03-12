@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
@@ -41,7 +43,8 @@ class ContentMetaDataWidget extends StatelessWidget {
           minChildSize: 0.25,
           maxChildSize: 0.75,
           builder: (context, controller) {
-            final width = MediaQuery.sizeOf(context).width;
+            final width =
+                min(MediaQuery.sizeOf(context).width, Constants.compact);
 
             return Container(
               padding: const EdgeInsets.all(

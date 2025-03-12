@@ -3,6 +3,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/constrained-box/expanded_box.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/pull-to-refresh/pull_to_refresh.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
@@ -79,9 +80,11 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
     }
 
     // show user friend widget
-    return FriendWidget(
-      userKey: userFriends.items[index],
-      key: ValueKey(userFriends.items[index]),
+    return ExpandedBox(
+      child: FriendWidget(
+        userKey: userFriends.items[index],
+        key: ValueKey(userFriends.items[index]),
+      ),
     );
   }
 
@@ -234,41 +237,44 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: Constants.padding,
-                          ),
-                          child: Stack(
-                            alignment: AlignmentDirectional.centerEnd,
-                            children: [
-                              TextField(
-                                controller: queryController,
-                                onChanged: (String value) {
-                                  UserFriendsSearchInput searchDetails =
-                                      UserFriendsSearchInput(
-                                    username: username,
-                                    query: value,
-                                    currentUsername: currentUsername,
-                                  );
+                        ExpandedBox(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: Constants.padding,
+                            ),
+                            child: Stack(
+                              alignment: AlignmentDirectional.centerEnd,
+                              children: [
+                                TextField(
+                                  controller: queryController,
+                                  onChanged: (String value) {
+                                    UserFriendsSearchInput searchDetails =
+                                        UserFriendsSearchInput(
+                                      username: username,
+                                      query: value,
+                                      currentUsername: currentUsername,
+                                    );
 
-                                  context
-                                      .read<ProfileBloc>()
-                                      .add(UserFriendsSearchEvent(
-                                        searchDetails: searchDetails,
-                                      ));
-                                },
-                                decoration: const InputDecoration(
-                                  labelText: "Search",
-                                  hintText: "Search user by username or name.",
+                                    context
+                                        .read<ProfileBloc>()
+                                        .add(UserFriendsSearchEvent(
+                                          searchDetails: searchDetails,
+                                        ));
+                                  },
+                                  decoration: const InputDecoration(
+                                    labelText: "Search",
+                                    hintText:
+                                        "Search user by username or name.",
+                                  ),
                                 ),
-                              ),
-                              if (searching) const SmallLoadingIndicator(),
-                              if (!searching && state is! ProfileInitial)
-                                Icon(
-                                  Icons.check,
-                                  color: currTheme.primary,
-                                ),
-                            ],
+                                if (searching) const SmallLoadingIndicator(),
+                                if (!searching && state is! ProfileInitial)
+                                  Icon(
+                                    Icons.check,
+                                    color: currTheme.primary,
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(
@@ -285,8 +291,10 @@ class _UserFriendsListPageState extends State<UserFriendsListPage> {
                                       itemCount: tempSearchResults.length,
                                       itemBuilder:
                                           (BuildContext context, int index) {
-                                        return FriendWidget(
-                                          userKey: tempSearchResults[index],
+                                        return ExpandedBox(
+                                          child: FriendWidget(
+                                            userKey: tempSearchResults[index],
+                                          ),
                                         );
                                       },
                                       separatorBuilder:

@@ -3,6 +3,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -79,22 +80,29 @@ class _TimelineState extends State<Timeline> {
       return const SizedBox.shrink();
     }
 
+    Widget? child;
+
     if (nodeType == DokiNodeType.post) {
-      return PostWidget(
-        key: ValueKey("timeline-$nodeKey"),
+      child = PostWidget(
         postKey: nodeKey,
       );
     }
 
     if (nodeType == DokiNodeType.discussion) {
-      return DiscussionWidget(
-        key: ValueKey("timeline-$nodeKey"),
+      child = DiscussionWidget(
         discussionKey: nodeKey,
       );
     }
-    return PollWidget(
+
+    if (nodeType == DokiNodeType.poll) {
+      child = PollWidget(
+        pollKey: nodeKey,
+      );
+    }
+
+    return CompactBox(
       key: ValueKey("timeline-$nodeKey"),
-      pollKey: nodeKey,
+      child: child,
     );
   }
 

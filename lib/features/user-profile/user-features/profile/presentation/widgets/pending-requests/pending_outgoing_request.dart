@@ -2,6 +2,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/constrained-box/expanded_box.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/pull-to-refresh/pull_to_refresh.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
@@ -58,9 +59,11 @@ class _PendingOutgoingRequestState extends State<PendingOutgoingRequest>
     }
 
     // show user friend widget
-    return FriendWidget(
-      userKey: pendingRequest.items[index],
+    return ExpandedBox(
       key: ValueKey(pendingRequest.items[index]),
+      child: FriendWidget(
+        userKey: pendingRequest.items[index],
+      ),
     );
   }
 

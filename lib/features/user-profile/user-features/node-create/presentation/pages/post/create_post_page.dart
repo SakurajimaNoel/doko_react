@@ -3,6 +3,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/content-media-selection-widget/content_media_selection_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
@@ -49,55 +50,59 @@ class CreatePostPageState extends State<CreatePostPage> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  child: Container(
-                    padding: const EdgeInsets.all(Constants.padding),
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: ContentMediaSelectionWidget(
-                      info: postContentInfo,
-                      nodeId: postId,
-                      nodeType: DokiNodeType.post,
-                      onMediaChange: (newMedia) {
-                        content = newMedia;
-                      },
-                      onVideoProcessingChange: (bool isProcessing) {
-                        videoProcessing = isProcessing;
-                      },
+                  child: CompactBox(
+                    child: Container(
+                      padding: const EdgeInsets.all(Constants.padding),
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: ContentMediaSelectionWidget(
+                        info: postContentInfo,
+                        nodeId: postId,
+                        nodeType: DokiNodeType.post,
+                        onMediaChange: (newMedia) {
+                          content = newMedia;
+                        },
+                        onVideoProcessingChange: (bool isProcessing) {
+                          videoProcessing = isProcessing;
+                        },
+                      ),
                     ),
                   ),
                 );
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(Constants.padding),
-            child: FilledButton(
-              onPressed: () {
-                if (videoProcessing) {
-                  showInfo("Please wait for video processing to finish.");
-                  return;
-                }
+          CompactBox(
+            child: Padding(
+              padding: const EdgeInsets.all(Constants.padding),
+              child: FilledButton(
+                onPressed: () {
+                  if (videoProcessing) {
+                    showInfo("Please wait for video processing to finish.");
+                    return;
+                  }
 
-                Map<String, dynamic> data = {
-                  "postDetails": PostPublishPageData(
-                    content: content,
-                    postId: postId,
+                  Map<String, dynamic> data = {
+                    "postDetails": PostPublishPageData(
+                      content: content,
+                      postId: postId,
+                    ),
+                  };
+
+                  context.pushNamed(
+                    RouterConstants.postPublish,
+                    extra: data,
+                  );
+                },
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(
+                    Constants.buttonWidth,
+                    Constants.buttonHeight,
                   ),
-                };
-
-                context.pushNamed(
-                  RouterConstants.postPublish,
-                  extra: data,
-                );
-              },
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(
-                  Constants.buttonWidth,
-                  Constants.buttonHeight,
                 ),
+                child: const Text("Continue"),
               ),
-              child: const Text("Continue"),
             ),
           ),
         ],

@@ -6,6 +6,7 @@ import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/content-media-selection-widget/content_media_selection_widget.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -112,83 +113,88 @@ class _DiscussionPublishPageState extends State<DiscussionPublishPage> {
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(
-                        child: Container(
-                          padding: const EdgeInsets.all(Constants.padding),
-                          constraints: BoxConstraints(
-                            minHeight: constraints.maxHeight,
-                          ),
-                          child: Column(
-                            spacing: Constants.gap,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ContentMediaSelectionWidget(
-                                info: mediaInfo,
-                                nodeId: discussionId,
-                                nodeType: DokiNodeType.discussion,
-                                onMediaChange: (List<MediaContent> newMedia) {
-                                  content = newMedia;
-                                },
-                                onVideoProcessingChange: (bool isProcessing) {
-                                  videoProcessing = isProcessing;
-                                },
-                              ),
-                              UsersTaggedWidget(
-                                onRemove: (String user) {
-                                  usersTagged.remove(user);
-                                },
-                                onSelected: (List<String> selected) {
-                                  usersTagged = selected;
-                                },
-                              ),
-                            ],
+                        child: CompactBox(
+                          child: Container(
+                            padding: const EdgeInsets.all(Constants.padding),
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight,
+                            ),
+                            child: Column(
+                              spacing: Constants.gap,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ContentMediaSelectionWidget(
+                                  info: mediaInfo,
+                                  nodeId: discussionId,
+                                  nodeType: DokiNodeType.discussion,
+                                  onMediaChange: (List<MediaContent> newMedia) {
+                                    content = newMedia;
+                                  },
+                                  onVideoProcessingChange: (bool isProcessing) {
+                                    videoProcessing = isProcessing;
+                                  },
+                                ),
+                                UsersTaggedWidget(
+                                  onRemove: (String user) {
+                                    usersTagged.remove(user);
+                                  },
+                                  onSelected: (List<String> selected) {
+                                    usersTagged = selected;
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
                     },
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(Constants.padding),
-                  child: FilledButton(
-                    onPressed: uploading
-                        ? null
-                        : () {
-                            if (videoProcessing) {
-                              showInfo(
-                                  "Please wait for video processing to finish.");
-                              return;
-                            }
-                            // call bloc
-                            final username = (context.read<UserBloc>().state
-                                    as UserCompleteState)
-                                .username;
+                CompactBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(Constants.padding),
+                    child: FilledButton(
+                      onPressed: uploading
+                          ? null
+                          : () {
+                              if (videoProcessing) {
+                                showInfo(
+                                    "Please wait for video processing to finish.");
+                                return;
+                              }
+                              // call bloc
+                              final username = (context.read<UserBloc>().state
+                                      as UserCompleteState)
+                                  .username;
 
-                            final discussionDetails = widget.discussionDetails;
-                            DiscussionCreateInput discussionInput =
-                                DiscussionCreateInput(
-                              discussionId: discussionId,
-                              username: username,
-                              title: discussionDetails.title,
-                              text: discussionDetails.text,
-                              media: content,
-                              usersTagged: usersTagged,
-                            );
+                              final discussionDetails =
+                                  widget.discussionDetails;
+                              DiscussionCreateInput discussionInput =
+                                  DiscussionCreateInput(
+                                discussionId: discussionId,
+                                username: username,
+                                title: discussionDetails.title,
+                                text: discussionDetails.text,
+                                media: content,
+                                usersTagged: usersTagged,
+                              );
 
-                            context
-                                .read<NodeCreateBloc>()
-                                .add(DiscussionCreateEvent(
-                                  discussionDetails: discussionInput,
-                                ));
-                          },
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(
-                        Constants.buttonWidth,
-                        Constants.buttonHeight,
+                              context
+                                  .read<NodeCreateBloc>()
+                                  .add(DiscussionCreateEvent(
+                                    discussionDetails: discussionInput,
+                                  ));
+                            },
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(
+                          Constants.buttonWidth,
+                          Constants.buttonHeight,
+                        ),
                       ),
+                      child: uploading
+                          ? const SmallLoadingIndicator()
+                          : const Text("Upload"),
                     ),
-                    child: uploading
-                        ? const SmallLoadingIndicator()
-                        : const Text("Upload"),
                   ),
                 ),
               ],

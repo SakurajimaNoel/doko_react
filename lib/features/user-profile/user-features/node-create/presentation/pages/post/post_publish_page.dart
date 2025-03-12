@@ -4,6 +4,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
@@ -107,88 +108,92 @@ class _PostPublishPageState extends State<PostPublishPage> {
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         return SingleChildScrollView(
-                          child: Container(
-                            padding: const EdgeInsets.all(Constants.padding),
-                            constraints: BoxConstraints(
-                              minHeight: constraints.maxHeight,
-                            ),
-                            child: Column(
-                              spacing: Constants.gap,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TextFormField(
-                                  enabled: !uploading,
-                                  controller: captionController,
-                                  decoration: const InputDecoration(
-                                    alignLabelWithHint: true,
-                                    border: OutlineInputBorder(),
-                                    labelText: "Caption",
-                                    hintText: "Caption here...",
+                          child: CompactBox(
+                            child: Container(
+                              padding: const EdgeInsets.all(Constants.padding),
+                              constraints: BoxConstraints(
+                                minHeight: constraints.maxHeight,
+                              ),
+                              child: Column(
+                                spacing: Constants.gap,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextFormField(
+                                    enabled: !uploading,
+                                    controller: captionController,
+                                    decoration: const InputDecoration(
+                                      alignLabelWithHint: true,
+                                      border: OutlineInputBorder(),
+                                      labelText: "Caption",
+                                      hintText: "Caption here...",
+                                    ),
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: 12,
+                                    minLines: 5,
+                                    maxLength: Constants.postCaptionLimit,
                                   ),
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: 12,
-                                  minLines: 5,
-                                  maxLength: Constants.postCaptionLimit,
-                                ),
-                                UsersTaggedWidget(
-                                  onRemove: (String user) {
-                                    usersTagged.remove(user);
-                                  },
-                                  onSelected: (List<String> selected) {
-                                    usersTagged = selected;
-                                  },
-                                ),
-                              ],
+                                  UsersTaggedWidget(
+                                    onRemove: (String user) {
+                                      usersTagged.remove(user);
+                                    },
+                                    onSelected: (List<String> selected) {
+                                      usersTagged = selected;
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );
                       },
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(Constants.padding),
-                    child: FilledButton(
-                      onPressed: uploading
-                          ? null
-                          : () {
-                              final username = (context.read<UserBloc>().state
-                                      as UserCompleteState)
-                                  .username;
+                  CompactBox(
+                    child: Padding(
+                      padding: const EdgeInsets.all(Constants.padding),
+                      child: FilledButton(
+                        onPressed: uploading
+                            ? null
+                            : () {
+                                final username = (context.read<UserBloc>().state
+                                        as UserCompleteState)
+                                    .username;
 
-                              final String caption =
-                                  captionController.text.trim();
+                                final String caption =
+                                    captionController.text.trim();
 
-                              if (caption.isEmpty &&
-                                  widget.postDetails.content.isEmpty) {
-                                String message =
-                                    "Your post needs either content or a caption.\nPlease add at least one to proceed.";
-                                showError(message);
-                                return;
-                              }
+                                if (caption.isEmpty &&
+                                    widget.postDetails.content.isEmpty) {
+                                  String message =
+                                      "Your post needs either content or a caption.\nPlease add at least one to proceed.";
+                                  showError(message);
+                                  return;
+                                }
 
-                              PostCreateInput postDetails = PostCreateInput(
-                                username: username,
-                                caption: captionController.text.trim(),
-                                content: widget.postDetails.content,
-                                postId: widget.postDetails.postId,
-                                usersTagged: usersTagged,
-                              );
+                                PostCreateInput postDetails = PostCreateInput(
+                                  username: username,
+                                  caption: captionController.text.trim(),
+                                  content: widget.postDetails.content,
+                                  postId: widget.postDetails.postId,
+                                  usersTagged: usersTagged,
+                                );
 
-                              context
-                                  .read<NodeCreateBloc>()
-                                  .add(PostCreateEvent(
-                                    postDetails: postDetails,
-                                  ));
-                            },
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(
-                          Constants.buttonWidth,
-                          Constants.buttonHeight,
+                                context
+                                    .read<NodeCreateBloc>()
+                                    .add(PostCreateEvent(
+                                      postDetails: postDetails,
+                                    ));
+                              },
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size(
+                            Constants.buttonWidth,
+                            Constants.buttonHeight,
+                          ),
                         ),
+                        child: uploading
+                            ? const SmallLoadingIndicator()
+                            : const Text("Upload"),
                       ),
-                      child: uploading
-                          ? const SmallLoadingIndicator()
-                          : const Text("Upload"),
                     ),
                   ),
                 ],

@@ -1,5 +1,6 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
+import 'package:doko_react/core/widgets/constrained-box/expanded_box.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
@@ -51,68 +52,70 @@ class SearchPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      spacing: Constants.gap,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            left: Constants.padding,
-                          ),
-                          child: GestureDetector(
-                            onTap: () {
-                              context.pop();
-                            },
-                            child: const Icon(Icons.arrow_back_outlined),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
+                    ExpandedBox(
+                      child: Row(
+                        spacing: Constants.gap,
+                        children: [
+                          Padding(
                             padding: const EdgeInsets.only(
-                              right: Constants.padding,
+                              left: Constants.padding,
                             ),
-                            child: Stack(
-                              alignment: AlignmentDirectional.centerEnd,
-                              children: [
-                                TextField(
-                                  onChanged: (String value) {
-                                    UserSearchInput searchDetails =
-                                        UserSearchInput(
-                                      username: username,
-                                      query: value,
-                                    );
-
-                                    query = value;
-
-                                    context
-                                        .read<ProfileBloc>()
-                                        .add(UserSearchEvent(
-                                          searchDetails: searchDetails,
-                                        ));
-                                  },
-                                  decoration: const InputDecoration(
-                                    labelText: "Search",
-                                    hintText:
-                                        "Search user by username or name.",
-                                  ),
-                                ),
-                                if (loading) const SmallLoadingIndicator(),
-                                if (!error &&
-                                    !loading &&
-                                    state is! ProfileInitial)
-                                  Icon(
-                                    Icons.check,
-                                    color: currTheme.primary,
-                                  ),
-                                if (error)
-                                  Icon(
-                                    Icons.error_outline,
-                                    color: currTheme.error,
-                                  )
-                              ],
+                            child: GestureDetector(
+                              onTap: () {
+                                context.pop();
+                              },
+                              child: const Icon(Icons.arrow_back_outlined),
                             ),
                           ),
-                        ),
-                      ],
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                right: Constants.padding,
+                              ),
+                              child: Stack(
+                                alignment: AlignmentDirectional.centerEnd,
+                                children: [
+                                  TextField(
+                                    onChanged: (String value) {
+                                      UserSearchInput searchDetails =
+                                          UserSearchInput(
+                                        username: username,
+                                        query: value,
+                                      );
+
+                                      query = value;
+
+                                      context
+                                          .read<ProfileBloc>()
+                                          .add(UserSearchEvent(
+                                            searchDetails: searchDetails,
+                                          ));
+                                    },
+                                    decoration: const InputDecoration(
+                                      labelText: "Search",
+                                      hintText:
+                                          "Search user by username or name.",
+                                    ),
+                                  ),
+                                  if (loading) const SmallLoadingIndicator(),
+                                  if (!error &&
+                                      !loading &&
+                                      state is! ProfileInitial)
+                                    Icon(
+                                      Icons.check,
+                                      color: currTheme.primary,
+                                    ),
+                                  if (error)
+                                    Icon(
+                                      Icons.error_outline,
+                                      color: currTheme.error,
+                                    )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(
                       height: Constants.gap * 1.5,
@@ -136,14 +139,19 @@ class SearchPage extends StatelessWidget {
                                       itemCount: tempResults.length,
                                       itemBuilder:
                                           (BuildContext context, int index) {
+                                        Widget child;
                                         if (inbox) {
-                                          return FriendWidget.message(
+                                          child = FriendWidget.message(
+                                            userKey: tempResults[index],
+                                          );
+                                        } else {
+                                          child = FriendWidget(
                                             userKey: tempResults[index],
                                           );
                                         }
 
-                                        return FriendWidget(
-                                          userKey: tempResults[index],
+                                        return ExpandedBox(
+                                          child: child,
                                         );
                                       },
                                       separatorBuilder:

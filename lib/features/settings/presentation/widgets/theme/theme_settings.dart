@@ -138,7 +138,6 @@ class _AccentWidgetState extends State<_AccentWidget> {
         return AlertDialog(
           title: const Text('Change Accent Color'),
           content: SizedBox(
-            width: double.maxFinite,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: ColorPicker(

@@ -3,6 +3,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/pull-to-refresh/pull_to_refresh.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
@@ -261,28 +262,31 @@ class _CommentPageState extends State<CommentPage> {
                         child: repliesLoading || repliesError || isCommentReply
                             ? SingleChildScrollView(
                                 physics: const AlwaysScrollableScrollPhysics(),
-                                child: Column(
-                                  spacing: Constants.gap * 2,
-                                  children: [
-                                    CommentWidget(
-                                      commentKey: commentKey,
-                                      parentNodeId: comment.id,
-                                      isReplyPage: isCommentReply,
-                                    ),
-                                    if (!isCommentReply)
-                                      repliesError
-                                          ? SizedBox(
-                                              height: Constants.height * 5,
-                                              child: StyledText.error(
-                                                  state.message),
-                                            )
-                                          : const SizedBox(
-                                              height: Constants.height * 5,
-                                              child: Center(
-                                                child: SmallLoadingIndicator(),
+                                child: CompactBox(
+                                  child: Column(
+                                    spacing: Constants.gap * 2,
+                                    children: [
+                                      CommentWidget(
+                                        commentKey: commentKey,
+                                        parentNodeId: comment.id,
+                                        isReplyPage: isCommentReply,
+                                      ),
+                                      if (!isCommentReply)
+                                        repliesError
+                                            ? SizedBox(
+                                                height: Constants.height * 5,
+                                                child: StyledText.error(
+                                                    state.message),
+                                              )
+                                            : const SizedBox(
+                                                height: Constants.height * 5,
+                                                child: Center(
+                                                  child:
+                                                      SmallLoadingIndicator(),
+                                                ),
                                               ),
-                                            ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               )
                             : SliverViewObserver(
@@ -294,9 +298,11 @@ class _CommentPageState extends State<CommentPage> {
                                   cacheExtent: scrollCacheHeight,
                                   slivers: [
                                     SliverToBoxAdapter(
-                                      child: CommentWidget(
-                                        commentKey: commentKey,
-                                        parentNodeId: comment.id,
+                                      child: CompactBox(
+                                        child: CommentWidget(
+                                          commentKey: commentKey,
+                                          parentNodeId: comment.id,
+                                        ),
                                       ),
                                     ),
                                     const SliverToBoxAdapter(

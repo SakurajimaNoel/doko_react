@@ -6,6 +6,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/constrained-box/expanded_box.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/message-forward/message_forward.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
@@ -499,7 +500,9 @@ class _MessageArchivePageState extends State<MessageArchivePage>
                                   },
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    return buildItem(context, index);
+                                    return ExpandedBox(
+                                      child: buildItem(context, index),
+                                    );
                                   },
                                 ),
                               );

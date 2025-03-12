@@ -3,6 +3,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/pull-to-refresh/pull_to_refresh.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
@@ -78,8 +79,10 @@ class _UserPollsListPageState extends State<UserPollsListPage> {
     }
 
     // show user post
-    return PollWidget(
-      pollKey: userPolls.items[index],
+    return CompactBox(
+      child: PollWidget(
+        pollKey: userPolls.items[index],
+      ),
     );
   }
 

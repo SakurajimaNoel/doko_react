@@ -1,5 +1,6 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart';
@@ -58,81 +59,83 @@ class _ConfirmLoginPageState extends State<ConfirmLoginPage> {
               return LayoutBuilder(
                 builder: (context, constraints) {
                   return SingleChildScrollView(
-                    child: Container(
-                      padding: const EdgeInsets.all(Constants.padding),
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Heading(
-                            "Multi-factor authentication",
-                            size: Constants.heading3,
-                          ),
-                          const SizedBox(
-                            height: Constants.gap * 1.5,
-                          ),
-                          Form(
-                            key: formKey,
-                            child: Column(
-                              children: [
-                                TextFormField(
-                                  controller: controller,
-                                  keyboardType: TextInputType.number,
-                                  enabled: !loading,
-                                  maxLength: 6,
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly,
-                                    LengthLimitingTextInputFormatter(6),
-                                  ],
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    labelText: "Code",
-                                    hintText: "Code...",
-                                  ),
-                                  validator: (value) {
-                                    if (value == null ||
-                                        value.isEmpty ||
-                                        value.length > 6) {
-                                      return "Invalid code.";
-                                    }
-
-                                    return null;
-                                  },
-                                ),
-                              ],
+                    child: CompactBox(
+                      child: Container(
+                        padding: const EdgeInsets.all(Constants.padding),
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Heading(
+                              "Multi-factor authentication",
+                              size: Constants.heading3,
                             ),
-                          ),
-                          const SizedBox(
-                            height: Constants.gap,
-                          ),
-                          FilledButton(
-                            onPressed: loading
-                                ? null
-                                : () => handleConfirmLogin(context),
-                            style: FilledButton.styleFrom(
-                              minimumSize: const Size(
-                                Constants.buttonWidth,
-                                Constants.buttonHeight,
+                            const SizedBox(
+                              height: Constants.gap * 1.5,
+                            ),
+                            Form(
+                              key: formKey,
+                              child: Column(
+                                children: [
+                                  TextFormField(
+                                    controller: controller,
+                                    keyboardType: TextInputType.number,
+                                    enabled: !loading,
+                                    maxLength: 6,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                      LengthLimitingTextInputFormatter(6),
+                                    ],
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: "Code",
+                                      hintText: "Code...",
+                                    ),
+                                    validator: (value) {
+                                      if (value == null ||
+                                          value.isEmpty ||
+                                          value.length > 6) {
+                                        return "Invalid code.";
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+                                ],
                               ),
                             ),
-                            child: loading
-                                ? const SmallLoadingIndicator()
-                                : const Text("Continue"),
-                          ),
-                          const SizedBox(
-                            height: Constants.gap,
-                          ),
-                          const Text(
-                            "Check your authenticator app for the code to verify your identity.",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                              fontSize: Constants.smallFontSize,
-                              fontStyle: FontStyle.italic,
+                            const SizedBox(
+                              height: Constants.gap,
                             ),
-                          ),
-                        ],
+                            FilledButton(
+                              onPressed: loading
+                                  ? null
+                                  : () => handleConfirmLogin(context),
+                              style: FilledButton.styleFrom(
+                                minimumSize: const Size(
+                                  Constants.buttonWidth,
+                                  Constants.buttonHeight,
+                                ),
+                              ),
+                              child: loading
+                                  ? const SmallLoadingIndicator()
+                                  : const Text("Continue"),
+                            ),
+                            const SizedBox(
+                              height: Constants.gap,
+                            ),
+                            const Text(
+                              "Check your authenticator app for the code to verify your identity.",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                fontSize: Constants.smallFontSize,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );

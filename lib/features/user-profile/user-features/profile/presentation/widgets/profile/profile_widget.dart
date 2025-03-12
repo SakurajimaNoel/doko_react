@@ -7,6 +7,8 @@ import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.d
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
+import 'package:doko_react/core/widgets/heading/auto_heading.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
@@ -605,10 +607,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                       SliverAppBar(
                         pinned: true,
                         expandedHeight: height,
-                        title: Heading(
+                        title: AutoHeading(
                           username,
                           color: currTheme.onSurface,
-                          size: Constants.heading4,
+                          size: Constants.heading3,
+                          minFontSize: Constants.heading4,
+                          maxLines: 1,
                         ),
                         actionsPadding: const EdgeInsets.symmetric(
                           horizontal: Constants.gap,
@@ -630,7 +634,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                             builder: (context, state) {
                               final user = graph.getValueByKey(key)!
                                   as CompleteUserEntity;
-                              int nameLength = user.name.length;
+
                               return Stack(
                                 fit: StackFit.expand,
                                 children: [
@@ -660,16 +664,17 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                           ),
                                         ),
                                   ProfilePictureFilter(
-                                    child: Heading.left(
-                                      user.name,
-                                      color: currTheme.onSurface,
-                                      size: nameLength <= 15
-                                          ? Constants.heading2
-                                          : nameLength <= 20
-                                              ? Constants.heading3
-                                              : nameLength <= 25
-                                                  ? Constants.heading4
-                                                  : Constants.fontSize * 1.25,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: Constants.padding * 0.25,
+                                      ),
+                                      child: AutoHeading(
+                                        user.name,
+                                        color: currTheme.onSurface,
+                                        size: Constants.heading2,
+                                        minFontSize: Constants.heading3,
+                                        maxLines: 1,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -679,31 +684,33 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         ),
                       ),
                       SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.all(Constants.padding),
-                          child: BlocBuilder<UserToUserActionBloc,
-                              UserToUserActionState>(
-                            buildWhen: (previousState, state) {
-                              return (state
-                                      is UserToUserActionUpdateProfileState &&
-                                  state.username == username);
-                            },
-                            builder: (context, state) {
-                              final user = graph.getValueByKey(key)!
-                                  as CompleteUserEntity;
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (user.bio.isNotEmpty) ...[
-                                    Text(user.bio),
-                                    const SizedBox(
-                                      height: Constants.gap,
-                                    ),
+                        child: CompactBox(
+                          child: Padding(
+                            padding: const EdgeInsets.all(Constants.padding),
+                            child: BlocBuilder<UserToUserActionBloc,
+                                UserToUserActionState>(
+                              buildWhen: (previousState, state) {
+                                return (state
+                                        is UserToUserActionUpdateProfileState &&
+                                    state.username == username);
+                              },
+                              builder: (context, state) {
+                                final user = graph.getValueByKey(key)!
+                                    as CompleteUserEntity;
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (user.bio.isNotEmpty) ...[
+                                      Text(user.bio),
+                                      const SizedBox(
+                                        height: Constants.gap,
+                                      ),
+                                    ],
+                                    userProfileAction(user),
                                   ],
-                                  userProfileAction(user),
-                                ],
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -760,7 +767,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
           width: Constants.sliverBorder,
         ),
       ),
-      child: _widget,
+      child: Center(child: _widget),
     );
   }
 

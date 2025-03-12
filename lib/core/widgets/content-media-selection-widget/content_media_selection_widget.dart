@@ -180,11 +180,9 @@ class _ContentMediaSelectionWidgetState
     bool animated = false,
     required String path,
   }) {
-    var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
     var currTheme = Theme.of(context).colorScheme;
 
     return SizedBox(
-      width: width,
       child: Stack(
         children: [
           child,
@@ -253,10 +251,9 @@ class _ContentMediaSelectionWidgetState
     );
   }
 
-  List<Widget> handleDisplaySelectedMedia() {
+  List<Widget> handleDisplaySelectedMedia(double width) {
     var currTheme = Theme.of(context).colorScheme;
     double opacity = 0.5;
-    var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
     var height = width * (1 / Constants.postContainer);
 
     List<Widget> mediaWidgets = [];
@@ -357,9 +354,6 @@ class _ContentMediaSelectionWidgetState
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.sizeOf(context).width - Constants.padding * 2;
-    var height = width * (1 / Constants.postContainer);
-
     var currTheme = Theme.of(context).colorScheme;
 
     return PopScope(
@@ -383,33 +377,38 @@ class _ContentMediaSelectionWidgetState
           const SizedBox(
             height: Constants.gap * 0.5,
           ),
-          SizedBox(
-            height: height,
-            child: CarouselView(
-              enableSplash: false,
-              controller: carouselController,
-              itemExtent: width,
-              shrinkExtent: width * 0.5,
-              itemSnapping: true,
-              padding: const EdgeInsets.symmetric(
-                horizontal: Constants.padding * 0.5,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(Constants.radius),
-              ),
-              children: [
-                if (content.isNotEmpty) ...handleDisplaySelectedMedia(),
-                if (content.length < Constants.mediaLimit)
-                  Container(
-                    width: width,
-                    color: currTheme.outlineVariant,
-                    child: Center(
-                      child: mediaSelect(),
+          LayoutBuilder(builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            final height = width * (1 / Constants.postContainer);
+
+            return SizedBox(
+              height: height,
+              child: CarouselView(
+                enableSplash: false,
+                controller: carouselController,
+                itemExtent: width,
+                shrinkExtent: width * 0.5,
+                itemSnapping: true,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Constants.padding * 0.5,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(Constants.radius),
+                ),
+                children: [
+                  if (content.isNotEmpty) ...handleDisplaySelectedMedia(width),
+                  if (content.length < Constants.mediaLimit)
+                    Container(
+                      width: width,
+                      color: currTheme.outlineVariant,
+                      child: Center(
+                        child: mediaSelect(),
+                      ),
                     ),
-                  ),
-              ],
-            ),
-          ),
+                ],
+              ),
+            );
+          }),
           if (content.isNotEmpty) ...[
             const SizedBox(
               height: Constants.gap * 0.5,

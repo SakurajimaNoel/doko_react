@@ -3,6 +3,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
 import 'package:doko_react/core/widgets/bullet-list/bullet_list.dart';
+import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
@@ -75,116 +76,123 @@ class _CompleteProfileUsernamePageState
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(
-                        child: Container(
-                          padding: const EdgeInsets.all(Constants.padding),
-                          constraints: BoxConstraints(
-                            minHeight: constraints.maxHeight,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Heading.left(
-                                "Create Username",
-                                size: Constants.largeFontSize,
-                              ),
-                              const Text(
-                                  "Your username, is a unique identifier that allows others to find and connect with your profile. Once created, your username cannot be changed."),
-                              const SizedBox(
-                                height: Constants.gap * 0.5,
-                              ),
-                              const Heading.left(
-                                "Your username must:",
-                                size: Constants.fontSize,
-                              ),
-                              BulletList(usernamePattern),
-                              const SizedBox(
-                                height: Constants.gap * 1.5,
-                              ),
-                              Form(
-                                key: formKey,
-                                child: Stack(
-                                  alignment: AlignmentDirectional.centerEnd,
-                                  children: [
-                                    TextFormField(
-                                      controller: usernameController,
-                                      validator: (value) {
-                                        return validateUsername(value)
-                                            ? null
-                                            : "Invalid username.";
-                                      },
-                                      autovalidateMode:
-                                          AutovalidateMode.onUserInteraction,
-                                      onChanged: (value) {
-                                        if (!validateUsername(value)) return;
-
-                                        // emit username events
-                                        UsernameInput input =
-                                            UsernameInput(username: value);
-                                        context.read<CompleteProfileBloc>().add(
-                                              CompleteProfileUsernameEvent(
-                                                usernameInput: input,
-                                              ),
-                                            );
-                                      },
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(),
-                                        labelText: "Username",
-                                        hintText: "Username...",
-                                      ),
-                                    ),
-                                    if (loading)
-                                      Container(
-                                        margin: const EdgeInsets.only(
-                                          right: Constants.gap,
-                                        ),
-                                        child: const SmallLoadingIndicator(),
-                                      ),
-                                  ],
+                        child: CompactBox(
+                          child: Container(
+                            padding: const EdgeInsets.all(Constants.padding),
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Heading.left(
+                                  "Create Username",
+                                  size: Constants.largeFontSize,
                                 ),
-                              ),
-                              const SizedBox(
-                                height: Constants.gap * 0.5,
-                              ),
-                              if (state is CompleteProfileUsernameStatusState)
-                                state.available
-                                    ? StyledText.success(
-                                        state.createDisplayMessage())
-                                    : StyledText.error(
-                                        state.createDisplayMessage()),
-                            ],
+                                const Text(
+                                    "Your username, is a unique identifier that allows others to find and connect with your profile. Once created, your username cannot be changed."),
+                                const SizedBox(
+                                  height: Constants.gap * 0.5,
+                                ),
+                                const Heading.left(
+                                  "Your username must:",
+                                  size: Constants.fontSize,
+                                ),
+                                BulletList(usernamePattern),
+                                const SizedBox(
+                                  height: Constants.gap * 1.5,
+                                ),
+                                Form(
+                                  key: formKey,
+                                  child: Stack(
+                                    alignment: AlignmentDirectional.centerEnd,
+                                    children: [
+                                      TextFormField(
+                                        controller: usernameController,
+                                        validator: (value) {
+                                          return validateUsername(value)
+                                              ? null
+                                              : "Invalid username.";
+                                        },
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        onChanged: (value) {
+                                          if (!validateUsername(value)) return;
+
+                                          // emit username events
+                                          UsernameInput input =
+                                              UsernameInput(username: value);
+                                          context
+                                              .read<CompleteProfileBloc>()
+                                              .add(
+                                                CompleteProfileUsernameEvent(
+                                                  usernameInput: input,
+                                                ),
+                                              );
+                                        },
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: "Username",
+                                          hintText: "Username...",
+                                        ),
+                                      ),
+                                      if (loading)
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                            right: Constants.gap,
+                                          ),
+                                          child: const SmallLoadingIndicator(),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: Constants.gap * 0.5,
+                                ),
+                                if (state is CompleteProfileUsernameStatusState)
+                                  state.available
+                                      ? StyledText.success(
+                                          state.createDisplayMessage())
+                                      : StyledText.error(
+                                          state.createDisplayMessage()),
+                              ],
+                            ),
                           ),
                         ),
                       );
                     },
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(Constants.padding),
-                  child: FilledButton(
-                    onPressed: (loading || !valid)
-                        ? null
-                        : () {
-                            if (state is! CompleteProfileUsernameStatusState ||
-                                (!state.available &&
-                                    usernameController.text.trim() !=
-                                        state.username)) {
-                              return;
-                            }
+                CompactBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(Constants.padding),
+                    child: FilledButton(
+                      onPressed: (loading || !valid)
+                          ? null
+                          : () {
+                              if (state
+                                      is! CompleteProfileUsernameStatusState ||
+                                  (!state.available &&
+                                      usernameController.text.trim() !=
+                                          state.username)) {
+                                return;
+                              }
 
-                            context.pushNamed(
-                              RouterConstants.completeProfileInfo,
-                              pathParameters: {
-                                "username": state.username,
-                              },
-                            );
-                          },
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(
-                        Constants.buttonWidth,
-                        Constants.buttonHeight,
+                              context.pushNamed(
+                                RouterConstants.completeProfileInfo,
+                                pathParameters: {
+                                  "username": state.username,
+                                },
+                              );
+                            },
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(
+                          Constants.buttonWidth,
+                          Constants.buttonHeight,
+                        ),
                       ),
+                      child: const Text("Continue"),
                     ),
-                    child: const Text("Continue"),
                   ),
                 ),
               ],

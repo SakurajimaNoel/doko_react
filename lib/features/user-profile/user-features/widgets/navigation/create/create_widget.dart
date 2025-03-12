@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +38,8 @@ class CreateWidget extends StatelessWidget {
   }
 
   static void createOptions(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
+    final width = min(MediaQuery.sizeOf(context).width, Constants.compact);
+
     showModalBottomSheet(
       useRootNavigator: true,
       context: context,

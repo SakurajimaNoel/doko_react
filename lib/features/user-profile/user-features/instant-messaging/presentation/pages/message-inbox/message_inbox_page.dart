@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
+import 'package:doko_react/core/widgets/constrained-box/expanded_box.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
@@ -13,6 +16,7 @@ import 'package:doko_react/features/user-profile/user-features/instant-messaging
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/archive-item-options/archive_item_options.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/widgets/typing-status/typing_status_widget_wrapper.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
+import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -29,7 +33,7 @@ class _MessageInboxPageState extends State<MessageInboxPage> {
 
   void showInboxItemOptions(
       BuildContext context, String user, String inboxUser) {
-    final width = MediaQuery.sizeOf(context).width;
+    final width = min(MediaQuery.sizeOf(context).width, Constants.compact);
     final currTheme = Theme.of(context).colorScheme;
     final height = MediaQuery.sizeOf(context).height / 2;
 
@@ -240,14 +244,21 @@ class _MessageInboxPageState extends State<MessageInboxPage> {
           ),
         ],
       ),
-      body: BlocProvider.value(
-        value: context.read<RealTimeBloc>()
-          ..add(RealTimeInboxGetEvent(
-              details: InboxQueryInput(
-            cursor: "",
-            username:
-                (context.read<UserBloc>().state as UserCompleteState).username,
-          ))),
+      body: MultiBlocProvider(
+        providers: [
+          BlocProvider.value(
+            value: context.read<RealTimeBloc>()
+              ..add(RealTimeInboxGetEvent(
+                  details: InboxQueryInput(
+                cursor: "",
+                username: (context.read<UserBloc>().state as UserCompleteState)
+                    .username,
+              ))),
+          ),
+          BlocProvider(
+            create: (context) => serviceLocator<InstantMessagingBloc>(),
+          ),
+        ],
         child: BlocConsumer<RealTimeBloc, RealTimeState>(
           listenWhen: (prevState, state) {
             return state is RealTimeUserInboxUpdateState;
@@ -297,7 +308,9 @@ class _MessageInboxPageState extends State<MessageInboxPage> {
                 top: Constants.padding * 0.5,
               ),
               itemBuilder: (BuildContext context, int index) {
-                return buildItems(context, index);
+                return ExpandedBox(
+                  child: buildItems(context, index),
+                );
               },
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(

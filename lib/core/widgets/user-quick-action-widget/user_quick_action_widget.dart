@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
@@ -197,7 +199,7 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
-    final width = MediaQuery.sizeOf(context).width;
+    final width = min(MediaQuery.sizeOf(context).width, Constants.compact);
 
     final itemSize = 130;
 
