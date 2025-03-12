@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
@@ -15,11 +14,12 @@ import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/utils/instant-messaging/message_preview.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/notifications/notifications_helper.dart';
-import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/navigation/bottom_nav_bar.dart';
+import 'package:doko_react/features/user-profile/user-features/widgets/navigation/side_nav_rail.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -31,6 +31,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 import 'bloc/real-time/real_time_bloc.dart';
 import 'bloc/user-action/user_action_bloc.dart';
+import 'user-features/widgets/navigation/data/destinations.dart';
 
 class UserLayout extends StatefulWidget {
   const UserLayout(this.navigationShell, {super.key});
@@ -312,7 +313,6 @@ class _UserLayoutState extends State<UserLayout> {
     );
 
     connectWS();
-    // stressTest();
   }
 
   void refreshApp() {
@@ -320,78 +320,6 @@ class _UserLayoutState extends State<UserLayout> {
     graph.reset();
 
     context.read<UserBloc>().add(UserInitEvent());
-  }
-
-  Future<void> stressTest() async {
-    final username =
-        (context.read<UserBloc>().state as UserCompleteState).username;
-    // create 100 clients and send message to each
-    for (int i = 0; i < 15000; i++) {
-      var client = Client(
-        url: Uri.parse(dotenv.env["WEBSOCKET_ENDPOINT"]!),
-        pingInterval: Constants.pingInterval,
-        getToken: () async {
-          final token = await getUserToken();
-          return token.idToken;
-        },
-        onReconnectSuccess: () {},
-        onConnectionClosure: (retry) async {
-          // retry();
-          print("connection dropped: $i");
-        },
-        payloadHandler: {
-          PayloadType.chatMessage: (ChatMessage message) {},
-        },
-      );
-
-      await client.connect();
-      sendMessages(client, username);
-      await Future.delayed(const Duration(
-        seconds: 1,
-      ));
-    }
-  }
-
-  String generateRandomString() {
-    int wordCount = 10;
-    const characters =
-        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ';
-    final random = Random();
-
-    String generateRandomWord(int length) {
-      return String.fromCharCodes(
-        List.generate(
-          length,
-          (index) => characters.codeUnitAt(random.nextInt(characters.length)),
-        ),
-      );
-    }
-
-    List<String> generateRandomWords(int count) {
-      return List.generate(
-        count,
-        (index) => generateRandomWord(
-            random.nextInt(8) + 3), // Words between 3 and 10 characters
-      );
-    }
-
-    return generateRandomWords(wordCount).join(' ');
-  }
-
-  void sendMessages(Client client, String username) async {
-    while (true) {
-      client.sendPayload(ChatMessage(
-        from: username,
-        to: "rohan_verma__",
-        id: generateTimeBasedUniqueString(),
-        subject: MessageSubject.text,
-        body: generateRandomString(),
-        sendAt: DateTime.now(),
-      ));
-      await Future.delayed(const Duration(
-        seconds: 1,
-      ));
-    }
   }
 
   Future<void> connectWS() async {
@@ -711,11 +639,91 @@ class _UserLayoutState extends State<UserLayout> {
     ];
   }
 
+  List<Destinations> createDestinations(UserEntity user) {
+    final currTheme = Theme.of(context).colorScheme;
+    return [
+      Destinations(
+        icon: const Icon(Icons.home_outlined),
+        selectedIcon: Icon(
+          Icons.home,
+          color: currTheme.onPrimary,
+        ),
+        label: "Home",
+      ),
+      Destinations(
+        selectedIcon: Icon(
+          Icons.broadcast_on_personal,
+          color: currTheme.onPrimary,
+        ),
+        icon: const Icon(Icons.broadcast_on_personal_outlined),
+        label: "Nearby",
+      ),
+      Destinations(
+        selectedIcon: user.profilePicture.bucketPath.isEmpty
+            ? Icon(
+                Icons.account_circle,
+                color: currTheme.onPrimary,
+              )
+            : CircleAvatar(
+                radius: 20,
+                backgroundColor: currTheme.primary,
+                child: CircleAvatar(
+                  radius: 17,
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      cacheKey: user.profilePicture.bucketPath,
+                      imageUrl: user.profilePicture.accessURI,
+                      placeholder: (context, url) => const Center(
+                        child: SmallLoadingIndicator.small(),
+                      ),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                      fit: BoxFit.cover,
+                      width: 40,
+                      height: 40,
+                      memCacheHeight: Constants.thumbnailCacheHeight,
+                    ),
+                  ),
+                ),
+              ),
+        icon: user.profilePicture.bucketPath.isEmpty
+            ? const Icon(Icons.account_circle_outlined)
+            : CircleAvatar(
+                radius: 20,
+                backgroundColor: currTheme.primary,
+                child: CircleAvatar(
+                  radius: 20,
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      cacheKey: user.profilePicture.bucketPath,
+                      imageUrl: user.profilePicture.accessURI,
+                      placeholder: (context, url) => const Center(
+                        child: SmallLoadingIndicator.small(),
+                      ),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                      fit: BoxFit.cover,
+                      width: 40,
+                      height: 40,
+                      memCacheHeight: Constants.thumbnailCacheHeight,
+                    ),
+                  ),
+                ),
+              ),
+        label: trimText(
+          user.name,
+          len: 16,
+        ),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final username =
         (context.read<UserBloc>().state as UserCompleteState).username;
-    final currTheme = Theme.of(context).colorScheme;
+
+    bool useSideNavRail = MediaQuery.sizeOf(context).width >= Constants.compact;
 
     return BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
       buildWhen: (previousState, state) {
@@ -746,24 +754,39 @@ class _UserLayoutState extends State<UserLayout> {
             onDestinationSelected(0, profileEmpty);
           },
           child: Scaffold(
-            body: widget.navigationShell,
-            bottomNavigationBar: Builder(
-              builder: (context) {
-                bool show = context.watch<BottomNavProvider>().show;
-
-                return show
-                    ? NavigationBar(
-                        indicatorColor: (activeIndex != 2 || profileEmpty)
-                            ? currTheme.primary
-                            : Colors.transparent,
-                        selectedIndex: widget.navigationShell.currentIndex,
-                        destinations: getDestinations(user),
-                        onDestinationSelected: (index) =>
-                            onDestinationSelected(index, profileEmpty),
-                      )
-                    : const SizedBox.shrink();
-              },
+            body: Row(
+              children: [
+                if (useSideNavRail)
+                  SideNavRail(
+                    selectedIndex: widget.navigationShell.currentIndex,
+                    onDestinationSelected: (index) =>
+                        onDestinationSelected(index, profileEmpty),
+                    destinations: createDestinations(user),
+                    profileEmpty: profileEmpty,
+                  ),
+                Expanded(
+                  child: widget.navigationShell,
+                ),
+              ],
             ),
+            bottomNavigationBar: useSideNavRail
+                ? null
+                : Builder(
+                    builder: (context) {
+                      bool show = context.watch<BottomNavProvider>().show;
+
+                      return show
+                          ? BottomNavBar(
+                              selectedIndex:
+                                  widget.navigationShell.currentIndex,
+                              onDestinationSelected: (index) =>
+                                  onDestinationSelected(index, profileEmpty),
+                              destinations: createDestinations(user),
+                              profileEmpty: profileEmpty,
+                            )
+                          : const SizedBox.shrink();
+                    },
+                  ),
           ),
         );
       },
