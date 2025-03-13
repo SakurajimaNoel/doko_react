@@ -106,7 +106,7 @@ class PollWidget extends StatelessWidget {
         return Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: isPollPage
+            onTap: isPollPage || preview
                 ? null
                 : () {
                     context.pushNamed(
