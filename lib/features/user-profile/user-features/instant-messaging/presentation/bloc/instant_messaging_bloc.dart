@@ -301,10 +301,14 @@ class InstantMessagingBloc
         unread: true,
       );
 
-      await Future.wait([
-        _updateInbox([myInbox, remoteInbox]),
-        _editMessageInArchive(event.message)
-      ]);
+      List<InboxMutationInput> inboxItems = [];
+      inboxItems.add(myInbox);
+      if (event.message.from != event.message.to) {
+        inboxItems.add(remoteInbox);
+      }
+
+      await Future.wait(
+          [_updateInbox(inboxItems), _editMessageInArchive(event.message)]);
     } catch (_) {
       emit(InstantMessagingEditMessageErrorState(
         message: Constants.websocketNotConnectedError,
@@ -339,9 +343,14 @@ class InstantMessagingBloc
         displayText: remoteDeleteText(event.username),
         unread: true,
       );
+      List<InboxMutationInput> inboxItems = [];
+      inboxItems.add(myInbox);
+      if (event.message.from != event.message.to) {
+        inboxItems.add(remoteInbox);
+      }
 
       await Future.wait([
-        _updateInbox([myInbox, remoteInbox]),
+        _updateInbox(inboxItems),
         _deleteMessageInArchive(event.message),
       ]);
     } catch (_) {
