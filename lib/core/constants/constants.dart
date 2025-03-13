@@ -29,6 +29,8 @@ class Constants {
   static const double width = _root;
   static const double height = _root;
 
+  static const double nestedLoaderSize = height;
+
   static const double buttonHeight = _root * 3;
   static const double buttonWidth = double.infinity;
   static const double buttonLoaderWidth = _root * 1.5;

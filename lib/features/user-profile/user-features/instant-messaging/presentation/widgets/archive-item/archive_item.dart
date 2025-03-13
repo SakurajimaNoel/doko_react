@@ -13,7 +13,7 @@ import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/instant-messaging/message_preview.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/message-forward/message_forward.dart';
 import 'package:doko_react/core/widgets/swipe-action-widget/swipe_action_widget.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';

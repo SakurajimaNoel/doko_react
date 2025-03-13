@@ -11,6 +11,7 @@ import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/bullet-list/bullet_list.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/video-player/video_player.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
 import 'package:flutter/material.dart';
@@ -174,7 +175,7 @@ class _ContentMediaSelectionWidgetState
     );
   }
 
-  Widget discussionItemWrapper({
+  Widget mediaItemWrapper({
     required Widget child,
     required int index,
     bool animated = false,
@@ -269,7 +270,7 @@ class _ContentMediaSelectionWidgetState
           String? extension = getFileExtensionFromFileName(item.originalImage!);
 
           mediaWidgets.add(
-            discussionItemWrapper(
+            mediaItemWrapper(
               child: Image.file(
                 File(item.file!),
                 fit: BoxFit.cover,
@@ -286,7 +287,7 @@ class _ContentMediaSelectionWidgetState
           break;
         case MediaTypeValue.video:
           mediaWidgets.add(
-            discussionItemWrapper(
+            mediaItemWrapper(
               child: VideoPlayer(
                 path: item.file!,
                 bucketPath: item.bucketPath,
@@ -300,7 +301,7 @@ class _ContentMediaSelectionWidgetState
           break;
         case MediaTypeValue.thumbnail:
           mediaWidgets.add(
-            discussionItemWrapper(
+            mediaItemWrapper(
               path: item.file!,
               child: Stack(
                 children: [
@@ -323,7 +324,7 @@ class _ContentMediaSelectionWidgetState
                       ),
                     ),
                     child: const Center(
-                      child: CircularProgressIndicator(),
+                      child: LoadingWidget.small(),
                     ),
                   )
                 ],
@@ -334,12 +335,12 @@ class _ContentMediaSelectionWidgetState
           );
           break;
         case MediaTypeValue.unknown:
-          mediaWidgets.add(discussionItemWrapper(
+          mediaWidgets.add(mediaItemWrapper(
             child: Container(
               width: width,
               color: currTheme.outlineVariant,
               child: const Center(
-                child: CircularProgressIndicator(),
+                child: LoadingWidget.small(),
               ),
             ),
             index: index,

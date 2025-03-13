@@ -1,7 +1,7 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/widgets/constrained-box/expanded_box.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/input/profile_input.dart';
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/bloc/profile_bloc.dart';
@@ -97,7 +97,7 @@ class SearchPage extends StatelessWidget {
                                           "Search user by username or name.",
                                     ),
                                   ),
-                                  if (loading) const SmallLoadingIndicator(),
+                                  if (loading) const LoadingWidget.small(),
                                   if (!error &&
                                       !loading &&
                                       state is! ProfileInitial)

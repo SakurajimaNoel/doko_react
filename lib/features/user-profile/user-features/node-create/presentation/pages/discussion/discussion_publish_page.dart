@@ -8,7 +8,7 @@ import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/content-media-selection-widget/content_media_selection_widget.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/discussion_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
@@ -192,7 +192,7 @@ class _DiscussionPublishPageState extends State<DiscussionPublishPage> {
                         ),
                       ),
                       child: uploading
-                          ? const SmallLoadingIndicator()
+                          ? const LoadingWidget.small()
                           : const Text("Upload"),
                     ),
                   ),

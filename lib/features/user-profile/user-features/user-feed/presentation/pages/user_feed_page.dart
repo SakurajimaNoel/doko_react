@@ -5,7 +5,7 @@ import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/provider/bottom-nav/bottom_nav_provider.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/pull-to-refresh/pull_to_refresh.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -105,7 +105,7 @@ class _UserFeedPageState extends State<UserFeedPage> {
       }
 
       return const Center(
-        child: SmallLoadingIndicator(),
+        child: LoadingWidget.small(),
       );
     }
 
@@ -150,133 +150,135 @@ class _UserFeedPageState extends State<UserFeedPage> {
     bool useSideNavRail = MediaQuery.sizeOf(context).width >= Constants.compact;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Doki"),
-        actionsPadding: const EdgeInsets.symmetric(
-          horizontal: Constants.gap,
-        ),
-        actions: useSideNavRail
-            ? null
-            : [
+      appBar: useSideNavRail
+          ? null
+          : AppBar(
+              title: const Text("Doki"),
+              actionsPadding: const EdgeInsets.symmetric(
+                horizontal: Constants.gap,
+              ),
+              actions: [
                 const CreateWidget(),
                 const SearchWidget(),
                 const PendingRequestsWidget(),
                 const InboxWidget(),
               ],
-      ),
-      body: BlocProvider(
-        create: (context) => serviceLocator<UserFeedBloc>()
-          ..add(UserFeedGetEvent(
-            details: UserFeedInput(
-              username: username,
-              cursor: "",
             ),
-          )),
-        child: BlocConsumer<UserFeedBloc, UserFeedState>(
-          listenWhen: (previousState, state) {
-            return state is UserFeedGetResponseState;
-          },
-          listener: (context, state) async {
-            loading = false;
+      body: SafeArea(
+        child: BlocProvider(
+          create: (context) => serviceLocator<UserFeedBloc>()
+            ..add(UserFeedGetEvent(
+              details: UserFeedInput(
+                username: username,
+                cursor: "",
+              ),
+            )),
+          child: BlocConsumer<UserFeedBloc, UserFeedState>(
+            listenWhen: (previousState, state) {
+              return state is UserFeedGetResponseState;
+            },
+            listener: (context, state) async {
+              loading = false;
 
-            if (state is UserFeedGetResponseErrorState) {
-              showError(state.message);
-            }
+              if (state is UserFeedGetResponseErrorState) {
+                showError(state.message);
+              }
 
-            context.read<RealTimeBloc>().add(RealTimeInboxGetEvent(
-                    details: InboxQueryInput(
-                  cursor: "",
-                  username: username,
-                )));
-          },
-          buildWhen: (previousState, state) {
-            return state is UserFeedGetResponseState;
-          },
-          builder: (context, state) {
-            bool initialLoading = state is UserFeedLoading;
-            final userFeed = graph.getValueByKey(userFeedKey);
-
-            return PullToRefresh(
-              onRefresh: () async {
-                final userFeedBloc = context.read<UserFeedBloc>();
-                Future userFeedBlocState = userFeedBloc.stream.first;
-
-                userFeedBloc.add(UserFeedGetEvent(
-                  details: UserFeedInput(
-                    username: username,
+              context.read<RealTimeBloc>().add(RealTimeInboxGetEvent(
+                      details: InboxQueryInput(
                     cursor: "",
-                  ),
-                ));
+                    username: username,
+                  )));
+            },
+            buildWhen: (previousState, state) {
+              return state is UserFeedGetResponseState;
+            },
+            builder: (context, state) {
+              bool initialLoading = state is UserFeedLoading;
+              final userFeed = graph.getValueByKey(userFeedKey);
 
-                await userFeedBlocState;
-              },
-              child: CustomScrollView(
-                controller: controller,
-                physics: const AlwaysScrollableScrollPhysics(),
-                cacheExtent: scrollCacheHeight,
-                slivers: [
-                  const SliverPadding(
-                    padding: EdgeInsets.only(
-                      top: Constants.padding,
+              return PullToRefresh(
+                onRefresh: () async {
+                  final userFeedBloc = context.read<UserFeedBloc>();
+                  Future userFeedBlocState = userFeedBloc.stream.first;
+
+                  userFeedBloc.add(UserFeedGetEvent(
+                    details: UserFeedInput(
+                      username: username,
+                      cursor: "",
                     ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: Constants.padding,
+                  ));
+
+                  await userFeedBlocState;
+                },
+                child: CustomScrollView(
+                  controller: controller,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  cacheExtent: scrollCacheHeight,
+                  slivers: [
+                    const SliverPadding(
+                      padding: EdgeInsets.only(
+                        top: Constants.padding,
+                      ),
                     ),
-                    sliver: SliverToBoxAdapter(
-                      child: CompactBox(
-                        child: UserWidget.preview(
-                          userKey: generateUserNodeKey(username),
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: Constants.padding,
+                      ),
+                      sliver: SliverToBoxAdapter(
+                        child: CompactBox(
+                          child: UserWidget.preview(
+                            userKey: generateUserNodeKey(username),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SliverPadding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: Constants.padding,
-                    ),
-                  ),
-                  if (initialLoading)
-                    const SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: Constants.height * 20,
-                        child: Center(
-                          child: SmallLoadingIndicator(),
-                        ),
+                    const SliverPadding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: Constants.padding,
                       ),
-                    )
-                  else
-                    (userFeed is! Nodes)
-                        ? const SliverFillRemaining(
-                            child: Center(
-                              child: Text(
-                                "Looks like there is nothing to show.",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
+                    ),
+                    if (initialLoading)
+                      const SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: Constants.height * 20,
+                          child: Center(
+                            child: LoadingWidget(),
+                          ),
+                        ),
+                      )
+                    else
+                      (userFeed is! Nodes)
+                          ? const SliverFillRemaining(
+                              child: Center(
+                                child: Text(
+                                  "Looks like there is nothing to show.",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
+                            )
+                          : SliverList.separated(
+                              itemCount: userFeed.items.length + 1,
+                              itemBuilder: buildTimelineItems,
+                              separatorBuilder:
+                                  (BuildContext context, int index) {
+                                return const SizedBox(
+                                  height: Constants.gap * 1.75,
+                                );
+                              },
                             ),
-                          )
-                        : SliverList.separated(
-                            itemCount: userFeed.items.length + 1,
-                            itemBuilder: buildTimelineItems,
-                            separatorBuilder:
-                                (BuildContext context, int index) {
-                              return const SizedBox(
-                                height: Constants.gap * 1.75,
-                              );
-                            },
-                          ),
-                  const SliverPadding(
-                    padding: EdgeInsets.only(
-                      bottom: Constants.padding,
+                    const SliverPadding(
+                      padding: EdgeInsets.only(
+                        bottom: Constants.padding,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

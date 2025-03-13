@@ -3,7 +3,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/constrained-box/expanded_box.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/pull-to-refresh/pull_to_refresh.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -54,7 +54,7 @@ class _PendingIncomingRequestState extends State<PendingIncomingRequest>
       }
 
       return const Center(
-        child: SmallLoadingIndicator(),
+        child: LoadingWidget.small(),
       );
     }
 
@@ -93,7 +93,7 @@ class _PendingIncomingRequestState extends State<PendingIncomingRequest>
           builder: (context, state) {
             if (state is ProfileLoading || state is ProfileInitial) {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: LoadingWidget(),
               );
             }
 

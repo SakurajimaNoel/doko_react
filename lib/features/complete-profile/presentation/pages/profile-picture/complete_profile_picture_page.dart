@@ -8,7 +8,7 @@ import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/public/sign-out-button/sign_out_button.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
@@ -160,7 +160,7 @@ class _CompleteProfilePicturePageState
                         ),
                       ),
                       child: loading
-                          ? const SmallLoadingIndicator()
+                          ? const LoadingWidget.small()
                           : const Text("Complete"),
                     ),
                   ),

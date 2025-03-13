@@ -14,7 +14,7 @@ import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/utils/instant-messaging/message_preview.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/notifications/notifications_helper.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -558,87 +558,6 @@ class _UserLayoutState extends State<UserLayout> {
     super.dispose();
   }
 
-  List<Widget> getDestinations(UserEntity user) {
-    final currTheme = Theme.of(context).colorScheme;
-
-    return [
-      NavigationDestination(
-        selectedIcon: Icon(
-          Icons.home,
-          color: currTheme.onPrimary,
-        ),
-        icon: const Icon(Icons.home_outlined),
-        label: "Home",
-      ),
-      NavigationDestination(
-        selectedIcon: Icon(
-          Icons.broadcast_on_personal,
-          color: currTheme.onPrimary,
-        ),
-        icon: const Icon(Icons.broadcast_on_personal_outlined),
-        label: "Nearby",
-      ),
-      NavigationDestination(
-        selectedIcon: user.profilePicture.bucketPath.isEmpty
-            ? Icon(
-                Icons.account_circle,
-                color: currTheme.onPrimary,
-              )
-            : CircleAvatar(
-                radius: 20,
-                backgroundColor: currTheme.primary,
-                child: CircleAvatar(
-                  radius: 17,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      cacheKey: user.profilePicture.bucketPath,
-                      imageUrl: user.profilePicture.accessURI,
-                      placeholder: (context, url) => const Center(
-                        child: SmallLoadingIndicator.small(),
-                      ),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
-                      fit: BoxFit.cover,
-                      width: 40,
-                      height: 40,
-                      memCacheHeight: Constants.thumbnailCacheHeight,
-                    ),
-                  ),
-                ),
-              ),
-        icon: user.profilePicture.bucketPath.isEmpty
-            ? const Icon(Icons.account_circle_outlined)
-            : CircleAvatar(
-                radius: 20,
-                backgroundColor: currTheme.primary,
-                child: CircleAvatar(
-                  radius: 20,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      cacheKey: user.profilePicture.bucketPath,
-                      imageUrl: user.profilePicture.accessURI,
-                      placeholder: (context, url) => const Center(
-                        child: SmallLoadingIndicator.small(),
-                      ),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
-                      fit: BoxFit.cover,
-                      width: 40,
-                      height: 40,
-                      memCacheHeight: Constants.thumbnailCacheHeight,
-                    ),
-                  ),
-                ),
-              ),
-        label: trimText(
-          user.name,
-          len: 16,
-        ),
-        tooltip: user.name,
-      ),
-    ];
-  }
-
   List<Destinations> createDestinations(UserEntity user) {
     final currTheme = Theme.of(context).colorScheme;
     return [
@@ -674,7 +593,7 @@ class _UserLayoutState extends State<UserLayout> {
                       cacheKey: user.profilePicture.bucketPath,
                       imageUrl: user.profilePicture.accessURI,
                       placeholder: (context, url) => const Center(
-                        child: SmallLoadingIndicator.small(),
+                        child: LoadingWidget.nested(),
                       ),
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),
@@ -698,7 +617,7 @@ class _UserLayoutState extends State<UserLayout> {
                       cacheKey: user.profilePicture.bucketPath,
                       imageUrl: user.profilePicture.accessURI,
                       placeholder: (context, url) => const Center(
-                        child: SmallLoadingIndicator.small(),
+                        child: LoadingWidget.nested(),
                       ),
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),

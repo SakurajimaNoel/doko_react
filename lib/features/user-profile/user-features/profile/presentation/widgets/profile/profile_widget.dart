@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/config/router/router_constants.dart';
@@ -9,8 +11,7 @@ import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/heading/auto_heading.dart';
-import 'package:doko_react/core/widgets/heading/heading.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
 import 'package:doko_react/core/widgets/pull-to-refresh/pull_to_refresh.dart';
 import 'package:doko_react/core/widgets/share/share.dart';
@@ -108,51 +109,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     );
   }
 
-  List<Widget> appBarActions() {
-    final currTheme = Theme.of(context).colorScheme;
-
-    if (!self) {
-      return [
-        TextButton(
-          onPressed: handleUserProfileShare,
-          // icon: const Icon(Icons.share),
-          style: TextButton.styleFrom(
-            minimumSize: Size.zero,
-            // padding: const EdgeInsets.symmetric(
-            //   vertical: Constants.padding * 0.5,
-            //   horizontal: Constants.padding * 0.75,
-            // ),
-
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-          child: Text(
-            "Share",
-            style: TextStyle(
-              color: currTheme.onSurface,
-              fontWeight: FontWeight.w600,
-              fontSize: Constants.fontSize,
-            ),
-          ),
-        ),
-      ];
-    }
-
-    return [
-      IconButton(
-        onPressed: () {
-          context.pushNamed(RouterConstants.settings);
-        },
-        color: currTheme.onSurface,
-        icon: const Icon(
-          Icons.settings,
-        ),
-        tooltip: "Settings",
-      ),
-      const SignOutButton(),
-    ];
-  }
-
-  Widget userProfileAction(CompleteUserEntity user) {
+  Widget userProfileAction(
+    UserEntity user, {
+    bool disable = false,
+  }) {
     if (self) {
       return Wrap(
         spacing: Constants.gap * 2,
@@ -160,17 +120,19 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         runSpacing: Constants.gap * 2,
         children: [
           FilledButton.icon(
-            onPressed: () {
-              // go to edit page
-              context.pushNamed<String>(
-                RouterConstants.editProfile,
-              );
-            },
+            onPressed: disable
+                ? null
+                : () {
+                    // go to edit page
+                    context.pushNamed<String>(
+                      RouterConstants.editProfile,
+                    );
+                  },
             label: const Text("Edit"),
             icon: const Icon(Icons.edit_note),
           ),
           FilledButton.tonalIcon(
-            onPressed: handleUserProfileShare,
+            onPressed: disable ? null : handleUserProfileShare,
             icon: const Icon(Icons.share),
             label: const Text("Share"),
           ),
@@ -189,11 +151,14 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     return LayoutBuilder(builder: (context, constraints) {
       if (constraints.maxWidth > Constants.userRelationWidth) {
         return UserToUserRelationWidget.label(
+          key: ValueKey("$username-relation-with-label"),
+          disabled: disable,
           username: username,
         );
       }
 
       return UserToUserRelationWidget(
+        disabled: disable,
         key: ValueKey("$username-relation-without-label"),
         username: username,
       );
@@ -390,10 +355,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     );
 
     final key = generateUserNodeKey(username);
-
     final currTheme = Theme.of(context).colorScheme;
-    final width = MediaQuery.sizeOf(context).width;
-    final height = width * (1 / Constants.profile);
 
     final scrollCacheHeight = MediaQuery.sizeOf(context).height * 2;
 
@@ -423,7 +385,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
             return BlocBuilder<ProfileBloc, ProfileState>(
               builder: (context, state) {
                 bool isUserEntity = graph.containsKey(key) &&
-                    graph.getValueByKey(key)! is! CompleteUserEntity;
+                    graph.getValueByKey(key) is! CompleteUserEntity;
 
                 if (state is ProfileError) {
                   return Center(
@@ -446,126 +408,48 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 }
 
                 if (isUserEntity) {
-                  var initUser = graph.getValueByKey(key)! as UserEntity;
+                  var user = graph.getValueByKey(key)! as UserEntity;
 
                   return Stack(
                     children: [
-                      Column(
-                        children: [
-                          SizedBox(
-                            height: height,
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                initUser.profilePicture.bucketPath.isNotEmpty
-                                    ? CachedNetworkImage(
-                                        memCacheHeight:
-                                            Constants.profileCacheHeight,
-                                        cacheKey:
-                                            initUser.profilePicture.bucketPath,
-                                        imageUrl:
-                                            initUser.profilePicture.accessURI,
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) =>
-                                            const Center(
-                                          child: SmallLoadingIndicator.small(),
-                                        ),
-                                        errorWidget: (context, url, error) =>
-                                            const Icon(Icons.error),
-                                        height: height,
-                                      )
-                                    : Container(
-                                        color: currTheme.onSecondary,
-                                        child: Icon(
-                                          Icons.person,
-                                          size: height,
-                                        ),
-                                      ),
-                                Container(
-                                  padding: const EdgeInsets.only(
-                                    top: Constants.padding * 2,
-                                    bottom: Constants.padding,
-                                    left: Constants.padding,
-                                    right: Constants.padding,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        currTheme.surface
-                                            .withValues(alpha: 0.75),
-                                        currTheme.surface
-                                            .withValues(alpha: 0.75),
-                                      ],
-                                    ),
-                                  ),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: currTheme.surface.withValues(
+                            alpha: 0.5,
+                          ),
+                        ),
+                        position: DecorationPosition.foreground,
+                        child: CustomScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          slivers: [
+                            _ProfilePicture(
+                              username: username,
+                              self: self,
+                              onShare: handleUserProfileShare,
+                            ),
+                            SliverToBoxAdapter(
+                              child: CompactBox(
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.all(Constants.padding),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Heading(
-                                            initUser.username,
-                                            size: Constants.heading4,
-                                          ),
-                                          Row(
-                                            spacing: Constants.gap,
-                                            children: appBarActions(),
-                                          ),
-                                        ],
-                                      ),
-                                      Heading.left(
-                                        initUser.name,
-                                        size: Constants.heading3,
+                                      userProfileAction(
+                                        user,
+                                        disable: true,
                                       ),
                                     ],
                                   ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(Constants.padding),
-                            child: Stack(
-                              fit: StackFit.loose,
-                              children: [
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    if (constraints.maxWidth >
-                                        Constants.userRelationWidth) {
-                                      return UserToUserRelationWidget.label(
-                                        username: username,
-                                        disabled: true,
-                                      );
-                                    }
-
-                                    return UserToUserRelationWidget(
-                                      key: ValueKey(
-                                          "$username-relation-without-label"),
-                                      username: username,
-                                      disabled: true,
-                                    );
-                                  },
                                 ),
-                                Container(
-                                  color: currTheme.surface.withValues(
-                                    alpha: 0.75,
-                                  ),
-                                  height: Constants.height * 3,
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       const Center(
-                        child: CircularProgressIndicator(),
+                        child: LoadingWidget(),
                       ),
                     ],
                   );
@@ -573,7 +457,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
                 if (state is ProfileLoading || state is ProfileInitial) {
                   return const Center(
-                    child: CircularProgressIndicator(),
+                    child: LoadingWidget(),
                   );
                 }
 
@@ -604,84 +488,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     controller: controller,
                     cacheExtent: scrollCacheHeight,
                     slivers: [
-                      SliverAppBar(
-                        pinned: true,
-                        expandedHeight: height,
-                        title: AutoHeading(
-                          username,
-                          color: currTheme.onSurface,
-                          size: Constants.heading3,
-                          minFontSize: Constants.heading4,
-                          maxLines: 1,
-                        ),
-                        actionsPadding: const EdgeInsets.symmetric(
-                          horizontal: Constants.gap,
-                        ),
-                        actions: [
-                          Row(
-                            spacing: Constants.gap,
-                            children: appBarActions(),
-                          ),
-                        ],
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: BlocBuilder<UserToUserActionBloc,
-                              UserToUserActionState>(
-                            buildWhen: (previousState, state) {
-                              return (state
-                                      is UserToUserActionUpdateProfileState &&
-                                  state.username == username);
-                            },
-                            builder: (context, state) {
-                              final user = graph.getValueByKey(key)!
-                                  as CompleteUserEntity;
-
-                              return Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  user.profilePicture.bucketPath.isNotEmpty
-                                      ? CachedNetworkImage(
-                                          memCacheHeight:
-                                              Constants.profileCacheHeight,
-                                          cacheKey:
-                                              user.profilePicture.bucketPath,
-                                          imageUrl:
-                                              user.profilePicture.accessURI,
-                                          fit: BoxFit.cover,
-                                          placeholder: (context, url) =>
-                                              const Center(
-                                            child:
-                                                SmallLoadingIndicator.small(),
-                                          ),
-                                          errorWidget: (context, url, error) =>
-                                              const Icon(Icons.error),
-                                          height: height,
-                                        )
-                                      : Container(
-                                          color: currTheme.onSecondary,
-                                          child: Icon(
-                                            Icons.person,
-                                            size: height,
-                                          ),
-                                        ),
-                                  ProfilePictureFilter(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        bottom: Constants.padding * 0.25,
-                                      ),
-                                      child: AutoHeading(
-                                        user.name,
-                                        color: currTheme.onSurface,
-                                        size: Constants.heading2,
-                                        minFontSize: Constants.heading3,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
+                      _ProfilePicture(
+                        username: username,
+                        self: self,
+                        onShare: handleUserProfileShare,
                       ),
                       SliverToBoxAdapter(
                         child: CompactBox(
@@ -774,5 +584,139 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
     return true;
+  }
+}
+
+class _ProfilePicture extends StatelessWidget {
+  const _ProfilePicture({
+    required this.username,
+    required this.self,
+    required this.onShare,
+  });
+
+  final String username;
+  final bool self;
+  final VoidCallback onShare;
+
+  List<Widget> appBarActions(BuildContext context) {
+    final currTheme = Theme.of(context).colorScheme;
+
+    if (!self) {
+      return [
+        TextButton(
+          onPressed: onShare,
+          style: TextButton.styleFrom(
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(
+            "Share",
+            style: TextStyle(
+              color: currTheme.onSurface,
+              fontWeight: FontWeight.w600,
+              fontSize: Constants.fontSize,
+            ),
+          ),
+        ),
+      ];
+    }
+
+    return [
+      IconButton(
+        onPressed: () {
+          context.pushNamed(RouterConstants.settings);
+        },
+        color: currTheme.onSurface,
+        icon: const Icon(
+          Icons.settings,
+        ),
+        tooltip: "Settings",
+      ),
+      const SignOutButton(),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final UserGraph graph = UserGraph();
+    final key = generateUserNodeKey(username);
+
+    final currTheme = Theme.of(context).colorScheme;
+
+    return SliverLayoutBuilder(
+      builder: (context, constraints) {
+        final height =
+            min(constraints.crossAxisExtent, MediaQuery.sizeOf(context).height);
+
+        return SliverAppBar(
+          pinned: true,
+          expandedHeight: height,
+          title: AutoHeading(
+            username,
+            color: currTheme.onSurface,
+            size: Constants.heading3,
+            minFontSize: Constants.heading4,
+            maxLines: 1,
+          ),
+          actionsPadding: const EdgeInsets.symmetric(
+            horizontal: Constants.gap,
+          ),
+          actions: appBarActions(context),
+          flexibleSpace: FlexibleSpaceBar(
+            background:
+                BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
+              buildWhen: (previousState, state) {
+                return (state is UserToUserActionUpdateProfileState &&
+                    state.username == username);
+              },
+              builder: (context, state) {
+                final user = graph.getValueByKey(key)! as UserEntity;
+
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    user.profilePicture.bucketPath.isNotEmpty
+                        ? CachedNetworkImage(
+                            memCacheHeight: Constants.profileCacheHeight,
+                            cacheKey: user.profilePicture.bucketPath,
+                            imageUrl: user.profilePicture.accessURI,
+                            fit: BoxFit.fitHeight,
+                            placeholder: (context, url) => const Center(
+                              child: LoadingWidget.small(),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                            height: height,
+                            alignment: Alignment.center,
+                          )
+                        : Container(
+                            color: currTheme.onSecondary,
+                            child: Icon(
+                              Icons.person,
+                              size: height,
+                            ),
+                          ),
+                    ProfilePictureFilter(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: Constants.padding * 0.25,
+                        ),
+                        child: AutoHeading(
+                          user.name,
+                          color: currTheme.onSurface,
+                          size: Constants.heading2,
+                          minFontSize: Constants.heading3,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
   }
 }

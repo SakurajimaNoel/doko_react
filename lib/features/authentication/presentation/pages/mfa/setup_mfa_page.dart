@@ -2,6 +2,7 @@ import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
@@ -48,7 +49,7 @@ class _SetupMfaPageState extends State<SetupMfaPage> {
 
                 if (state is AuthenticationLoading) {
                   return const Center(
-                    child: CircularProgressIndicator(),
+                    child: LoadingWidget(),
                   );
                 }
 

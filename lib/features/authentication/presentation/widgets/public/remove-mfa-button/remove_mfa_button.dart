@@ -1,6 +1,6 @@
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +51,7 @@ class _RemoveMfaButtonState extends State<RemoveMfaButton> {
                       context.read<AuthenticationBloc>().add(RemoveMFAEvent());
                     },
               child: removing
-                  ? SmallLoadingIndicator(
+                  ? LoadingWidget(
                       color: currTheme.error,
                     )
                   : Text(

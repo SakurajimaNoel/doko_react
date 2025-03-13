@@ -10,7 +10,7 @@ import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/utils/text-controller/mention_text_controller.dart';
 import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
 import 'package:doko_react/core/widgets/gif-picker/gif_picker.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/comment/comment_entity.dart';
@@ -364,7 +364,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                 SizedBox(
                   height: height,
                   child: const Center(
-                    child: SmallLoadingIndicator.small(),
+                    child: LoadingWidget.small(),
                   ),
                 ),
               ],
@@ -441,7 +441,7 @@ class _CommentMentionOverlayState extends State<_CommentMentionOverlay> {
                 const SizedBox(
                   height: Constants.height,
                   child: Center(
-                    child: SmallLoadingIndicator.small(),
+                    child: LoadingWidget.small(),
                   ),
                 ),
               ]
@@ -601,7 +601,7 @@ class _CommentMedia extends StatelessWidget {
                     fit: BoxFit.cover,
                     imageUrl: media.uri!,
                     placeholder: (context, url) => const Center(
-                      child: SmallLoadingIndicator.small(),
+                      child: LoadingWidget.small(),
                     ),
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.error),
@@ -850,7 +850,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
                             ? const Icon(Icons.reply)
                             : const Icon(Icons.add),
                     label: adding
-                        ? const SmallLoadingIndicator.small()
+                        ? const LoadingWidget.nested()
                         : commentProvider.isReply
                             ? const Text("Reply")
                             : const Text("Add"),

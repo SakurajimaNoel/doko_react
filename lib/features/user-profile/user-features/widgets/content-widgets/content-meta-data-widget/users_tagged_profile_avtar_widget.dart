@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/constants/constants.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_widget.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +78,7 @@ class _UsersTaggedAvtarWidgetState extends State<UsersTaggedAvtarWidget> {
                             cacheKey: currentDisplay.profilePicture.bucketPath,
                             imageUrl: currentDisplay.profilePicture.accessURI,
                             placeholder: (context, url) => const Center(
-                              child: SmallLoadingIndicator.small(),
+                              child: LoadingWidget.small(),
                             ),
                             errorWidget: (context, url, error) =>
                                 const Icon(Icons.error),

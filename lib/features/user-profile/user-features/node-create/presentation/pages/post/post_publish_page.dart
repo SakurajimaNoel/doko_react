@@ -5,7 +5,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/presentation/bloc/node_create_bloc.dart';
@@ -191,7 +191,7 @@ class _PostPublishPageState extends State<PostPublishPage> {
                           ),
                         ),
                         child: uploading
-                            ? const SmallLoadingIndicator()
+                            ? const LoadingWidget.small()
                             : const Text("Upload"),
                       ),
                     ),

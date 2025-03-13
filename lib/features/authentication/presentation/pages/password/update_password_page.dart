@@ -3,7 +3,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
 import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/features/authentication/input/authentication_input.dart';
 import 'package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
@@ -196,7 +196,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                         ),
                       ),
                       child: loading
-                          ? const SmallLoadingIndicator()
+                          ? const LoadingWidget.small()
                           : const Text("Update"),
                     ),
                   ],

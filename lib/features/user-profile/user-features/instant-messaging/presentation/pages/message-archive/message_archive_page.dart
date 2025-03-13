@@ -7,7 +7,7 @@ import 'package:doko_react/core/global/provider/websocket-client/websocket_clien
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/constrained-box/expanded_box.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/message-forward/message_forward.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/archive_entity.dart';
@@ -199,7 +199,7 @@ class _MessageArchivePageState extends State<MessageArchivePage>
       }
 
       return const Center(
-        child: SmallLoadingIndicator(),
+        child: LoadingWidget.small(),
       );
     }
 
@@ -471,7 +471,7 @@ class _MessageArchivePageState extends State<MessageArchivePage>
 
                               if (loading) {
                                 return const Center(
-                                  child: CircularProgressIndicator(),
+                                  child: LoadingWidget(),
                                 );
                               }
 

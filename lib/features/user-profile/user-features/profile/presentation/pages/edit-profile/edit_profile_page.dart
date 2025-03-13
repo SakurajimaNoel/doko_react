@@ -12,7 +12,7 @@ import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
 import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -171,7 +171,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 TextButton(
                   onPressed: updating ? null : () => handleEditProfile(context),
                   child: updating
-                      ? const SmallLoadingIndicator.small()
+                      ? const LoadingWidget.small()
                       : const Text("Save"),
                 ),
               ],
@@ -387,7 +387,7 @@ class _ProfileSelectionState extends State<_ProfileSelection> {
       imageUrl: widget.currentProfile.accessURI,
       fit: BoxFit.cover,
       placeholder: (context, url) => const Center(
-        child: SmallLoadingIndicator.small(),
+        child: LoadingWidget.small(),
       ),
       errorWidget: (context, url, error) => const Icon(Icons.error),
       height: height,

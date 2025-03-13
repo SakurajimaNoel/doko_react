@@ -7,7 +7,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/content-widgets/content-meta-data-widget/users_tagged_profile_avtar_widget.dart';
@@ -103,7 +103,7 @@ class ContentMetaDataWidget extends StatelessWidget {
                                         imageUrl: user.profilePicture.accessURI,
                                         placeholder: (context, url) =>
                                             const Center(
-                                          child: SmallLoadingIndicator.small(),
+                                          child: LoadingWidget.small(),
                                         ),
                                         errorWidget: (context, url, error) =>
                                             const Icon(Icons.error),

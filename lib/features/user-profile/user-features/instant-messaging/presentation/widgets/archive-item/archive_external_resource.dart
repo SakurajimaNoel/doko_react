@@ -46,10 +46,13 @@ class _ArchiveExternalResource extends StatelessWidget {
                 placeholder: (context, url) => SizedBox(
                   height: constraints.maxWidth,
                   child: const Center(
-                    child: SmallLoadingIndicator.small(),
+                    child: LoadingWidget.small(),
                   ),
                 ),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
+                errorWidget: (context, url, error) => SizedBox(
+                  height: constraints.maxWidth,
+                  child: const Icon(Icons.error),
+                ),
                 memCacheHeight: Constants.archiveMedia,
                 width: constraints.maxWidth,
               ),

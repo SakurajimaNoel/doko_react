@@ -3,6 +3,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/page/token_page.dart';
 import 'package:doko_react/core/widgets/error/error_unknown_route.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/features/authentication/presentation/pages/login/confirm_login_page.dart';
 import 'package:doko_react/features/authentication/presentation/pages/login/login_page.dart';
 import 'package:doko_react/features/authentication/presentation/pages/mfa/setup_mfa_page.dart';
@@ -128,7 +129,7 @@ class AppRouterConfig {
         builder: (context, state) {
           return const Scaffold(
             body: Center(
-              child: CircularProgressIndicator(),
+              child: LoadingWidget(),
             ),
           );
         },

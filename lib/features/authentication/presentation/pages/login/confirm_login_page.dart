@@ -2,7 +2,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
@@ -120,7 +120,7 @@ class _ConfirmLoginPageState extends State<ConfirmLoginPage> {
                                 ),
                               ),
                               child: loading
-                                  ? const SmallLoadingIndicator()
+                                  ? const LoadingWidget.small()
                                   : const Text("Continue"),
                             ),
                             const SizedBox(

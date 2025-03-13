@@ -1,3 +1,4 @@
+import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/navigation/create/create_widget.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/navigation/data/destinations.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/navigation/inbox/inbox_widget.dart';
@@ -54,6 +55,7 @@ class SideNavRail extends StatelessWidget {
   Widget build(BuildContext context) {
     final destinations = createNewDestinations();
 
+    bool extended = MediaQuery.sizeOf(context).width > Constants.expanded;
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -63,8 +65,10 @@ class SideNavRail extends StatelessWidget {
             ),
             child: IntrinsicHeight(
               child: NavigationRail(
+                extended: extended,
+                minExtendedWidth: Constants.width * 12,
                 groupAlignment: 0,
-                labelType: NavigationRailLabelType.all,
+                labelType: extended ? null : NavigationRailLabelType.all,
                 indicatorShape: const CircleBorder(),
                 indicatorColor: indicatorColor,
                 selectedIndex: selectedIndex == 2

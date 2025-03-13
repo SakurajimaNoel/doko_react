@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/core/widgets/video-player/video_player.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
@@ -142,7 +142,7 @@ class _MediaContentState extends State<_MediaContent> {
           fit: boxFitContain ? BoxFit.contain : BoxFit.cover,
           imageUrl: image.resource.accessURI,
           placeholder: (context, url) => const Center(
-            child: SmallLoadingIndicator.small(),
+            child: LoadingWidget.small(),
           ),
           errorWidget: (context, url, error) => const Icon(Icons.error),
           memCacheHeight: Constants.postCacheHeight,

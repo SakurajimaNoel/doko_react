@@ -6,7 +6,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
@@ -398,7 +398,7 @@ class UserWidget extends StatelessWidget {
       cacheKey: profilePicture.bucketPath,
       imageUrl: profilePicture.accessURI,
       placeholder: (context, url) => const Center(
-        child: SmallLoadingIndicator.small(),
+        child: LoadingWidget.nested(),
       ),
       errorWidget: (context, url, error) => const Icon(Icons.error),
       fit: BoxFit.cover,
@@ -469,7 +469,7 @@ class UserWidget extends StatelessWidget {
           cacheKey: profilePicture.bucketPath,
           imageUrl: profilePicture.accessURI,
           placeholder: (context, url) => const Center(
-            child: SmallLoadingIndicator.small(),
+            child: LoadingWidget.nested(),
           ),
           errorWidget: (context, url, error) => const Icon(Icons.error),
           fit: BoxFit.cover,

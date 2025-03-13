@@ -5,7 +5,7 @@ import 'package:doko_react/core/validation/input_validation/input_validation.dar
 import 'package:doko_react/core/widgets/bullet-list/bullet_list.dart';
 import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/authentication/presentation/widgets/public/sign-out-button/sign_out_button.dart';
 import 'package:doko_react/features/complete-profile/input/complete_profile_input.dart';
@@ -104,46 +104,35 @@ class _CompleteProfileUsernamePageState
                                 ),
                                 Form(
                                   key: formKey,
-                                  child: Stack(
-                                    alignment: AlignmentDirectional.centerEnd,
-                                    children: [
-                                      TextFormField(
-                                        controller: usernameController,
-                                        validator: (value) {
-                                          return validateUsername(value)
-                                              ? null
-                                              : "Invalid username.";
-                                        },
-                                        autovalidateMode:
-                                            AutovalidateMode.onUserInteraction,
-                                        onChanged: (value) {
-                                          if (!validateUsername(value)) return;
+                                  child: TextFormField(
+                                    controller: usernameController,
+                                    validator: (value) {
+                                      return validateUsername(value)
+                                          ? null
+                                          : "Invalid username.";
+                                    },
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    onChanged: (value) {
+                                      if (!validateUsername(value)) return;
 
-                                          // emit username events
-                                          UsernameInput input =
-                                              UsernameInput(username: value);
-                                          context
-                                              .read<CompleteProfileBloc>()
-                                              .add(
-                                                CompleteProfileUsernameEvent(
-                                                  usernameInput: input,
-                                                ),
-                                              );
-                                        },
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          labelText: "Username",
-                                          hintText: "Username...",
-                                        ),
-                                      ),
-                                      if (loading)
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                            right: Constants.gap,
-                                          ),
-                                          child: const SmallLoadingIndicator(),
-                                        ),
-                                    ],
+                                      // emit username events
+                                      UsernameInput input =
+                                          UsernameInput(username: value);
+                                      context.read<CompleteProfileBloc>().add(
+                                            CompleteProfileUsernameEvent(
+                                              usernameInput: input,
+                                            ),
+                                          );
+                                    },
+                                    decoration: InputDecoration(
+                                      border: const OutlineInputBorder(),
+                                      labelText: "Username",
+                                      hintText: "Username...",
+                                      suffixIcon: loading
+                                          ? const LoadingWidget.small()
+                                          : null,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(

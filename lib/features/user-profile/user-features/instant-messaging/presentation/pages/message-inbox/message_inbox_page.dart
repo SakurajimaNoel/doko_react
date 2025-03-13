@@ -6,7 +6,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/widgets/constrained-box/expanded_box.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_entity.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/inbox/inbox_item_entity.dart';
@@ -130,7 +130,7 @@ class _MessageInboxPageState extends State<MessageInboxPage> {
       }
 
       return const Center(
-        child: SmallLoadingIndicator(),
+        child: LoadingWidget.small(),
       );
     }
 
@@ -277,7 +277,7 @@ class _MessageInboxPageState extends State<MessageInboxPage> {
 
             if (loading) {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: LoadingWidget(),
               );
             }
 

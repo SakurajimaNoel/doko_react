@@ -5,7 +5,7 @@ import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/display/display_helper.dart';
 import 'package:doko_react/core/utils/extension/go_router_extension.dart';
-import 'package:doko_react/core/widgets/loading/small_loading_indicator.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/share/share.dart';
 import 'package:doko_react/core/widgets/text/styled_text.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
@@ -84,7 +84,7 @@ class PostWidget extends StatelessWidget {
                             ),
                           ],
                         )
-                      : const SmallLoadingIndicator.small(),
+                      : const LoadingWidget.small(),
                 ),
               );
             },
