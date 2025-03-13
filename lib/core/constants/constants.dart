@@ -64,6 +64,11 @@ class Constants {
   static const int mediaLimit = 1 << 4;
   static const double carouselDots = 6;
   static const double carouselActiveDotScale = 1.5;
+  // when media files are used
+  static const double contentWidth = 1;
+  static const double contentHeight = 1;
+  static const double contentContainer = (contentWidth /
+      contentHeight); // for height use 1/contentContainer and for width use contentContainer
 
   // polls
   static const int pollOptionsLimit = 5;
@@ -76,10 +81,7 @@ class Constants {
   static const int discussionTextLimit = 1 << 15;
 
   // post
-  static const double postWidth = 1;
-  static const double postHeight = 1;
-  static const double postContainer = (postWidth /
-      postHeight); // for height use 1/postContainer and for width use postContainer
+
   static const double actionWidth = _root * 2.5;
   static const double actionEdgeGap = _root * 0.125;
   static const int postCaptionLimit = 1 << 10;

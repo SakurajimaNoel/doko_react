@@ -202,7 +202,7 @@ class _ContentMediaSelectionWidgetState
                       CroppedFile? croppedImage = await getCroppedImage(
                         path,
                         context: context,
-                        location: ImageLocation.post,
+                        location: ImageLocation.content,
                       );
 
                       if (croppedImage == null) return;
@@ -254,7 +254,7 @@ class _ContentMediaSelectionWidgetState
   List<Widget> handleDisplaySelectedMedia(double width) {
     var currTheme = Theme.of(context).colorScheme;
     double opacity = 0.5;
-    var height = width * (1 / Constants.postContainer);
+    var height = width * (1 / Constants.contentContainer);
 
     List<Widget> mediaWidgets = [];
 
@@ -379,7 +379,7 @@ class _ContentMediaSelectionWidgetState
           ),
           LayoutBuilder(builder: (context, constraints) {
             final width = constraints.maxWidth;
-            final height = width * (1 / Constants.postContainer);
+            final height = width * (1 / Constants.contentContainer);
 
             return SizedBox(
               height: height,

@@ -171,7 +171,7 @@ class _MediaContentState extends State<_MediaContent> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final height = width * (1 / Constants.postContainer);
+        final height = width * (1 / Constants.contentContainer);
 
         return Column(
           spacing: Constants.gap * (preview ? 0.75 : 1),

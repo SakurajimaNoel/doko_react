@@ -6,7 +6,7 @@ part 'image_cropper_helper_lib.dart';
 
 enum ImageLocation {
   profile,
-  post,
+  content,
   comment,
 }
 
@@ -22,8 +22,8 @@ Future<CroppedFile?> getCroppedImage(
     case ImageLocation.profile:
       ratio = _profileRatio;
       break;
-    case ImageLocation.post:
-      ratio = _postRatio;
+    case ImageLocation.content:
+      ratio = _contentRatio;
       break;
     case ImageLocation.comment:
       ratio = _commentRatio;
@@ -35,7 +35,7 @@ Future<CroppedFile?> getCroppedImage(
     aspectRatio: ratio,
     uiSettings: [
       AndroidUiSettings(
-        toolbarTitle: 'Profile Picture',
+        toolbarTitle: 'Crop Image',
         toolbarColor: currTheme.surface,
         toolbarWidgetColor: currTheme.onSurface,
         statusBarColor: currTheme.surface,
@@ -47,7 +47,7 @@ Future<CroppedFile?> getCroppedImage(
         cropGridStrokeWidth: 6,
       ),
       IOSUiSettings(
-        title: 'Profile Picture',
+        title: 'Crop Image',
       ),
       WebUiSettings(
         context: context,
