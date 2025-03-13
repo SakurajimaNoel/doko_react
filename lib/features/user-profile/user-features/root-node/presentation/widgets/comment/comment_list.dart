@@ -89,17 +89,16 @@ class _CommentListState extends State<CommentList> {
       child = CommentWidget.reply(
         commentKey: comments.items[index],
         parentNodeId: parentNodeId,
-        key: ValueKey(getCommentIdFromCommentKey(comments.items[index])),
       );
     } else {
       child = CommentWidget(
         commentKey: comments.items[index],
         parentNodeId: parentNodeId,
-        key: ValueKey(getCommentIdFromCommentKey(comments.items[index])),
       );
     }
 
     return CompactBox(
+      key: ValueKey(getCommentIdFromCommentKey(comments.items[index])),
       child: child,
     );
   }
