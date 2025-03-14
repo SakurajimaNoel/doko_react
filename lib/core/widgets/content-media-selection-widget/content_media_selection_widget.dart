@@ -90,6 +90,7 @@ class _ContentMediaSelectionWidgetState
         type: MediaTypeValue.thumbnail,
         file: thumbnail,
         bucketPath: "",
+        thumbnail: thumbnail,
       );
     }
 
@@ -101,6 +102,12 @@ class _ContentMediaSelectionWidgetState
     compressingVideo = false;
     widget.onVideoProcessingChange(compressingVideo);
 
+    /// only one video at a time
+    int tempIndex = content.indexWhere((item) =>
+        item.type == MediaTypeValue.thumbnail ||
+        item.type == MediaTypeValue.unknown);
+    if (tempIndex == -1) return;
+
     if (compressedVideo == null) {
       // handle failed case
       String message =
@@ -109,18 +116,18 @@ class _ContentMediaSelectionWidgetState
       showError(message);
       if (mounted) {
         setState(() {
-          content.removeLast();
+          content.removeAt(tempIndex);
         });
       }
       return;
     }
 
-    int tempIndex = content.length - 1;
     setState(() {
       content[tempIndex] = MediaContent(
         type: MediaTypeValue.video,
         file: compressedVideo,
         bucketPath: generateBucketPath(compressedVideo),
+        thumbnail: thumbnail,
       );
     });
 
@@ -183,78 +190,78 @@ class _ContentMediaSelectionWidgetState
   }) {
     var currTheme = Theme.of(context).colorScheme;
 
-    return SizedBox(
-      child: Stack(
-        children: [
-          child,
-          Padding(
-            padding: const EdgeInsets.only(
-              right: Constants.padding * 0.5,
-              top: Constants.padding * 0.5,
-            ),
-            child: Row(
-              mainAxisAlignment: !animated
-                  ? MainAxisAlignment.spaceBetween
-                  : MainAxisAlignment.end,
-              children: [
-                if (!animated)
-                  IconButton.filledTonal(
-                    onPressed: () async {
-                      CroppedFile? croppedImage = await getCroppedImage(
-                        path,
-                        context: context,
-                        location: ImageLocation.content,
-                      );
-
-                      if (croppedImage == null) return;
-
-                      setState(() {
-                        content[index] = MediaContent(
-                          type: MediaTypeValue.image,
-                          file: croppedImage.path,
-                          bucketPath: generateBucketPath(croppedImage.path),
-                          originalImage: path,
-                        );
-                      });
-                    },
-                    icon: const Icon(
-                      Icons.crop,
-                    ),
-                  ),
+    return Stack(
+      key: ObjectKey(content[index]),
+      children: [
+        child,
+        Padding(
+          padding: const EdgeInsets.only(
+            right: Constants.padding * 0.5,
+            top: Constants.padding * 0.5,
+          ),
+          child: Row(
+            mainAxisAlignment: !animated
+                ? MainAxisAlignment.spaceBetween
+                : MainAxisAlignment.end,
+            children: [
+              if (!animated)
                 IconButton.filledTonal(
-                  color: currTheme.onError,
-                  style: IconButton.styleFrom(
-                    backgroundColor: currTheme.error,
-                  ),
                   onPressed: () async {
-                    var type = content[index].type;
-                    if (type == MediaTypeValue.thumbnail ||
-                        type == MediaTypeValue.unknown) {
-                      await VideoActions
-                          .cancelCurrentlyActiveVideoCompression();
-                    }
+                    CroppedFile? croppedImage = await getCroppedImage(
+                      path,
+                      context: context,
+                      location: ImageLocation.content,
+                    );
+
+                    if (croppedImage == null) return;
 
                     setState(() {
-                      content.removeAt(index);
+                      content[index] = MediaContent(
+                        type: MediaTypeValue.image,
+                        file: croppedImage.path,
+                        bucketPath: generateBucketPath(croppedImage.path),
+                        originalImage: path,
+                      );
                     });
-
-                    widget.onMediaChange(content);
                   },
                   icon: const Icon(
-                    Icons.delete,
+                    Icons.crop,
                   ),
                 ),
-              ],
-            ),
+              IconButton.filledTonal(
+                color: currTheme.onError,
+                style: IconButton.styleFrom(
+                  backgroundColor: currTheme.error,
+                ),
+                onPressed: () async {
+                  var type = content[index].type;
+                  if (type == MediaTypeValue.thumbnail ||
+                      type == MediaTypeValue.unknown) {
+                    await VideoActions.cancelCurrentlyActiveVideoCompression();
+                    compressingVideo = false;
+                    widget.onVideoProcessingChange(compressingVideo);
+                  }
+
+                  setState(() {
+                    content.removeAt(index);
+                  });
+
+                  widget.onMediaChange(content);
+                },
+                icon: const Icon(
+                  Icons.delete,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   List<Widget> handleDisplaySelectedMedia(double width) {
     var currTheme = Theme.of(context).colorScheme;
-    double opacity = 0.5;
+
     var height = width * (1 / Constants.contentContainer);
 
     List<Widget> mediaWidgets = [];
@@ -312,21 +319,16 @@ class _ContentMediaSelectionWidgetState
                       cacheHeight: Constants.postCacheHeight,
                     ),
                   ),
-                  Container(
+                  DecoratedBox(
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          currTheme.surface.withValues(alpha: opacity),
-                          currTheme.surface.withValues(alpha: opacity),
-                        ],
+                      color: currTheme.surfaceContainer.withValues(
+                        alpha: 0.5,
                       ),
                     ),
                     child: const Center(
                       child: LoadingWidget.small(),
                     ),
-                  )
+                  ),
                 ],
               ),
               index: index,
@@ -337,7 +339,6 @@ class _ContentMediaSelectionWidgetState
         case MediaTypeValue.unknown:
           mediaWidgets.add(mediaItemWrapper(
             child: Container(
-              width: width,
               color: currTheme.outlineVariant,
               child: const Center(
                 child: LoadingWidget.small(),
@@ -376,51 +377,156 @@ class _ContentMediaSelectionWidgetState
           ),
           BulletList(info),
           const SizedBox(
-            height: Constants.gap * 0.5,
+            height: Constants.gap * 0.25,
           ),
-          LayoutBuilder(builder: (context, constraints) {
-            final width = constraints.maxWidth;
-            final height = width * (1 / Constants.contentContainer);
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              final height = width * (1 / Constants.contentContainer);
 
-            return SizedBox(
-              height: height,
-              child: CarouselView(
-                enableSplash: false,
-                controller: carouselController,
-                itemExtent: width,
-                shrinkExtent: width * 0.5,
-                itemSnapping: true,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: Constants.padding * 0.5,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(Constants.radius),
-                ),
+              return Column(
+                spacing: Constants.gap * 0.375,
                 children: [
-                  if (content.isNotEmpty) ...handleDisplaySelectedMedia(width),
-                  if (content.length < Constants.mediaLimit)
-                    Container(
-                      width: width,
-                      color: currTheme.outlineVariant,
-                      child: Center(
-                        child: mediaSelect(),
+                  if (content.length > 1)
+                    SizedBox(
+                      height: Constants.height * 2,
+                      child: ReorderableList(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          final item = content[index];
+                          MediaTypeValue type = item.type;
+
+                          final diameter = Constants.width * 2;
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: Constants.gap * 0.75,
+                            ),
+                            key: ObjectKey(item),
+                            child: Row(
+                              spacing: Constants.gap * 0.25,
+                              children: [
+                                type == MediaTypeValue.image
+                                    ? ClipOval(
+                                        child: Image.file(
+                                          File(item.file!),
+                                          fit: BoxFit.cover,
+                                          cacheHeight:
+                                              Constants.thumbnailCacheHeight,
+                                          width: diameter,
+                                          height: diameter,
+                                        ),
+                                      )
+                                    : SizedBox(
+                                        width: diameter,
+                                        height: diameter,
+                                        child: (item.thumbnail == null ||
+                                                item.thumbnail!.isEmpty)
+                                            ? Icon(
+                                                Icons.video_file,
+                                                color:
+                                                    currTheme.primaryContainer,
+                                              )
+                                            : Stack(
+                                                children: [
+                                                  Center(
+                                                    child: Image.file(
+                                                      File(item.thumbnail!),
+                                                      fit: BoxFit.cover,
+                                                      cacheHeight: Constants
+                                                          .thumbnailCacheHeight,
+                                                    ),
+                                                  ),
+                                                  DecoratedBox(
+                                                    decoration: BoxDecoration(
+                                                      color: currTheme
+                                                          .surfaceContainer
+                                                          .withValues(
+                                                        alpha: 0.25,
+                                                      ),
+                                                    ),
+                                                    child: Center(
+                                                      child: type ==
+                                                              MediaTypeValue
+                                                                  .thumbnail
+                                                          ? const LoadingWidget
+                                                              .nested()
+                                                          : Icon(
+                                                              Icons.play_arrow,
+                                                              size:
+                                                                  diameter / 2,
+                                                              color: currTheme
+                                                                  .primaryContainer,
+                                                            ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                      ),
+                                ReorderableDragStartListener(
+                                  index: index,
+                                  child: const Icon(
+                                    Icons.drag_handle,
+                                    size: Constants.iconButtonSize * 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        itemCount: content.length,
+                        onReorder: (int prevIndex, int newIndex) {
+                          setState(() {
+                            if (prevIndex < newIndex) {
+                              newIndex -= 1;
+                            }
+                            var item = content.removeAt(prevIndex);
+                            content.insert(newIndex, item);
+                          });
+                          widget.onMediaChange(content);
+                        },
                       ),
                     ),
+                  SizedBox(
+                    height: height,
+                    child: CarouselView(
+                      enableSplash: false,
+                      controller: carouselController,
+                      itemExtent: width,
+                      shrinkExtent: width * 0.5,
+                      itemSnapping: true,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: Constants.padding * 0.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(Constants.radius),
+                      ),
+                      children: [
+                        if (content.isNotEmpty)
+                          ...handleDisplaySelectedMedia(width),
+                        if (content.length < Constants.mediaLimit)
+                          Container(
+                            width: width,
+                            color: currTheme.outlineVariant,
+                            child: Center(
+                              child: mediaSelect(),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
-              ),
-            );
-          }),
-          if (content.isNotEmpty) ...[
-            const SizedBox(
-              height: Constants.gap * 0.5,
-            ),
+              );
+            },
+          ),
+          if (content.isNotEmpty)
             _MediaContentIndicator(
               length: content.length == Constants.mediaLimit
                   ? Constants.mediaLimit
-                  : content.length + 1,
+                  : content.length + 1, // handle media selection widget
               controller: carouselController,
             )
-          ],
         ],
       ),
     );
