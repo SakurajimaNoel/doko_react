@@ -40,6 +40,7 @@ class UserQuickActionWidget extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
+      clipBehavior: Clip.antiAlias,
       builder: (BuildContext context) {
         return DraggableScrollableSheet(
           expand: false,
@@ -201,14 +202,6 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
     final height = MediaQuery.sizeOf(context).height;
     final width = min(MediaQuery.sizeOf(context).width, Constants.compact);
 
-    final itemSize = 130;
-
-    final gridDelegate = SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: (width ~/ itemSize),
-      mainAxisSpacing: Constants.gap * 0.5,
-      crossAxisSpacing: Constants.gap * 0.5,
-    );
-
     final currTheme = Theme.of(context).colorScheme;
 
     final UserProfileNodesInput details = UserProfileNodesInput(
@@ -307,7 +300,9 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
             children: [
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(Constants.padding),
+                  padding: const EdgeInsets.only(
+                    top: Constants.padding,
+                  ),
                   child: CustomScrollView(
                     cacheExtent: height,
                     controller: widget.controller,
@@ -388,9 +383,9 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
                           height: Constants.gap,
                         ),
                       ),
-                      if (selectedUsers.isNotEmpty)
-                        SliverGrid.builder(
-                          gridDelegate: gridDelegate,
+                      if (selectedUsers.isNotEmpty) ...[
+                        SliverList.separated(
+                          // gridDelegate: gridDelegate,
                           itemCount: selectedUsers.length,
                           itemBuilder: (BuildContext context, int index) {
                             final username = selectedUsers[index];
@@ -402,7 +397,19 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
                               isSelected: selectedUsers.contains(username),
                             );
                           },
+                          separatorBuilder: (context, _) {
+                            return const SizedBox(
+                              height: Constants.gap * 0.5,
+                            );
+                          },
                         ),
+                        const SliverToBoxAdapter(
+                          child: Divider(
+                            thickness: Constants.height * 0.125,
+                            height: Constants.height,
+                          ),
+                        ),
+                      ],
                       const SliverToBoxAdapter(
                         child: SizedBox(
                           height: Constants.gap * 0.5,
@@ -410,14 +417,19 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
                       ),
                       searchResult
                           ? tempSearchResults.isEmpty
-                              ? SliverToBoxAdapter(
-                                  child: Center(
-                                    child: Text(
-                                        "No user found with \"${queryController.text.trim()}\""),
+                              ? SliverPadding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: Constants.padding,
+                                  ),
+                                  sliver: SliverToBoxAdapter(
+                                    child: Center(
+                                      child: Text(
+                                          "No user found with \"${queryController.text.trim()}\""),
+                                    ),
                                   ),
                                 )
-                              : SliverGrid.builder(
-                                  gridDelegate: gridDelegate,
+                              : SliverList.separated(
+                                  // gridDelegate: gridDelegate,
                                   itemCount: searchDisplay.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
@@ -433,25 +445,40 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
                                       isSelected: isSelected,
                                     );
                                   },
+                                  separatorBuilder: (context, _) {
+                                    return const SizedBox(
+                                      height: Constants.gap * 0.5,
+                                    );
+                                  },
                                 )
                           : userFriends.items.isEmpty
-                              ? const SliverToBoxAdapter(
-                                  child: Center(
-                                    child: Text(
-                                      "You don't have friends right now.",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
+                              ? const SliverPadding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: Constants.padding,
+                                  ),
+                                  sliver: SliverToBoxAdapter(
+                                    child: Center(
+                                      child: Text(
+                                        "You don't have friends right now.",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 )
-                              : SliverGrid.builder(
-                                  gridDelegate: gridDelegate,
+                              : SliverList.separated(
+                                  // gridDelegate: gridDelegate,
                                   itemCount: displayFriends.length + 1,
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     return buildFriendItems(
                                         context, index, displayFriends);
+                                  },
+                                  separatorBuilder: (context, _) {
+                                    return const SizedBox(
+                                      height: Constants.gap * 0.5,
+                                    );
                                   },
                                 ),
                       const SliverToBoxAdapter(
@@ -463,8 +490,14 @@ class _GetUserDetailsState extends State<_GetUserDetails> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(Constants.padding),
+              Container(
+                color: currTheme.surfaceContainerLow.withValues(
+                  alpha: 0.5,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Constants.padding,
+                  vertical: Constants.padding * 0.5,
+                ),
                 child: showEmptySelection
                     ? widget.whenEmptySelection
                     : FilledButton(
@@ -516,55 +549,27 @@ class _GetUserWidget extends StatelessWidget {
     final currTheme = Theme.of(context).colorScheme;
     final friendUsername = getUsernameFromUserKey(userKey);
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(Constants.radius),
-        color: isSelected
-            ? currTheme.primaryContainer.withValues(
-                alpha: 0.75,
-              )
-            : Colors.transparent,
+    return ListTile(
+      onTap: () {
+        onUserSelect(friendUsername);
+      },
+      selectedTileColor: currTheme.primaryContainer,
+      selectedColor: currTheme.onPrimaryContainer,
+      dense: true,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: Constants.padding,
       ),
-      clipBehavior: Clip.antiAlias,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            onUserSelect(friendUsername);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(Constants.padding * 0.25),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              spacing: Constants.gap * 0.5,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                UserWidget.avtarLarge(
-                  userKey: userKey,
-                ),
-                Expanded(
-                  child: Column(
-                    spacing: Constants.gap * 0.125,
-                    children: [
-                      Flexible(
-                        child: UserWidget.name(
-                          userKey: userKey,
-                        ),
-                      ),
-                      Flexible(
-                        child: UserWidget.username(
-                          userKey: userKey,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
+      minVerticalPadding: Constants.padding * 0.5,
+      leading: UserWidget.avtar(
+        userKey: userKey,
       ),
+      title: UserWidget.name(
+        userKey: userKey,
+      ),
+      subtitle: UserWidget.username(
+        userKey: userKey,
+      ),
+      selected: isSelected,
     );
   }
 }
@@ -586,6 +591,9 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
     final currTheme = Theme.of(context).colorScheme;
     return Container(
       color: currTheme.surfaceContainerLow,
+      padding: const EdgeInsets.symmetric(
+        horizontal: Constants.padding,
+      ),
       child: _widget,
     );
   }
