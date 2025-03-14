@@ -45,8 +45,11 @@ class _UsersTaggedWidgetState extends State<UsersTaggedWidget> {
         avatar: UserWidget.avtar(
           userKey: userKey,
         ),
-        label: UserWidget.name(
-          userKey: userKey,
+        label: Text(
+          "@$user",
+          style: const TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
         ),
         onDeleted: () {
           setState(() {

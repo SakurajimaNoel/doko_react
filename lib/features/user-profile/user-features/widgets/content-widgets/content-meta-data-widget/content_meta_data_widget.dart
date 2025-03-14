@@ -103,7 +103,7 @@ class ContentMetaDataWidget extends StatelessWidget {
                                         imageUrl: user.profilePicture.accessURI,
                                         placeholder: (context, url) =>
                                             const Center(
-                                          child: LoadingWidget.small(),
+                                          child: LoadingWidget.nested(),
                                         ),
                                         errorWidget: (context, url, error) =>
                                             const Icon(Icons.error),
