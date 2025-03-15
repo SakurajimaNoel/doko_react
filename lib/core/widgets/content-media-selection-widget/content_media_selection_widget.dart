@@ -393,7 +393,7 @@ class _ContentMediaSelectionWidgetState
               return Column(
                 spacing: Constants.gap * 0.375,
                 children: [
-                  if (content.length > 1)
+                  if (content.isNotEmpty)
                     SizedBox(
                       height: Constants.height * 2,
                       child: ReorderableList(
@@ -463,7 +463,7 @@ class _ContentMediaSelectionWidgetState
                                                               size:
                                                                   diameter / 2,
                                                               color: currTheme
-                                                                  .primaryContainer,
+                                                                  .primary,
                                                             ),
                                                     ),
                                                   ),
