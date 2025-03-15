@@ -54,6 +54,8 @@ class _ContentMediaSelectionWidgetState
 
   late final DokiNodeType nodeType;
 
+  bool adding = false;
+
   @override
   void initState() {
     super.initState();
@@ -168,6 +170,7 @@ class _ContentMediaSelectionWidgetState
   }
 
   void onSelection(List<String> selectedFiles) {
+    if (!mounted) return;
     if (content.length >= Constants.mediaLimit) return;
 
     // handle selected files
@@ -185,7 +188,14 @@ class _ContentMediaSelectionWidgetState
       multiple: true,
       multipleLimit: Constants.mediaLimit - content.length,
       video: true,
-      disabled: compressingVideo || content.length == Constants.mediaLimit,
+      disabled:
+          compressingVideo || content.length == Constants.mediaLimit || adding,
+      adding: adding,
+      selectionStatusChange: (bool adding) {
+        setState(() {
+          this.adding = adding;
+        });
+      },
     );
   }
 

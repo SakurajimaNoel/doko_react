@@ -1,6 +1,9 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/preferences/preferences_bloc.dart';
+import 'package:doko_react/core/utils/media/image/image.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
+import 'package:doko_react/core/widgets/loading/loading_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gal/gal.dart';
@@ -17,6 +20,8 @@ class ImagePickerWidget extends StatelessWidget {
     this.disabled = false,
     this.image = true,
     this.video = false,
+    this.adding = false,
+    this.selectionStatusChange,
     this.recordLimit = Constants.videoDurationPost,
   })  : assert(text != null || icon != null,
             "Need either text or an Icon to create media selection trigger."),
@@ -31,6 +36,8 @@ class ImagePickerWidget extends StatelessWidget {
     this.multiple = false,
     this.multipleLimit = 10,
     this.disabled = false,
+    this.adding = false,
+    this.selectionStatusChange,
   })  : assert(text != null || icon != null,
             "Need either text or an Icon to create media selection trigger."),
         picker = ImagePicker(),
@@ -61,6 +68,12 @@ class ImagePickerWidget extends StatelessWidget {
   /// used for disabling display button
   /// default is false
   final bool disabled;
+
+  /// used when images are being processed
+  final bool adding;
+
+  /// this is used to update status of adding media files
+  final ValueSetter<bool>? selectionStatusChange;
 
   /// to allow selecting video files
   /// default is false
@@ -108,6 +121,11 @@ class ImagePickerWidget extends StatelessWidget {
   /// this causes issue because only 1 video can be processed
   /// at a time
   void handleMedia(BuildContext context) {
+    if (adding) {
+      showInfo("Adding your images... just a moment!");
+      return;
+    }
+
     if (multiple && multipleLimit > 1) {
       selectMultipleMediaFilesFromGallery();
     } else if (multipleLimit > 0) {
@@ -116,6 +134,11 @@ class ImagePickerWidget extends StatelessWidget {
   }
 
   void selectOptions(BuildContext context) {
+    if (adding) {
+      showInfo("Adding your images... just a moment!");
+      return;
+    }
+
     final width = MediaQuery.sizeOf(context).width;
     final currTheme = Theme.of(context).colorScheme;
 
@@ -196,17 +219,40 @@ class ImagePickerWidget extends StatelessWidget {
     if (icon == null) {
       return TextButton(
         onPressed: disabled ? null : action,
-        child: Text(
-          text!,
-          textAlign: TextAlign.center,
-        ),
+        child: adding
+            ? const LoadingWidget.small()
+            : Text(
+                text!,
+                textAlign: TextAlign.center,
+              ),
       );
     }
 
     return IconButton.filled(
       onPressed: disabled ? null : action,
-      icon: icon!,
+      icon: adding ? const LoadingWidget.small() : icon!,
     );
+  }
+
+  Future<void> compressSelectedImages(List<String> images) async {
+    if (selectionStatusChange != null) selectionStatusChange!(true);
+    int batchSize = 5;
+    int len = images.length;
+
+    for (int i = 0; i < len; i += batchSize) {
+      final batch = images.sublist(
+        i,
+        i + batchSize > len ? len : i + batchSize,
+      );
+
+      /// create batch images
+      List<Future<String>> batchFutures = [];
+      for (String path in batch) {
+        batchFutures.add(compute(compressImage, path));
+      }
+      onSelection(await Future.wait(batchFutures));
+    }
+    if (selectionStatusChange != null) selectionStatusChange!(false);
   }
 
   Future<void> handleSaveOnCapture(
@@ -271,7 +317,7 @@ class ImagePickerWidget extends StatelessWidget {
     for (var media in selectedImages) {
       selected.add(media.path);
     }
-    onSelection(selected);
+    compressSelectedImages(selected);
   }
 
   Future<void> selectImageFromGallery() async {
@@ -280,7 +326,7 @@ class ImagePickerWidget extends StatelessWidget {
     );
 
     if (selectedImage == null) return;
-    onSelection([selectedImage.path]);
+    compressSelectedImages([selectedImage.path]);
   }
 
   Future<void> selectImageFromCamera(bool saveOnCapture) async {
@@ -295,8 +341,7 @@ class ImagePickerWidget extends StatelessWidget {
         isVideo: false,
       );
     }
-
-    onSelection([capturedImage.path]);
+    compressSelectedImages([capturedImage.path]);
   }
 
   Future<void> selectMultipleMediaFilesFromGallery() async {
