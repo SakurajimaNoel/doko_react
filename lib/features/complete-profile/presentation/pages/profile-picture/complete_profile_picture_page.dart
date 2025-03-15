@@ -16,7 +16,6 @@ import 'package:doko_react/features/complete-profile/presentation/bloc/complete_
 import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 
 class CompleteProfilePicturePage extends StatefulWidget {
   const CompleteProfilePicturePage({
@@ -199,20 +198,20 @@ class _ImageSelectionState extends State<_ImageSelection> {
     return false;
   }
 
-  Future<void> onSelection(List<XFile> images) async {
-    XFile selectedImage = images.first;
+  Future<void> onSelection(List<String> images) async {
+    String selectedImage = images.first;
 
     // check if selected image is animated or not
-    if (await checkAnimatedImage(selectedImage.path)) {
+    if (await checkAnimatedImage(selectedImage)) {
       setState(() {
-        profilePicture = selectedImage.path;
+        profilePicture = selectedImage;
       });
       return;
     }
 
     if (!mounted) return;
     String croppedImage = await getCroppedImage(
-      selectedImage.path,
+      selectedImage,
       context: context,
       location: ImageLocation.profile,
     );

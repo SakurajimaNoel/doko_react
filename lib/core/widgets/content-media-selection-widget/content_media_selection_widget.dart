@@ -17,7 +17,6 @@ import 'package:doko_react/features/user-profile/user-features/node-create/input
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ContentMediaSelectionWidget extends StatefulWidget {
@@ -168,12 +167,12 @@ class _ContentMediaSelectionWidgetState
     showError(message);
   }
 
-  void onSelection(List<XFile> selectedFiles) {
+  void onSelection(List<String> selectedFiles) {
     if (content.length >= Constants.mediaLimit) return;
 
     // handle selected files
     for (var item in selectedFiles) {
-      handleMediaInfo(item.path);
+      handleMediaInfo(item);
     }
   }
 

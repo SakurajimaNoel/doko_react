@@ -23,7 +23,6 @@ import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({
@@ -277,21 +276,21 @@ class _ProfileSelectionState extends State<_ProfileSelection> {
     return false;
   }
 
-  Future<void> onSelection(List<XFile> images) async {
-    XFile selectedImage = images.first;
+  Future<void> onSelection(List<String> images) async {
+    String path = images.first;
     removeProfile = false;
 
     // check if selected image is animated or not
-    if (await checkAnimatedImage(selectedImage.path)) {
+    if (await checkAnimatedImage(path)) {
       setState(() {
-        newProfilePicture = selectedImage.path;
+        newProfilePicture = path;
       });
       return;
     }
 
     if (!mounted) return;
     String croppedImage = await getCroppedImage(
-      selectedImage.path,
+      path,
       context: context,
       location: ImageLocation.profile,
     );

@@ -52,7 +52,7 @@ class ImagePickerWidget extends StatelessWidget {
   final Icon? icon;
 
   /// callback to call when media file is selected
-  final ValueSetter<List<XFile>> onSelection;
+  final ValueSetter<List<String>> onSelection;
 
   /// allowing multiple media images to be selected
   /// default is false
@@ -223,7 +223,7 @@ class ImagePickerWidget extends StatelessWidget {
     );
 
     if (selectedVideo == null) return;
-    onSelection([selectedVideo]);
+    onSelection([selectedVideo.path]);
   }
 
   Future<void> selectVideoFromCamera(bool saveOnCapture) async {
@@ -237,7 +237,7 @@ class ImagePickerWidget extends StatelessWidget {
       handleSaveOnCapture(capturedVideo.path);
     }
 
-    onSelection([capturedVideo]);
+    onSelection([capturedVideo.path]);
   }
 
   Future<void> selectMultipleImagesFromGallery() async {
@@ -246,7 +246,11 @@ class ImagePickerWidget extends StatelessWidget {
     );
 
     if (selectedImages.isEmpty) return;
-    onSelection(selectedImages);
+    List<String> selected = [];
+    for (var media in selectedImages) {
+      selected.add(media.path);
+    }
+    onSelection(selected);
   }
 
   Future<void> selectImageFromGallery() async {
@@ -255,7 +259,7 @@ class ImagePickerWidget extends StatelessWidget {
     );
 
     if (selectedImage == null) return;
-    onSelection([selectedImage]);
+    onSelection([selectedImage.path]);
   }
 
   Future<void> selectImageFromCamera(bool saveOnCapture) async {
@@ -268,7 +272,7 @@ class ImagePickerWidget extends StatelessWidget {
       handleSaveOnCapture(capturedImage.path);
     }
 
-    onSelection([capturedImage]);
+    onSelection([capturedImage.path]);
   }
 
   Future<void> selectMultipleMediaFilesFromGallery() async {
@@ -277,14 +281,18 @@ class ImagePickerWidget extends StatelessWidget {
     );
 
     if (selectedMediaFiles.isEmpty) return;
-    onSelection(selectedMediaFiles);
+    List<String> selected = [];
+    for (var media in selectedMediaFiles) {
+      selected.add(media.path);
+    }
+    onSelection(selected);
   }
 
   Future<void> selectMediaFileFromGallery() async {
     final XFile? selectedMedia = await picker.pickMedia();
 
     if (selectedMedia == null) return;
-    onSelection([selectedMedia]);
+    onSelection([selectedMedia.path]);
   }
 }
 
