@@ -1,14 +1,10 @@
-import 'dart:io';
-
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/preferences/preferences_bloc.dart';
-import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
-import 'package:doko_react/core/utils/uuid/uuid_helper.dart';
-import 'package:flutter/foundation.dart';
+import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gal/gal.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 
 class ImagePickerWidget extends StatelessWidget {
   ImagePickerWidget({
@@ -213,8 +209,30 @@ class ImagePickerWidget extends StatelessWidget {
     );
   }
 
-  Future<void> handleSaveOnCapture(String path) async {
-    await compute(addFileToUserDevice, path);
+  Future<void> handleSaveOnCapture(
+    String path, {
+    required bool isVideo,
+  }) async {
+    bool permission = await Gal.requestAccess(toAlbum: true);
+    if (!permission) showError(GalExceptionType.accessDenied.message);
+
+    try {
+      if (isVideo) {
+        await Gal.putVideo(
+          path,
+          album: "Doki",
+        );
+      } else {
+        await Gal.putImage(
+          path,
+          album: "Doki",
+        );
+      }
+    } on GalException catch (e) {
+      showError(e.type.message);
+    } catch (_) {
+      showError(Constants.errorMessage);
+    }
   }
 
   Future<void> selectVideoFromGallery() async {
@@ -234,7 +252,10 @@ class ImagePickerWidget extends StatelessWidget {
 
     if (capturedVideo == null) return;
     if (saveOnCapture) {
-      handleSaveOnCapture(capturedVideo.path);
+      handleSaveOnCapture(
+        capturedVideo.path,
+        isVideo: true,
+      );
     }
 
     onSelection([capturedVideo.path]);
@@ -269,7 +290,10 @@ class ImagePickerWidget extends StatelessWidget {
 
     if (capturedImage == null) return;
     if (saveOnCapture) {
-      handleSaveOnCapture(capturedImage.path);
+      handleSaveOnCapture(
+        capturedImage.path,
+        isVideo: false,
+      );
     }
 
     onSelection([capturedImage.path]);
@@ -338,29 +362,4 @@ class _IconLabel extends StatelessWidget {
       textAlign: TextAlign.center,
     );
   }
-}
-
-Future<void> addFileToUserDevice(String path) async {
-  String dirPath;
-  if (Platform.isAndroid) {
-    dirPath = "/storage/emulated/0/Download";
-  } else {
-    final applicationPath = await getDownloadsDirectory();
-
-    if (applicationPath == null) return;
-    dirPath = applicationPath.path;
-  }
-
-  final extension = getFileExtensionFromFileName(path);
-  if (extension == null || extension.isEmpty) return;
-
-  final directoryPath = "$dirPath/Doki";
-  Directory newDir = Directory(directoryPath);
-  await newDir.create(
-    recursive: true,
-  );
-
-  final pathToSave = "$directoryPath/${generateUniqueString()}$extension";
-  File tempFile = File(path);
-  await tempFile.copy(pathToSave);
 }

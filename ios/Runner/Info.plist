@@ -52,6 +52,8 @@
     <key>NSMicrophoneUsageDescription</key>
     <string>Doki needs access to your microphone to record videos.</string>
 
+    <key>NSPhotoLibraryAddUsageDescription</key>
+
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
