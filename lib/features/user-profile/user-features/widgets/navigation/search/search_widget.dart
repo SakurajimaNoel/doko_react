@@ -14,7 +14,7 @@ class SearchWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () {
-        context.pushNamed(RouterConstants.userSearch);
+        redirect(context);
       },
       iconSize: inNavRail ? 24 : null,
       style: inNavRail
@@ -26,5 +26,9 @@ class SearchWidget extends StatelessWidget {
           : null,
       icon: const Icon(Icons.search),
     );
+  }
+
+  static void redirect(BuildContext context) {
+    context.pushNamed(RouterConstants.userSearch);
   }
 }

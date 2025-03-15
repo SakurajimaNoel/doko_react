@@ -19,7 +19,7 @@ class InboxWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () {
-        context.pushNamed(RouterConstants.messageInbox);
+        redirect(context);
       },
       iconSize: inNavRail ? 24 : null,
       style: inNavRail
@@ -63,5 +63,9 @@ class InboxWidget extends StatelessWidget {
         },
       ),
     );
+  }
+
+  static void redirect(BuildContext context) {
+    context.pushNamed(RouterConstants.messageInbox);
   }
 }

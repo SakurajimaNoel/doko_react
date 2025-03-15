@@ -14,7 +14,7 @@ class PendingRequestsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () {
-        context.pushNamed(RouterConstants.pendingRequests);
+        redirect(context);
       },
       iconSize: inNavRail ? 24 : null,
       style: inNavRail
@@ -26,5 +26,9 @@ class PendingRequestsWidget extends StatelessWidget {
           : null,
       icon: const Icon(Icons.person),
     );
+  }
+
+  static void redirect(BuildContext context) {
+    context.pushNamed(RouterConstants.pendingRequests);
   }
 }

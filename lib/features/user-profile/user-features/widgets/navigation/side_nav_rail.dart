@@ -22,30 +22,38 @@ class SideNavRail extends StatelessWidget {
   final bool profileEmpty;
   final Color indicatorColor;
 
-  List<Destinations> createNewDestinations() {
+  List<Destinations> createNewDestinations(BuildContext context) {
     List<Destinations> moreDestinations = [
-      const Destinations(
-        icon: CreateWidget.icon(),
-        label: "Create",
-      ),
-      const Destinations(
-        icon: SearchWidget(
-          inNavRail: true,
-        ),
-        label: "Search",
-      ),
-      const Destinations(
-        icon: PendingRequestsWidget(
-          inNavRail: true,
-        ),
-        label: "Request",
-      ),
-      const Destinations(
-        icon: InboxWidget(
-          inNavRail: true,
-        ),
-        label: "Messages",
-      ),
+      Destinations(
+          icon: const CreateWidget.icon(),
+          label: "Create",
+          action: () {
+            CreateWidget.createOptions(context);
+          }),
+      Destinations(
+          icon: const SearchWidget(
+            inNavRail: true,
+          ),
+          label: "Search",
+          action: () {
+            SearchWidget.redirect(context);
+          }),
+      Destinations(
+          icon: const PendingRequestsWidget(
+            inNavRail: true,
+          ),
+          label: "Request",
+          action: () {
+            PendingRequestsWidget.redirect(context);
+          }),
+      Destinations(
+          icon: const InboxWidget(
+            inNavRail: true,
+          ),
+          label: "Messages",
+          action: () {
+            InboxWidget.redirect(context);
+          }),
     ];
     destinations.insertAll(2, moreDestinations);
     return destinations;
@@ -53,7 +61,7 @@ class SideNavRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final destinations = createNewDestinations();
+    final destinations = createNewDestinations(context);
 
     bool extended = MediaQuery.sizeOf(context).width > Constants.expanded;
     return LayoutBuilder(
@@ -75,7 +83,12 @@ class SideNavRail extends StatelessWidget {
                     ? destinations.length - 1
                     : selectedIndex,
                 onDestinationSelected: (index) {
-                  if (index > 1 && index < destinations.length - 1) return;
+                  if (index > 1 && index < destinations.length - 1) {
+                    if (destinations[index].action != null) {
+                      destinations[index].action!();
+                    }
+                    return;
+                  }
                   if (index == destinations.length - 1) index = 2;
                   onDestinationSelected(index);
                 },
