@@ -247,6 +247,9 @@ class ProfileRemoteDataSource {
       user.bio = editDetails.bio;
       user.name = updatedUser.name;
       user.profilePicture = updatedUser.profilePicture;
+      user.profileHeight = null;
+      user.faceAlignment = null;
+      user.faces = null;
 
       return true;
     } catch (e) {

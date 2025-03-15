@@ -4,6 +4,8 @@ import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
+import 'package:doko_react/features/user-profile/user-features/profile/presentation/widgets/profile/profile_widget.dart';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 
 /// user entity to use with user widget
 /// across pages with connection detail
@@ -26,6 +28,9 @@ class UserEntity implements GraphEntity {
   String name;
   StorageResource profilePicture;
   UserRelationInfo? relationInfo;
+  int? profileHeight;
+  List<Face>? faces;
+  FaceAlignment? faceAlignment;
 
   // used to update user to user relation info
   void updateRelationInfo(UserRelationInfo? currentRelationInfo) {

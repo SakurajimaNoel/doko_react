@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -26,10 +27,17 @@ import 'package:doko_react/features/user-profile/user-features/profile/presentat
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/widgets/timeline/timeline.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_to_user_relation_widget.dart';
 import 'package:doko_react/init_dependency.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
+
+part "profile_user_widget.dart";
 
 class ProfileWidget extends StatefulWidget {
   const ProfileWidget({
@@ -422,7 +430,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         child: CustomScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           slivers: [
-                            _ProfilePicture(
+                            _ProfileUserWidget(
                               username: username,
                               self: self,
                               onShare: handleUserProfileShare,
@@ -488,7 +496,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     controller: controller,
                     cacheExtent: scrollCacheHeight,
                     slivers: [
-                      _ProfilePicture(
+                      _ProfileUserWidget(
                         username: username,
                         self: self,
                         onShare: handleUserProfileShare,
@@ -584,139 +592,5 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
     return true;
-  }
-}
-
-class _ProfilePicture extends StatelessWidget {
-  const _ProfilePicture({
-    required this.username,
-    required this.self,
-    required this.onShare,
-  });
-
-  final String username;
-  final bool self;
-  final VoidCallback onShare;
-
-  List<Widget> appBarActions(BuildContext context) {
-    final currTheme = Theme.of(context).colorScheme;
-
-    if (!self) {
-      return [
-        TextButton(
-          onPressed: onShare,
-          style: TextButton.styleFrom(
-            minimumSize: Size.zero,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-          child: Text(
-            "Share",
-            style: TextStyle(
-              color: currTheme.onSurface,
-              fontWeight: FontWeight.w600,
-              fontSize: Constants.fontSize,
-            ),
-          ),
-        ),
-      ];
-    }
-
-    return [
-      IconButton(
-        onPressed: () {
-          context.pushNamed(RouterConstants.settings);
-        },
-        color: currTheme.onSurface,
-        icon: const Icon(
-          Icons.settings,
-        ),
-        tooltip: "Settings",
-      ),
-      const SignOutButton(),
-    ];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final UserGraph graph = UserGraph();
-    final key = generateUserNodeKey(username);
-
-    final currTheme = Theme.of(context).colorScheme;
-
-    return SliverLayoutBuilder(
-      builder: (context, constraints) {
-        final height =
-            min(constraints.crossAxisExtent, MediaQuery.sizeOf(context).height);
-
-        return SliverAppBar(
-          pinned: true,
-          expandedHeight: height,
-          title: AutoHeading(
-            username,
-            color: currTheme.onSurface,
-            size: Constants.heading3,
-            minFontSize: Constants.heading4,
-            maxLines: 1,
-          ),
-          actionsPadding: const EdgeInsets.symmetric(
-            horizontal: Constants.gap,
-          ),
-          actions: appBarActions(context),
-          flexibleSpace: FlexibleSpaceBar(
-            background:
-                BlocBuilder<UserToUserActionBloc, UserToUserActionState>(
-              buildWhen: (previousState, state) {
-                return (state is UserToUserActionUpdateProfileState &&
-                    state.username == username);
-              },
-              builder: (context, state) {
-                final user = graph.getValueByKey(key)! as UserEntity;
-
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    user.profilePicture.bucketPath.isNotEmpty
-                        ? CachedNetworkImage(
-                            memCacheHeight: Constants.profileCacheHeight,
-                            cacheKey: user.profilePicture.bucketPath,
-                            imageUrl: user.profilePicture.accessURI,
-                            fit: BoxFit.fitHeight,
-                            placeholder: (context, url) => const Center(
-                              child: LoadingWidget.small(),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
-                            height: height,
-                            alignment: Alignment.center,
-                          )
-                        : Container(
-                            color: currTheme.onSecondary,
-                            child: Icon(
-                              Icons.person,
-                              size: height,
-                            ),
-                          ),
-                    ProfilePictureFilter(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          bottom: Constants.padding * 0.25,
-                        ),
-                        child: AutoHeading(
-                          user.name,
-                          color: currTheme.onSurface,
-                          size: Constants.heading2,
-                          minFontSize: Constants.heading3,
-                          maxLines: 1,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        );
-      },
-    );
   }
 }
