@@ -17,7 +17,6 @@ import 'package:doko_react/features/user-profile/user-features/node-create/input
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -84,6 +83,7 @@ class _ContentMediaSelectionWidgetState
       tempContent = const MediaContent(
         type: MediaTypeValue.unknown,
         bucketPath: "",
+        animated: true,
       );
     } else {
       tempContent = MediaContent(
@@ -91,6 +91,7 @@ class _ContentMediaSelectionWidgetState
         file: thumbnail,
         bucketPath: "",
         thumbnail: thumbnail,
+        animated: true,
       );
     }
 
@@ -128,13 +129,14 @@ class _ContentMediaSelectionWidgetState
         file: compressedVideo,
         bucketPath: generateBucketPath(compressedVideo),
         thumbnail: thumbnail,
+        animated: true,
       );
     });
 
     widget.onMediaChange(content);
   }
 
-  void handleMediaInfo(String item) {
+  Future<void> handleMediaInfo(String item) async {
     MediaTypeValue type = getMediaTypeFromPath(item);
 
     if (type == MediaTypeValue.video) {
@@ -143,12 +145,18 @@ class _ContentMediaSelectionWidgetState
     }
 
     if (type == MediaTypeValue.image) {
+      String extension = getFileExtensionFromFileName(item) ?? "";
+      bool animated = extension == ".gif";
+      if (extension == ".webp" && await isWebpAnimated(item)) {
+        animated = true;
+      }
       setState(() {
         content.add(MediaContent(
           type: type,
           file: item,
           bucketPath: generateBucketPath(item),
           originalImage: item,
+          animated: animated,
         ));
       });
       widget.onMediaChange(content);
@@ -207,20 +215,21 @@ class _ContentMediaSelectionWidgetState
               if (!animated)
                 IconButton.filledTonal(
                   onPressed: () async {
-                    CroppedFile? croppedImage = await getCroppedImage(
+                    String croppedImage = await getCroppedImage(
                       path,
                       context: context,
                       location: ImageLocation.content,
                     );
 
-                    if (croppedImage == null) return;
+                    if (croppedImage.isEmpty) return;
 
                     setState(() {
                       content[index] = MediaContent(
                         type: MediaTypeValue.image,
-                        file: croppedImage.path,
-                        bucketPath: generateBucketPath(croppedImage.path),
+                        file: croppedImage,
+                        bucketPath: generateBucketPath(croppedImage),
                         originalImage: path,
+                        animated: false,
                       );
                     });
                   },
@@ -274,8 +283,6 @@ class _ContentMediaSelectionWidgetState
 
       switch (type) {
         case MediaTypeValue.image:
-          String? extension = getFileExtensionFromFileName(item.originalImage!);
-
           mediaWidgets.add(
             mediaItemWrapper(
               child: Image.file(
@@ -287,7 +294,7 @@ class _ContentMediaSelectionWidgetState
               ),
               index: index,
               path: item.originalImage!,
-              animated: extension == ".gif",
+              animated: item.animated,
             ),
           );
 

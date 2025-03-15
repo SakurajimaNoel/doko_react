@@ -1,4 +1,6 @@
 import 'package:doko_react/core/constants/constants.dart';
+import 'package:doko_react/core/utils/media/image/image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 
@@ -10,7 +12,7 @@ enum ImageLocation {
   comment,
 }
 
-Future<CroppedFile?> getCroppedImage(
+Future<String> getCroppedImage(
   String path, {
   required BuildContext context,
   required ImageLocation location,
@@ -30,7 +32,7 @@ Future<CroppedFile?> getCroppedImage(
       break;
   }
 
-  return await ImageCropper().cropImage(
+  final croppedImage = await ImageCropper().cropImage(
     sourcePath: path,
     aspectRatio: ratio,
     uiSettings: [
@@ -54,4 +56,7 @@ Future<CroppedFile?> getCroppedImage(
       ),
     ],
   );
+
+  if (croppedImage == null) return "";
+  return compute(compressImage, croppedImage.path);
 }

@@ -23,7 +23,6 @@ import 'package:doko_react/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -291,16 +290,16 @@ class _ProfileSelectionState extends State<_ProfileSelection> {
     }
 
     if (!mounted) return;
-    CroppedFile? croppedImage = await getCroppedImage(
+    String croppedImage = await getCroppedImage(
       selectedImage.path,
       context: context,
       location: ImageLocation.profile,
     );
 
-    if (croppedImage == null) return;
-    widget.setProfile(croppedImage.path);
+    if (croppedImage.isEmpty) return;
+    widget.setProfile(croppedImage);
     setState(() {
-      newProfilePicture = croppedImage.path;
+      newProfilePicture = croppedImage;
     });
   }
 

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:image/image.dart' as img;
 
 part 'media_meta_data_helper_lib.dart';
@@ -61,10 +59,8 @@ MediaTypeValue getMediaTypeFromPath(String path) {
 
 /// check if given webp is animated or not
 Future<bool> isWebpAnimated(String path) async {
-  final imageBytes = await File(path).readAsBytes();
-  final image = img.WebPDecoder().decode(imageBytes);
+  // final imageBytes = await File(path).readAsBytes();
+  final image = await img.decodeWebPFile(path);
 
-  if (image != null) return image.numFrames > 1;
-
-  return false;
+  return image?.hasAnimation ?? false;
 }

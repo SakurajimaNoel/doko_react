@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
@@ -29,7 +31,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -736,13 +737,13 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
     required String path,
     required String extension,
   }) async {
-    CroppedFile? croppedMedia = await getCroppedImage(
+    String croppedMedia = await getCroppedImage(
       path,
       context: context,
       location: ImageLocation.comment,
     );
-    if (croppedMedia == null) return;
-    final mediaData = await croppedMedia.readAsBytes();
+    if (croppedMedia.isEmpty) return;
+    final mediaData = await File(croppedMedia).readAsBytes();
     CommentMedia media = CommentMedia(
       extension: extension,
       data: mediaData,

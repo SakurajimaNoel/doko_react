@@ -7,6 +7,7 @@ class MediaContent {
     this.originalImage,
     required this.bucketPath,
     this.thumbnail,
+    required this.animated,
   })  : assert(
           type == MediaTypeValue.unknown || file != null,
           "File cannot be null for MediaTypeValue: $type.",
@@ -21,4 +22,5 @@ class MediaContent {
   final String bucketPath;
   final String? originalImage;
   final String? thumbnail;
+  final bool animated;
 }
