@@ -6,9 +6,6 @@ class GlobalThemeData {
       colorScheme: colorScheme,
       fontFamily: "Rubik",
       useMaterial3: true,
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
-        year2023: false,
-      ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: <TargetPlatform, PageTransitionsBuilder>{
           // TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),

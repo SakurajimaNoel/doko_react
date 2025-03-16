@@ -249,7 +249,7 @@ class ProfileRemoteDataSource {
       user.profilePicture = updatedUser.profilePicture;
       user.profileHeight = null;
       user.faceAlignment = null;
-      user.faces = null;
+      // user.faces = null;
 
       return true;
     } catch (e) {

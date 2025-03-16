@@ -176,86 +176,84 @@ class _ProfilePictureState extends State<_ProfilePicture> {
   void initState() {
     super.initState();
 
-    detectFacePosition();
+    // detectFacePosition();
   }
 
-  Future<String?> downloadUserProfilePicture(String url) async {
-    try {
-      final tempDir = await getTemporaryDirectory();
-      String path = "${tempDir.path}/${user.profilePicture.bucketPath}";
-
-      if (await File(path).exists()) return path;
-
-      final directory = File(path).parent;
-      if (!await directory.exists()) {
-        await directory.create(recursive: true); // Ensure the directory exists
-      }
-
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final file = File(path);
-        await file.writeAsBytes(response.bodyBytes);
-        return file.path;
-      }
-    } catch (e) {
-      debugPrint("Error downloading image: $e");
-    }
-    return null;
-  }
-
-  Future<void> detectFacePosition() async {
-    String? image =
-        await downloadUserProfilePicture(user.profilePicture.accessURI);
-    if (image == null) return;
-
-    if (user.profileHeight == null) {
-      final userProfile = await compute(img.decodeImageFile, image);
-      if (userProfile == null) return;
-
-      user.profileHeight = userProfile.height;
-      // graph.addEntity(userKey, user);
-    }
-
-    // Get image height from metadata
-    final imageHeight = user.profileHeight!;
-
-    if (user.faces == null) {
-      final InputImage inputProfile = InputImage.fromFile(File(image));
-      final faceDetector =
-          FaceDetector(options: FaceDetectorOptions(enableContours: false));
-
-      final List<Face> faces = await faceDetector.processImage(inputProfile);
-      await faceDetector.close();
-      user.faces = faces;
-      // graph.addEntity(userKey, user);
-    }
-
-    final faces = user.faces!;
-    if (faces.isEmpty) return;
-
-    Face face = faces.first;
-
-    // Normalize face Y position
-    final faceCenterY = face.boundingBox.center.dy;
-    final relativePosition = faceCenterY / imageHeight;
-
-    FaceAlignment alignment;
-    // Categorize position
-    if (relativePosition < 0.33) {
-      alignment = FaceAlignment.top;
-    } else if (relativePosition < 0.66) {
-      alignment = FaceAlignment.center;
-    } else {
-      alignment = FaceAlignment.bottom;
-    }
-
-    if (user.faceAlignment != alignment) {
-      user.faceAlignment = alignment;
-    }
-    if (mounted) {
-      setState(() {});
-    }
-  }
+  // Future<String?> downloadUserProfilePicture(String url) async {
+  //   try {
+  //     final tempDir = await getTemporaryDirectory();
+  //     String path = "${tempDir.path}/${user.profilePicture.bucketPath}";
+  //
+  //     if (await File(path).exists()) return path;
+  //
+  //     final directory = File(path).parent;
+  //     if (!await directory.exists()) {
+  //       await directory.create(recursive: true); // Ensure the directory exists
+  //     }
+  //
+  //     final response = await http.get(Uri.parse(url));
+  //     if (response.statusCode == 200) {
+  //       final file = File(path);
+  //       await file.writeAsBytes(response.bodyBytes);
+  //       return file.path;
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Error downloading image: $e");
+  //   }
+  //   return null;
+  // }
+  //
+  // Future<void> detectFacePosition() async {
+  //   String? image =
+  //       await downloadUserProfilePicture(user.profilePicture.accessURI);
+  //   if (image == null) return;
+  //
+  //   if (user.profileHeight == null) {
+  //     final userProfile = await compute(img.decodeImageFile, image);
+  //     if (userProfile == null) return;
+  //
+  //     user.profileHeight = userProfile.height;
+  //   }
+  //
+  //   // Get image height from metadata
+  //   final imageHeight = user.profileHeight!;
+  //
+  //   if (user.faces == null) {
+  //     final InputImage inputProfile = InputImage.fromFile(File(image));
+  //     final faceDetector =
+  //         FaceDetector(options: FaceDetectorOptions(enableContours: false));
+  //
+  //     final List<Face> faces = await faceDetector.processImage(inputProfile);
+  //     await faceDetector.close();
+  //     user.faces = faces;
+  //   }
+  //
+  //   final faces = user.faces!;
+  //   if (faces.isEmpty) return;
+  //
+  //   Face face = faces.first;
+  //
+  //   // Normalize face Y position
+  //   final faceCenterY = face.boundingBox.center.dy;
+  //   final relativePosition = faceCenterY / imageHeight;
+  //
+  //   FaceAlignment alignment;
+  //   // Categorize position
+  //   if (relativePosition < 0.33) {
+  //     alignment = FaceAlignment.top;
+  //   } else if (relativePosition < 0.66) {
+  //     alignment = FaceAlignment.center;
+  //   } else {
+  //     alignment = FaceAlignment.bottom;
+  //   }
+  //
+  //   if (user.faceAlignment != alignment) {
+  //     user.faceAlignment = alignment;
+  //   }
+  //   if (mounted) {
+  //     setState(() {});
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -263,7 +261,7 @@ class _ProfilePictureState extends State<_ProfilePicture> {
       memCacheHeight: Constants.profileCacheHeight,
       cacheKey: user.profilePicture.bucketPath,
       imageUrl: user.profilePicture.accessURI,
-      fit: BoxFit.cover,
+      fit: user.faceAlignment == null ? BoxFit.fitHeight : BoxFit.cover,
       placeholder: (context, url) => const Center(
         child: LoadingWidget.small(),
       ),

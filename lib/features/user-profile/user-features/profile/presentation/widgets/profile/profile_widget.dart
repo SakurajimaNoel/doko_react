@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -27,15 +26,10 @@ import 'package:doko_react/features/user-profile/user-features/profile/presentat
 import 'package:doko_react/features/user-profile/user-features/profile/presentation/widgets/timeline/timeline.dart';
 import 'package:doko_react/features/user-profile/user-features/widgets/user/user_to_user_relation_widget.dart';
 import 'package:doko_react/init_dependency.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
-import 'package:http/http.dart' as http;
-import 'package:image/image.dart' as img;
-import 'package:path_provider/path_provider.dart';
 
 part "profile_user_widget.dart";
 

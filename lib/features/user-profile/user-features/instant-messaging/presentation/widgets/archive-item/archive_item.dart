@@ -15,7 +15,6 @@ import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/widgets/heading/heading.dart';
 import 'package:doko_react/core/widgets/loading/loading_widget.dart';
 import 'package:doko_react/core/widgets/message-forward/message_forward.dart';
-import 'package:doko_react/core/widgets/swipe-action-widget/swipe_action_widget.dart';
 import 'package:doko_react/features/user-profile/bloc/real-time/real_time_bloc.dart';
 import 'package:doko_react/features/user-profile/bloc/user-action/user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/instant-messaging/archive/message_entity.dart';
@@ -35,6 +34,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:swipe_callback/swipe_callback.dart';
 
 part "archive_discussion.dart";
 part "archive_external_resource.dart";
@@ -374,7 +374,7 @@ class _ArchiveItemState extends State<ArchiveItem> {
           builder: (context) {
             final _ = context.watch<ArchiveMessageProvider>();
 
-            return SwipeActionWidget(
+            return SwipeCallback(
               onSwipeSuccess: () {
                 archiveProvider.addReply(widget.messageId);
               },
