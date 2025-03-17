@@ -22,7 +22,7 @@ class CreatePostPage extends StatefulWidget {
 class CreatePostPageState extends State<CreatePostPage> {
   bool videoProcessing = false;
   final List<String> postContentInfo = [
-    "Keep your videos under ${Constants.videoDurationPost.inSeconds} seconds. Longer videos will be automatically trimmed.",
+    "Keep your videos under ${Constants.videoDurationContent.inSeconds} seconds. Longer videos will be automatically trimmed.",
     "GIFs are typically designed to loop seamlessly, so cropping them might disrupt their intended animation.",
   ];
 

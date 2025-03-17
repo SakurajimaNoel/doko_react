@@ -35,7 +35,7 @@ class _DiscussionPublishPageState extends State<DiscussionPublishPage> {
   bool videoProcessing = false;
 
   final List<String> mediaInfo = [
-    "Keep your videos under ${Constants.videoDurationPost.inSeconds} seconds. Longer videos will be automatically trimmed.",
+    "Keep your videos under ${Constants.videoDurationContent.inSeconds} seconds. Longer videos will be automatically trimmed.",
   ];
 
   List<String> usersTagged = [];

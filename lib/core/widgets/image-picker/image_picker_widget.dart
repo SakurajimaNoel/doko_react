@@ -22,7 +22,7 @@ class ImagePickerWidget extends StatelessWidget {
     this.video = false,
     this.adding = false,
     this.selectionStatusChange,
-    this.recordLimit = Constants.videoDurationPost,
+    this.recordLimit = Constants.videoDurationContent,
   })  : assert(text != null || icon != null,
             "Need either text or an Icon to create media selection trigger."),
         picker = ImagePicker(),

@@ -56,7 +56,7 @@ class Constants {
   static int editProfileCachedHeight = (_root * 75).round();
 
   // video
-  static const Duration videoDurationPost = Duration(seconds: 300);
+  static const Duration videoDurationContent = Duration(seconds: 300);
   static const Duration videoDurationStory = Duration(seconds: 30);
   static const double landscape = 16 / 9;
   static const double portrait = 9 / 16;

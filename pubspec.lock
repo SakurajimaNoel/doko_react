@@ -354,6 +354,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.26.0"
+  easy_video_editor:
+    dependency: "direct main"
+    description:
+      name: easy_video_editor
+      sha256: "1a74eccdea8351ad40336554d28d426332468980ab2f1e43b4f3a413230751ac"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   equatable:
     dependency: "direct main"
     description:
@@ -934,6 +942,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.1"
+  media_data_extractor:
+    dependency: "direct main"
+    description:
+      name: media_data_extractor
+      sha256: "37b0d51ab56626eb3a389bb989dd8fba2d379a02cea271e7380343fefbe60042"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.6"
   media_kit:
     dependency: "direct main"
     description:
@@ -1018,10 +1034,10 @@ packages:
     dependency: transitive
     description:
       name: mime
-      sha256: "41a20518f0cb1256669420fdba0cd90d21561e560ac240f26ef8322e45bb7ed6"
+      sha256: "801fd0b26f14a4a58ccb09d5892c3fbdeff209594300a542492cf13fba9d247a"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "1.0.6"
   mocktail:
     dependency: "direct dev"
     description:
@@ -1595,14 +1611,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
-  video_compress:
-    dependency: "direct main"
-    description:
-      name: video_compress
-      sha256: "31bc5cdb9a02ba666456e5e1907393c28e6e0e972980d7d8d619a7beda0d4f20"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.4"
   visibility_detector:
     dependency: "direct main"
     description:
