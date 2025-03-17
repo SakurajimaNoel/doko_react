@@ -1,19 +1,12 @@
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
-import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/global/provider/websocket-client/websocket_client_provider.dart';
-import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
-import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
 import 'package:doko_react/core/validation/input_validation/input_validation.dart';
 import 'package:doko_react/core/widgets/constrained-box/compact_box.dart';
-import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loading/loading_widget.dart';
-import 'package:doko_react/core/widgets/profile/profile_picture_filter.dart';
+import 'package:doko_react/core/widgets/profile-picture-selection/profile_picture_selection.dart';
 import 'package:doko_react/features/user-profile/bloc/user-to-user-action/user_to_user_action_bloc.dart';
 import 'package:doko_react/features/user-profile/domain/entity/user/user_entity.dart';
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
@@ -185,10 +178,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 padding: const EdgeInsets.all(Constants.padding),
                 children: [
                   CompactBox(
-                    child: _ProfileSelection(
+                    child: ProfilePictureSelection(
                       key: const ValueKey("profile-picture"),
-                      setProfile: setProfilePicture,
-                      updating: updating,
+                      onSelectionChange: setProfilePicture,
+                      disabled: updating,
                       currentProfile: user.profilePicture,
                     ),
                   ),
@@ -243,152 +236,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
           );
         },
       ),
-    );
-  }
-}
-
-class _ProfileSelection extends StatefulWidget {
-  const _ProfileSelection({
-    super.key,
-    required this.setProfile,
-    required this.updating,
-    required this.currentProfile,
-  });
-
-  final ValueSetter<String?> setProfile;
-  final bool updating;
-  final StorageResource currentProfile;
-
-  @override
-  State<_ProfileSelection> createState() => _ProfileSelectionState();
-}
-
-class _ProfileSelectionState extends State<_ProfileSelection> {
-  String? newProfilePicture;
-  bool removeProfile = false;
-
-  Future<bool> checkAnimatedImage(String path) async {
-    String? extension = getFileExtensionFromFileName(path);
-
-    if (extension == ".gif") return true;
-    if (extension == ".webp") return await isWebpAnimated(path);
-
-    return false;
-  }
-
-  Future<void> onSelection(List<String> images) async {
-    String path = images.first;
-    removeProfile = false;
-
-    // check if selected image is animated or not
-    if (await checkAnimatedImage(path)) {
-      setState(() {
-        newProfilePicture = path;
-      });
-      return;
-    }
-
-    if (!mounted) return;
-    String croppedImage = await getCroppedImage(
-      path,
-      context: context,
-      location: ImageLocation.profile,
-    );
-
-    if (croppedImage.isEmpty) return;
-    widget.setProfile(croppedImage);
-    setState(() {
-      newProfilePicture = croppedImage;
-    });
-  }
-
-  void handleRemove() {
-    newProfilePicture = null;
-    widget.setProfile(null);
-
-    removeProfile = true;
-
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final currTheme = Theme.of(context).colorScheme;
-
-    bool noPicture = removeProfile ||
-        (widget.currentProfile.bucketPath.isEmpty && newProfilePicture == null);
-
-    return LayoutBuilder(builder: (context, constraints) {
-      final width = constraints.maxWidth;
-      final height = width * (1 / Constants.profile);
-
-      return SizedBox(
-        width: width,
-        height: height,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            getProfileImage(height),
-            ProfilePictureFilter.preview(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ImagePickerWidget(
-                    onSelection: onSelection,
-                    icon: const Icon(Icons.photo_camera),
-                    disabled: widget.updating,
-                  ),
-                  if (!noPicture)
-                    IconButton.filled(
-                      onPressed: widget.updating ? null : handleRemove,
-                      icon: const Icon(Icons.delete),
-                      color: currTheme.onError,
-                      style: IconButton.styleFrom(
-                        backgroundColor: currTheme.error,
-                      ),
-                    )
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-
-  Widget getProfileImage(double height) {
-    final currTheme = Theme.of(context).colorScheme;
-
-    if (removeProfile ||
-        (widget.currentProfile.bucketPath.isEmpty &&
-            newProfilePicture == null)) {
-      return Container(
-        color: currTheme.surfaceContainerHighest,
-        child: const Icon(
-          Icons.person,
-          size: Constants.height * 15,
-        ),
-      );
-    }
-
-    if (newProfilePicture != null) {
-      return Image.file(
-        File(newProfilePicture!),
-        fit: BoxFit.cover,
-        cacheHeight: Constants.editProfileCachedHeight,
-      );
-    }
-
-    return CachedNetworkImage(
-      memCacheHeight: Constants.profileCacheHeight,
-      cacheKey: widget.currentProfile.bucketPath,
-      imageUrl: widget.currentProfile.accessURI,
-      fit: BoxFit.cover,
-      placeholder: (context, url) => const Center(
-        child: LoadingWidget.small(),
-      ),
-      errorWidget: (context, url, error) => const Icon(Icons.error),
-      height: height,
     );
   }
 }

@@ -23,6 +23,7 @@ class ImagePickerWidget extends StatelessWidget {
     this.adding = false,
     this.selectionStatusChange,
     this.recordLimit = Constants.videoDurationContent,
+    this.disableImageCompression = false,
   })  : assert(text != null || icon != null,
             "Need either text or an Icon to create media selection trigger."),
         picker = ImagePicker(),
@@ -38,6 +39,7 @@ class ImagePickerWidget extends StatelessWidget {
     this.disabled = false,
     this.adding = false,
     this.selectionStatusChange,
+    this.disableImageCompression = false,
   })  : assert(text != null || icon != null,
             "Need either text or an Icon to create media selection trigger."),
         picker = ImagePicker(),
@@ -68,6 +70,10 @@ class ImagePickerWidget extends StatelessWidget {
   /// used for disabling display button
   /// default is false
   final bool disabled;
+
+  /// used when selecting user profile
+  /// as compression will happen after cropping
+  final bool disableImageCompression;
 
   /// used when images are being processed
   final bool adding;
@@ -235,6 +241,11 @@ class ImagePickerWidget extends StatelessWidget {
   }
 
   Future<void> compressSelectedImages(List<String> images) async {
+    if (disableImageCompression) {
+      onSelection(images);
+      return;
+    }
+
     if (selectionStatusChange != null) selectionStatusChange!(true);
     int batchSize = 5;
     int len = images.length;
