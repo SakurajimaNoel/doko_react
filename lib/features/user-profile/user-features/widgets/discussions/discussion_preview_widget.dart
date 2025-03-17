@@ -103,8 +103,7 @@ class DiscussionPreviewWidget extends StatelessWidget {
                   size: Constants.fontSize * 1.25,
                 ),
                 if (discussion.media.isNotEmpty)
-                  MediaWidget.preview(
-                    mediaItems: discussion.media,
+                  MediaWidget(
                     nodeKey: discussionKey,
                     width: width,
                   ),

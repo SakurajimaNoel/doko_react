@@ -15,10 +15,15 @@ class VideoPlayer extends StatefulWidget {
   final String path;
   final String bucketPath;
 
+  /// determines where the video player is rendered
+  /// either content carousel or full page carousel
+  final bool fullScreen;
+
   const VideoPlayer({
     super.key,
     required this.path,
     required this.bucketPath,
+    this.fullScreen = false,
   });
 
   @override
@@ -26,6 +31,8 @@ class VideoPlayer extends StatefulWidget {
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
+  late final fullScreen = widget.fullScreen;
+
   late final String path = widget.path;
   late final String bucketPath = widget.bucketPath;
   late final PreferencesBloc preferences;
@@ -101,6 +108,21 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
   }
 
+  MaterialVideoControlsThemeData createVideoControlsTheme() {
+    var currTheme = Theme.of(context).colorScheme;
+    const double seekBarHeight = Constants.height * 0.2;
+
+    return MaterialVideoControlsThemeData(
+      seekBarPositionColor: currTheme.primary,
+      seekBarThumbColor: currTheme.primary,
+      seekBarColor: currTheme.onPrimary,
+      seekBarBufferColor:
+          currTheme.onSecondaryContainer.withValues(alpha: 0.25),
+      seekBarThumbSize: 0,
+      seekBarHeight: seekBarHeight,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var currTheme = Theme.of(context).colorScheme;
@@ -137,47 +159,15 @@ class _VideoPlayerState extends State<VideoPlayer> {
         }
       },
       child: MaterialVideoControlsTheme(
-        normal: MaterialVideoControlsThemeData(
-          speedUpOnLongPress: true,
-          seekBarPositionColor: currTheme.primary,
-          seekBarThumbColor: currTheme.primary,
-          seekBarColor: currTheme.onPrimary,
-          seekBarBufferColor:
-              currTheme.onSecondaryContainer.withValues(alpha: 0.25),
-          seekBarThumbSize: 0,
-          seekBarHeight: seekBarHeight,
-        ),
-        fullscreen: MaterialVideoControlsThemeData(
-          speedUpOnLongPress: true,
-          speedUpFactor: 2,
-          seekBarPositionColor: currTheme.primary,
-          seekBarThumbColor: currTheme.primary,
-          seekBarColor: currTheme.onPrimary,
-          seekBarBufferColor:
-              currTheme.onSecondaryContainer.withValues(alpha: 0.25),
-          seekBarThumbSize: 0,
-          seekBarHeight: seekBarHeight,
-        ),
+        normal: createVideoControlsTheme(),
+        fullscreen: createVideoControlsTheme(),
         child: Video(
-          onEnterFullscreen: () async {
-            Timer(
-                const Duration(
-                  milliseconds: 500,
-                ), () {
-              controller.player.play();
-            });
-          },
-          onExitFullscreen: () async {
-            controller.player.play();
-          },
           fill: currTheme.surfaceContainer,
           resumeUponEnteringForegroundMode: true,
           controller: controller,
           fit: BoxFit.contain,
           aspectRatio: ratio,
           controls: (VideoState state) {
-            bool fullScreen = state.isFullscreen();
-
             Widget child = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -188,11 +178,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
                       iconColor: primary,
                       iconSize: Constants.width,
                     ),
-                    if (fullScreen)
-                      MaterialFullscreenButton(
-                        iconColor: primary,
-                        iconSize: Constants.width * 1.125,
-                      ),
                   ],
                 ),
                 const Spacer(),
@@ -248,34 +233,26 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
             return Material(
               color: Colors.transparent,
-              child: GestureDetector(
-                onLongPress: !fullScreen
-                    ? null
-                    : () {
+              child: fullScreen
+                  ? GestureDetector(
+                      onLongPress: () {
                         controller.player.setRate(2.0);
                       },
-                onLongPressEnd: !fullScreen
-                    ? null
-                    : (_) {
+                      onLongPressEnd: (_) {
                         controller.player.setRate(1.0);
                       },
-                child: InkWell(
-                  onTap: () {
-                    if (!loaded) return;
+                      child: InkWell(
+                        onTap: () {
+                          if (!loaded) return;
 
-                    if (!fullScreen) {
-                      state.toggleFullscreen();
-                    } else {
-                      controller.player.playOrPause();
-                    }
-                  },
-                  child: fullScreen
-                      ? SafeArea(
+                          controller.player.playOrPause();
+                        },
+                        child: SafeArea(
                           child: child,
-                        )
-                      : child,
-                ),
-              ),
+                        ),
+                      ),
+                    )
+                  : child,
             );
           },
           key: Key(path),

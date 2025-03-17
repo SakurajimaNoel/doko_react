@@ -21,6 +21,7 @@ import 'package:doko_react/features/settings/presentation/pages/settings_page.da
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/pages/message-archive-profile/message_archive_profile_page.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/pages/message-archive/message_archive_page.dart';
 import 'package:doko_react/features/user-profile/user-features/instant-messaging/presentation/pages/message-inbox/message_inbox_page.dart';
+import 'package:doko_react/features/user-profile/user-features/media-carousel-page/media_carousel_page.dart';
 import 'package:doko_react/features/user-profile/user-features/nearby/nearby_page.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/discussion_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/poll_create_input.dart';
@@ -442,6 +443,17 @@ class AppRouterConfig {
 
                       return PollPage(
                         pollId: pollId,
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: rootNavigatorKey,
+                    name: RouterConstants.mediaCarousel,
+                    path: "media/:nodeKey",
+                    builder: (context, state) {
+                      String nodeKey = state.pathParameters["nodeKey"]!;
+                      return MediaCarouselPage(
+                        nodeKey: nodeKey,
                       );
                     },
                   ),

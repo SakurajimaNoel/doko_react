@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:easy_video_editor/easy_video_editor.dart';
 import 'package:media_data_extractor/media_data_extractor.dart';
@@ -30,18 +28,7 @@ class VideoActions {
     editor.compress(
       resolution: VideoResolution.p1080,
     );
-    final path = await editor.export();
-    if (path != null) {
-      File file = File(path);
-      int sizeInBytes = await file.length();
-      double sizeInKB = sizeInBytes / 1024;
-      double sizeInMB = sizeInKB / 1024;
-
-      print('File size: $sizeInBytes bytes');
-      print('File size: $sizeInKB KB');
-      print('File size: $sizeInMB MB');
-    }
-    return path;
+    return await editor.export();
   }
 
   static VideoOrientation getVideoOrientation(int width, int height) {

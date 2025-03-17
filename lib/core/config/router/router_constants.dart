@@ -23,6 +23,9 @@ class RouterConstants {
   static const String userSearch = "user-search";
   static const String profileFriends = "profile-friends";
 
+  // media carousel
+  static const String mediaCarousel = "media-carousel";
+
   // post
   static const String createPost = "create-post";
   static const String postPublish = "publish-post";

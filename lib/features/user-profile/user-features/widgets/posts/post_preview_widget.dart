@@ -98,8 +98,7 @@ class PostPreviewWidget extends StatelessWidget {
                   nodeId: post.id,
                 ),
                 if (post.content.isNotEmpty)
-                  MediaWidget.preview(
-                    mediaItems: post.content,
+                  MediaWidget(
                     nodeKey: postKey,
                     width: width,
                   ),

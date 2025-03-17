@@ -142,7 +142,6 @@ class DiscussionWidget extends StatelessWidget {
                 ),
                 if (discussion.media.isNotEmpty) ...[
                   MediaWidget(
-                    mediaItems: discussion.media,
                     nodeKey: discussionKey,
                   ),
                   if (!isDiscussionPage)

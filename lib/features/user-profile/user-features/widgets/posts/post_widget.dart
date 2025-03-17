@@ -128,7 +128,6 @@ class PostWidget extends StatelessWidget {
                 // post content
                 if (post.content.isNotEmpty)
                   MediaWidget(
-                    mediaItems: post.content,
                     nodeKey: postKey,
                   ),
                 Padding(

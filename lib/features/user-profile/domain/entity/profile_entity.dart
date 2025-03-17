@@ -1,5 +1,6 @@
 import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
+import 'package:doko_react/features/user-profile/domain/media/media_entity.dart';
 
 /// base class to use with user graph
 abstract class GraphEntity {}
@@ -27,6 +28,8 @@ abstract class UserActionEntityWithMediaItems
   int get currDisplay;
 
   void updateDisplayItem(int item);
+
+  List<MediaEntity> get mediaItems;
 }
 
 final class UsersTagged {

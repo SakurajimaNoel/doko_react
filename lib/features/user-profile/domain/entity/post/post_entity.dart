@@ -46,6 +46,9 @@ class PostEntity implements UserActionEntityWithMediaItems {
   int currDisplay = 0;
 
   @override
+  List<MediaEntity> get mediaItems => content;
+
+  @override
   void updateDisplayItem(int item) {
     currDisplay = item;
   }

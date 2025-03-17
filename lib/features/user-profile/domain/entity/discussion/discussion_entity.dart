@@ -46,6 +46,9 @@ class DiscussionEntity implements UserActionEntityWithMediaItems {
   int currDisplay = 0;
 
   @override
+  List<MediaEntity> get mediaItems => media;
+
+  @override
   void updateDisplayItem(int item) {
     currDisplay = item;
   }
