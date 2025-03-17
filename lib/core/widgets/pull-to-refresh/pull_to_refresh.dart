@@ -19,7 +19,7 @@ class PullToRefresh extends StatelessWidget {
       showChildOpacityTransition: false,
       animSpeedFactor: 4,
       springAnimationDurationInMilliseconds: 500,
-      height: 150,
+      height: 200,
       child: child,
     );
   }
