@@ -1,5 +1,6 @@
 import 'package:doki_websocket_client/doki_websocket_client.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
+import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 
 class MessageEntity implements GraphEntity {
   MessageEntity({
@@ -45,5 +46,10 @@ class MessageEntity implements GraphEntity {
       message: message,
       edited: map["edited"],
     );
+  }
+
+  @override
+  String getNodeKey() {
+    return generateMessageKey(message.id);
   }
 }

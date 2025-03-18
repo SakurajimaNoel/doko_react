@@ -148,40 +148,19 @@ class ProfileRemoteDataSource {
       var contentFuture = (contentList).map((content) {
         var contentMap = content["node"];
         String id = contentMap["id"];
-        String key = "";
+
         String typename = contentMap["__typename"];
+        DokiNodeType node = DokiNodeType.fromTypename(typename);
+        items.add(node.keyGenerator(id));
 
-        Future<dynamic> entity;
-
-        if (typename == DokiNodeType.post.nodeName) {
-          entity = PostEntity.createEntity(map: contentMap);
-          key = DokiNodeType.post.keyGenerator(id);
-        } else if (typename == DokiNodeType.discussion.nodeName) {
-          entity = DiscussionEntity.createEntity(map: contentMap);
-          key = DokiNodeType.discussion.keyGenerator(id);
-        } else {
-          entity = PollEntity.createEntity(map: contentMap);
-          key = DokiNodeType.poll.keyGenerator(id);
-        }
-
-        items.add(key);
-
-        return entity;
+        return node.entityGenerator(
+          map: contentMap,
+        );
       }).toList();
 
-      List content = await Future.wait(contentFuture);
+      var content = await Future.wait(contentFuture);
       for (var item in content) {
-        if (item is PostEntity) {
-          graph.addEntity(DokiNodeType.post.keyGenerator(item.id), item);
-        }
-
-        if (item is DiscussionEntity) {
-          graph.addEntity(DokiNodeType.discussion.keyGenerator(item.id), item);
-        }
-
-        if (item is PollEntity) {
-          graph.addEntity(DokiNodeType.poll.keyGenerator(item.id), item);
-        }
+        graph.addEntity(item.getNodeKey(), item);
       }
       graph.addContentEntityToUser(
         details.username,

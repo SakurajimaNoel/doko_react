@@ -1924,28 +1924,28 @@ class GraphqlQueries {
               options
               activeTill
               selfVote: votesConnection(where: \$votesConnectionWhere2) {
-                      edges {
-                        properties {
-                          addedOn
-                          option
-                        }
-                      }
-                    }
-                    optionA: votesConnection (where: \$votesConnectionWhere3){
-                      totalCount
-                    }
-                    optionB: votesConnection (where: \$votesConnectionWhere4){
-                      totalCount
-                    }
-                    optionC: votesConnection (where: \$votesConnectionWhere5){
-                      totalCount
-                    }
-                    optionD: votesConnection (where: \$votesConnectionWhere6){
-                      totalCount
-                    }
-                    optionE: votesConnection (where: \$votesConnectionWhere7){
-                      totalCount
-                    }
+                edges {
+                  properties {
+                    addedOn
+                    option
+                  }
+                }
+              }
+              optionA: votesConnection (where: \$votesConnectionWhere3){
+                totalCount
+              }
+              optionB: votesConnection (where: \$votesConnectionWhere4){
+                totalCount
+              }
+              optionC: votesConnection (where: \$votesConnectionWhere5){
+                totalCount
+              }
+              optionD: votesConnection (where: \$votesConnectionWhere6){
+                totalCount
+              }
+              optionE: votesConnection (where: \$votesConnectionWhere7){
+                totalCount
+              }
             }
           }
         }
@@ -2128,6 +2128,152 @@ class GraphqlQueries {
           "username_EQ": username,
         }
       }
+    };
+  }
+
+  /// node details for message archive
+  static String getNodeDetailsForMessageArchive() {
+    return """
+    query Contents(\$where: ContentWhere, \$usersWhere2: UserWhere, \$friendsConnectionWhere2: UserFriendsConnectionWhere, \$likedByWhere2: UserWhere, \$votesConnectionWhere2: PollVotesConnectionWhere, \$votesConnectionWhere3: PollVotesConnectionWhere, \$votesConnectionWhere4: PollVotesConnectionWhere, \$votesConnectionWhere5: PollVotesConnectionWhere, \$votesConnectionWhere6: PollVotesConnectionWhere, \$votesConnectionWhere7: PollVotesConnectionWhere) {
+      contents(where: \$where) {
+        __typename
+        id
+        createdOn
+        createdBy {
+          id
+          username
+          profilePicture
+          name
+          friendsConnection(where: \$friendsConnectionWhere2) {
+            edges {
+              properties {
+                addedOn
+                requestedBy
+                status
+              }
+            }
+          }
+        }
+        likedBy(where: \$likedByWhere2) {
+          username
+        }
+        likedByConnection {
+          totalCount
+        }
+        commentsConnection {
+          totalCount
+        }
+        usersTagged {
+          username
+          profilePicture
+        }
+        ... on Post {
+          content
+          caption
+        }
+        ... on Discussion {
+          title
+          text
+          media
+        }
+        ... on Poll {
+          question
+          options
+          activeTill
+          selfVote: votesConnection(where: \$votesConnectionWhere2) {
+            edges {
+              properties {
+                addedOn
+                option
+              }
+            }
+          }
+          optionA: votesConnection (where: \$votesConnectionWhere3){
+            totalCount
+          }
+          optionB: votesConnection (where: \$votesConnectionWhere4){
+            totalCount
+          }
+          optionC: votesConnection (where: \$votesConnectionWhere5){
+            totalCount
+          }
+          optionD: votesConnection (where: \$votesConnectionWhere6){
+            totalCount
+          }
+          optionE: votesConnection (where: \$votesConnectionWhere7){
+            totalCount
+          }
+        }
+      }
+      users(where: \$usersWhere2) {
+        id
+        username
+        name
+        profilePicture
+        friendsConnection(where: \$friendsConnectionWhere2) {
+          edges {
+            properties {
+              addedOn
+              requestedBy
+              status
+            }
+          }
+        }
+      }
+    }
+    """;
+  }
+
+  static Map<String, dynamic> getNodeDetailsForMessageArchiveVariables({
+    required String username,
+    required List<String> contentIds,
+    required List<String> users,
+  }) {
+    return {
+      "where": {
+        "id_IN": contentIds,
+      },
+      "usersWhere2": {
+        "username_IN": users,
+      },
+      "friendsConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
+      "likedByWhere2": {
+        "username_EQ": username,
+      },
+      "votesConnectionWhere2": {
+        "node": {
+          "username_EQ": username,
+        }
+      },
+      "votesConnectionWhere3": {
+        "edge": {
+          "option_EQ": PollOption.optionA.value,
+        }
+      },
+      "votesConnectionWhere4": {
+        "edge": {
+          "option_EQ": PollOption.optionB.value,
+        }
+      },
+      "votesConnectionWhere5": {
+        "edge": {
+          "option_EQ": PollOption.optionC.value,
+        }
+      },
+      "votesConnectionWhere6": {
+        "edge": {
+          "option_EQ": PollOption.optionD.value,
+        }
+      },
+      "votesConnectionWhere7": {
+        "edge": {
+          "option_EQ": PollOption.optionE.value,
+        }
+      },
     };
   }
 }

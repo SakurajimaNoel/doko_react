@@ -125,4 +125,9 @@ class CommentEntity implements GraphEntityWithUserAction {
 
   @override
   List<UsersTagged> get usersTagged => [];
+
+  @override
+  String getNodeKey() {
+    return generateCommentNodeKey(id);
+  }
 }

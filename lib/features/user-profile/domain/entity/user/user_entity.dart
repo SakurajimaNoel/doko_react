@@ -4,6 +4,7 @@ import 'package:doko_react/core/global/entity/page-info/nodes.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/global/entity/user-relation-info/user_relation_info.dart';
 import 'package:doko_react/features/user-profile/domain/entity/profile_entity.dart';
+import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 
 /// user entity to use with user widget
 /// across pages with connection detail
@@ -71,6 +72,11 @@ class UserEntity implements GraphEntity {
     }
 
     return relationInfo;
+  }
+
+  @override
+  String getNodeKey() {
+    return generateUserNodeKey(username);
   }
 }
 

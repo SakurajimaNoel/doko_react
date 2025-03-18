@@ -121,4 +121,9 @@ class DiscussionEntity implements UserActionEntityWithMediaItems {
       text: map["text"],
     );
   }
+
+  @override
+  String getNodeKey() {
+    return generateDiscussionNodeKey(id);
+  }
 }

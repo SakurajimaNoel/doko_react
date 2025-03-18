@@ -3,7 +3,9 @@ import 'package:doko_react/core/global/entity/storage-resource/storage_resource.
 import 'package:doko_react/features/user-profile/domain/media/media_entity.dart';
 
 /// base class to use with user graph
-abstract class GraphEntity {}
+abstract class GraphEntity {
+  String getNodeKey();
+}
 
 /// base class for nodes that allow user actions in it
 abstract class GraphEntityWithUserAction implements GraphEntity {

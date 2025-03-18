@@ -126,4 +126,9 @@ class PostEntity implements UserActionEntityWithMediaItems {
       usersTagged: usersTagged,
     );
   }
+
+  @override
+  String getNodeKey() {
+    return generatePostNodeKey(id);
+  }
 }

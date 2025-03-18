@@ -68,4 +68,9 @@ class Nodes implements GraphEntity {
   bool _empty;
 
   PageInfo get pageInfo => _pageInfo;
+
+  @override
+  String getNodeKey() {
+    return "";
+  }
 }

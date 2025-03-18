@@ -279,4 +279,9 @@ class PollEntity implements GraphEntityWithUserAction {
       activeTill: DateTime.parse(map["activeTill"]).toLocal(),
     );
   }
+
+  @override
+  String getNodeKey() {
+    return generatePollNodeKey(id);
+  }
 }

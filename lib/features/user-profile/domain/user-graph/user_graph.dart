@@ -719,6 +719,9 @@ class UserGraph {
   }
 
   /// add fetched users to graph based on search query
+  /// this is used with search and other methods where list of users are fetched
+  /// getting user profile for message inbox
+  /// getting user profiles in message archive
   List<String> addUserSearchEntry(List<UserEntity> searchResults) {
     Map<String, GraphEntity> tempMap = HashMap();
 
