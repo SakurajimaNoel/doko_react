@@ -145,8 +145,7 @@ class _MessageInboxPageState extends State<MessageInboxPage> {
         inboxItemEntity.displayText ?? "Start the conversation.";
     String? inboxActivityTime;
     if (inboxItemEntity.lastActivityTime != null) {
-      inboxActivityTime =
-          formatDateTimeToTimeString(inboxItemEntity.lastActivityTime!);
+      inboxActivityTime = formatDateForInbox(inboxItemEntity.lastActivityTime!);
     }
 
     return ListTile(

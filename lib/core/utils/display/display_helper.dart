@@ -1,4 +1,4 @@
-import 'package:characters/characters.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 String getUsernameFromCommentInput(String username) {
@@ -48,6 +48,15 @@ String formatDateToWeekDays(DateTime date) {
 /// Converts `DateTime` to a formatted time string like "3:45 PM"
 String formatDateTimeToTimeString(DateTime date) {
   return DateFormat('hh:mm a').format(date);
+}
+
+String formatDateForInbox(DateTime date) {
+  DateTime now = DateTime.now();
+  if (DateUtils.isSameDay(now, date)) {
+    return DateFormat('hh:mm a').format(date); // Only time if today
+  } else {
+    return DateFormat('d MMM yyy').format(date); // Date and time if not today
+  }
 }
 
 /// Checks if two `DateTime` objects represent the same calendar day.
