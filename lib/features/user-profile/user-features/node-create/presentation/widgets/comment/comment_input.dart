@@ -741,6 +741,7 @@ class _CommentInputActionsState extends State<_CommentInputActions> {
       path,
       context: context,
       location: ImageLocation.comment,
+      compress: false,
     );
     if (croppedMedia.isEmpty) return;
     final mediaData = await File(croppedMedia).readAsBytes();

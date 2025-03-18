@@ -74,6 +74,7 @@ class _ProfilePictureSelectionState extends State<ProfilePictureSelection> {
       selectedImage,
       context: context,
       location: ImageLocation.profile,
+      compress: true,
     );
 
     if (croppedImage.isEmpty) return;

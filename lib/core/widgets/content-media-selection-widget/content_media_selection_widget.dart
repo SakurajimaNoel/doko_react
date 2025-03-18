@@ -228,6 +228,7 @@ class _ContentMediaSelectionWidgetState
                       path,
                       context: context,
                       location: ImageLocation.content,
+                      compress: false,
                     );
 
                     if (croppedImage.isEmpty) return;

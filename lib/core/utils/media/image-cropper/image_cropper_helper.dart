@@ -16,6 +16,7 @@ Future<String> getCroppedImage(
   String path, {
   required BuildContext context,
   required ImageLocation location,
+  required bool compress,
 }) async {
   var currTheme = Theme.of(context).colorScheme;
   CropAspectRatio ratio;
@@ -58,5 +59,8 @@ Future<String> getCroppedImage(
   );
 
   if (croppedImage == null) return "";
-  return compute(compressImage, croppedImage.path);
+
+  return compress
+      ? compute(compressImage, croppedImage.path)
+      : croppedImage.path;
 }
