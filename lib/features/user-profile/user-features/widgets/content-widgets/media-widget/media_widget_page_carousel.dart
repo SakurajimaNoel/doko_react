@@ -25,7 +25,7 @@ class _MediaContentPageState extends State<_MediaContentPage>
   final UserGraph graph = UserGraph();
   late final String nodeKey = widget.nodeKey;
 
-  bool pageView = true;
+  bool shouldScroll = true;
 
   final TransformationController transformationController =
       TransformationController();
@@ -185,8 +185,9 @@ class _MediaContentPageState extends State<_MediaContentPage>
               SizedBox(
                 height: height,
                 child: PageView.builder(
-                  physics:
-                      !pageView ? null : const NeverScrollableScrollPhysics(),
+                  physics: shouldScroll
+                      ? null
+                      : const NeverScrollableScrollPhysics(),
                   controller: controller,
                   itemCount: displayItems.length,
                   itemBuilder: (context, index) {
@@ -218,10 +219,10 @@ class _MediaContentPageState extends State<_MediaContentPage>
                           _onDragUpdate(details);
                           if (scale == 1) {
                             _enableDrag = true;
-                            pageView = false;
+                            shouldScroll = true;
                           } else {
                             _enableDrag = false;
-                            pageView = true;
+                            shouldScroll = false;
                           }
 
                           setState(() {});
@@ -343,7 +344,10 @@ class _MediaContentPageState extends State<_MediaContentPage>
 
     /// Determines the state after a double tap action exactly
     if (currentScale <= widget.minScale) {
-      targetScale = widget.maxScale;
+      targetScale = widget.maxScale / 2;
+      shouldScroll = false;
+    } else {
+      shouldScroll = true;
     }
 
     /// calculate new offset of double tap
@@ -380,5 +384,6 @@ class _MediaContentPageState extends State<_MediaContentPage>
       CurveTween(curve: Curves.easeOut).animate(_animationController),
     );
     _animationController.forward(from: 0);
+    setState(() {});
   }
 }
