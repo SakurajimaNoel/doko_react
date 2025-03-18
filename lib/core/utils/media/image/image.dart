@@ -6,7 +6,7 @@ Future<String> compressImage(String path) async {
   if (extension == null) return "";
 
   Image? image = await decodeImageFile(path);
-  if (image == null) return "";
+  if (image == null) return path;
   if (image.hasAnimation) return path; // don't compress animated images
 
   int width;
@@ -34,5 +34,14 @@ Future<String> compressImage(String path) async {
     quality: 75,
   );
 
-  return res ? compressedPath : "";
+  return res ? compressedPath : path;
+}
+
+/// used to compress multiple images
+Future<List<String>> compressImages(List<String> paths) async {
+  List<Future<String>> imageFuture = paths.map((path) {
+    return compressImage(path);
+  }).toList();
+
+  return await Future.wait(imageFuture);
 }

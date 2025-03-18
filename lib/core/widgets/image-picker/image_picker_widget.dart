@@ -256,12 +256,7 @@ class ImagePickerWidget extends StatelessWidget {
         i + batchSize > len ? len : i + batchSize,
       );
 
-      /// create batch images
-      List<Future<String>> batchFutures = [];
-      for (String path in batch) {
-        batchFutures.add(compute(compressImage, path));
-      }
-      onSelection(await Future.wait(batchFutures));
+      onSelection(await compute(compressImages, batch));
     }
     if (selectionStatusChange != null) selectionStatusChange!(false);
   }
