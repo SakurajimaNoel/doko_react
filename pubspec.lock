@@ -125,10 +125,10 @@ packages:
     dependency: transitive
     description:
       name: args
-      sha256: bf9f5caeea8d8fe6721a9c358dd8a5c1947b27f1cfaa18b39c301273594919e6
+      sha256: d0481093c50b1da8910eb0bb301626d4d8eb7284aa739614d2b394ee09e3ea04
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.0"
+    version: "2.7.0"
   async:
     dependency: transitive
     description:
@@ -358,10 +358,10 @@ packages:
     dependency: "direct main"
     description:
       name: easy_video_editor
-      sha256: "1a74eccdea8351ad40336554d28d426332468980ab2f1e43b4f3a413230751ac"
+      sha256: aede2aa265eb3cf601bd64c4dab475a17da3b2d6b6656fd700face3eb263b489
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.3"
+    version: "0.0.4"
   equatable:
     dependency: "direct main"
     description:
@@ -462,10 +462,10 @@ packages:
     dependency: transitive
     description:
       name: flex_seed_scheme
-      sha256: d3ba3c5c92d2d79d45e94b4c6c71d01fac3c15017da1545880c53864da5dfeb0
+      sha256: b06d8b367b84cbf7ca5c5603c858fa5edae88486c4e4da79ac1044d73b6c62ec
       url: "https://pub.dev"
     source: hosted
-    version: "3.5.0"
+    version: "3.5.1"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -802,10 +802,10 @@ packages:
     dependency: transitive
     description:
       name: image_picker_linux
-      sha256: "4ed1d9bb36f7cd60aa6e6cd479779cc56a4cb4e4de8f49d487b1aaad831300fa"
+      sha256: "34a65f6740df08bbbeb0a1abd8e6d32107941fd4868f67a507b25601651022c9"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.1+1"
+    version: "0.2.1+2"
   image_picker_macos:
     dependency: transitive
     description:
@@ -942,14 +942,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.1"
-  media_data_extractor:
-    dependency: "direct main"
-    description:
-      name: media_data_extractor
-      sha256: "37b0d51ab56626eb3a389bb989dd8fba2d379a02cea271e7380343fefbe60042"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.6"
   media_kit:
     dependency: "direct main"
     description:
@@ -1034,10 +1026,10 @@ packages:
     dependency: transitive
     description:
       name: mime
-      sha256: "801fd0b26f14a4a58ccb09d5892c3fbdeff209594300a542492cf13fba9d247a"
+      sha256: "41a20518f0cb1256669420fdba0cd90d21561e560ac240f26ef8322e45bb7ed6"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6"
+    version: "2.0.0"
   mocktail:
     dependency: "direct dev"
     description:
@@ -1314,10 +1306,10 @@ packages:
     dependency: "direct main"
     description:
       name: scrollview_observer
-      sha256: c528c3868cb17135ad6ccabef68753e2e6636b55dfaecc762f5e353e1eb3878a
+      sha256: "9af16bdcfa11af07021586e9d7fc7c7d78dc222507bc6879483da3aa0c38b4e2"
       url: "https://pub.dev"
     source: hosted
-    version: "1.25.1"
+    version: "1.25.2"
   share_plus:
     dependency: "direct main"
     description:
@@ -1471,10 +1463,10 @@ packages:
     dependency: "direct main"
     description:
       name: swipe_callback
-      sha256: "5c1266bd1991b4dc98472dd32fea37970714543447480279ff53f1667fe76d6d"
+      sha256: d1a3af6541cbd8f3f52c63ae89bf613135ee1a5e6c416f00622f13f44d5ce458
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.0+1"
   synchronized:
     dependency: transitive
     description:
@@ -1679,10 +1671,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: b89e6e24d1454e149ab20fbb225af58660f0c0bf4475544650700d8e2da54aef
+      sha256: dc6ecaa00a7c708e5b4d10ee7bec8c270e9276dfcab1783f57e9962d7884305f
       url: "https://pub.dev"
     source: hosted
-    version: "5.11.0"
+    version: "5.12.0"
   win32_registry:
     dependency: transitive
     description:

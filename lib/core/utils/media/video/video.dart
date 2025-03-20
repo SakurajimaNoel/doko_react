@@ -1,6 +1,5 @@
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:easy_video_editor/easy_video_editor.dart';
-import 'package:media_data_extractor/media_data_extractor.dart';
 
 enum VideoOrientation { landscape, portrait }
 
@@ -13,11 +12,10 @@ class VideoActions {
   }) async {
     final double videoLimit = limit.inMilliseconds.toDouble();
 
-    final duration = await getVideoDuration(videoPath);
-
     final editor = VideoEditorBuilder(
       videoPath: videoPath,
     );
+    final duration = await getVideoDuration(editor);
     if (duration != null && duration > videoLimit) {
       editor.trim(
         startTimeMs: 0,
@@ -52,15 +50,11 @@ class VideoActions {
   }
 
   static Future<void> cancelCurrentlyActiveVideoCompression() async {
-    // await VideoCompress.cancelCompression();
+    await VideoEditorBuilder.cancel();
   }
 
-  static Future<double?> getVideoDuration(String videoPath) async {
-    final mediaDataExtractorPlugin = MediaDataExtractor();
-    final metas = await mediaDataExtractorPlugin.getVideoData(MediaDataSource(
-      type: MediaDataSourceType.file,
-      url: videoPath,
-    ));
-    return metas.tracks.firstOrNull?.duration?.toDouble();
+  static Future<double?> getVideoDuration(VideoEditorBuilder editor) async {
+    var details = await editor.getVideoMetadata();
+    return details.duration.toDouble();
   }
 }
