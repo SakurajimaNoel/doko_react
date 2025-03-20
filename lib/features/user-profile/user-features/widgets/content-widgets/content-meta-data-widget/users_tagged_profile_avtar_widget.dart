@@ -46,7 +46,7 @@ class _UsersTaggedAvtarWidgetState extends State<UsersTaggedAvtarWidget> {
 
     Timer(
       const Duration(
-        seconds: 8,
+        seconds: 5,
       ),
       updateUsersTagged,
     );
@@ -62,19 +62,19 @@ class _UsersTaggedAvtarWidgetState extends State<UsersTaggedAvtarWidget> {
         child: Stack(
           children: [
             Positioned(
-              child: CircleAvatar(
-                radius: Constants.avtarRadius,
-                child: AnimatedSwitcher(
-                  duration: const Duration(
-                    milliseconds: 2000,
-                  ),
+              child: AnimatedSwitcher(
+                switchInCurve: Curves.decelerate,
+                switchOutCurve: Curves.decelerate,
+                duration: const Duration(
+                  milliseconds: 750,
+                ),
+                child: CircleAvatar(
                   key: ObjectKey(currentDisplay),
+                  radius: Constants.avtarRadius,
                   child: currentDisplay.profilePicture.bucketPath.isEmpty
                       ? const Icon(Icons.person)
                       : ClipOval(
-                          key: ObjectKey(currentDisplay),
                           child: CachedNetworkImage(
-                            key: ObjectKey(currentDisplay),
                             cacheKey: currentDisplay.profilePicture.bucketPath,
                             imageUrl: currentDisplay.profilePicture.accessURI,
                             placeholder: (context, url) => const Center(
