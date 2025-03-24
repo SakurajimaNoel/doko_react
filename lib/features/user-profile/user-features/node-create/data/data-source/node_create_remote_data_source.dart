@@ -12,6 +12,7 @@ import 'package:doko_react/features/user-profile/domain/entity/post/post_entity.
 import 'package:doko_react/features/user-profile/domain/user-graph/user_graph.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/comment_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/discussion_create_input.dart';
+import 'package:doko_react/features/user-profile/user-features/node-create/input/node_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/poll_create_input.dart';
 import 'package:doko_react/features/user-profile/user-features/node-create/input/post_create_input.dart';
 import 'package:graphql/client.dart';
@@ -23,24 +24,31 @@ class NodeCreateRemoteDataSource {
 
   final GraphQLClient _client;
 
+  Future<List<String>> _uploadMediaFiles(List<MediaContent> mediaItems) async {
+    List<Future<String>> mediaUploadFuture = [];
+
+    for (final item in mediaItems) {
+      if (item.mediaType == MediaTypeValue.thumbnail ||
+          item.mediaType == MediaTypeValue.unknown) {
+        continue;
+      }
+
+      mediaUploadFuture.add(uploadFileToAWSByPath(
+        item.mediaFile,
+        item.bucketPath,
+      ));
+      addFileToCache(item.mediaFile, item.bucketPath);
+    }
+
+    return await Future.wait(mediaUploadFuture);
+  }
+
   Future<String> createNewPost(PostCreateInput postDetails) async {
     try {
       // upload media items to aws
-      List<Future<String>> fileUploadFuture = [];
-      for (final item in postDetails.content) {
-        if (item.type == MediaTypeValue.thumbnail ||
-            item.type == MediaTypeValue.unknown) {
-          continue;
-        }
-
-        fileUploadFuture.add(uploadFileToAWSByPath(
-          item.file!,
-          item.bucketPath,
-        ));
-        addFileToCache(item.file!, item.bucketPath);
-      }
       List<String> uploadedPostMediaContent =
-          await Future.wait(fileUploadFuture);
+          await _uploadMediaFiles(postDetails.content);
+
       if (postDetails.content.isNotEmpty && uploadedPostMediaContent.isEmpty) {
         throw const ApplicationException(
           reason:
@@ -145,21 +153,9 @@ class NodeCreateRemoteDataSource {
       DiscussionCreateInput discussionDetails) async {
     try {
       // upload media items to aws
-      List<Future<String>> fileUploadFuture = [];
-      for (final item in discussionDetails.media) {
-        if (item.type == MediaTypeValue.thumbnail ||
-            item.type == MediaTypeValue.unknown) {
-          continue;
-        }
 
-        fileUploadFuture.add(uploadFileToAWSByPath(
-          item.file!,
-          item.bucketPath,
-        ));
-        addFileToCache(item.file!, item.bucketPath);
-      }
       List<String> uploadedDiscussionMediaContent =
-          await Future.wait(fileUploadFuture);
+          await _uploadMediaFiles(discussionDetails.media);
       if (discussionDetails.media.isNotEmpty &&
           uploadedDiscussionMediaContent.isEmpty) {
         throw const ApplicationException(

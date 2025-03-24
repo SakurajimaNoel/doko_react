@@ -81,18 +81,10 @@ class _ContentMediaSelectionWidgetState
 
     MediaContent tempContent;
     if (thumbnail == null) {
-      tempContent = const MediaContent(
-        type: MediaTypeValue.unknown,
-        bucketPath: "",
-        animated: true,
-      );
+      tempContent = const VideoUnknownThumbnailContent();
     } else {
-      tempContent = MediaContent(
-        type: MediaTypeValue.thumbnail,
-        file: thumbnail,
-        bucketPath: "",
-        thumbnail: thumbnail,
-        animated: true,
+      tempContent = VideoThumbnailContent(
+        mediaFile: thumbnail,
       );
     }
 
@@ -106,8 +98,8 @@ class _ContentMediaSelectionWidgetState
 
     /// only one video at a time
     int tempIndex = content.indexWhere((item) =>
-        item.type == MediaTypeValue.thumbnail ||
-        item.type == MediaTypeValue.unknown);
+        item.mediaType == MediaTypeValue.thumbnail ||
+        item.mediaType == MediaTypeValue.unknown);
     if (tempIndex == -1) return;
 
     if (compressedVideo == null) {
@@ -125,12 +117,10 @@ class _ContentMediaSelectionWidgetState
     }
 
     setState(() {
-      content[tempIndex] = MediaContent(
-        type: MediaTypeValue.video,
-        file: compressedVideo,
+      content[tempIndex] = VideoContent(
+        mediaFile: compressedVideo,
         bucketPath: generateBucketPath(compressedVideo),
         thumbnail: thumbnail,
-        animated: true,
       );
     });
 
@@ -152,9 +142,8 @@ class _ContentMediaSelectionWidgetState
         animated = true;
       }
       setState(() {
-        content.add(MediaContent(
-          type: type,
-          file: item,
+        content.add(ImageContent(
+          mediaFile: item,
           bucketPath: generateBucketPath(item),
           originalImage: item,
           animated: animated,
@@ -202,13 +191,13 @@ class _ContentMediaSelectionWidgetState
   Widget mediaItemWrapper({
     required Widget child,
     required int index,
-    bool animated = false,
-    required String path,
   }) {
     var currTheme = Theme.of(context).colorScheme;
+    MediaContent mediaContent = content[index];
+    bool animated = mediaContent.animated;
 
     return Stack(
-      key: ObjectKey(content[index]),
+      key: ObjectKey(mediaContent),
       children: [
         child,
         Padding(
@@ -220,32 +209,44 @@ class _ContentMediaSelectionWidgetState
             mainAxisAlignment: !animated
                 ? MainAxisAlignment.spaceBetween
                 : MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // only still images are not animated
               if (!animated)
-                IconButton.filledTonal(
-                  onPressed: () async {
-                    String croppedImage = await getCroppedImage(
-                      path,
-                      context: context,
-                      location: ImageLocation.content,
-                      compress: false,
-                    );
+                Column(
+                  spacing: Constants.gap * 0.5,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton.filledTonal(
+                      onPressed: () async {
+                        String croppedImage = await getCroppedImage(
+                          (mediaContent as ImageContent).originalImage,
+                          context: context,
+                          location: ImageLocation.content,
+                          compress: false,
+                        );
 
-                    if (croppedImage.isEmpty) return;
+                        if (croppedImage.isEmpty) return;
 
-                    setState(() {
-                      content[index] = MediaContent(
-                        type: MediaTypeValue.image,
-                        file: croppedImage,
-                        bucketPath: generateBucketPath(croppedImage),
-                        originalImage: path,
-                        animated: false,
-                      );
-                    });
-                  },
-                  icon: const Icon(
-                    Icons.crop,
-                  ),
+                        setState(() {
+                          content[index] = ImageContent(
+                            mediaFile: croppedImage,
+                            bucketPath: generateBucketPath(croppedImage),
+                            originalImage: mediaContent.originalImage,
+                          );
+                        });
+                      },
+                      icon: const Icon(
+                        Icons.crop,
+                      ),
+                    ),
+                    IconButton.filledTonal(
+                      onPressed: () async {},
+                      icon: const Icon(
+                        Icons.photo_filter,
+                      ),
+                    ),
+                  ],
                 ),
               IconButton.filledTonal(
                 color: currTheme.onError,
@@ -253,7 +254,7 @@ class _ContentMediaSelectionWidgetState
                   backgroundColor: currTheme.error,
                 ),
                 onPressed: () async {
-                  var type = content[index].type;
+                  var type = content[index].mediaType;
                   if (type == MediaTypeValue.thumbnail ||
                       type == MediaTypeValue.unknown) {
                     await VideoActions.cancelCurrentlyActiveVideoCompression();
@@ -288,7 +289,7 @@ class _ContentMediaSelectionWidgetState
     for (int i = 0; i < content.length; i++) {
       final MediaContent item = content[i];
 
-      final type = item.type;
+      final type = item.mediaType;
       final index = i;
 
       switch (type) {
@@ -296,15 +297,13 @@ class _ContentMediaSelectionWidgetState
           mediaWidgets.add(
             mediaItemWrapper(
               child: Image.file(
-                File(item.file!),
+                File(item.mediaFile),
                 fit: BoxFit.cover,
                 cacheHeight: Constants.postCacheHeight,
                 width: width,
                 height: height,
               ),
               index: index,
-              path: item.originalImage!,
-              animated: item.animated,
             ),
           );
 
@@ -313,25 +312,22 @@ class _ContentMediaSelectionWidgetState
           mediaWidgets.add(
             mediaItemWrapper(
               child: VideoPlayer(
-                path: item.file!,
+                path: item.mediaFile,
                 bucketPath: item.bucketPath,
                 // key: Key(item.bucketPath),
               ),
               index: index,
-              path: item.file!,
-              animated: true,
             ),
           );
           break;
         case MediaTypeValue.thumbnail:
           mediaWidgets.add(
             mediaItemWrapper(
-              path: item.file!,
               child: Stack(
                 children: [
                   Center(
                     child: Image.file(
-                      File(item.file!),
+                      File(item.mediaFile),
                       fit: BoxFit.cover,
                       cacheHeight: Constants.postCacheHeight,
                     ),
@@ -349,7 +345,6 @@ class _ContentMediaSelectionWidgetState
                 ],
               ),
               index: index,
-              animated: true,
             ),
           );
           break;
@@ -362,8 +357,6 @@ class _ContentMediaSelectionWidgetState
               ),
             ),
             index: index,
-            path: "",
-            animated: true,
           ));
       }
     }
@@ -412,7 +405,7 @@ class _ContentMediaSelectionWidgetState
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (context, index) {
                           final item = content[index];
-                          MediaTypeValue type = item.type;
+                          MediaTypeValue type = item.mediaType;
 
                           final diameter = Constants.width * 2;
 
@@ -427,7 +420,7 @@ class _ContentMediaSelectionWidgetState
                                 type == MediaTypeValue.image
                                     ? ClipOval(
                                         child: Image.file(
-                                          File(item.file!),
+                                          File(item.mediaFile),
                                           fit: BoxFit.cover,
                                           cacheHeight:
                                               Constants.thumbnailCacheHeight,
@@ -438,8 +431,11 @@ class _ContentMediaSelectionWidgetState
                                     : SizedBox(
                                         width: diameter,
                                         height: diameter,
-                                        child: (item.thumbnail == null ||
-                                                item.thumbnail!.isEmpty)
+                                        child: type == MediaTypeValue.unknown ||
+                                                (type == MediaTypeValue.video &&
+                                                    (item as VideoContent)
+                                                            .thumbnail ==
+                                                        null)
                                             ? Icon(
                                                 Icons.video_file,
                                                 color:
@@ -448,11 +444,22 @@ class _ContentMediaSelectionWidgetState
                                             : Stack(
                                                 children: [
                                                   Center(
-                                                    child: Image.file(
-                                                      File(item.thumbnail!),
-                                                      fit: BoxFit.cover,
-                                                      cacheHeight: Constants
-                                                          .thumbnailCacheHeight,
+                                                    child: Builder(
+                                                      builder: (context) {
+                                                        final path = type ==
+                                                                MediaTypeValue
+                                                                    .thumbnail
+                                                            ? item.mediaFile
+                                                            : (item as VideoContent)
+                                                                .thumbnail;
+
+                                                        return Image.file(
+                                                          File(path!),
+                                                          fit: BoxFit.cover,
+                                                          cacheHeight: Constants
+                                                              .thumbnailCacheHeight,
+                                                        );
+                                                      },
                                                     ),
                                                   ),
                                                   DecoratedBox(
@@ -464,9 +471,9 @@ class _ContentMediaSelectionWidgetState
                                                       ),
                                                     ),
                                                     child: Center(
-                                                      child: type ==
+                                                      child: type !=
                                                               MediaTypeValue
-                                                                  .thumbnail
+                                                                  .video
                                                           ? const LoadingWidget
                                                               .nested()
                                                           : Icon(
