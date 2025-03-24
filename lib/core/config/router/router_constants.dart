@@ -25,6 +25,7 @@ class RouterConstants {
 
   // media carousel
   static const String mediaCarousel = "media-carousel";
+  static const String imageFilter = "add-image-filter";
 
   // post
   static const String createPost = "create-post";

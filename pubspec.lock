@@ -370,6 +370,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.7"
+  exif:
+    dependency: transitive
+    description:
+      name: exif
+      sha256: a7980fdb3b7ffcd0b035e5b8a5e1eef7cadfe90ea6a4e85ebb62f87b96c7a172
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.0"
   extended_image:
     dependency: transitive
     description:
@@ -503,6 +511,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.1"
+  flutter_gpu_filters_interface:
+    dependency: transitive
+    description:
+      name: flutter_gpu_filters_interface
+      sha256: "5729d6f3c5c6034c698100ceab48ef745c7ed1c88d4250861f0fcf7bca347d0e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.18"
+  flutter_image_filters:
+    dependency: "direct main"
+    description:
+      name: flutter_image_filters
+      sha256: "9258c5775a728eb25af6e6d8f62297de54c8a6c926b8eda398869e0af7e49e90"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.25"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:

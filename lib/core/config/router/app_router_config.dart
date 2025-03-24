@@ -1,6 +1,7 @@
 import 'package:doko_react/core/config/router/router_constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
+import 'package:doko_react/core/utils/media/image-filter/image_filter_page.dart';
 import 'package:doko_react/core/utils/page/token_page.dart';
 import 'package:doko_react/core/widgets/error/error_unknown_route.dart';
 import 'package:doko_react/core/widgets/loading/loading_widget.dart';
@@ -177,6 +178,18 @@ class AppRouterConfig {
             },
           ),
         ],
+      ),
+      // add filter to image
+      GoRoute(
+        name: RouterConstants.imageFilter,
+        path: "/add-image-filter/:image",
+        builder: (context, state) {
+          final image = state.pathParameters["image"]!;
+
+          return ImageFilterPage(
+            image: image,
+          );
+        },
       ),
       // incomplete-profile routes
       GoRoute(

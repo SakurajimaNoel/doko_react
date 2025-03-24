@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/entity/storage-resource/storage_resource.dart';
 import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
+import 'package:doko_react/core/utils/media/image-filter/image_filter.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/widgets/image-picker/image_picker_widget.dart';
 import 'package:doko_react/core/widgets/loading/loading_widget.dart';
@@ -74,11 +75,19 @@ class _ProfilePictureSelectionState extends State<ProfilePictureSelection> {
       selectedImage,
       context: context,
       location: ImageLocation.profile,
-      compress: true,
+      compress: false,
     );
 
     if (croppedImage.isEmpty) return;
-    selectProfilePicture(croppedImage);
+    if (!mounted) return;
+
+    String imageWithFilter = await addImageFilter(
+      croppedImage,
+      context: context,
+    );
+
+    if (imageWithFilter.isEmpty) return;
+    selectProfilePicture(imageWithFilter);
   }
 
   @override
