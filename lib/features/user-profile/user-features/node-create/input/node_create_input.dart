@@ -13,6 +13,7 @@ class ImageContent implements MediaContent {
     required this.mediaFile,
     required this.bucketPath,
     required this.originalImage,
+    required this.croppedImage,
     this.animated = false,
   }) : mediaType = MediaTypeValue.image;
 
@@ -26,6 +27,7 @@ class ImageContent implements MediaContent {
   final String bucketPath;
 
   final String originalImage;
+  final String croppedImage;
 
   @override
   final bool animated;

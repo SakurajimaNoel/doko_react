@@ -173,10 +173,12 @@ class _ImageFilterPageState extends State<ImageFilterPage> {
                                             configProvider.updateConfiguration(
                                                 _filterConfigurations[i], i);
                                           },
-                                          child: ImageShaderPreview(
-                                            configuration:
-                                                _filterConfigurations[i],
-                                            texture: texture,
+                                          child: Center(
+                                            child: ImageShaderPreview(
+                                              configuration:
+                                                  _filterConfigurations[i],
+                                              texture: texture,
+                                            ),
                                           ),
                                         ),
                                         Builder(

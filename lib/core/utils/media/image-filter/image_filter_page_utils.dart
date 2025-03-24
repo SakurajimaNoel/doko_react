@@ -26,6 +26,19 @@ class ImageWithFilterInput {
   final RootIsolateToken token;
 }
 
+String getFileSizeString(int bytes, {int decimals = 2}) {
+  const suffixes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  int i = 0;
+  double size = bytes.toDouble();
+
+  while (size >= 1024 && i < suffixes.length - 1) {
+    size /= 1024;
+    i++;
+  }
+
+  return '${size.toStringAsFixed(decimals)} ${suffixes[i]}';
+}
+
 Future<String> getImageWithFilter(ImageWithFilterInput details) async {
   BackgroundIsolateBinaryMessenger.ensureInitialized(details.token);
 
@@ -39,9 +52,14 @@ Future<String> getImageWithFilter(ImageWithFilterInput details) async {
   final directory = await getTemporaryDirectory();
   final output = File('${directory.path}/${generateUniqueString()}.jpeg');
 
-  img.JpegEncoder encoder = img.JpegEncoder();
+  img.JpegEncoder encoder = img.JpegEncoder(
+    quality: 75,
+  );
   final data = encoder.encode(persistedImage);
   await output.writeAsBytes(data);
+
+  // int sizeInBytes = await output.length();
+  // print('File size: ${getFileSizeString(sizeInBytes)}');
 
   return output.path;
 }

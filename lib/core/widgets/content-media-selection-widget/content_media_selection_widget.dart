@@ -4,6 +4,7 @@ import 'package:doko_react/core/constants/constants.dart';
 import 'package:doko_react/core/global/bloc/user/user_bloc.dart';
 import 'package:doko_react/core/global/entity/node-type/doki_node_type.dart';
 import 'package:doko_react/core/utils/media/image-cropper/image_cropper_helper.dart';
+import 'package:doko_react/core/utils/media/image-filter/image_filter.dart';
 import 'package:doko_react/core/utils/media/meta-data/media_meta_data_helper.dart';
 import 'package:doko_react/core/utils/media/video/video.dart';
 import 'package:doko_react/core/utils/notifications/notifications.dart';
@@ -147,6 +148,7 @@ class _ContentMediaSelectionWidgetState
           bucketPath: generateBucketPath(item),
           originalImage: item,
           animated: animated,
+          croppedImage: item,
         ));
       });
       widget.onMediaChange(content);
@@ -233,6 +235,7 @@ class _ContentMediaSelectionWidgetState
                             mediaFile: croppedImage,
                             bucketPath: generateBucketPath(croppedImage),
                             originalImage: mediaContent.originalImage,
+                            croppedImage: croppedImage,
                           );
                         });
                       },
@@ -241,7 +244,27 @@ class _ContentMediaSelectionWidgetState
                       ),
                     ),
                     IconButton.filledTonal(
-                      onPressed: () async {},
+                      onPressed: () async {
+                        String imageWithFilter = await addImageFilter(
+                          (mediaContent as ImageContent).croppedImage,
+                          context: context,
+                          compress: false,
+                        );
+
+                        if (imageWithFilter.isEmpty ||
+                            imageWithFilter == mediaContent.mediaFile) {
+                          return;
+                        }
+
+                        setState(() {
+                          content[index] = ImageContent(
+                            mediaFile: imageWithFilter,
+                            bucketPath: generateBucketPath(imageWithFilter),
+                            originalImage: mediaContent.originalImage,
+                            croppedImage: mediaContent.croppedImage,
+                          );
+                        });
+                      },
                       icon: const Icon(
                         Icons.photo_filter,
                       ),

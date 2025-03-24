@@ -7,6 +7,10 @@ import 'package:go_router/go_router.dart';
 Future<String> addImageFilter(
   String path, {
   required BuildContext context,
+
+  /// compress is required when user selects none filter
+  /// no need to recompress the same image
+  required bool compress,
 }) async {
   String? imageWithFilter = await context.pushNamed(
     RouterConstants.imageFilter,
@@ -18,8 +22,8 @@ Future<String> addImageFilter(
   if (imageWithFilter == null) return "";
 
   if (imageWithFilter.isEmpty) {
-    return compute(compressImage, path);
+    return compress ? compute(compressImage, path) : path;
   }
 
-  return compute(compressImage, imageWithFilter);
+  return compress ? compute(compressImage, imageWithFilter) : imageWithFilter;
 }

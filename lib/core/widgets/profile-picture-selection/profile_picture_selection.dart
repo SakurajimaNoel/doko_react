@@ -84,6 +84,7 @@ class _ProfilePictureSelectionState extends State<ProfilePictureSelection> {
     String imageWithFilter = await addImageFilter(
       croppedImage,
       context: context,
+      compress: true,
     );
 
     if (imageWithFilter.isEmpty) return;
